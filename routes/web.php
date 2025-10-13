@@ -16,6 +16,19 @@ Route::view('dashboard', 'dashboard')
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::view('proposals', 'proposals.index')->name('proposals.index');
+
+    Route::view('laporan-penelitian', 'reports.research')
+        ->middleware(['role:admin lppm|rektor'])
+        ->name('reports.research');
+
+    Route::view('users', 'users.index')
+        ->middleware(['role:admin lppm'])
+        ->name('users.index');
+
+    // Example page for page header component
+    Route::view('examples/page-header', 'examples.page-header-demo')->name('examples.page-header');
+
     Route::redirect('settings', 'settings/profile');
 
     Route::get('settings/profile', Profile::class)->name('settings.profile');

@@ -188,7 +188,10 @@
                         <a href="#" class="dropdown-item">Feedback</a>
                         <div class="dropdown-divider"></div>
                         <a href="./settings.html" class="dropdown-item">Settings</a>
-                        <a href="./sign-in.html" class="dropdown-item">Logout</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-100 text-start dropdown-item">Logout</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -214,7 +217,7 @@
                                                 <a class="nav-link dropdown-toggle"
                                                     href="{{ $menuItem['toggle_href'] ?? '#' }}" data-bs-toggle="dropdown"
                                                     data-bs-auto-close="{{ $menuItem['dropdown']['auto_close'] ?? 'outside' }}"
-                                                    role="button" aria-expanded="false">
+                                                    role="button" aria-expanded="false" wire:navigate>
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
                                                         @if (!empty($menuItem['icon']))
                                                             @include('components.layouts.partials.menu.icon', [
@@ -233,7 +236,7 @@
                                             </li>
                                         @else
                                             <li class="nav-item{{ $isActive ? ' active' : '' }}">
-                                                <a class="nav-link" href="{{ $menuItem['href'] ?? '#' }}">
+                                                <a class="nav-link" href="{{ $menuItem['href'] ?? '#' }}" wire:navigate>
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
                                                         @if (!empty($menuItem['icon']))
                                                             @include('components.layouts.partials.menu.icon', [

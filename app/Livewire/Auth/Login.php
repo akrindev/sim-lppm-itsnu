@@ -42,7 +42,7 @@ class Login extends Component
                 'login.remember' => $this->remember,
             ]);
 
-            $this->redirect(route('two-factor.login'), navigate: true);
+            $this->redirect(route('two-factor.login'), navigate: false);
 
             return;
         }
@@ -52,7 +52,7 @@ class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
     }
 
     /**

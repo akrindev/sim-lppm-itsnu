@@ -1,22 +1,109 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        @include('partials.head')
-    </head>
-    <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div class="flex w-full max-w-sm flex-col gap-2">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
-                    <span class="flex h-9 w-9 mb-1 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
-                    </span>
-                    <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
-                </a>
-                <div class="flex flex-col gap-6">
-                    {{ $slot }}
-                </div>
-            </div>
-        </div>
-        @fluxScripts
-    </body>
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.4.0
+* @link https://tabler.io
+* Copyright 2018-2025 The Tabler Authors
+* Copyright 2018-2025 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Sign in</title>
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="/dist/css/tabler.min.css?1760227346" rel="stylesheet" />
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <!-- BEGIN PLUGINS STYLES -->
+    <link href="/dist/css/tabler-flags.min.css?1760227346" rel="stylesheet" />
+    <link href="/dist/css/tabler-socials.min.css?1760227346" rel="stylesheet" />
+    <link href="/dist/css/tabler-payments.min.css?1760227346" rel="stylesheet" />
+    <link href="/dist/css/tabler-vendors.min.css?1760227346" rel="stylesheet" />
+    <link href="/dist/css/tabler-marketing.min.css?1760227346" rel="stylesheet" />
+    <link href="/dist/css/tabler-themes.min.css?1760227346" rel="stylesheet" />
+    <!-- END PLUGINS STYLES -->
+    <!-- BEGIN DEMO STYLES -->
+    {{-- <link href="./preview/css/demo.css?1760227346" rel="stylesheet" /> --}}
+    <!-- END DEMO STYLES -->
+    <!-- BEGIN CUSTOM FONT -->
+    <style>
+        @import url("https://rsms.me/inter/inter.css");
+    </style>
+    <!-- END CUSTOM FONT -->
+</head>
+
+<body>
+    {{ $slot }}
+    <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
+    <script src="/dist/js/tabler.min.js?1760227346" defer></script>
+    <!-- END GLOBAL MANDATORY SCRIPTS -->
+    <!-- BEGIN DEMO SCRIPTS -->
+    {{-- <script src="./preview/js/demo.min.js?1760227346" defer></script> --}}
+    <!-- END DEMO SCRIPTS -->
+    <!-- BEGIN PAGE SCRIPTS -->
+    <script>
+        function initTablerSettings() {
+            var themeConfig = {
+                theme: "light",
+                "theme-base": "gray",
+                "theme-font": "sans-serif",
+                "theme-primary": "green",
+                "theme-radius": "1",
+            };
+            var url = new URL(window.location);
+            var form = document.getElementById("offcanvasSettings");
+            var resetButton = document.getElementById("reset-changes");
+            var checkItems = function() {
+                if (!form) return;
+                for (var key in themeConfig) {
+                    var value = window.localStorage["tabler-" + key] || themeConfig[key];
+                    if (!!value) {
+                        var radios = form.querySelectorAll(`[name="${key}"]`);
+                        if (!!radios) {
+                            radios.forEach((radio) => {
+                                radio.checked = radio.value === value;
+                            });
+                        }
+                    }
+                }
+            };
+            if (form) {
+                form.addEventListener("change", function(event) {
+                    var target = event.target,
+                        name = target.name,
+                        value = target.value;
+                    for (var key in themeConfig) {
+                        if (name === key) {
+                            document.documentElement.setAttribute("data-bs-" + key, value);
+                            window.localStorage.setItem("tabler-" + key, value);
+                            url.searchParams.set(key, value);
+                        }
+                    }
+                    window.history.pushState({}, "", url);
+                });
+            }
+            if (resetButton) {
+                resetButton.addEventListener("click", function() {
+                    for (var key in themeConfig) {
+                        var value = themeConfig[key];
+                        document.documentElement.removeAttribute("data-bs-" + key);
+                        window.localStorage.removeItem("tabler-" + key);
+                        url.searchParams.delete(key);
+                    }
+                    checkItems();
+                    window.history.pushState({}, "", url);
+                });
+            }
+            checkItems();
+        }
+
+        document.addEventListener("livewire:load", initTablerSettings);
+        document.addEventListener("livewire:navigated", initTablerSettings);
+    </script>
+    <!-- END PAGE SCRIPTS -->
+</body>
+
 </html>
