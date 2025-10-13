@@ -15,18 +15,18 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Sign in</title>
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    <link href="/dist/css/tabler.min.css?1760227346" rel="stylesheet" />
+    <link href="/dist/css/tabler.min.css" rel="stylesheet" />
     <!-- END GLOBAL MANDATORY STYLES -->
     <!-- BEGIN PLUGINS STYLES -->
-    <link href="/dist/css/tabler-flags.min.css?1760227346" rel="stylesheet" />
-    <link href="/dist/css/tabler-socials.min.css?1760227346" rel="stylesheet" />
-    <link href="/dist/css/tabler-payments.min.css?1760227346" rel="stylesheet" />
-    <link href="/dist/css/tabler-vendors.min.css?1760227346" rel="stylesheet" />
-    <link href="/dist/css/tabler-marketing.min.css?1760227346" rel="stylesheet" />
-    <link href="/dist/css/tabler-themes.min.css?1760227346" rel="stylesheet" />
+    <link href="/dist/css/tabler-flags.min.css" rel="stylesheet" />
+    <link href="/dist/css/tabler-socials.min.css" rel="stylesheet" />
+    <link href="/dist/css/tabler-payments.min.css" rel="stylesheet" />
+    <link href="/dist/css/tabler-vendors.min.css" rel="stylesheet" />
+    <link href="/dist/css/tabler-marketing.min.css" rel="stylesheet" />
+    <link href="/dist/css/tabler-themes.min.css" rel="stylesheet" />
     <!-- END PLUGINS STYLES -->
     <!-- BEGIN DEMO STYLES -->
-    {{-- <link href="./preview/css/demo.css?1760227346" rel="stylesheet" /> --}}
+    {{-- <link href="./preview/css/demo.css" rel="stylesheet" /> --}}
     <!-- END DEMO STYLES -->
     <!-- BEGIN CUSTOM FONT -->
     <style>
@@ -38,10 +38,10 @@
 <body>
     {{ $slot }}
     <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
-    <script src="/dist/js/tabler.min.js?1760227346" defer></script>
+    <script src="/dist/js/tabler.min.js" defer></script>
     <!-- END GLOBAL MANDATORY SCRIPTS -->
     <!-- BEGIN DEMO SCRIPTS -->
-    {{-- <script src="./preview/js/demo.min.js?1760227346" defer></script> --}}
+    {{-- <script src="./preview/js/demo.min.js" defer></script> --}}
     <!-- END DEMO SCRIPTS -->
     <!-- BEGIN PAGE SCRIPTS -->
     <script>
