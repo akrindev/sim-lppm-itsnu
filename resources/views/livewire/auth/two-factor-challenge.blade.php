@@ -1,99 +1,93 @@
 <x-layouts.auth>
-    <div class="flex flex-col gap-6">
-        <div
-            class="relative w-full h-auto"
-            x-cloak
-            x-data="{
-                showRecoveryInput: @js($errors->has('recovery_code')),
-                code: '',
-                recovery_code: '',
-                toggleInput() {
-                    this.showRecoveryInput = !this.showRecoveryInput;
-
-                    this.code = '';
-                    this.recovery_code = '';
-
-                    $dispatch('clear-2fa-auth-code');
-
-                    $nextTick(() => {
-                        this.showRecoveryInput
-                            ? this.$refs.recovery_code?.focus()
-                            : $dispatch('focus-2fa-auth-code');
-                    });
-                },
-            }"
-        >
-            <div x-show="!showRecoveryInput">
-                <x-auth-header
-                    :title="__('Kode Autentikasi')"
-                    :description="__('Masukkan kode autentikasi yang disediakan oleh aplikasi autentikator Anda.')"
-                />
-            </div>
-
-            <div x-show="showRecoveryInput">
-                <x-auth-header
-                    :title="__('Kode Pemulihan')"
-                    :description="__('Silakan konfirmasi akses ke akun Anda dengan memasukkan salah satu kode pemulihan darurat Anda.')"
-                />
-            </div>
-
-            <form method="POST" action="{{ route('two-factor.login.store') }}">
-                @csrf
-
-                <div class="space-y-5 text-center">
+    <div class="py-4 container-tight">
+        <div class="mb-4 text-center">
+            <a href="." class="navbar-brand navbar-brand-autodark">
+                <img src="/logo.png" alt="Logo" width="100" height="100">
+            </a>
+        </div>
+        <div class="card card-md">
+            <div class="card-body">
+                <div
+                    x-cloak
+                    x-data="{
+                        showRecoveryInput: @js($errors->has('recovery_code')),
+                        code: '',
+                        recovery_code: '',
+                        toggleInput() {
+                            this.showRecoveryInput = !this.showRecoveryInput;
+                            this.code = '';
+                            this.recovery_code = '';
+                            $dispatch('clear-2fa-auth-code');
+                            $nextTick(() => {
+                                this.showRecoveryInput
+                                    ? this.$refs.recovery_code?.focus()
+                                    : $dispatch('focus-2fa-auth-code');
+                            });
+                        },
+                    }"
+                >
                     <div x-show="!showRecoveryInput">
-                        <div class="flex justify-center items-center my-5">
-                            <x-input-otp
-                                name="code"
-                                digits="6"
-                                autocomplete="one-time-code"
-                                x-model="code"
-                            />
-                        </div>
-
-                        @error('code')
-                            <flux:text color="red">
-                                {{ $message }}
-                            </flux:text>
-                        @enderror
+                        <h2 class="mb-4 text-center h2">{{ __('Kode Autentikasi') }}</h2>
+                        <p class="mb-4 text-secondary text-center">{{ __('Masukkan kode autentikasi yang disediakan oleh aplikasi autentikator Anda.') }}</p>
                     </div>
 
                     <div x-show="showRecoveryInput">
-                        <div class="my-5">
-                            <flux:input
-                                type="text"
-                                name="recovery_code"
-                                x-ref="recovery_code"
-                                x-bind:required="showRecoveryInput"
-                                autocomplete="one-time-code"
-                                x-model="recovery_code"
-                            />
+                        <h2 class="mb-4 text-center h2">{{ __('Kode Pemulihan') }}</h2>
+                        <p class="mb-4 text-secondary text-center">{{ __('Silakan konfirmasi akses ke akun Anda dengan memasukkan salah satu kode pemulihan darurat Anda.') }}</p>
+                    </div>
+
+                    <form method="POST" action="{{ route('two-factor.login.store') }}">
+                        @csrf
+
+                        <div x-show="!showRecoveryInput">
+                            <div class="d-flex justify-content-center mb-3">
+                                <x-input-otp
+                                    name="code"
+                                    digits="6"
+                                    autocomplete="one-time-code"
+                                    x-model="code"
+                                />
+                            </div>
+
+                            @error('code')
+                                <div class="d-block mb-3 text-center invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        @error('recovery_code')
-                            <flux:text color="red">
-                                {{ $message }}
-                            </flux:text>
-                        @enderror
-                    </div>
+                        <div x-show="showRecoveryInput">
+                            <div class="mb-3">
+                                <input
+                                    type="text"
+                                    name="recovery_code"
+                                    class="form-control"
+                                    x-ref="recovery_code"
+                                    x-bind:required="showRecoveryInput"
+                                    autocomplete="one-time-code"
+                                    x-model="recovery_code"
+                                />
+                            </div>
 
-                    <flux:button
-                        variant="primary"
-                        type="submit"
-                        class="w-full"
-                    >
-                        {{ __('Lanjutkan') }}
-                    </flux:button>
-                </div>
+                            @error('recovery_code')
+                                <div class="d-block mb-3 invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                <div class="space-x-0.5 mt-5 text-sm text-center leading-5">
-                    <span class="opacity-50">{{ __('atau Anda dapat') }}</span>
-                    <div class="inline opacity-80 font-medium underline cursor-pointer">
-                        <span x-show="!showRecoveryInput" @click="toggleInput()">{{ __('masuk menggunakan kode pemulihan') }}</span>
-                        <span x-show="showRecoveryInput" @click="toggleInput()">{{ __('masuk menggunakan kode autentikasi') }}</span>
-                    </div>
+                        <div class="form-footer">
+                            <button type="submit" class="w-100 btn btn-primary">
+                                {{ __('Lanjutkan') }}
+                            </button>
+                        </div>
+
+                        <div class="mt-3 text-secondary text-center">
+                            <span>{{ __('atau Anda dapat') }}</span>
+                            <div class="d-inline">
+                                <a href="#" class="link-primary" x-show="!showRecoveryInput" @click.prevent="toggleInput()">{{ __('masuk menggunakan kode pemulihan') }}</a>
+                                <a href="#" class="link-primary" x-show="showRecoveryInput" @click.prevent="toggleInput()">{{ __('masuk menggunakan kode autentikasi') }}</a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </x-layouts.auth>

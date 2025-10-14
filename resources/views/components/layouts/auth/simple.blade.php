@@ -35,7 +35,9 @@
     <!-- END CUSTOM FONT -->
 </head>
 
-<body>
+<body><!-- BEGIN GLOBAL THEME SCRIPT -->
+<script src="/dist/js/tabler-theme.min.js"></script>
+<!-- END GLOBAL THEME SCRIPT -->
     {{ $slot }}
     <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
     <script src="/dist/js/tabler.min.js" defer></script>
@@ -73,6 +75,11 @@
                 "theme-primary": "green",
                 "theme-radius": "1",
             };
+
+            document.documentElement.setAttribute("data-bs-theme-primary", "green");
+            window.localStorage.setItem("tabler-theme-primary", "green");
+
+
             var url = new URL(window.location);
             var form = document.getElementById("offcanvasSettings");
             var resetButton = document.getElementById("reset-changes");
@@ -119,12 +126,6 @@
             }
             checkItems();
         }
-
-        // Initialize on load
-        document.addEventListener("DOMContentLoaded", function() {
-            initTablerComponents();
-            initTablerSettings();
-        });
 
         // Reinitialize after Livewire navigation
         document.addEventListener("livewire:navigated", function() {

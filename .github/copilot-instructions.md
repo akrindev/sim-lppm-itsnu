@@ -12,7 +12,6 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
-- livewire/flux (FLUXUI_FREE) - v2
 - livewire/livewire (LIVEWIRE) - v3
 - livewire/volt (VOLT) - v1
 - laravel/mcp (MCP) - v0
@@ -21,7 +20,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/telescope (TELESCOPE) - v5
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
-- tailwindcss (TAILWINDCSS) - v4
+- bootstrap/tabler (TABLER) - v1.4.0
 
 
 ## Conventions
@@ -183,28 +182,65 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing conventions from other models.
 
 
-=== fluxui-free/core rules ===
+=== bootstrap-tabler/core rules ===
 
-## Flux UI Free
+## Bootstrap Tabler
 
-- This project is using the free edition of Flux UI. It has full access to the free components and variants, but does not have access to the Pro components.
-- Flux UI is a component library for Livewire. Flux is a robust, hand-crafted, UI component library for your Livewire applications. It's built using Tailwind CSS and provides a set of components that are easy to use and customize.
-- You should use Flux UI components when available.
-- Fallback to standard Blade components if Flux is unavailable.
-- If available, use Laravel Boost's `search-docs` tool to get the exact documentation and code snippets available for this project.
-- Flux UI components look like this:
+- This project uses Bootstrap Tabler v1.4.0 for UI components and styling.
+- Tabler is a premium and open-source dashboard template with responsive and high-quality UI built on Bootstrap 5.
+- Use Tabler's built-in components and utilities when available.
+- All Tabler CSS and JavaScript files are located in `/dist/` directory.
+- Follow Bootstrap 5 conventions for components and utilities.
 
-<code-snippet name="Flux UI Component Usage Example" lang="blade">
-    <flux:button variant="primary"/>
+### Common Components
+
+<code-snippet name="Tabler Form Input Example" lang="blade">
+<div class="mb-3">
+    <label class="form-label">Email address</label>
+    <input type="email" class="form-control" placeholder="your@email.com" />
+</div>
 </code-snippet>
 
+<code-snippet name="Tabler Button Example" lang="blade">
+<button type="submit" class="btn btn-primary">Submit</button>
+<button type="button" class="btn btn-secondary">Cancel</button>
+</code-snippet>
 
-### Available Components
-This is correct as of Boost installation, but there may be additional components within the codebase.
+<code-snippet name="Tabler Card Example" lang="blade">
+<div class="card card-md">
+    <div class="card-body">
+        <h2 class="mb-4 text-center h2">Card Title</h2>
+        <p class="text-secondary">Card content goes here.</p>
+    </div>
+</div>
+</code-snippet>
 
-<available-flux-components>
-avatar, badge, brand, breadcrumbs, button, callout, checkbox, dropdown, field, heading, icon, input, modal, navbar, profile, radio, select, separator, switch, text, textarea, tooltip
-</available-flux-components>
+<code-snippet name="Tabler Password Input with Toggle" lang="blade">
+<div class="input-group input-group-flat" x-data="{ showPassword: false }">
+    <input x-bind:type="showPassword ? 'text' : 'password'" 
+        class="form-control" placeholder="Password" />
+    <span class="input-group-text">
+        <button type="button" class="bg-transparent p-0 border-0 link-secondary"
+            x-on:click="showPassword = ! showPassword"
+            x-bind:title="showPassword ? 'Hide password' : 'Show password'"
+            data-bs-toggle="tooltip">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                class="icon">
+                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+            </svg>
+        </button>
+    </span>
+</div>
+</code-snippet>
+
+### Available Bootstrap/Tabler Utilities
+- Use Bootstrap 5 utility classes: `mb-3`, `text-center`, `w-100`, `d-flex`, `justify-content-center`, etc.
+- Use Tabler-specific classes: `card-md`, `form-footer`, `container-tight`, `page-center`, etc.
+- Icons use Tabler Icons via SVG or the `icon` class
+- Forms use Bootstrap form classes: `form-label`, `form-control`, `form-check`, `form-footer`, `invalid-feedback`
 
 
 === livewire/core rules ===
@@ -385,18 +421,20 @@ $delete = fn(Product $product) => $product->delete();
 <!-- HTML / UI Here -->
 </code-snippet>
 
-<code-snippet name="Real-Time Search With Volt" lang="php">
-    <flux:input
+<code-snippet name="Real-Time Search With Volt" lang="blade">
+    <input 
+        type="text" 
+        class="form-control" 
         wire:model.live.debounce.300ms="search"
         placeholder="Search..."
     />
 </code-snippet>
 
-<code-snippet name="Loading States With Volt" lang="php">
-    <flux:button wire:click="save" wire:loading.attr="disabled">
+<code-snippet name="Loading States With Volt" lang="blade">
+    <button type="button" class="btn btn-primary" wire:click="save" wire:loading.attr="disabled">
         <span wire:loading.remove>Save</span>
         <span wire:loading>Saving...</span>
-    </flux:button>
+    </button>
 </code-snippet>
 
 
@@ -505,66 +543,6 @@ $pages = visit(['/', '/about', '/contact']);
 
 $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 </code-snippet>
-
-
-=== tailwindcss/core rules ===
-
-## Tailwind Core
-
-- Use Tailwind CSS classes to style HTML, check and use existing tailwind conventions within the project before writing your own.
-- Offer to extract repeated patterns into components that match the project's conventions (i.e. Blade, JSX, Vue, etc..)
-- Think through class placement, order, priority, and defaults - remove redundant classes, add classes to parent or child carefully to limit repetition, group elements logically
-- You can use the `search-docs` tool to get exact examples from the official documentation when needed.
-
-### Spacing
-- When listing items, use gap utilities for spacing, don't use margins.
-
-    <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
-        <div class="flex gap-8">
-            <div>Superior</div>
-            <div>Michigan</div>
-            <div>Erie</div>
-        </div>
-    </code-snippet>
-
-
-### Dark Mode
-- If existing pages and components support dark mode, new pages and components must support dark mode in a similar way, typically using `dark:`.
-
-
-=== tailwindcss/v4 rules ===
-
-## Tailwind 4
-
-- Always use Tailwind CSS v4 - do not use the deprecated utilities.
-- `corePlugins` is not supported in Tailwind v4.
-- In Tailwind v4, you import Tailwind using a regular CSS `@import` statement, not using the `@tailwind` directives used in v3:
-
-<code-snippet name="Tailwind v4 Import Tailwind Diff" lang="diff">
-   - @tailwind base;
-   - @tailwind components;
-   - @tailwind utilities;
-   + @import "tailwindcss";
-</code-snippet>
-
-
-### Replaced Utilities
-- Tailwind v4 removed deprecated utilities. Do not use the deprecated option - use the replacement.
-- Opacity values are still numeric.
-
-| Deprecated |	Replacement |
-|------------+--------------|
-| bg-opacity-* | bg-black/* |
-| text-opacity-* | text-black/* |
-| border-opacity-* | border-black/* |
-| divide-opacity-* | divide-black/* |
-| ring-opacity-* | ring-black/* |
-| placeholder-opacity-* | placeholder-black/* |
-| flex-shrink-* | shrink-* |
-| flex-grow-* | grow-* |
-| overflow-ellipsis | text-ellipsis |
-| decoration-slice | box-decoration-slice |
-| decoration-clone | box-decoration-clone |
 
 
 === tests rules ===
