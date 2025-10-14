@@ -45,6 +45,26 @@
     <!-- END DEMO SCRIPTS -->
     <!-- BEGIN PAGE SCRIPTS -->
     <script>
+        function initTablerComponents() {
+            // Reinitialize Bootstrap dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
+            dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+
+            // Reinitialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Reinitialize Bootstrap popovers
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+        }
+
         function initTablerSettings() {
             var themeConfig = {
                 theme: "light",
@@ -100,8 +120,17 @@
             checkItems();
         }
 
-        document.addEventListener("livewire:load", initTablerSettings);
-        document.addEventListener("livewire:navigated", initTablerSettings);
+        // Initialize on load
+        document.addEventListener("DOMContentLoaded", function() {
+            initTablerComponents();
+            initTablerSettings();
+        });
+
+        // Reinitialize after Livewire navigation
+        document.addEventListener("livewire:navigated", function() {
+            initTablerComponents();
+            initTablerSettings();
+        });
     </script>
     <!-- END PAGE SCRIPTS -->
 </body>

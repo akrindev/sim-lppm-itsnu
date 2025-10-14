@@ -2,18 +2,18 @@
     @include('partials.settings-heading')
 
     <x-settings.layout
-        :heading="__('Two Factor Authentication')"
-        :subheading="__('Manage your two-factor authentication settings')"
+        :heading="__('Autentikasi Dua Faktor')"
+        :subheading="__('Kelola pengaturan autentikasi dua faktor Anda')"
     >
-        <div class="flex flex-col w-full mx-auto space-y-6 text-sm" wire:cloak>
+        <div class="flex flex-col space-y-6 mx-auto w-full text-sm" wire:cloak>
             @if ($twoFactorEnabled)
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
-                        <flux:badge color="green">{{ __('Enabled') }}</flux:badge>
+                        <flux:badge color="green">{{ __('Diaktifkan') }}</flux:badge>
                     </div>
 
                     <flux:text>
-                        {{ __('With two-factor authentication enabled, you will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.') }}
+                        {{ __('Dengan autentikasi dua faktor diaktifkan, Anda akan diminta memasukkan pin acak yang aman saat login, yang dapat Anda ambil dari aplikasi yang mendukung TOTP di ponsel Anda.') }}
                     </flux:text>
 
                     <livewire:settings.two-factor.recovery-codes :$requiresConfirmation/>
@@ -25,18 +25,18 @@
                             icon:variant="outline"
                             wire:click="disable"
                         >
-                            {{ __('Disable 2FA') }}
+                            {{ __('Nonaktifkan 2FA') }}
                         </flux:button>
                     </div>
                 </div>
             @else
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
-                        <flux:badge color="red">{{ __('Disabled') }}</flux:badge>
+                        <flux:badge color="red">{{ __('Dinonaktifkan') }}</flux:badge>
                     </div>
 
                     <flux:text variant="subtle">
-                        {{ __('When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.') }}
+                        {{ __('Saat Anda mengaktifkan autentikasi dua faktor, Anda akan diminta memasukkan pin yang aman saat login. Pin ini dapat diambil dari aplikasi yang mendukung TOTP di ponsel Anda.') }}
                     </flux:text>
 
                     <flux:button
@@ -45,7 +45,7 @@
                         icon:variant="outline"
                         wire:click="enable"
                     >
-                        {{ __('Enable 2FA') }}
+                        {{ __('Aktifkan 2FA') }}
                     </flux:button>
                 </div>
             @endif
@@ -54,27 +54,27 @@
 
     <flux:modal
         name="two-factor-setup-modal"
-        class="max-w-md md:min-w-md"
+        class="md:min-w-md max-w-md"
         @close="closeModal"
         wire:model="showModal"
     >
         <div class="space-y-6">
             <div class="flex flex-col items-center space-y-4">
-                <div class="p-0.5 w-auto rounded-full border border-stone-100 dark:border-stone-600 bg-white dark:bg-stone-800 shadow-sm">
-                    <div class="p-2.5 rounded-full border border-stone-200 dark:border-stone-600 overflow-hidden bg-stone-100 dark:bg-stone-200 relative">
-                        <div class="flex items-stretch absolute inset-0 w-full h-full divide-x [&>div]:flex-1 divide-stone-200 dark:divide-stone-300 justify-around opacity-50">
+                <div class="bg-white dark:bg-stone-800 shadow-sm p-0.5 border border-stone-100 dark:border-stone-600 rounded-full w-auto">
+                    <div class="relative bg-stone-100 dark:bg-stone-200 p-2.5 border border-stone-200 dark:border-stone-600 rounded-full overflow-hidden">
+                        <div class="absolute inset-0 flex [&>div]:flex-1 justify-around items-stretch opacity-50 divide-x divide-stone-200 dark:divide-stone-300 w-full h-full">
                             @for ($i = 1; $i <= 5; $i++)
                                 <div></div>
                             @endfor
                         </div>
 
-                        <div class="flex flex-col items-stretch absolute w-full h-full divide-y [&>div]:flex-1 inset-0 divide-stone-200 dark:divide-stone-300 justify-around opacity-50">
+                        <div class="absolute inset-0 flex flex-col [&>div]:flex-1 justify-around items-stretch opacity-50 divide-y divide-stone-200 dark:divide-stone-300 w-full h-full">
                             @for ($i = 1; $i <= 5; $i++)
                                 <div></div>
                             @endfor
                         </div>
 
-                        <flux:icon.qr-code class="relative z-20 dark:text-accent-foreground"/>
+                        <flux:icon.qr-code class="z-20 relative dark:text-accent-foreground"/>
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@
                             class="flex-1"
                             wire:click="resetVerification"
                         >
-                            {{ __('Back') }}
+                            {{ __('Kembali') }}
                         </flux:button>
 
                         <flux:button
@@ -115,7 +115,7 @@
                             wire:click="confirmTwoFactor"
                             x-bind:disabled="$wire.code.length < 6"
                         >
-                            {{ __('Confirm') }}
+                            {{ __('Konfirmasi') }}
                         </flux:button>
                     </div>
                 </div>
@@ -125,13 +125,13 @@
                 @enderror
 
                 <div class="flex justify-center">
-                    <div class="relative w-64 overflow-hidden border rounded-lg border-stone-200 dark:border-stone-700 aspect-square">
+                    <div class="relative border border-stone-200 dark:border-stone-700 rounded-lg w-64 aspect-square overflow-hidden">
                         @empty($qrCodeSvg)
-                            <div class="absolute inset-0 flex items-center justify-center bg-white dark:bg-stone-700 animate-pulse">
+                            <div class="absolute inset-0 flex justify-center items-center bg-white dark:bg-stone-700 animate-pulse">
                                 <flux:icon.loading/>
                             </div>
                         @else
-                            <div class="flex items-center justify-center h-full p-4">
+                            <div class="flex justify-center items-center p-4 h-full">
                                 {!! $qrCodeSvg !!}
                             </div>
                         @endempty
@@ -150,10 +150,10 @@
                 </div>
 
                 <div class="space-y-4">
-                    <div class="relative flex items-center justify-center w-full">
-                        <div class="absolute inset-0 w-full h-px top-1/2 bg-stone-200 dark:bg-stone-600"></div>
-                        <span class="relative px-2 text-sm bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400">
-                            {{ __('or, enter the code manually') }}
+                    <div class="relative flex justify-center items-center w-full">
+                        <div class="top-1/2 absolute inset-0 bg-stone-200 dark:bg-stone-600 w-full h-px"></div>
+                        <span class="relative bg-white dark:bg-stone-800 px-2 text-stone-600 dark:text-stone-400 text-sm">
+                            {{ __('atau, masukkan kode secara manual') }}
                         </span>
                     </div>
 
@@ -172,9 +172,9 @@
                             }
                         }"
                     >
-                        <div class="flex items-stretch w-full border rounded-xl dark:border-stone-700">
+                        <div class="flex items-stretch border dark:border-stone-700 rounded-xl w-full">
                             @empty($manualSetupKey)
-                                <div class="flex items-center justify-center w-full p-3 bg-stone-100 dark:bg-stone-700">
+                                <div class="flex justify-center items-center bg-stone-100 dark:bg-stone-700 p-3 w-full">
                                     <flux:icon.loading variant="mini"/>
                                 </div>
                             @else
@@ -182,12 +182,12 @@
                                     type="text"
                                     readonly
                                     value="{{ $manualSetupKey }}"
-                                    class="w-full p-3 bg-transparent outline-none text-stone-900 dark:text-stone-100"
+                                    class="bg-transparent p-3 outline-none w-full text-stone-900 dark:text-stone-100"
                                 />
 
                                 <button
                                     @click="copy()"
-                                    class="px-3 transition-colors border-l cursor-pointer border-stone-200 dark:border-stone-600"
+                                    class="px-3 border-stone-200 dark:border-stone-600 border-l transition-colors cursor-pointer"
                                 >
                                     <flux:icon.document-duplicate x-show="!copied" variant="outline"></flux:icon>
                                     <flux:icon.check

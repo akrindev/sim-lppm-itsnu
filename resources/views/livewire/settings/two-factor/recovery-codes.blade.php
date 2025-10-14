@@ -1,20 +1,20 @@
 <div
-    class="py-6 space-y-6 border shadow-sm rounded-xl border-zinc-200 dark:border-white/10"
+    class="space-y-6 shadow-sm py-6 border border-zinc-200 dark:border-white/10 rounded-xl"
     wire:cloak
     x-data="{ showRecoveryCodes: false }"
 >
-    <div class="px-6 space-y-2">
+    <div class="space-y-2 px-6">
         <div class="flex items-center gap-2">
             <flux:icon.lock-closed variant="outline" class="size-4"/>
-            <flux:heading size="lg" level="3">{{ __('2FA Recovery Codes') }}</flux:heading>
+            <flux:heading size="lg" level="3">{{ __('Kode Pemulihan 2FA') }}</flux:heading>
         </div>
         <flux:text variant="subtle">
-            {{ __('Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.') }}
+            {{ __('Kode pemulihan memungkinkan Anda mendapatkan kembali akses jika Anda kehilangan perangkat 2FA Anda. Simpan di pengelola kata sandi yang aman.') }}
         </flux:text>
     </div>
 
     <div class="px-6">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-3">
             <flux:button
                 x-show="!showRecoveryCodes"
                 icon="eye"
@@ -24,7 +24,7 @@
                 aria-expanded="false"
                 aria-controls="recovery-codes-section"
             >
-                {{ __('View Recovery Codes') }}
+                {{ __('Lihat Kode Pemulihan') }}
             </flux:button>
 
             <flux:button
@@ -36,7 +36,7 @@
                 aria-expanded="true"
                 aria-controls="recovery-codes-section"
             >
-                {{ __('Hide Recovery Codes') }}
+                {{ __('Sembunyikan Kode Pemulihan') }}
             </flux:button>
 
             @if (filled($recoveryCodes))
@@ -46,7 +46,7 @@
                     variant="filled"
                     wire:click="regenerateRecoveryCodes"
                 >
-                    {{ __('Regenerate Codes') }}
+                    {{ __('Regenerasi Kode') }}
                 </flux:button>
             @endif
         </div>
@@ -58,14 +58,14 @@
             class="relative overflow-hidden"
             x-bind:aria-hidden="!showRecoveryCodes"
         >
-            <div class="mt-3 space-y-3">
+            <div class="space-y-3 mt-3">
                 @error('recoveryCodes')
                     <flux:callout variant="danger" icon="x-circle" heading="{{$message}}"/>
                 @enderror
 
                 @if (filled($recoveryCodes))
                     <div
-                        class="grid gap-1 p-4 font-mono text-sm rounded-lg bg-zinc-100 dark:bg-white/5"
+                        class="gap-1 grid bg-zinc-100 dark:bg-white/5 p-4 rounded-lg font-mono text-sm"
                         role="list"
                         aria-label="Recovery codes"
                     >
@@ -80,7 +80,7 @@
                         @endforeach
                     </div>
                     <flux:text variant="subtle" class="text-xs">
-                        {{ __('Each recovery code can be used once to access your account and will be removed after use. If you need more, click Regenerate Codes above.') }}
+                        {{ __('Setiap kode pemulihan dapat digunakan sekali untuk mengakses akun Anda dan akan dihapus setelah digunakan. Jika Anda membutuhkan lebih banyak, klik Regenerasi Kode di atas.') }}
                     </flux:text>
                 @endif
             </div>

@@ -67,7 +67,42 @@
     <!-- BEGIN PAGE SCRIPTS -->
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        // Function to initialize Tabler components
+        function initTablerComponents() {
+            // Reinitialize Bootstrap dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
+            dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+
+            // Reinitialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Reinitialize Bootstrap popovers
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+
+            // Reinitialize Bootstrap collapse
+            var collapseElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="collapse"]'));
+            collapseElementList.map(function (collapseEl) {
+                return new bootstrap.Collapse(collapseEl, {
+                    toggle: false
+                });
+            });
+
+            // Reinitialize Bootstrap modals if needed
+            var modalElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="modal"]'));
+            modalElementList.map(function (modalEl) {
+                return new bootstrap.Modal(modalEl);
+            });
+        }
+
+        function initTablerSettings() {
             var themeConfig = {
               theme: "light",
               "theme-base": "gray",
@@ -82,6 +117,9 @@
             var url = new URL(window.location);
             var form = document.getElementById("offcanvasSettings");
             var resetButton = document.getElementById("reset-changes");
+
+            if (!form || !resetButton) return; // Guard clause if elements don't exist
+
             var checkItems = function () {
               for (var key in themeConfig) {
                 var value = window.localStorage["tabler-" + key] || themeConfig[key];
@@ -119,7 +157,37 @@
               window.history.pushState({}, "", url);
             });
             checkItems();
-          });
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener("DOMContentLoaded", function () {
+            initTablerComponents();
+            initTablerSettings();
+        });
+
+        // Reinitialize after Livewire navigation
+        document.addEventListener("livewire:navigated", function () {
+            initTablerComponents();
+            initTablerSettings();
+        });
+
+        // Also listen for Livewire's navigate event (for smoother transitions)
+        document.addEventListener("livewire:navigate", function () {
+            // Clean up existing dropdowns before navigation
+            var existingDropdowns = document.querySelectorAll('.dropdown-menu.show');
+            existingDropdowns.forEach(function(dropdown) {
+                dropdown.classList.remove('show');
+            });
+
+            // Close any open modals
+            var existingModals = document.querySelectorAll('.modal.show');
+            existingModals.forEach(function(modal) {
+                var bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            });
+        });
     </script>
     <!-- END PAGE SCRIPTS -->
 </body>

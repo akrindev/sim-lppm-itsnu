@@ -4,6 +4,10 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
+use App\Livewire\Users\Create as UsersCreate;
+use App\Livewire\Users\Edit as UsersEdit;
+use App\Livewire\Users\Index as UsersIndex;
+use App\Livewire\Users\Show as UsersShow;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -22,9 +26,21 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:admin lppm|rektor'])
         ->name('reports.research');
 
-    Route::view('users', 'users.index')
+    Route::get('users', UsersIndex::class)
         ->middleware(['role:admin lppm'])
         ->name('users.index');
+
+    Route::get('users/create', UsersCreate::class)
+        ->middleware(['role:admin lppm'])
+        ->name('users.create');
+
+    Route::get('users/{user}', UsersShow::class)
+        ->middleware(['role:admin lppm'])
+        ->name('users.show');
+
+    Route::get('users/{user}/edit', UsersEdit::class)
+        ->middleware(['role:admin lppm'])
+        ->name('users.edit');
 
     // Example page for page header component
     Route::view('examples/page-header', 'examples.page-header-demo')->name('examples.page-header');

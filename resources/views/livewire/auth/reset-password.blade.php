@@ -1,5 +1,6 @@
-<div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Reset password')" :description="__('Please enter your new password below')" />
+<x-layouts.auth>
+    <div class="flex flex-col gap-6">
+        <x-auth-header :title="__('Reset kata sandi')" :description="__('Silakan masukkan kata sandi baru Anda di bawah ini')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
@@ -17,29 +18,30 @@
         <!-- Password -->
         <flux:input
             wire:model="password"
-            :label="__('Password')"
+            :label="__('Kata sandi')"
             type="password"
             required
             autocomplete="new-password"
-            :placeholder="__('Password')"
+            :placeholder="__('Kata sandi')"
             viewable
         />
 
         <!-- Confirm Password -->
         <flux:input
             wire:model="password_confirmation"
-            :label="__('Confirm password')"
+            :label="__('Konfirmasi kata sandi')"
             type="password"
             required
             autocomplete="new-password"
-            :placeholder="__('Confirm password')"
+            :placeholder="__('Konfirmasi kata sandi')"
             viewable
         />
 
-        <div class="flex items-center justify-end">
+        <div class="flex justify-end items-center">
             <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Reset password') }}
+                {{ __('Reset kata sandi') }}
             </flux:button>
         </div>
     </form>
-</div>
+    </div>
+</x-layouts.auth>
