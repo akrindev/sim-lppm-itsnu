@@ -75,7 +75,7 @@ class ThemeManager {
 		for (const key in this.config) {
 			// Check if already set by URL params
 			const currentValue = document.documentElement.getAttribute(`data-bs-${key}`);
-			
+
 			if (!currentValue) {
 				// Only load from localStorage if not already set
 				const savedValue = window.localStorage.getItem(`tabler-${key}`);
@@ -152,9 +152,4 @@ const initializeTheme = () => {
 	new ThemeManager(THEME_CONFIG);
 };
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', initializeTheme);
-} else {
-	initializeTheme();
-}
+document.addEventListener('livewire:navigated', initializeTheme);
