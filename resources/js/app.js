@@ -136,7 +136,7 @@ const initializeSettings = () => {
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', initializeSettings);
+	document.addEventListener('livewire:navigated', initializeSettings);
 } else {
 	initializeSettings();
 }
