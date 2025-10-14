@@ -23,10 +23,15 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'nidn',
-        'profile_picture',
         'password',
     ];
+    /**
+     * Get the identity associated with the user.
+     */
+    public function identity()
+    {
+        return $this->hasOne(Identity::class, 'user_id');
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -61,7 +66,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 }
