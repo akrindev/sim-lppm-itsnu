@@ -1,3 +1,6 @@
+---
+alwaysApply: true
+---
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -183,31 +186,35 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing conventions from other models.
 
 
-=== tabler/v1.4 rules ===
+=== fluxui-free/core rules ===
 
-## Tabler v1.4
+## Flux UI Free
 
-- This project uses Tabler v1.4 for UI components and icons.
-- Tabler provides a set of ready-to-use HTML components, icons, and utilities that can be integrated into Livewire and Blade templates.
-- Use Tabler components when available for consistent styling and functionality.
-- Use the search-docs tool to get documentation and code snippets for this project's version of Tabler.
+- This project is using the free edition of Flux UI. It has full access to the free components and variants, but does not have access to the Pro components.
+- Flux UI is a component library for Livewire. Flux is a robust, hand-crafted, UI component library for your Livewire applications. It's built using Tailwind CSS and provides a set of components that are easy to use and customize.
+- You should use Flux UI components when available.
+- Fallback to standard Blade components if Flux is unavailable.
+- If available, use Laravel Boost's `search-docs` tool to get the exact documentation and code snippets available for this project.
+- Flux UI components look like this:
 
-### Tabler Component Creation & Reusability
-- Create reusable Tabler components under `resources/views/components/tabler/` if they don't already exist.
-- Before creating a new component, check existing components in `resources/views/components/tabler/` to avoid duplication.
-- Tabler components should be combined with Alpine or Livewire interactivity when needed:
-  - Use **Alpine** for lightweight, client-side interactions (animations, toggles, dropdowns, etc.)
-  - Use **Livewire** for server-state interactions (form submissions, database operations, complex state management)
-- When creating Blade components, **always search for existing Tabler components** in `resources/views/components/tabler/` before writing raw HTML.
-- Document the purpose and available props for each component within the component file using PHPDoc or comments.
-- Keep components focused and single-purpose for maximum reusability across the application.
+<code-snippet name="Flux UI Component Usage Example" lang="blade">
+    <flux:button variant="primary"/>
+</code-snippet>
+
+
+### Available Components
+This is correct as of Boost installation, but there may be additional components within the codebase.
+
+<available-flux-components>
+avatar, badge, brand, breadcrumbs, button, callout, checkbox, dropdown, field, heading, icon, input, modal, navbar, profile, radio, select, separator, switch, text, textarea, tooltip
+</available-flux-components>
 
 
 === livewire/core rules ===
 
 ## Livewire Core
 - Use the `search-docs` tool to find exact version specific documentation for how to write Livewire & Livewire tests.
-- Use the `php artisan make:livewire [Posts\CreatePost]` artisan command to create new components
+- Use the `php artisan make:livewire [Posts\\CreatePost]` artisan command to create new components
 - State should live on the server, with the UI reflecting it.
 - All Livewire requests hit the Laravel backend, they're like regular HTTP requests. Always validate form data, and run authorization checks in Livewire actions.
 
