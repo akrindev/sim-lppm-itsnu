@@ -18,6 +18,7 @@ class RoleSeeder extends Seeder
             'admin lppm',
             'admin lppm saintek',
             'admin lppm dekabita',
+            'kepala lppm',
             'dosen',
             'reviewer',
             'rektor',
