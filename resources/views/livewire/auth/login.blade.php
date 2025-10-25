@@ -17,8 +17,15 @@
                                 <form method="post" wire:submit.prevent="login" autocomplete="off" novalidate>
                                     <div class="mb-3">
                                         <label class="form-label">Email address</label>
-                                        <input type="email" wire:model="email" class="form-control" placeholder="your@email.com"
+                                        <input type="email" wire:model="email"
+                                            class="form-control @error('email') is-invalid @enderror"
+                                            placeholder="your@email.com"
                                             autocomplete="email" autofocus />
+                                        @error('email')
+                                            <div class="invalid-feedback" style="display: block;">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">
@@ -29,7 +36,7 @@
                                         </label>
                                         <div class="input-group input-group-flat" x-data="{ showPassword: false }">
                                             <input type="password" x-bind:type="showPassword ? 'text' : 'password'"
-                                                class="form-control" placeholder="Your password" autocomplete="off"
+                                                class="form-control @error('password') is-invalid @enderror" placeholder="Your password" autocomplete="off"
                                                 wire:model="password" />
                                             <span class="input-group-text">
                                                 <button type="button" class="bg-transparent p-0 border-0 link-secondary"
@@ -48,6 +55,11 @@
                                                 </button>
                                             </span>
                                         </div>
+                                        @error('password')
+                                            <div class="invalid-feedback" style="display: block;">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-check">
