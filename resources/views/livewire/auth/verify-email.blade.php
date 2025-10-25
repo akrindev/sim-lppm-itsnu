@@ -1,21 +1,34 @@
-<div class="mt-4 flex flex-col gap-6">
-    <flux:text class="text-center">
-        {{ __('Please verify your email address by clicking on the link we just emailed to you.') }}
-    </flux:text>
+<x-layouts.auth>
+    <div class="py-4 container-tight">
+        <div class="mb-4 text-center">
+            <a href="." class="navbar-brand navbar-brand-autodark">
+                <img src="/logo.png" alt="Logo" width="100" height="100">
+            </a>
+        </div>
+        <div class="card card-md">
+            <div class="card-body">
+                <h2 class="mb-4 text-center h2">{{ __('Verifikasi Email') }}</h2>
 
-    @if (session('status') == 'verification-link-sent')
-        <flux:text class="text-center font-medium !dark:text-green-400 !text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </flux:text>
-    @endif
+                <div class="mb-3 text-secondary text-center">
+                    {{ __('Silakan verifikasi alamat email Anda dengan mengklik tautan yang baru saja kami kirimkan kepada Anda.') }}
+                </div>
 
-    <div class="flex flex-col items-center justify-between space-y-3">
-        <flux:button wire:click="sendVerification" variant="primary" class="w-full">
-            {{ __('Resend verification email') }}
-        </flux:button>
+                @if (session('status') == 'verification-link-sent')
+                    <div class="mb-3 alert alert-success" role="alert">
+                        {{ __('Tautan verifikasi baru telah dikirim ke alamat email yang Anda berikan saat pendaftaran.') }}
+                    </div>
+                @endif
 
-        <flux:link class="text-sm cursor-pointer" wire:click="logout">
-            {{ __('Log out') }}
-        </flux:link>
+                <div class="d-flex flex-column gap-3">
+                    <button wire:click="sendVerification" class="w-100 btn btn-primary">
+                        {{ __('Kirim ulang email verifikasi') }}
+                    </button>
+
+                    <a wire:click="logout" class="text-secondary text-center btn btn-link">
+                        {{ __('Keluar') }}
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</x-layouts.auth>

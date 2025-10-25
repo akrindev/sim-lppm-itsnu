@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "wsl",
+            "args": [
+                "/usr/bin/php8.4",
+                "/home/salju/Workspace/sim-lppm-itsnu/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}

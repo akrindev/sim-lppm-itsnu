@@ -19,7 +19,14 @@ class UserSeeder extends Seeder
             $user = \App\Models\User::factory()->create([
                 'name' => str($role->name)->title() . ' User',
                 'email' => str($role->name)->slug() . '@email.com',
-                'nidn' => '000000' . rand(1000, 9999),
+            ]);
+
+            $user->identity()->create([
+                'identity_id' => rand(10000, 99999),
+                'address' => 'Jl. Example No. ' . rand(1, 100),
+                'birthdate' => now()->subYears(rand(20, 40))->toDateString(),
+                'birthplace' => fake()->city(),
+                'profile_picture' => null,
             ]);
 
             $user->assignRole($role->name);

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,10 +25,15 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'nidn',
-        'profile_picture',
         'password',
     ];
+    /**
+     * Get the identity associated with the user.
+     */
+    public function identity()
+    {
+        return $this->hasOne(Identity::class, 'user_id');
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -61,7 +68,16 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    // attributes
+    public function profilePicture(): Attribute
+    {
+        return new Attribute(
+            get: fn($value) => $this->identity?->profile_picture
+                ?? 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?s=128&d=identicon',
+        );
     }
 }

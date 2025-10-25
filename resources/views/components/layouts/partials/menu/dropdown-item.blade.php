@@ -20,6 +20,7 @@
     </div>
 @else
     <a class="{{ $item['class'] ?? 'dropdown-item' }}" href="{{ $item['href'] ?? '#' }}"
+        wire:navigate
         @foreach (($item['attributes'] ?? []) as $attribute => $value)
             {{ $attribute }}="{{ $value }}"
         @endforeach>

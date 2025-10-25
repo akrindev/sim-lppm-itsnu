@@ -210,9 +210,9 @@
                                         @if ($isDropdown)
                                             <li class="nav-item dropdown{{ $isActive ? ' active' : '' }}">
                                                 <a class="nav-link dropdown-toggle"
-                                                    href="{{ $menuItem['toggle_href'] ?? '#' }}" data-bs-toggle="dropdown"
+                                                    href="#" data-bs-toggle="dropdown"
                                                     data-bs-auto-close="{{ $menuItem['dropdown']['auto_close'] ?? 'outside' }}"
-                                                    role="button" aria-expanded="false" wire:navigate>
+                                                    role="button" aria-expanded="false">
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
                                                         @if (!empty($menuItem['icon']))
                                                             @include('components.layouts.partials.menu.icon', [
