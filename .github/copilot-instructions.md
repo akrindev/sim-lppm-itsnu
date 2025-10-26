@@ -11,6 +11,7 @@ This is a Laravel 12 app for managing Research and Community Service lifecycles 
     - Use Tabler patterns with Bootstrap utilities (grid, spacing `g-*`/`gap-*`, flex, helpers). Use Blade Lucide icons (`<x-lucide-search/>`).
     - Livewire components must have a single root element and include `wire:key` in loops.
     - No Volt SFCs; keep Livewire logic in `App\\Livewire` and Blade views under `resources/views`.
+    - **Livewire Blade views**: Use slot attributes (`<x-slot:title>`, `<x-slot:pageTitle>`, `<x-slot:pageSubtitle>`, `<x-slot:pageActions>`) directly without wrapping in `<x-layouts.app>` wrapper. The layout is auto-applied by the render method or parent template.
 - Livewire specifics:
     - Use `wire:model.live` for real-time binding (default `wire:model` is deferred). Dispatch events with `$this->dispatch()`.
 - Eloquent & data:

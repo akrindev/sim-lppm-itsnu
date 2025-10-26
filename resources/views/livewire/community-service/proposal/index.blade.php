@@ -138,7 +138,7 @@
                             @endif
                         </button>
                     </th>
-                    <th>{{ __('Pelaksana') }}</th>
+                    <th>{{ __('Pengabdi') }}</th>
                     <th>
                         <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('status')">
                             {{ __('Status') }}
@@ -147,6 +147,7 @@
                             @endif
                         </button>
                     </th>
+                    <th>{{ __('Skema') }}</th>
                     <th>{{ __('Bidang Fokus') }}</th>
                     <th>
                         <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('created_at')">
@@ -175,6 +176,11 @@
                             <x-tabler.badge :color="$proposal->status" class="fw-normal">
                                 {{ __('Status: :status', ['status' => ucfirst($proposal->status)]) }}
                             </x-tabler.badge>
+                        </td>
+                        <td>
+                            <div class="bg-blue-lt badge-outline badge">
+                                {{ $proposal->communityServiceScheme?->name ?? '—' }}
+                            </div>
                         </td>
                         <td>
                             <div class="badge-outline badge">
@@ -207,7 +213,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="py-8 text-center">
+                        <td colspan="7" class="py-8 text-center">
                             <div class="mb-3">
                                 <x-lucide-inbox class="text-secondary icon icon-lg" />
                             </div>
