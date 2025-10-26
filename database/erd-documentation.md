@@ -24,6 +24,7 @@ Users (Strong Entity)
 ├── email_verified_at
 ├── two_factor_secret
 ├── two_factor_recovery_codes
+├── two_factor_confirmed_at
 ├── remember_token
 └── created_at/updated_at
 
@@ -143,14 +144,13 @@ Topics 1:N Proposals (direct relationship)
 ResearchSchemes
 ├── id (PK)
 ├── name
-├── description (nullable)
+├── strata (nullable)
 └── created_at/updated_at
 ResearchSchemes 1:N Proposals
 
 NationalPriorities
 ├── id (PK)
 ├── name
-├── description (nullable)
 └── created_at/updated_at
 NationalPriorities 1:N Proposals
 
@@ -164,9 +164,10 @@ ScienceClusters 1:N Proposals (3 separate FKs for each level)
 
 StudyPrograms
 ├── id (PK)
+├── institution_id (FK → institutions.id, cascade delete)
 ├── name
-├── description (nullable)
 └── created_at/updated_at
+StudyPrograms N:1 Institution
 
 Keywords
 ├── id (PK)
@@ -270,11 +271,20 @@ proposal_keyword (Pivot Table)
 Identities
 ├── id (PK)
 ├── user_id (FK → users.id)
+├── identity_id (unique)
+├── sinta_id (nullable)
+├── type (dosen/mitra, dll.)
+├── address (nullable)
+├── birthplace (nullable)
+├── birthdate (nullable)
+├── institution_id (FK → institutions.id, set null)
+├── study_program_id (FK → study_programs.id, set null)
 ├── profile_picture (nullable)
-├── other identity fields...
 └── created_at/updated_at
 
 Identities 1:1 User
+Identities N:1 Institution
+Identities N:1 StudyProgram
 ```
 
 ---

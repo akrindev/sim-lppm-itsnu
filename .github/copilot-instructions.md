@@ -1,3 +1,51 @@
+## Copilot Quickstart for sim-lppm-itsnu
+
+This is a Laravel 12 app for managing Research and Community Service lifecycles at ITSNU Pekalongan. The quick notes below make agents effective fast; detailed rules stay below.
+
+- Core stack: Laravel 12 + Fortify, Livewire v3 (no Volt), Tabler 1.4 + Bootstrap 5, Pest v4, Telescope, Pint. No Flux UI. No Tailwind. Use bun instead of npm.
+- Domain & structure:
+    - Modules mirror business areas: `app/Livewire/{Research,CommunityService,Reports,Users,Settings,...}`; models in `app/Models` (e.g., `Research`, `CommunityService`, `Proposal`, `BudgetItem`).
+    - Routing: `routes/web.php`, `routes/auth.php`; console tasks in `routes/console.php`.
+    - Laravel 12 setup: middleware/routing config in `bootstrap/app.php`; service providers in `bootstrap/providers.php`. No Console Kernel.
+- UI & views:
+    - Use Tabler patterns with Bootstrap utilities (grid, spacing `g-*`/`gap-*`, flex, helpers). Use Blade Lucide icons (`<x-lucide-search/>`).
+    - Livewire components must have a single root element and include `wire:key` in loops.
+    - No Volt SFCs; keep Livewire logic in `App\\Livewire` and Blade views under `resources/views`.
+- Livewire specifics:
+    - Use `wire:model.live` for real-time binding (default `wire:model` is deferred). Dispatch events with `$this->dispatch()`.
+- Eloquent & data:
+    - Prefer relationships and `casts()` on models; avoid `DB::`. Eager load to prevent N+1.
+    - Factories/seeders live in `database/factories` & `database/seeders`; run `php artisan migrate --seed` for a baseline dataset.
+- Language & naming:
+    - All user-facing copy and UI text in code should be Indonesian. Table, model, and field names remain in English (consistent with schema).
+- Developer workflow:
+    - Install: `composer install`, `bun install`, copy `.env`, `php artisan key:generate`, then `php artisan migrate --seed`.
+    - Dev/build assets: `bun run dev` for local dev; `bun run build` for production build. Run backend via `php artisan serve`.
+    - Tests: write Pest tests in `tests/Feature` or `tests/Unit` and run targeted with `php artisan test`.
+    - Style: run `vendor/bin/pint --dirty` before committing.
+- Troubleshooting:
+    - Frontend changes not visible? Run `bun run dev` or `bun run build` (check Vite manifest if needed).
+    - Use Telescope for backend debugging; check recent browser logs when diagnosing client errors.
+- For AI agents:
+    - Prefer incremental, symbol-scoped edits; check sibling components before creating new ones.
+    - Use Laravel Boost MCP or other availables MCP (version-specific docs, tinker, browser logs, DB read-only) when needed.
+
+Examples in this repo:
+- Livewire feature areas: `app/Livewire/Research/*`, `app/Livewire/CommunityService/*`.
+- Key models: `app/Models/Research.php`, `app/Models/CommunityService.php`, `app/Models/Proposal.php`.
+- Routes: `routes/web.php`, `routes/auth.php`. Bootstrap config: `bootstrap/app.php`.
+
+---
+
+### Project overrides vs generic rules
+
+- Do not use Flux UI or Volt (ignore related sections below).
+- Use Bootstrap 5 + Tabler patterns (not Tailwind).
+- Use bun (`bun install`, `bun run dev/build`) instead of npm.
+- Write Indonesian for UI/user-facing copy in code; keep table/model/field names in English.
+
+---
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
