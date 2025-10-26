@@ -1,11 +1,11 @@
-<x-slot:title>{{ __('Penelitian') }}</x-slot:title>
-<x-slot:pageTitle>{{ __('Daftar Penelitian') }}</x-slot:pageTitle>
-<x-slot:pageSubtitle>{{ __('Kelola proposal penelitian Anda dengan fitur lengkap.') }}</x-slot:pageSubtitle>
+<x-slot:title>Penelitian</x-slot:title>
+<x-slot:pageTitle>Daftar Penelitian</x-slot:pageTitle>
+<x-slot:pageSubtitle>Kelola proposal penelitian Anda dengan fitur lengkap.</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
-        <a href="{{ route('research.proposal.create') }}" class="btn btn-primary">
+        <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
             <x-lucide-plus class="icon" />
-            {{ __('Usulan Penelitian Baru') }}
+            Usulan Penelitian Baru
         </a>
     </div>
 </x-slot:pageActions>
@@ -19,20 +19,20 @@
                         <!-- Search Input -->
                         <div class="col-md-6">
                             <input type="text" class="form-control"
-                                placeholder="{{ __('Cari berdasarkan judul atau ringkasan...') }}"
+                                placeholder="Cari berdasarkan judul atau ringkasan..."
                                 wire:model.live.debounce.300ms="search" />
                         </div>
 
                         <!-- Status Filter -->
                         <div class="col-md-3">
                             <select class="form-select" wire:model.live="statusFilter">
-                                <option value="all">{{ __('Semua Status') }}</option>
-                                <option value="draft">{{ __('Draft') }}</option>
-                                <option value="submitted">{{ __('Diajukan') }}</option>
-                                <option value="reviewed">{{ __('Ditinjau') }}</option>
-                                <option value="approved">{{ __('Disetujui') }}</option>
-                                <option value="rejected">{{ __('Ditolak') }}</option>
-                                <option value="completed">{{ __('Selesai') }}</option>
+                                <option value="all">Semua Status</option>
+                                <option value="draft">Draft</option>
+                                <option value="submitted">Diajukan</option>
+                                <option value="reviewed">Ditinjau</option>
+                                <option value="approved">Disetujui</option>
+                                <option value="rejected">Ditolak</option>
+                                <option value="completed">Selesai</option>
                             </select>
                         </div>
 
@@ -40,7 +40,7 @@
                         <div class="col-md-3">
                             <button type="button" class="btn-outline-secondary w-100 btn" wire:click="resetFilters">
                                 <x-lucide-rotate-ccw class="icon" />
-                                {{ __('Reset') }}
+                                Reset
                             </button>
                         </div>
                     </div>
@@ -56,39 +56,39 @@
                     <tr>
                         <th>
                             <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('title')">
-                                {{ __('Judul') }}
-                                @if ($sortBy === 'title')
-                                    <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
+                                Judul
+                                @if ($this->sortBy === 'title')
+                                    <x-lucide-{{ $this->sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
                                         class="icon" />
                                 @endif
                             </button>
                         </th>
-                        <th>{{ __('Peneliti') }}</th>
+                        <th>Peneliti</th>
                         <th>
                             <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('status')">
-                                {{ __('Status') }}
-                                @if ($sortBy === 'status')
-                                    <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
+                                Status
+                                @if ($this->sortBy === 'status')
+                                    <x-lucide-{{ $this->sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
                                         class="icon" />
                                 @endif
                             </button>
                         </th>
-                        <th>{{ __('Skema') }}</th>
-                        <th>{{ __('Bidang Fokus') }}</th>
+                        <th>Skema</th>
+                        <th>Bidang Fokus</th>
                         <th>
                             <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('created_at')">
-                                {{ __('Tanggal Dibuat') }}
-                                @if ($sortBy === 'created_at')
-                                    <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
+                                Tanggal Dibuat
+                                @if ($this->sortBy === 'created_at')
+                                    <x-lucide-{{ $this->sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
                                         class="icon" />
                                 @endif
                             </button>
                         </th>
-                        <th class="w-1">{{ __('Aksi') }}</th>
+                        <th class="w-1">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($proposals as $proposal)
+                    @forelse ($this->proposals as $proposal)
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td class="text-truncate" style="max-width: 250px;">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
@@ -101,7 +101,7 @@
                             </td>
                             <td>
                                 <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                                    {{ __('Status: :status', ['status' => ucfirst($proposal->status)]) }}
+                                    Status: {{ ucfirst($proposal->status) }}
                                 </x-tabler.badge>
                             </td>
                             <td>
@@ -122,18 +122,17 @@
                             <td>
                                 <div class="flex-nowrap btn-list">
                                     <a href="{{ route('research.proposal.show', $proposal) }}"
-                                        class="btn btn-icon btn-ghost-primary" title="{{ __('Lihat') }}">
+                                        class="btn btn-icon btn-ghost-primary" title="Lihat">
                                         <x-lucide-eye class="icon" />
                                     </a>
                                     @if ($proposal->status === 'draft')
-                                        <a href="#" class="btn btn-icon btn-ghost-info"
-                                            title="{{ __('Edit') }}">
+                                        <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
                                             <x-lucide-pencil class="icon" />
                                         </a>
                                     @endif
-                                    <button type="button" class="btn btn-icon btn-ghost-danger"
-                                        title="{{ __('Hapus') }}" wire:click="deleteProposal({{ $proposal->id }})"
-                                        wire:confirm="{{ __('Yakin ingin menghapus proposal ini?') }}">
+                                    <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
+                                        wire:click="deleteProposal({{ $proposal->id }})"
+                                        wire:confirm="Yakin ingin menghapus proposal ini?">
                                         <x-lucide-trash-2 class="icon" />
                                     </button>
                                 </div>
@@ -145,7 +144,7 @@
                                 <div class="mb-3">
                                     <x-lucide-inbox class="text-secondary icon icon-lg" />
                                 </div>
-                                <p class="text-secondary">{{ __('Tidak ada data penelitian yang ditemukan.') }}</p>
+                                <p class="text-secondary">Tidak ada data penelitian yang ditemukan.</p>
                             </td>
                         </tr>
                     @endforelse
@@ -153,9 +152,9 @@
             </table>
         </div>
 
-        @if ($proposals->hasPages())
+        @if ($this->proposals->hasPages())
             <div class="d-flex align-items-center card-footer">
-                {{ $proposals->links() }}
+                {{ $this->proposals->links() }}
             </div>
         @endif
     </div>

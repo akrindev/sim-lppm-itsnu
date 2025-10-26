@@ -52,13 +52,7 @@ class Index extends Component
 
     public function render(): View
     {
-        return view('livewire.research.proposal.index', [
-            'proposals' => $this->proposals,
-            'statusStats' => $this->statusStats,
-            'typeStats' => $this->typeStats,
-            'sortBy' => $this->sortBy,
-            'sortDirection' => $this->sortDirection,
-        ]);
+        return view('livewire.research.proposal.index');
     }
 
     #[Computed]
