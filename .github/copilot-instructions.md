@@ -1,6 +1,7 @@
 <laravel-boost-guidelines>
 === foundation rules ===
 
+
 # Laravel Boost Guidelines
 
 The Laravel Boost guidelines are specifically curated by Laravel maintainers for this application. These guidelines should be followed closely to enhance the user's satisfaction building Laravel applications.
@@ -22,12 +23,13 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
 - tailwindcss (TAILWINDCSS) - v4
-
+- blade-lucide-icons (BLADE_LUCIDE_ICONS) - latest
 
 ## Conventions
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
+- Use Blade Lucide Icons (`x-lucide-[icon]`) for icons in Blade views when appropriate. Refer to https://github.com/mallardduck/blade-lucide-icons for usage and available icons.
 
 ## Verification Scripts
 - Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
