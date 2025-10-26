@@ -172,6 +172,106 @@
             </div>
         </div>
 
+        <!-- Section: Anggota -->
+        <div class="mb-3 card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <x-lucide-users class="me-3 icon" />
+                    <h3 class="mb-0 card-title">Anggota Peneliti</h3>
+                </div>
+
+                <!-- Members List -->
+                @if (!empty($this->members))
+                    <div class="mb-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>NIDN</th>
+                                        <th>Tugas</th>
+                                        <th class="text-end" style="width: 100px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($this->members as $index => $member)
+                                        <tr>
+                                            <td class="align-middle">
+                                                <code>{{ $member['nidn'] }}</code>
+                                            </td>
+                                            <td class="align-middle">{{ $member['tugas'] }}</td>
+                                            <td class="text-end align-middle">
+                                                <button type="button" wire:click="removeMember({{ $index }})"
+                                                    class="btn-outline-danger btn btn-sm" title="Hapus">
+                                                    <x-lucide-trash-2 class="icon" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Add Button -->
+                <button type="button" wire:click="$set('showMemberModal', true)" class="btn btn-primary">
+                    <x-lucide-plus class="icon" />
+                    Tambah Anggota
+                </button>
+
+                @error('members')
+                    <div class="d-block mt-2 text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+
+        <!-- Add Member Modal -->
+        @if ($showMemberModal)
+            <div class="d-block modal fade show" style="background-color: rgba(0, 0, 0, 0.5);">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tambah Anggota Peneliti</h5>
+                            <button type="button" wire:click="$set('showMemberModal', false)" class="btn-close"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="member_nidn">NIDN / NIP <span
+                                        class="text-danger">*</span></label>
+                                <input id="member_nidn" type="text"
+                                    class="form-control @error('member_nidn') is-invalid @enderror"
+                                    wire:model.defer="member_nidn" placeholder="Masukkan NIDN atau NIP anggota">
+                                @error('member_nidn')
+                                    <div class="d-block invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="member_tugas">Tugas <span
+                                        class="text-danger">*</span></label>
+                                <textarea id="member_tugas" class="form-control @error('member_tugas') is-invalid @enderror"
+                                    wire:model.defer="member_tugas" rows="3" placeholder="Jelaskan tugas anggota dalam penelitian ini"
+                                    required></textarea>
+                                @error('member_tugas')
+                                    <div class="d-block invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" wire:click="$set('showMemberModal', false)"
+                                class="btn-outline-secondary btn">
+                                Batal
+                            </button>
+                            <button type="button" wire:click="addMember" class="btn btn-primary">
+                                <x-lucide-plus class="icon" />
+                                Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Section: Klasifikasi Ilmu -->
         <div class="mb-3 card">
             <div class="card-body">

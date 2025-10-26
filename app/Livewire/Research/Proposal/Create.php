@@ -27,6 +27,10 @@ class Create extends Component
     public string $state_of_the_art = '';
     public string $methodology = '';
     public array $roadmap_data = [];
+    public array $members = [];
+    public string $member_nidn = '';
+    public string $member_tugas = '';
+    public bool $showMemberModal = false;
 
     /**
      * Get validation rules for the proposal.
@@ -51,7 +55,39 @@ class Create extends Component
             'state_of_the_art' => 'required|string|min:200',
             'methodology' => 'required|string|min:200',
             'roadmap_data' => 'nullable|array',
+            'members' => 'nullable|array',
+            'members.*.nidn' => 'required_with:members|string|max:255',
+            'members.*.tugas' => 'required_with:members|string|max:500',
         ];
+    }
+
+    /**
+     * Add member
+     */
+    public function addMember(): void
+    {
+        $this->validate([
+            'member_nidn' => 'required|string|max:255',
+            'member_tugas' => 'required|string|max:500',
+        ]);
+
+        $this->members[] = [
+            'nidn' => $this->member_nidn,
+            'tugas' => $this->member_tugas,
+        ];
+
+        $this->member_nidn = '';
+        $this->member_tugas = '';
+        $this->showMemberModal = false;
+    }
+
+    /**
+     * Remove member
+     */
+    public function removeMember(int $index): void
+    {
+        unset($this->members[$index]);
+        $this->members = array_values($this->members);
     }
 
     /**
@@ -88,6 +124,16 @@ class Create extends Component
                 'summary' => $this->summary,
                 'status' => 'draft',
             ]);
+
+            // Store members data with their tasks
+            if (!empty($this->members)) {
+                foreach ($this->members as $member) {
+                    $proposal->proposalMembers()->create([
+                        'nidn' => $member['nidn'],
+                        'tugas' => $member['tugas'],
+                    ]);
+                }
+            }
 
             session()->flash('success', 'Proposal penelitian berhasil dibuat');
             $this->redirect(route('research.proposal.show', $proposal));
