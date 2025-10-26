@@ -4,19 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Identity extends Model
 {
     use HasFactory;
 
-
-
     protected $fillable = [
-        'identity_id', // unique lecturer/employee id
+        'identity_id',
         'user_id',
+        'sinta_id',
+        'type',
         'address',
         'birthdate',
         'birthplace',
+        'institution_id',
+        'study_program_id',
         'profile_picture',
     ];
 
@@ -29,12 +32,30 @@ class Identity extends Model
     {
         return [
             'birthdate' => 'date',
-            'profile_picture' => 'string',
         ];
     }
 
-    public function user()
+    /**
+     * Get the user that owns the identity.
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the institution that the identity belongs to.
+     */
+    public function institution(): BelongsTo
+    {
+        return $this->belongsTo(Institution::class);
+    }
+
+    /**
+     * Get the study program that the identity belongs to.
+     */
+    public function studyProgram(): BelongsTo
+    {
+        return $this->belongsTo(StudyProgram::class);
     }
 }
