@@ -1,3 +1,331 @@
+<x-slot:title>Usulan Penelitian Baru</x-slot:title>
+<x-slot:pageTitle>Usulan Penelitian Baru</x-slot:pageTitle>
+<x-slot:pageSubtitle>Buat proposal penelitian baru dengan mengisi form di bawah ini.</x-slot:pageSubtitle>
+<x-slot:pageActions>
+    <a href="{{ route('research.proposal.index') }}" class="btn-outline-secondary btn">
+        <x-lucide-arrow-left class="icon" />
+        Kembali ke Daftar
+    </a>
+</x-slot:pageActions>
+
 <div>
-    {{-- Be like water. --}}
+    @if (session()->has('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>
+                    {{ session('success') }}
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>
+                    {{ session('error') }}
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <form wire:submit.prevent="save" novalidate>
+        <!-- Section: Informasi Dasar -->
+        <div class="mb-3 card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <x-lucide-file-text class="me-3 icon" />
+                    <h3 class="mb-0 card-title">Informasi Dasar Proposal</h3>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label class="form-label" for="title">Judul Proposal <span
+                                    class="text-danger">*</span></label>
+                            <input id="title" type="text"
+                                class="form-control @error('title') is-invalid @enderror" wire:model.defer="title"
+                                placeholder="Masukkan judul proposal penelitian" required>
+                            @error('title')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="research_scheme">Skema Penelitian <span
+                                    class="text-danger">*</span></label>
+                            <select id="research_scheme"
+                                class="form-select tom-select @error('research_scheme_id') is-invalid @enderror"
+                                wire:model.defer="research_scheme_id" placeholder="Pilih skema penelitian" required>
+                                <option value="">-- Pilih Skema Penelitian --</option>
+                                @foreach ($schemes as $scheme)
+                                    <option value="{{ $scheme->id }}">{{ $scheme->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('research_scheme_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="duration_in_years">Durasi Penelitian (Tahun) <span
+                                    class="text-danger">*</span></label>
+                            <input id="duration_in_years" type="number"
+                                class="form-control @error('duration_in_years') is-invalid @enderror"
+                                wire:model.defer="duration_in_years" min="1" max="10" value="1"
+                                required>
+                            @error('duration_in_years')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="focus_area">Bidang Fokus <span
+                                    class="text-danger">*</span></label>
+                            <select id="focus_area"
+                                class="form-select tom-select @error('focus_area_id') is-invalid @enderror"
+                                wire:model.defer="focus_area_id" placeholder="Pilih bidang fokus" required>
+                                <option value="">-- Pilih Bidang Fokus --</option>
+                                @foreach ($focusAreas as $area)
+                                    <option value="{{ $area->id }}">{{ $area->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('focus_area_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="theme">Tema <span class="text-danger">*</span></label>
+                            <select id="theme"
+                                class="form-select tom-select @error('theme_id') is-invalid @enderror"
+                                wire:model.defer="theme_id" placeholder="Pilih tema" required>
+                                <option value="">-- Pilih Tema --</option>
+                                @foreach ($themes as $theme)
+                                    <option value="{{ $theme->id }}">{{ $theme->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('theme_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="topic">Topik <span class="text-danger">*</span></label>
+                            <select id="topic"
+                                class="form-select tom-select @error('topic_id') is-invalid @enderror"
+                                wire:model.defer="topic_id" placeholder="Pilih topik" required>
+                                <option value="">-- Pilih Topik --</option>
+                                @foreach ($topics as $topic)
+                                    <option value="{{ $topic->id }}">{{ $topic->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('topic_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="national_priority">Prioritas Nasional</label>
+                            <select id="national_priority"
+                                class="form-select tom-select @error('national_priority_id') is-invalid @enderror"
+                                wire:model.defer="national_priority_id"
+                                placeholder="Pilih prioritas nasional (opsional)">
+                                <option value="">-- Pilih Prioritas Nasional (Opsional) --</option>
+                                @foreach ($nationalPriorities as $priority)
+                                    <option value="{{ $priority->id }}">{{ $priority->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('national_priority_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="sbk_value">Nilai SKB <span
+                                    class="text-danger">*</span></label>
+                            <input id="sbk_value" type="number" step="0.01"
+                                class="form-control @error('sbk_value') is-invalid @enderror"
+                                wire:model.defer="sbk_value" placeholder="0.00" required>
+                            @error('sbk_value')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Klasifikasi Ilmu -->
+        <div class="mb-3 card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <x-lucide-dna class="me-3 icon" />
+                    <h3 class="mb-0 card-title">Klasifikasi Ilmu (Klaster Sains)</h3>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label" for="cluster_level1">Level 1 <span
+                                    class="text-danger">*</span></label>
+                            <select id="cluster_level1"
+                                class="form-select tom-select @error('cluster_level1_id') is-invalid @enderror"
+                                wire:model.defer="cluster_level1_id" placeholder="Pilih level 1" required>
+                                <option value="">-- Pilih Level 1 --</option>
+                                @foreach ($scienceClusters->where('level', 1) as $cluster)
+                                    <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('cluster_level1_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label" for="cluster_level2">Level 2</label>
+                            <select id="cluster_level2"
+                                class="form-select tom-select @error('cluster_level2_id') is-invalid @enderror"
+                                wire:model.defer="cluster_level2_id" placeholder="Pilih level 2 (opsional)">
+                                <option value="">-- Pilih Level 2 (Opsional) --</option>
+                                @foreach ($scienceClusters->where('level', 2) as $cluster)
+                                    <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('cluster_level2_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label" for="cluster_level3">Level 3</label>
+                            <select id="cluster_level3"
+                                class="form-select tom-select @error('cluster_level3_id') is-invalid @enderror"
+                                wire:model.defer="cluster_level3_id" placeholder="Pilih level 3 (opsional)">
+                                <option value="">-- Pilih Level 3 (Opsional) --</option>
+                                @foreach ($scienceClusters->where('level', 3) as $cluster)
+                                    <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('cluster_level3_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Ringkasan -->
+        <div class="mb-3 card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <x-lucide-file-text class="me-3 icon" />
+                    <h3 class="mb-0 card-title">Ringkasan Proposal</h3>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="summary">Ringkasan <span class="text-danger">*</span></label>
+                    <textarea id="summary" class="form-control @error('summary') is-invalid @enderror" wire:model.defer="summary"
+                        rows="4" placeholder="Masukkan ringkasan proposal (minimal 100 karakter)" required></textarea>
+                    @error('summary')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="text-muted">Minimum 100 karakter</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Detail Penelitian -->
+        <div class="mb-3 card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <x-lucide-microscope class="me-3 icon" />
+                    <h3 class="mb-0 card-title">Detail Penelitian</h3>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="final_tkt_target">Target TKT Final <span
+                            class="text-danger">*</span></label>
+                    <input id="final_tkt_target" type="text"
+                        class="form-control @error('final_tkt_target') is-invalid @enderror"
+                        wire:model.defer="final_tkt_target" placeholder="Contoh: TKT 5, TKT 6, dsb" required>
+                    @error('final_tkt_target')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="text-muted">Tingkat Kesiapan Teknologi (TKT) yang ditargetkan</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="background">Latar Belakang <span
+                            class="text-danger">*</span></label>
+                    <textarea id="background" class="form-control @error('background') is-invalid @enderror"
+                        wire:model.defer="background" rows="5"
+                        placeholder="Jelaskan latar belakang penelitian (minimal 200 karakter)" required></textarea>
+                    @error('background')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="text-muted">Minimum 200 karakter</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="state_of_the_art">State of the Art <span
+                            class="text-danger">*</span></label>
+                    <textarea id="state_of_the_art" class="form-control @error('state_of_the_art') is-invalid @enderror"
+                        wire:model.defer="state_of_the_art" rows="5"
+                        placeholder="Jelaskan state of the art penelitian (minimal 200 karakter)" required></textarea>
+                    @error('state_of_the_art')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="text-muted">Minimum 200 karakter</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="methodology">Metodologi <span class="text-danger">*</span></label>
+                    <textarea id="methodology" class="form-control @error('methodology') is-invalid @enderror"
+                        wire:model.defer="methodology" rows="5" placeholder="Jelaskan metodologi penelitian (minimal 200 karakter)"
+                        required></textarea>
+                    @error('methodology')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="text-muted">Minimum 200 karakter</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{{ route('research.proposal.index') }}" class="btn-outline-secondary btn">
+                <x-lucide-x class="icon" />
+                Batal
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <span class="me-2 spinner-border spinner-border-sm" wire:loading role="status"
+                    aria-hidden="true"></span>
+                <x-lucide-save class="icon" />
+                <span wire:loading.remove>Simpan Proposal</span>
+                <span wire:loading>Menyimpan...</span>
+            </button>
+        </div>
+    </form>
 </div>

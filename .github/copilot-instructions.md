@@ -12,6 +12,21 @@ Laravel 12 app for Research & Community Service at ITSNU Pekalongan.
 - Use Tabler + Bootstrap. Livewire has single root element + `wire:key` in loops
 - Use slot attributes (`<x-slot:title>`, etc.) - layout auto-applied
 - Use `wire:model.live` for real-time binding, `$this->dispatch()` for events
+- use x-slot instead of x-layout on livewire blade views
+
+```.blade.php
+<x-slot:title>Penelitian</x-slot:title>
+<x-slot:pageTitle>Daftar Penelitian</x-slot:pageTitle>
+<x-slot:pageSubtitle>Kelola proposal penelitian Anda dengan fitur lengkap.</x-slot:pageSubtitle>
+<x-slot:pageActions>
+    <div class="btn-list">
+        <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
+            <x-lucide-plus class="icon" />
+            Usulan Penelitian Baru
+        </a>
+    </div>
+</x-slot:pageActions>
+```
 
 **Data**: Relationships + `casts()`, eager load (prevent N+1), no `DB::`
 
@@ -22,7 +37,7 @@ Laravel 12 app for Research & Community Service at ITSNU Pekalongan.
 - Dev: `bun run dev`; build: `bun run build`; test: `php artisan test`
 - Style: `vendor/bin/pint --dirty` before committing
 
-**AI Agents**: Use Serena MCP for symbol navigation, Laravel Boost MCP for docs/tinker/DB queries
+**AI Agents**: Use Serena MCP for symbol navigation, Laravel Boost MCP for docs/tinker/DB queries, linear mcp for task tracking (use indonesian).
 
 ---
 
