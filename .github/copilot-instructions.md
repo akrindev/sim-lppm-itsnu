@@ -37,7 +37,7 @@ Laravel 12 app for Research & Community Service at ITSNU Pekalongan.
 - Dev: `bun run dev`; build: `bun run build`; test: `php artisan test`
 - Style: `vendor/bin/pint --dirty` before committing
 
-**AI Agents**: Use Serena MCP for symbol navigation, Laravel Boost MCP for docs/tinker/DB queries, linear mcp for task tracking (use indonesian).
+**AI Agents**: Always Use Serena MCP for symbol navigation, Laravel Boost MCP for docs/tinker/DB queries, linear mcp for task tracking (use indonesian), sequential thinking, and others mcp for best results.
 
 ---
 

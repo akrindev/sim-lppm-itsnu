@@ -26,7 +26,10 @@ class RoleSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            Role::create(['name' => $role]);
+            Role::create([
+                'id' => \Illuminate\Support\Str::uuid(),
+                'name' => $role,
+            ]);
         }
     }
 }

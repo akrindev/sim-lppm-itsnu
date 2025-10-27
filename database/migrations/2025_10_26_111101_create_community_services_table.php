@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('community_services', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('partner_id')->nullable()->constrained('partners')->onDelete('set null')->comment('Mitra');
             $table->text('partner_issue_summary')->nullable()->comment('Ringkasan Masalah Mitra');
             $table->text('solution_offered')->nullable()->comment('Solusi yang Ditawarkan');

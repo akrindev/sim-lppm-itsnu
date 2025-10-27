@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -18,7 +19,17 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, HasUuids, HasRoles, Notifiable, TwoFactorAuthenticatable;
+
+    /**
+     * The type of the auto-incrementing ID's primary key.
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the ID is auto-incrementing.
+     */
+    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
@@ -98,7 +109,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 
@@ -106,8 +117,8 @@ class User extends Authenticatable
     public function profilePicture(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->identity?->profile_picture
-                ?? 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s=128&d=identicon',
+            get: fn($value) => $this->identity?->profile_picture
+                ?? 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?s=128&d=identicon',
         );
     }
 }

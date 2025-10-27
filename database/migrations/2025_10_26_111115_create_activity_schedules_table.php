@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('activity_schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('proposal_id')->constrained('proposals')->onDelete('cascade')->comment('Proposal');
+            $table->foreignUuid('proposal_id')->constrained('proposals')->onDelete('cascade')->comment('Proposal');
             $table->string('activity_name')->comment('Nama Kegiatan');
             $table->integer('year')->comment('Tahun ke-');
             $table->integer('start_month')->comment('Bulan Mulai (1-12)');

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,7 +13,17 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Proposal extends Model
 {
     /** @use HasFactory<\Database\Factories\ProposalFactory> */
-    use HasFactory;
+    use HasFactory, HasUuids;
+
+    /**
+     * The type of the auto-incrementing ID's primary key.
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the ID is auto-incrementing.
+     */
+    public $incrementing = false;
 
     protected $fillable = [
         'title',

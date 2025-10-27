@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('research', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->integer('final_tkt_target')->nullable()->comment('Target TKT Akhir');
             $table->longText('background')->nullable()->comment('Latar Belakang');
             $table->longText('state_of_the_art')->nullable()->comment('State of the Art');

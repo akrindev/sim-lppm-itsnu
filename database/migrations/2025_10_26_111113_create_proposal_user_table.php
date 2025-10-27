@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('proposal_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('proposal_id')->constrained('proposals')->onDelete('cascade')->comment('Proposal');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->comment('Anggota Tim');
+            $table->foreignUuid('proposal_id')->constrained('proposals')->onDelete('cascade')->comment('Proposal');
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade')->comment('Anggota Tim');
             $table->enum('role', ['ketua', 'anggota'])->default('anggota')->comment('Peran dalam Tim');
             $table->text('tasks')->nullable()->comment('Bidang Tugas');
             $table->timestamps();

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -10,7 +11,17 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class CommunityService extends Model
 {
     /** @use HasFactory<\Database\Factories\CommunityServiceFactory> */
-    use HasFactory;
+    use HasFactory, HasUuids;
+
+    /**
+     * The type of the auto-incrementing ID's primary key.
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the ID is auto-incrementing.
+     */
+    public $incrementing = false;
 
     protected $fillable = [
         'partner_id',

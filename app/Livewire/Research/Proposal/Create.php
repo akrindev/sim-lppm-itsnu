@@ -4,6 +4,7 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Models\Proposal;
 use App\Models\Research;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Create extends Component
@@ -108,7 +109,7 @@ class Create extends Component
 
             $proposal = Proposal::create([
                 'title' => $this->title,
-                'submitter_id' => (int) auth()->id(),
+                'submitter_id' => (int) Auth::id(),
                 'detailable_id' => $research->id,
                 'detailable_type' => Research::class,
                 'research_scheme_id' => $this->research_scheme_id,

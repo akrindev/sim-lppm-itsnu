@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('proposals', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('title')->comment('Judul Proposal');
-            $table->foreignId('submitter_id')->constrained('users')->onDelete('cascade')->comment('Pengaju');
-            $table->morphs('detailable'); // Polymorphic relation to researches/community_services
+            $table->foreignUuid('submitter_id')->constrained('users')->onDelete('cascade')->comment('Pengaju');
+            $table->uuid('detailable_id')->nullable();
+            $table->string('detailable_type')->nullable();
             $table->foreignId('research_scheme_id')->nullable()->constrained('research_schemes')->onDelete('set null')->comment('Skema Penelitian');
             $table->foreignId('focus_area_id')->nullable()->constrained('focus_areas')->onDelete('set null')->comment('Bidang Fokus');
             $table->foreignId('theme_id')->nullable()->constrained('themes')->onDelete('set null')->comment('Tema');

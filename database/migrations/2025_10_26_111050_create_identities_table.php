@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('identities', function (Blueprint $table) {
             $table->id();
             $table->string('identity_id')->unique()->comment('NIDN / NIM');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->comment('User');
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade')->comment('User');
             $table->string('sinta_id')->nullable()->comment('ID SINTA');
             $table->enum('type', ['dosen', 'mahasiswa'])->comment('Tipe User');
             $table->string('address')->nullable()->comment('Alamat');
