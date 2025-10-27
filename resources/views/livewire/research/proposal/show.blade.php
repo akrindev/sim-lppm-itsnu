@@ -8,7 +8,7 @@
             {{ __('Kembali') }}
         </a>
         @if ($proposal->status === 'draft')
-            <a href="#" class="btn btn-primary">
+            <a href="{{ route('research.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
                 {{ __('Edit') }}
             </a>
@@ -106,6 +106,43 @@
             </div>
         </div>
 
+        <!-- Team Members -->
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">{{ __('Tim Peneliti') }}</h3>
+            </div>
+            <div class="p-0 card-body">
+                @if ($proposal->teamMembers->isNotEmpty())
+                    <div class="table-responsive">
+                        <table class="card-table table table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Nama') }}</th>
+                                    <th>{{ __('NIDN') }}</th>
+                                    <th>{{ __('Peran') }}</th>
+                                    <th>{{ __('Tugas') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($form->members as $member)
+                                    <tr>
+                                        <td>{{ $member['name'] }}</td>
+                                        <td>{{ $member['nidn'] ?? '' }}</td>
+                                        <td>{{ $member['role'] }}</td>
+                                        <td>{{ $member['tugas'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="py-4 text-secondary text-center">
+                        {{ __('Belum ada anggota tim ditambahkan') }}
+                    </div>
+                @endif
+            </div>
+        </div>
+
         <!-- Timeline -->
         <div class="card">
             <div class="card-header">
@@ -199,10 +236,43 @@
                     </a>
                 @endif
 
-                <button type="button" class="btn-outline-danger btn">
+                <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal">
                     <x-lucide-trash-2 class="icon" />
                     {{ __('Hapus') }}
                 </button>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                        <div class="bg-danger modal-status"></div>
+                        <div class="py-4 text-center modal-body">
+                            <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                            <h3>{{ __('Hapus Proposal?') }}</h3>
+                            <div class="text-secondary">
+                                {{ __('Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.') }}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="w-100">
+                                <div class="row">
+                                    <div class="col"><a href="#" class="w-100 btn btn-white"
+                                            data-bs-dismiss="modal">
+                                            {{ __('Batal') }}
+                                        </a></div>
+                                    <div class="col"><button type="button" wire:click="delete"
+                                            class="w-100 btn btn-danger" data-bs-dismiss="modal">
+                                            {{ __('Ya, Hapus Proposal') }}
+                                        </button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

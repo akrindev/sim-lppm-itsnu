@@ -143,6 +143,7 @@ class Proposal extends Model
     public function teamMembers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'proposal_user')
+            ->orderByPivot('created_at', 'desc')
             ->withPivot('role', 'tasks')
             ->withTimestamps();
     }

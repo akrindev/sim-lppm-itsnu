@@ -3,11 +3,11 @@
 namespace App\Livewire\Research\Proposal;
 
 use App\Livewire\Forms\ProposalForm;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Proposal;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
-class Create extends Component
+class Edit extends Component
 {
     public ProposalForm $form;
 
@@ -25,12 +25,15 @@ class Create extends Component
     public bool $memberFound = false;
 
     /**
-     * Mount the component.
+     * Mount the component with proposal data.
      */
-    public function mount(): void
+    public function mount(Proposal $proposal): void
     {
         // Generate a unique, stable component ID for this instance
-        $this->componentId = 'lwc-'.Str::random(10);
+        $this->componentId = 'lwc-' . Str::random(10);
+
+        // Load proposal data into form
+        $this->form->setProposal($proposal);
     }
 
     /**
@@ -43,12 +46,36 @@ class Create extends Component
             'member_tugas' => 'required|string|max:500',
         ]);
 
+        // Get member details
+        $identity = \App\Models\Identity::where('identity_id', $this->member_nidn)
+            ->with('user')
+            ->first();
+
+        if (! $identity || ! $identity->user) {
+            $this->addError('member_nidn', 'Anggota tidak ditemukan dalam sistem');
+            return;
+        }
+
+        // Check if member already added
+        $alreadyAdded = collect($this->form->members)->contains(function ($member) {
+            return $member['nidn'] === $this->member_nidn;
+        });
+
+        if ($alreadyAdded) {
+            $this->addError('member_nidn', 'Anggota ini sudah ditambahkan');
+            return;
+        }
+
         $this->form->members[] = [
+            'name' => $identity->user->name,
             'nidn' => $this->member_nidn,
             'tugas' => $this->member_tugas,
         ];
 
         $this->resetMemberForm();
+
+        // Close the modal
+        $this->dispatch('close-modal', 'modal-add-member');
     }
 
     /**
@@ -104,22 +131,22 @@ class Create extends Component
     }
 
     /**
-     * Save the proposal using the form object
+     * Update the proposal using the form object
      */
     public function save(): void
     {
         try {
-            $proposal = $this->form->store(Auth::user()->getKey());
-            session()->flash('success', 'Proposal penelitian berhasil dibuat');
-            $this->redirect(route('research.proposal.show', $proposal));
+            $this->form->update();
+            session()->flash('success', 'Proposal penelitian berhasil diperbarui');
+            $this->redirect(route('research.proposal.show', $this->form->proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal memperbarui proposal: ' . $e->getMessage());
         }
     }
 
     public function render()
     {
-        return view('livewire.research.proposal.create', [
+        return view('livewire.research.proposal.edit', [
             'schemes' => \App\Models\ResearchScheme::all(),
             'focusAreas' => \App\Models\FocusArea::all(),
             'themes' => \App\Models\Theme::all(),

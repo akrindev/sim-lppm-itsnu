@@ -89,7 +89,7 @@ class Index extends Component
     #[Computed]
     public function typeStats(): array
     {
-        $query = Proposal::where('detifiable_type', Research::class)
+        $query = Proposal::where('detailable_type', Research::class)
             ->where('submitter_id', Auth::user()->id);
 
         return [

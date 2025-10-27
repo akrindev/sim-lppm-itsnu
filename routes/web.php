@@ -11,6 +11,7 @@ use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
 use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
 use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
 use App\Livewire\Research\Proposal\Create as ResearchProposalCreate;
+use App\Livewire\Research\Proposal\Edit as ResearchProposalEdit;
 use App\Livewire\Research\Proposal\Index as ResearchProposalIndex;
 use App\Livewire\Research\Proposal\Show as ResearchProposalShow;
 use App\Livewire\Research\ProposalRevision\Index as ResearchProposalRevisionIndex;
@@ -52,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('proposal/create', ResearchProposalCreate::class)->name('proposal.create');
         Route::get('proposal/{proposal}', ResearchProposalShow::class)->name('proposal.show');
+        Route::get('proposal/{proposal}/edit', ResearchProposalEdit::class)->name('proposal.edit');
         Route::get('proposal-revision', ResearchProposalRevisionIndex::class)->name('proposal-revision.index');
         Route::get('progress-report', ResearchProgressReportIndex::class)->name('progress-report.index');
         Route::get('final-report', ResearchFinalReportIndex::class)->name('final-report.index');
@@ -87,4 +89,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
