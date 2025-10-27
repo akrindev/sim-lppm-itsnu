@@ -17,7 +17,7 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <!-- Search Input -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <input type="text" class="form-control"
                                 placeholder="Cari berdasarkan judul atau ringkasan..."
                                 wire:model.live.debounce.300ms="search" />
@@ -33,6 +33,16 @@
                                 <option value="approved">Disetujui</option>
                                 <option value="rejected">Ditolak</option>
                                 <option value="completed">Selesai</option>
+                            </select>
+                        </div>
+
+                        <!-- Year Filter -->
+                        <div class="col-md-2">
+                            <select class="form-select" wire:model.live="yearFilter">
+                                <option value="">Semua Tahun</option>
+                                @foreach ($this->availableYears as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -54,46 +64,20 @@
             <table class="card-table table table-vcenter">
                 <thead>
                     <tr>
-                        <th>
-                            <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('title')">
-                                Judul
-                                @if ($this->sortBy === 'title')
-                                    <x-lucide-{{ $this->sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
-                                        class="icon" />
-                                @endif
-                            </button>
-                        </th>
+                        <th>Judul</th>
                         <th>Peneliti</th>
-                        <th>
-                            <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('status')">
-                                Status
-                                @if ($this->sortBy === 'status')
-                                    <x-lucide-{{ $this->sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
-                                        class="icon" />
-                                @endif
-                            </button>
-                        </th>
+                        <th>Status</th>
                         <th>Skema</th>
                         <th>Bidang Fokus</th>
-                        <th>
-                            <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('created_at')">
-                                Tanggal Dibuat
-                                @if ($this->sortBy === 'created_at')
-                                    <x-lucide-{{ $this->sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
-                                        class="icon" />
-                                @endif
-                            </button>
-                        </th>
+                        <th>Tanggal Dibuat</th>
                         <th class="w-1">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($this->proposals as $proposal)
                         <tr wire:key="proposal-{{ $proposal->id }}">
-                            <td class="text-truncate" style="max-width: 250px;">
+                            <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
-                                <div class="text-secondary text-truncate">{{ Str::limit($proposal->summary, 60) }}
-                                </div>
                             </td>
                             <td>
                                 <div>{{ $proposal->submitter?->name }}</div>
@@ -101,7 +85,7 @@
                             </td>
                             <td>
                                 <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                                    Status: {{ ucfirst($proposal->status) }}
+                                    {{ ucfirst($proposal->status) }}
                                 </x-tabler.badge>
                             </td>
                             <td>

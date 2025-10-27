@@ -7,7 +7,7 @@ use App\Models\Research;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Reactive;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -15,39 +15,21 @@ class Index extends Component
 {
     use WithPagination;
 
-    #[Reactive]
+    #[Url]
     public string $search = '';
 
-    #[Reactive]
+    #[Url]
     public string $statusFilter = 'all';
 
-    #[Reactive]
-    public string $typeFilter = 'all';
-
-    #[Reactive]
-    public string $sortBy = 'created_at';
-
-    #[Reactive]
-    public string $sortDirection = 'desc';
+    #[Url]
+    public string $yearFilter = '';
 
     public function resetFilters(): void
     {
         $this->search = '';
         $this->statusFilter = 'all';
-        $this->typeFilter = 'all';
-        $this->sortBy = 'created_at';
-        $this->sortDirection = 'desc';
+        $this->yearFilter = '';
         $this->resetPage();
-    }
-
-    public function setSortBy(string $column): void
-    {
-        if ($this->sortBy === $column) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortBy = $column;
-            $this->sortDirection = 'asc';
-        }
     }
 
     public function render(): View
@@ -71,7 +53,10 @@ class Index extends Component
             ->when($this->statusFilter !== 'all', function ($query) {
                 $query->where('status', $this->statusFilter);
             })
-            ->orderBy($this->sortBy, $this->sortDirection)
+            ->when($this->yearFilter, function ($query) {
+                $query->whereYear('created_at', $this->yearFilter);
+            })
+            ->orderBy('created_at', 'desc')
             ->paginate(15);
     }
 
@@ -104,7 +89,7 @@ class Index extends Component
     #[Computed]
     public function typeStats(): array
     {
-        $query = Proposal::where('detailable_type', Research::class)
+        $query = Proposal::where('detifiable_type', Research::class)
             ->where('submitter_id', Auth::user()->id);
 
         return [
@@ -112,6 +97,20 @@ class Index extends Component
             'active' => (clone $query)->whereIn('status', ['submitted', 'under_review', 'approved'])->count(),
             'completed' => (clone $query)->where('status', 'completed')->count(),
         ];
+    }
+
+    #[Computed]
+    public function availableYears(): array
+    {
+        $years = Proposal::where('detailable_type', Research::class)
+            ->where('submitter_id', Auth::user()->id)
+            ->selectRaw('YEAR(created_at) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+
+        return $years;
     }
 
     public function deleteProposal(int $id): void
