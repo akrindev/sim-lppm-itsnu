@@ -21,6 +21,7 @@ class Index extends Component
 
     #[Url]
     public string $sortBy = 'created_at';
+
     #[Url]
     public string $sortDirection = 'desc';
 
@@ -49,6 +50,7 @@ class Index extends Component
             'availableYears' => $this->availableYears,
         ]);
     }
+
     public function setSortBy(string $field): void
     {
         if ($this->sortBy === $field) {
@@ -142,12 +144,14 @@ class Index extends Component
 
         if (! $proposal) {
             session()->flash('error', 'Proposal tidak ditemukan');
+
             return;
         }
 
         // Check authorization - user can only delete their own proposals
         if ($proposal->submitter_id !== Auth::user()->id) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
+
             return;
         }
 
@@ -155,7 +159,7 @@ class Index extends Component
             $proposal->delete();
             session()->flash('success', 'Proposal berhasil dihapus');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
         }
     }
 }

@@ -45,11 +45,12 @@ class Edit extends Component
         if ($proposal->submitter_id !== Auth::user()->id) {
             session()->flash('error', 'Anda tidak memiliki akses untuk mengedit proposal ini');
             $this->redirect(route('community-service.proposal.index'));
+
             return;
         }
 
         // Generate a unique, stable component ID for this instance
-        $this->componentId = 'lwc-' . Str::random(10);
+        $this->componentId = 'lwc-'.Str::random(10);
 
         // Load proposal data into form
         $this->form->setProposal($proposal);
@@ -72,6 +73,7 @@ class Edit extends Component
 
         if (! $identity || ! $identity->user) {
             $this->addError('member_nidn', 'Anggota tidak ditemukan dalam sistem');
+
             return;
         }
 
@@ -82,6 +84,7 @@ class Edit extends Component
 
         if ($alreadyAdded) {
             $this->addError('member_nidn', 'Anggota ini sudah ditambahkan');
+
             return;
         }
 
@@ -159,7 +162,7 @@ class Edit extends Component
             session()->flash('success', 'Proposal pengabdian masyarakat berhasil diperbarui');
             $this->redirect(route('community-service.proposal.show', $this->form->proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal memperbarui proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal memperbarui proposal: '.$e->getMessage());
         }
     }
 
