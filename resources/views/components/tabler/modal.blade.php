@@ -12,7 +12,7 @@
     'variant' => 'default', // simple, large, small, full-width, scrollable, form, success, danger, confirmation
     'type' => 'default', // success, danger, warning, info, primary (for colored headers)
     'icon' => null, // icon class for header
-    'componentId' => null,
+    'componentId' => str()->random(15),
     'onShow' => null,
     'onHide' => null,
 ])

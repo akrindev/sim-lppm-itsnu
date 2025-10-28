@@ -117,15 +117,14 @@
         </div> --}}
 
         <!-- Reviewer Assignment (Admin Only - Submitted Status) -->
-        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
-                $proposal->status === 'submitted')
+        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
             <div class="mb-3">
                 <livewire:research.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
             </div>
         @endif
 
         <!-- Reviewer Form (For Reviewers - Under Review Status) -->
-        @if ($proposal->status === 'under_review')
+        @if ($proposal->status === 'reviewed' || $proposal->status === 'under_review')
             <div class="mb-3">
                 <livewire:research.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
             </div>

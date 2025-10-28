@@ -9,9 +9,9 @@ use App\Models\User;
 class AssignReviewersAction
 {
     /**
-     * Assign reviewers to a proposal.
+     * Assign a reviewer to a proposal.
      */
-    public function execute(Proposal $proposal, array $reviewerIds): array
+    public function execute(Proposal $proposal, int|string $reviewerId): array
     {
         if ($proposal->status !== 'submitted') {
             return [
@@ -20,40 +20,39 @@ class AssignReviewersAction
             ];
         }
 
-        if (empty($reviewerIds)) {
+        // Validate already exists
+        $existingReviewer = $proposal->reviewers()->where('user_id', $reviewerId)->first();
+        if ($existingReviewer) {
             return [
                 'success' => false,
-                'message' => 'Minimal 1 reviewer harus ditugaskan.',
+                'message' => 'Reviewer sudah ditugaskan untuk proposal ini.',
             ];
         }
 
-        // Validate reviewers exist
-        $reviewers = User::whereIn('id', $reviewerIds)->get();
-        if ($reviewers->count() !== count($reviewerIds)) {
+        // Validate reviewer exists
+        $reviewer = User::find($reviewerId);
+        if (! $reviewer) {
             return [
                 'success' => false,
-                'message' => 'Beberapa reviewer tidak ditemukan.',
+                'message' => 'Reviewer tidak ditemukan.',
             ];
         }
 
-        // Clear existing reviewers if any
-        $proposal->reviewers()->delete();
+        // Assign reviewer
+        ProposalReviewer::create([
+            'proposal_id' => $proposal->id,
+            'user_id' => $reviewerId,
+            'status' => 'pending',
+        ]);
 
-        // Assign new reviewers
-        foreach ($reviewerIds as $reviewerId) {
-            ProposalReviewer::create([
-                'proposal_id' => $proposal->id,
-                'user_id' => $reviewerId,
-                'status' => 'pending',
-            ]);
+        // Update proposal status to reviewed if first reviewer
+        if ($proposal->reviewers()->count() === 1) {
+            $proposal->update(['status' => 'reviewed']);
         }
-
-        // Update proposal status to under_review
-        $proposal->update(['status' => 'under_review']);
 
         return [
             'success' => true,
-            'message' => sprintf('Berhasil menugaskan %d reviewer untuk proposal ini.', count($reviewerIds)),
+            'message' => 'Berhasil menugaskan reviewer untuk proposal ini.',
         ];
     }
 }

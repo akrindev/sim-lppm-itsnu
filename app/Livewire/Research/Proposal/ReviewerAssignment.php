@@ -14,8 +14,8 @@ class ReviewerAssignment extends Component
 {
     public string $proposalId = '';
 
-    #[Validate('required|array|min:1')]
-    public array $selectedReviewers = [];
+    #[Validate('required')]
+    public $selectedReviewer = '';
 
     public function mount(string $proposalId): void
     {
@@ -32,9 +32,9 @@ class ReviewerAssignment extends Component
     public function availableReviewers()
     {
         return User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['reviewer', 'admin lppm', 'kepala lppm']);
+            $query->whereIn('name', ['reviewer']);
         })
-            ->whereNotIn('id', $this->currentReviewers->pluck('user_id'))
+            ->with('identity:id,user_id,identity_id')
             ->get(['id', 'name', 'email']);
     }
 
@@ -52,12 +52,12 @@ class ReviewerAssignment extends Component
 
         $proposal = $this->proposal;
         $action = new AssignReviewersAction;
-        $result = $action->execute($proposal, $this->selectedReviewers);
+        $result = $action->execute($proposal, $this->selectedReviewer);
 
         if ($result['success']) {
             $this->dispatch('success', message: $result['message']);
             $this->dispatch('reviewers-assigned', proposalId: $proposal->id);
-            $this->selectedReviewers = [];
+            $this->selectedReviewer = null;
         } else {
             $this->dispatch('error', message: $result['message']);
         }
@@ -73,6 +73,12 @@ class ReviewerAssignment extends Component
             $reviewer->delete();
             $this->dispatch('success', message: 'Reviewer berhasil dihapus');
         }
+    }
+
+    public function resetReviewerForm(): void
+    {
+        $this->selectedReviewer = null;
+        $this->resetValidation();
     }
 
     public function render(): View
