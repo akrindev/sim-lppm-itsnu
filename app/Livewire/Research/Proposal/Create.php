@@ -3,10 +3,22 @@
 namespace App\Livewire\Research\Proposal;
 
 use App\Livewire\Forms\ProposalForm;
+use App\Models\FocusArea;
+use App\Models\NationalPriority;
+use App\Models\ResearchScheme;
+use App\Models\ScienceCluster;
+use App\Models\Theme;
+use App\Models\Topic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Layout('components.layouts.app')]
+#[Title('Buat Proposal Penelitian')]
 class Create extends Component
 {
     public ProposalForm $form;
@@ -30,7 +42,7 @@ class Create extends Component
     public function mount(): void
     {
         // Generate a unique, stable component ID for this instance
-        $this->componentId = 'lwc-'.Str::random(10);
+        $this->componentId = 'lwc-' . Str::random(10);
     }
 
     /**
@@ -113,19 +125,48 @@ class Create extends Component
             session()->flash('success', 'Proposal penelitian berhasil dibuat');
             $this->redirect(route('research.proposal.show', $proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal membuat proposal: ' . $e->getMessage());
         }
     }
 
-    public function render()
+    #[Computed]
+    public function schemes()
     {
-        return view('livewire.research.proposal.create', [
-            'schemes' => \App\Models\ResearchScheme::all(),
-            'focusAreas' => \App\Models\FocusArea::all(),
-            'themes' => \App\Models\Theme::all(),
-            'topics' => \App\Models\Topic::all(),
-            'nationalPriorities' => \App\Models\NationalPriority::all(),
-            'scienceClusters' => \App\Models\ScienceCluster::all(),
-        ]);
+        return ResearchScheme::all();
+    }
+
+    #[Computed]
+    public function focusAreas()
+    {
+        return FocusArea::all();
+    }
+
+    #[Computed]
+    public function themes()
+    {
+        return Theme::all();
+    }
+
+    #[Computed]
+    public function topics()
+    {
+        return Topic::all();
+    }
+
+    #[Computed]
+    public function nationalPriorities()
+    {
+        return NationalPriority::all();
+    }
+
+    #[Computed]
+    public function scienceClusters()
+    {
+        return ScienceCluster::all();
+    }
+
+    public function render(): View
+    {
+        return view('livewire.research.proposal.create');
     }
 }

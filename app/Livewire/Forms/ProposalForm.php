@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\CommunityService;
 use App\Models\Proposal;
 use App\Models\Research;
 use Livewire\Attributes\Validate;
@@ -130,6 +131,41 @@ class ProposalForm extends Form
             'detailable_id' => $research->id,
             'detailable_type' => Research::class,
             'research_scheme_id' => $this->research_scheme_id,
+            'focus_area_id' => $this->focus_area_id,
+            'theme_id' => $this->theme_id,
+            'topic_id' => $this->topic_id,
+            'national_priority_id' => $this->national_priority_id ?: null,
+            'cluster_level1_id' => $this->cluster_level1_id,
+            'cluster_level2_id' => $this->cluster_level2_id ?: null,
+            'cluster_level3_id' => $this->cluster_level3_id ?: null,
+            'sbk_value' => $this->sbk_value,
+            'duration_in_years' => (int) $this->duration_in_years,
+            'summary' => $this->summary,
+            'status' => 'draft',
+        ]);
+
+        $this->attachTeamMembers($proposal, $submitterId);
+
+        return $proposal;
+    }
+
+    /**
+     * Store a new Community Service proposal
+     */
+    public function storeCommunityService(string $submitterId): Proposal
+    {
+        $this->validate();
+
+        $communityService = CommunityService::create([
+            'background' => $this->background,
+            'methodology' => $this->methodology,
+        ]);
+
+        $proposal = Proposal::create([
+            'title' => $this->title,
+            'submitter_id' => $submitterId,
+            'detailable_id' => $communityService->id,
+            'detailable_type' => CommunityService::class,
             'focus_area_id' => $this->focus_area_id,
             'theme_id' => $this->theme_id,
             'topic_id' => $this->topic_id,

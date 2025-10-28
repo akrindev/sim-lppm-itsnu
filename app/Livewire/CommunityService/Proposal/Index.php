@@ -1,21 +1,29 @@
 <?php
 
-namespace App\Livewire\Research\Proposal;
+namespace App\Livewire\CommunityService\Proposal;
 
+use App\Models\CommunityService;
 use App\Models\Proposal;
-use App\Models\Research;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('components.layouts.app')]
+#[Title('Pengabdian Masyarakat')]
 class Index extends Component
 {
     use WithPagination;
 
     #[Url]
+    public string $sortBy = 'created_at';
+    #[Url]
+    public string $sortDirection = 'desc';
+
     public string $search = '';
 
     #[Url]
@@ -34,21 +42,31 @@ class Index extends Component
 
     public function render(): View
     {
-        return view('livewire.research.proposal.index', [
+        return view('livewire.community-service.proposal.index', [
             'proposals' => $this->proposals,
             'statusStats' => $this->statusStats,
             'typeStats' => $this->typeStats,
             'availableYears' => $this->availableYears,
         ]);
     }
+    public function setSortBy(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
 
     #[Computed]
     public function proposals()
     {
         return Proposal::query()
-            ->where('detailable_type', Research::class)
+            ->where('detailable_type', CommunityService::class)
             ->where('submitter_id', Auth::user()->id)
-            ->with(['submitter', 'focusArea', 'researchScheme'])
+            ->with(['submitter', 'focusArea'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('title', 'like', "%{$this->search}%")
@@ -61,7 +79,7 @@ class Index extends Component
             ->when($this->yearFilter, function ($query) {
                 $query->whereYear('created_at', $this->yearFilter);
             })
-            ->orderBy('created_at', 'desc')
+            ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate(15);
     }
 
@@ -78,7 +96,7 @@ class Index extends Component
             'completed' => 0,
         ];
 
-        Proposal::where('detailable_type', Research::class)
+        Proposal::where('detailable_type', CommunityService::class)
             ->where('submitter_id', Auth::user()->id)
             ->get(['status'])
             ->each(function ($proposal) use (&$stats) {
@@ -94,7 +112,7 @@ class Index extends Component
     #[Computed]
     public function typeStats(): array
     {
-        $query = Proposal::where('detailable_type', Research::class)
+        $query = Proposal::where('detailable_type', CommunityService::class)
             ->where('submitter_id', Auth::user()->id);
 
         return [
@@ -107,7 +125,7 @@ class Index extends Component
     #[Computed]
     public function availableYears(): array
     {
-        $years = Proposal::where('detailable_type', Research::class)
+        $years = Proposal::where('detailable_type', CommunityService::class)
             ->where('submitter_id', Auth::user()->id)
             ->selectRaw('YEAR(created_at) as year')
             ->distinct()

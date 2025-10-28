@@ -4,9 +4,14 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Livewire\Forms\ProposalForm;
 use App\Models\Proposal;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Layout('components.layouts.app')]
+#[Title('Detail Proposal Penelitian')]
 class Show extends Component
 {
     public ProposalForm $form;
@@ -24,6 +29,12 @@ class Show extends Component
      */
     public function delete(): void
     {
+        // Check authorization - user can only delete their own proposals
+        if ($this->form->proposal->submitter_id !== Auth::user()->id) {
+            session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
+            return;
+        }
+
         try {
             $this->form->delete();
             session()->flash('success', 'Proposal penelitian berhasil dihapus');

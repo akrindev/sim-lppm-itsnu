@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Livewire\Research\Proposal;
+namespace App\Livewire\CommunityService\Proposal;
 
 use App\Livewire\Forms\ProposalForm;
 use App\Models\FocusArea;
 use App\Models\NationalPriority;
 use App\Models\Proposal;
-use App\Models\ResearchScheme;
 use App\Models\ScienceCluster;
 use App\Models\Theme;
 use App\Models\Topic;
@@ -19,7 +18,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('components.layouts.app')]
-#[Title('Edit Proposal Penelitian')]
+#[Title('Edit Proposal Pengabdian Masyarakat')]
 class Edit extends Component
 {
     public ProposalForm $form;
@@ -45,7 +44,7 @@ class Edit extends Component
         // Check authorization - user can only edit their own proposals
         if ($proposal->submitter_id !== Auth::user()->id) {
             session()->flash('error', 'Anda tidak memiliki akses untuk mengedit proposal ini');
-            $this->redirect(route('research.proposal.index'));
+            $this->redirect(route('community-service.proposal.index'));
             return;
         }
 
@@ -157,17 +156,11 @@ class Edit extends Component
     {
         try {
             $this->form->update();
-            session()->flash('success', 'Proposal penelitian berhasil diperbarui');
-            $this->redirect(route('research.proposal.show', $this->form->proposal));
+            session()->flash('success', 'Proposal pengabdian masyarakat berhasil diperbarui');
+            $this->redirect(route('community-service.proposal.show', $this->form->proposal));
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal memperbarui proposal: ' . $e->getMessage());
         }
-    }
-
-    #[Computed]
-    public function schemes()
-    {
-        return ResearchScheme::all();
     }
 
     #[Computed]
@@ -202,6 +195,6 @@ class Edit extends Component
 
     public function render(): View
     {
-        return view('livewire.research.proposal.edit');
+        return view('livewire.community-service.proposal.edit');
     }
 }

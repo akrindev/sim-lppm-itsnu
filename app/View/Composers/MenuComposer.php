@@ -66,7 +66,7 @@ class MenuComposer
                     [
                         'title' => 'Usulan',
                         'icon' => 'file-text',
-                        'route' => 'community-service.proposal.create',
+                        'route' => 'community-service.proposal.index',
                     ],
                     [
                         'title' => 'Perbaikan Usulan',

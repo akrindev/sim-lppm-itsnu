@@ -62,7 +62,7 @@
                                 class="form-select tom-select @error('research_scheme_id') is-invalid @enderror"
                                 wire:model.defer="research_scheme_id" placeholder="Pilih skema penelitian" required>
                                 <option value="">-- Pilih Skema Penelitian --</option>
-                                @foreach ($schemes as $scheme)
+                                @foreach ($this->schemes as $scheme)
                                     <option value="{{ $scheme->id }}">{{ $scheme->name }}</option>
                                 @endforeach
                             </select>
@@ -94,7 +94,7 @@
                                 class="form-select tom-select @error('focus_area_id') is-invalid @enderror"
                                 wire:model.defer="focus_area_id" placeholder="Pilih bidang fokus" required>
                                 <option value="">-- Pilih Bidang Fokus --</option>
-                                @foreach ($focusAreas as $area)
+                                @foreach ($this->focusAreas as $area)
                                     <option value="{{ $area->id }}">{{ $area->name }}</option>
                                 @endforeach
                             </select>
@@ -111,7 +111,7 @@
                                 class="form-select tom-select @error('theme_id') is-invalid @enderror"
                                 wire:model.defer="theme_id" placeholder="Pilih tema" required>
                                 <option value="">-- Pilih Tema --</option>
-                                @foreach ($themes as $theme)
+                                @foreach ($this->themes as $theme)
                                     <option value="{{ $theme->id }}">{{ $theme->name }}</option>
                                 @endforeach
                             </select>
@@ -128,7 +128,7 @@
                                 class="form-select tom-select @error('topic_id') is-invalid @enderror"
                                 wire:model.defer="topic_id" placeholder="Pilih topik" required>
                                 <option value="">-- Pilih Topik --</option>
-                                @foreach ($topics as $topic)
+                                @foreach ($this->topics as $topic)
                                     <option value="{{ $topic->id }}">{{ $topic->name }}</option>
                                 @endforeach
                             </select>
@@ -146,7 +146,7 @@
                                 wire:model.defer="national_priority_id"
                                 placeholder="Pilih prioritas nasional (opsional)">
                                 <option value="">-- Pilih Prioritas Nasional (Opsional) --</option>
-                                @foreach ($nationalPriorities as $priority)
+                                @foreach ($this->nationalPriorities as $priority)
                                     <option value="{{ $priority->id }}">{{ $priority->name }}</option>
                                 @endforeach
                             </select>
@@ -312,7 +312,7 @@
                                 class="form-select tom-select @error('cluster_level1_id') is-invalid @enderror"
                                 wire:model.defer="cluster_level1_id" placeholder="Pilih level 1" required>
                                 <option value="">-- Pilih Level 1 --</option>
-                                @foreach ($scienceClusters->where('level', 1) as $cluster)
+                                @foreach ($this->scienceClusters->where('level', 1) as $cluster)
                                     <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
                                 @endforeach
                             </select>
@@ -329,7 +329,7 @@
                                 class="form-select tom-select @error('cluster_level2_id') is-invalid @enderror"
                                 wire:model.defer="cluster_level2_id" placeholder="Pilih level 2 (opsional)">
                                 <option value="">-- Pilih Level 2 (Opsional) --</option>
-                                @foreach ($scienceClusters->where('level', 2) as $cluster)
+                                @foreach ($this->scienceClusters->where('level', 2) as $cluster)
                                     <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
                                 @endforeach
                             </select>
@@ -346,7 +346,7 @@
                                 class="form-select tom-select @error('cluster_level3_id') is-invalid @enderror"
                                 wire:model.defer="cluster_level3_id" placeholder="Pilih level 3 (opsional)">
                                 <option value="">-- Pilih Level 3 (Opsional) --</option>
-                                @foreach ($scienceClusters->where('level', 3) as $cluster)
+                                @foreach ($this->scienceClusters->where('level', 3) as $cluster)
                                     <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
                                 @endforeach
                             </select>

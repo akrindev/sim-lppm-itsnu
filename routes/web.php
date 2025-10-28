@@ -5,6 +5,8 @@ use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalRepo
 use App\Livewire\CommunityService\Index as CommunityServiceIndex;
 use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
 use App\Livewire\CommunityService\Proposal\Create as CommunityServiceProposalCreate;
+use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
+use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalIndex;
 use App\Livewire\CommunityService\Proposal\Show as CommunityServiceProposalShow;
 use App\Livewire\CommunityService\ProposalRevision\Index as CommunityServiceProposalRevisionIndex;
 use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
@@ -62,9 +64,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Community Service Routes
     Route::middleware(['role:dosen'])->prefix('community-service')->name('community-service.')->group(function () {
-        Route::get('/', CommunityServiceIndex::class)->name('index');
+        Route::get('/', CommunityServiceProposalIndex::class)->name('proposal.index');
         Route::get('proposal/create', CommunityServiceProposalCreate::class)->name('proposal.create');
         Route::get('proposal/{proposal}', CommunityServiceProposalShow::class)->name('proposal.show');
+        Route::get('proposal/{proposal}/edit', CommunityServiceProposalEdit::class)->name('proposal.edit');
         Route::get('proposal-revision', CommunityServiceProposalRevisionIndex::class)->name('proposal-revision.index');
         Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
