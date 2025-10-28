@@ -29,7 +29,7 @@ class MenuComposer
             [
                 'title' => 'Penelitian',
                 'icon' => 'puzzle',
-                'roles' => ['dosen'],
+                'roles' => ['dosen', 'kepala lppm', 'reviewer', 'admin lppm', 'rektor'],
                 'children' => [
                     [
                         'title' => 'Usulan',
@@ -61,7 +61,7 @@ class MenuComposer
             [
                 'title' => 'Pengabdian',
                 'icon' => 'gift',
-                'roles' => ['dosen'],
+                'roles' => ['dosen', 'kepala lppm', 'reviewer', 'admin lppm', 'rektor'],
                 'children' => [
                     [
                         'title' => 'Usulan',

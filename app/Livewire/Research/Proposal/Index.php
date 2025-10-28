@@ -34,20 +34,25 @@ class Index extends Component
 
     public function render(): View
     {
-        return view('livewire.research.proposal.index', [
-            'proposals' => $this->proposals,
-            'statusStats' => $this->statusStats,
-            'typeStats' => $this->typeStats,
-            'availableYears' => $this->availableYears,
-        ]);
+        return view('livewire.research.proposal.index');
     }
 
     #[Computed]
     public function proposals()
     {
-        return Proposal::query()
-            ->where('detailable_type', Research::class)
-            ->where('submitter_id', Auth::user()->id)
+        $query = Proposal::query()
+            ->where('detailable_type', Research::class);
+
+        // Show all proposals for admin, kepala lppm, and rektor roles
+        $user = Auth::user();
+        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+
+        if (! $isAdmin) {
+            // Regular users only see their own proposals
+            $query->where('submitter_id', $user->id);
+        }
+
+        return $query
             ->with(['submitter', 'focusArea', 'researchScheme'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
@@ -78,9 +83,15 @@ class Index extends Component
             'completed' => 0,
         ];
 
-        Proposal::where('detailable_type', Research::class)
-            ->where('submitter_id', Auth::user()->id)
-            ->get(['status'])
+        $user = Auth::user();
+        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+
+        $query = Proposal::where('detailable_type', Research::class);
+        if (! $isAdmin) {
+            $query->where('submitter_id', $user->id);
+        }
+
+        $query->get(['status'])
             ->each(function ($proposal) use (&$stats) {
                 $stats['all']++;
                 if (isset($stats[$proposal->status])) {
@@ -94,8 +105,13 @@ class Index extends Component
     #[Computed]
     public function typeStats(): array
     {
-        $query = Proposal::where('detailable_type', Research::class)
-            ->where('submitter_id', Auth::user()->id);
+        $user = Auth::user();
+        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+
+        $query = Proposal::where('detailable_type', Research::class);
+        if (! $isAdmin) {
+            $query->where('submitter_id', $user->id);
+        }
 
         return [
             'all' => (clone $query)->count(),
@@ -107,8 +123,15 @@ class Index extends Component
     #[Computed]
     public function availableYears(): array
     {
-        $years = Proposal::where('detailable_type', Research::class)
-            ->where('submitter_id', Auth::user()->id)
+        $user = Auth::user();
+        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+
+        $query = Proposal::where('detailable_type', Research::class);
+        if (! $isAdmin) {
+            $query->where('submitter_id', $user->id);
+        }
+
+        $years = $query
             ->selectRaw('YEAR(created_at) as year')
             ->distinct()
             ->orderBy('year', 'desc')
@@ -127,8 +150,9 @@ class Index extends Component
             return;
         }
 
-        // Check authorization - user can only delete their own proposals
-        if ($proposal->submitter_id !== Auth::user()->id) {
+        $user = Auth::user();
+        // Only admin lppm can delete proposals
+        if (! $user->hasRole('admin lppm')) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
             return;
         }

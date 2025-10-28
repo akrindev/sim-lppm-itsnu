@@ -185,4 +185,105 @@ class Proposal extends Model
     {
         return $this->hasMany(ResearchStage::class);
     }
+
+    /**
+     * Get all reviewers for the proposal.
+     */
+    public function reviewers(): HasMany
+    {
+        return $this->hasMany(ProposalReviewer::class);
+    }
+
+    /**
+     * Check if all team members have accepted the invitation.
+     */
+    public function allTeamMembersAccepted(): bool
+    {
+        $totalMembers = $this->teamMembers()->count();
+        if ($totalMembers === 0) {
+            return true;
+        }
+
+        $acceptedMembers = $this->teamMembers()
+            ->wherePivot('status', 'accepted')
+            ->count();
+
+        return $totalMembers === $acceptedMembers;
+    }
+
+    /**
+     * Check if all reviewers have completed their reviews.
+     */
+    public function allReviewsCompleted(): bool
+    {
+        $totalReviewers = $this->reviewers()->count();
+        if ($totalReviewers === 0) {
+            return false;
+        }
+
+        $completedReviews = $this->reviewers()
+            ->where('status', 'completed')
+            ->count();
+
+        return $totalReviewers === $completedReviews;
+    }
+
+    /**
+     * Get pending team member invitations.
+     */
+    public function pendingTeamMembers()
+    {
+        return $this->teamMembers()
+            ->wherePivot('status', 'pending');
+    }
+
+    /**
+     * Get pending reviewer assignments.
+     */
+    public function pendingReviewers()
+    {
+        return $this->reviewers()
+            ->where('status', 'pending');
+    }
+
+    /**
+     * Get all pending team members (anggota who haven't accepted).
+     */
+    public function getPendingTeamMembers()
+    {
+        return $this->teamMembers()
+            ->wherePivot('status', '!=', 'accepted')
+            ->get();
+    }
+
+    /**
+     * Get all pending reviewers (who haven't completed their review).
+     */
+    public function getPendingReviewers()
+    {
+        return $this->reviewers()
+            ->where('status', '!=', 'completed')
+            ->get();
+    }
+
+    /**
+     * Check if all reviewers have completed their reviews.
+     */
+    public function allReviewersCompleted(): bool
+    {
+        $totalReviewers = $this->reviewers()->count();
+        $completedReviewers = $this->reviewers()
+            ->where('status', 'completed')
+            ->count();
+
+        return $totalReviewers > 0 && $totalReviewers === $completedReviewers;
+    }
+
+    /**
+     * Check if proposal can be approved (all reviewers completed).
+     */
+    public function canBeApproved(): bool
+    {
+        return $this->allReviewersCompleted();
+    }
 }

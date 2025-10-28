@@ -2,12 +2,14 @@
 <x-slot:pageTitle>Daftar Penelitian</x-slot:pageTitle>
 <x-slot:pageSubtitle>Kelola proposal penelitian Anda dengan fitur lengkap.</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    <div class="btn-list">
-        <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
-            <x-lucide-plus class="icon" />
-            Usulan Penelitian Baru
-        </a>
-    </div>
+    @unless (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
+        <div class="btn-list">
+            <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
+                <x-lucide-plus class="icon" />
+                Usulan Penelitian Baru
+            </a>
+        </div>
+    @endunless
 </x-slot:pageActions>
 
 <div>
@@ -114,11 +116,13 @@
                                             <x-lucide-pencil class="icon" />
                                         </a>
                                     @endif
-                                    <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
-                                        wire:click="deleteProposal({{ $proposal->id }})"
-                                        wire:confirm="Yakin ingin menghapus proposal ini?">
-                                        <x-lucide-trash-2 class="icon" />
-                                    </button>
+                                    @if (auth()->user()->hasRole('admin lppm'))
+                                        <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
+                                            wire:click="deleteProposal({{ $proposal->id }})"
+                                            wire:confirm="Yakin ingin menghapus proposal ini?">
+                                            <x-lucide-trash-2 class="icon" />
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Research Routes
-    Route::middleware(['role:dosen'])->prefix('research')->name('research.')->group(function () {
+    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor'])->prefix('research')->name('research.')->group(function () {
         Route::get('/', ResearchProposalIndex::class)->name('proposal.index');
 
         Route::get('proposal/create', ResearchProposalCreate::class)->name('proposal.create');
@@ -63,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Community Service Routes
-    Route::middleware(['role:dosen'])->prefix('community-service')->name('community-service.')->group(function () {
+    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor'])->prefix('community-service')->name('community-service.')->group(function () {
         Route::get('/', CommunityServiceProposalIndex::class)->name('proposal.index');
         Route::get('proposal/create', CommunityServiceProposalCreate::class)->name('proposal.create');
         Route::get('proposal/{proposal}', CommunityServiceProposalShow::class)->name('proposal.show');
