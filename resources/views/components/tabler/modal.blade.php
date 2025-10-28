@@ -182,9 +182,25 @@
                 // Set up listeners on initial load
                 setupTablerModalListeners();
 
-                // Re-setup listeners when Livewire updates the DOM
-                window.Livewire?.hook('message.processed', setupTablerModalListeners);
-                window.Livewire?.hook('dom.updated', setupTablerModalListeners);
+                // Re-setup listeners when Livewire updates the DOM using v3 hooks
+                Livewire.hook('morph.updated', setupTablerModalListeners);
+                Livewire.hook('morph.removed', setupTablerModalListeners);
+
+                // Listen for close-modal dispatch from Livewire
+                window.Livewire?.on('close-modal', (event) => {
+                    const modal = document.getElementById(event.detail.modalId);
+                    console.log('Received close-modal for:', event.detail);
+                    if (modal) {
+                        // Use setTimeout to ensure Bootstrap is loaded
+                        setTimeout(() => {
+                            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                                const bsModal = bootstrap.Modal.getInstance(modal) || new bootstrap
+                                    .Modal(modal);
+                                bsModal.hide();
+                            }
+                        }, 0);
+                    }
+                });
             });
         </script>
     @endpush

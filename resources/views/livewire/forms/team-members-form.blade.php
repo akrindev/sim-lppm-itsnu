@@ -1,6 +1,6 @@
 <div>
     <!-- Members List -->
-    @if (!empty($membersList))
+    @if (!empty($members))
         <div class="mb-4">
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
@@ -13,7 +13,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($membersList as $index => $member)
+                        @foreach ($members as $index => $member)
                             <tr wire:key="member-{{ $index }}">
                                 <td class="align-middle">
                                     {{ $member['name'] }}<br />
@@ -75,28 +75,50 @@
 
                 @if ($memberFound && $foundMember)
                     <div class="mb-3 alert alert-success">
-                        <div class="mb-2">
-                            <strong>Anggota Ditemukan:</strong>
+
+                        <div class="alert-icon">
+                            <!-- Download SVG icon from http://tabler.io/icons/icon/check -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="icon alert-icon icon-2">
+                                <path d="M5 12l5 5l10 -10"></path>
+                            </svg>
                         </div>
-                        <div class="small">
-                            <div><strong>Nama:</strong> {{ $foundMember['name'] }}</div>
-                            <div><strong>Email:</strong> {{ $foundMember['email'] }}</div>
-                            @if ($foundMember['institution'])
-                                <div><strong>Institusi:</strong> {{ $foundMember['institution'] }}</div>
+
+                        <dl class="mb-0 row g-2 small">
+                            <div class="mb-2 col-12"><strong>Anggota Ditemukan:</strong></div> <br>
+                            <dt class="text-bold col-12 col-sm-4">Nama</dt>
+                            <dd class="col-12 col-sm-8">{{ $foundMember['name'] }}</dd>
+
+                            <dt class="text-bold col-12 col-sm-4">NUPTK/NIDN</dt>
+                            <dd class="col-12 col-sm-8">
+                                {{ $foundMember['nidn'] }}
+                            </dd>
+
+                            @if (!empty($foundMember['institution']))
+                                <dt class="text-bold col-12 col-sm-4">Institusi</dt>
+                                <dd class="col-12 col-sm-8">{{ $foundMember['institution'] }}</dd>
                             @endif
-                            @if ($foundMember['study_program'])
-                                <div><strong>Program Studi:</strong> {{ $foundMember['study_program'] }}</div>
+
+                            @if (!empty($foundMember['study_program']))
+                                <dt class="text-bold col-12 col-sm-4">Program Studi</dt>
+                                <dd class="col-12 col-sm-8">{{ $foundMember['study_program'] }}</dd>
                             @endif
-                            <div><strong>Tipe Identitas:</strong> {{ $foundMember['identity_type'] }}</div>
-                        </div>
+
+                            <dt class="text-bold col-12 col-sm-4">Tipe Identitas</dt>
+                            <dd class="col-12 col-sm-8">{{ $foundMember['identity_type'] }}</dd>
+                        </dl>
                     </div>
                 @endif
 
                 <div class="mb-3">
                     <label class="form-label" for="member_tugas">Tugas <span class="text-danger">*</span></label>
-                    <textarea id="member_tugas" class="form-control @error('member_tugas') is-invalid @enderror"
-                        wire:model.live="member_tugas" rows="3" placeholder="Jelaskan tugas anggota dalam penelitian ini"
-                        {{ !$memberFound ? 'disabled' : '' }} required></textarea>
+                    <textarea id="member_tugas" @class([
+                        'form-control',
+                        'is-invalid' => $errors->has('member_tugas'),
+                        'disabled' => !$memberFound,
+                    ]) wire:model.live="member_tugas" rows="3"
+                        placeholder="Jelaskan tugas anggota dalam penelitian ini" {{ !$memberFound ? 'disabled' : '' }} required></textarea>
                     @error('member_tugas')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror

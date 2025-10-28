@@ -22,7 +22,7 @@
         <!-- Basic Information -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">Informasi Dasar</h3>
+                <h3 class="card-title">1.1 Informasi Dasar</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
@@ -34,7 +34,7 @@
                         <label class="form-label">Status</label>
                         <p>
                             <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                                Status: {{ ucfirst($proposal->status) }}
+                                {{ ucfirst($proposal->status) }}
                             </x-tabler.badge>
                         </p>
                     </div>
@@ -42,7 +42,7 @@
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Peneliti</label>
+                        <label class="form-label">Author</label>
                         <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                     </div>
                     <div class="col-md-6">
@@ -72,7 +72,7 @@
         <!-- Classification -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">Klasifikasi</h3>
+                <h3 class="card-title">1.2 Klasifikasi</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
@@ -105,6 +105,30 @@
                 </div>
             </div>
         </div>
+
+        {{-- klasifikasi ilmu --}}
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.3 Klasifikasi Ilmu</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 row">
+                    <div class="col-md-12">
+                        <label class="form-label">Level 1</label>
+                        <p class="text-reset">{{ $proposal->clusterLevel1?->name ?? '—' }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Level 2</label>
+                        <p class="text-reset">{{ $proposal->clusterLevel2?->name ?? '—' }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Level 3</label>
+                        <p class="text-reset">{{ $proposal->clusterLevel3?->name ?? '—' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Team Members Management -->
         <div class="mb-3">
@@ -166,11 +190,6 @@
                 <h3 class="card-title">Status Proposal</h3>
             </div>
             <div class="text-center card-body">
-                <div class="mb-3">
-                    <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                        Status: {{ ucfirst($proposal->status) }}
-                    </x-tabler.badge>
-                </div>
                 <p class="text-secondary text-sm">
                     @switch($proposal->status)
                         @case('draft')

@@ -40,7 +40,7 @@ class ProposalForm extends Form
     #[Validate('nullable|exists:science_clusters,id')]
     public string $cluster_level3_id = '';
 
-    #[Validate('required|numeric|min:0')]
+    #[Validate('nullable|numeric|min:0')]
     public string $sbk_value = '';
 
     #[Validate('required|integer|min:1|max:10')]
@@ -176,10 +176,10 @@ class ProposalForm extends Form
         // This prevents double-validation and maintains form data integrity
 
         $research = Research::create([
-            'final_tkt_target' => $this->final_tkt_target,
-            'background' => $this->background,
-            'state_of_the_art' => $this->state_of_the_art,
-            'methodology' => $this->methodology,
+            'final_tkt_target' => $this->final_tkt_target ?: null,
+            'background' => $this->background ?: null,
+            'state_of_the_art' => $this->state_of_the_art ?: null,
+            'methodology' => $this->methodology ?: null,
             'roadmap_data' => $this->roadmap_data ?: null,
         ]);
 
@@ -196,7 +196,7 @@ class ProposalForm extends Form
             'cluster_level1_id' => $this->cluster_level1_id,
             'cluster_level2_id' => $this->cluster_level2_id ?: null,
             'cluster_level3_id' => $this->cluster_level3_id ?: null,
-            'sbk_value' => $this->sbk_value,
+            'sbk_value' => $this->sbk_value ?: null,
             'duration_in_years' => (int) $this->duration_in_years,
             'summary' => $this->summary,
             'status' => 'draft',
@@ -328,7 +328,7 @@ class ProposalForm extends Form
             'cluster_level1_id' => 'required|exists:science_clusters,id',
             'cluster_level2_id' => 'nullable|exists:science_clusters,id',
             'cluster_level3_id' => 'nullable|exists:science_clusters,id',
-            'sbk_value' => 'required|numeric|min:0',
+            'sbk_value' => 'nullable|numeric|min:0',
             'duration_in_years' => 'required|integer|min:1|max:10',
             'summary' => 'required|string|min:100',
         ];

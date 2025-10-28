@@ -310,6 +310,36 @@
             </div>
         </div>
 
+        {{-- section: ketua tasks --}}
+        <div class="mb-3 card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <x-lucide-user-check class="me-3 icon" />
+                    <h3 class="mb-0 card-title">Tugas Ketua Peneliti</h3>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Ketua Peneliti</label>
+                    <input type="text" class="form-control @error('author_name') is-invalid @enderror"
+                        wire:model="author_name" placeholder="Nama Ketua Peneliti" required disabled />
+                    @error('author_name')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="ketua_tasks">Jelaskan tugas ketua peneliti dalam penelitian ini
+                        <span class="text-danger">*</span></label>
+                    <textarea id="ketua_tasks" class="form-control @error('form.author_tasks') is-invalid @enderror"
+                        wire:model="form.author_tasks" rows="3" placeholder="Jelaskan tugas ketua peneliti dalam penelitian ini"
+                        required></textarea>
+                    @error('form.author_tasks')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
         <!-- Section: Anggota -->
         <div class="mb-3 card">
             <div class="card-body">
@@ -319,7 +349,7 @@
                 </div>
 
                 <livewire:forms.team-members-form :members="$form->members" modal-title="Tambah Anggota Peneliti"
-                    member-label="Anggota Peneliti" wire:model="form.members" />
+                    member-label="Anggota Peneliti" />
             </div>
         </div>
 

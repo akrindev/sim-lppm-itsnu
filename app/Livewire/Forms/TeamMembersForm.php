@@ -54,11 +54,20 @@ class TeamMembersForm extends Component
             ->with('user', 'institution', 'studyProgram')
             ->first();
 
+        // if it self show error
+        if ($identity && request()->user() && $identity->user_id === request()->user()->getKey()) {
+            $this->memberFound = false;
+            $this->foundMember = null;
+            $this->addError('member_nidn', 'Anda tidak dapat menambahkan diri sendiri sebagai anggota');
+            return;
+        }
+
         if ($identity) {
             $this->memberFound = true;
             $this->foundMember = [
                 'name' => $identity->user->name,
                 'email' => $identity->user->email,
+                'nidn' => $identity->identity_id,
                 'institution' => $identity->institution?->name,
                 'study_program' => $identity->studyProgram?->name,
                 'identity_type' => $identity->type,
@@ -104,8 +113,10 @@ class TeamMembersForm extends Component
 
         $this->resetMemberForm();
 
+        $this->dispatch('members-updated', members: $this->members);
+
         // Dispatch event to close modal
-        $this->dispatch('close-modal', 'modal-add-member');
+        $this->dispatch('close-modal', 'modal-add-member')->to('research.proposal.create');
     }
 
     /**
@@ -115,8 +126,10 @@ class TeamMembersForm extends Component
     {
         unset($this->members[$index]);
         $this->members = array_values($this->members);
-    }
 
+        // Dispatch to parent component
+        $this->dispatch('members-updated', members: $this->members);
+    }
     /**
      * Reset member form
      */

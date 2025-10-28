@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -23,12 +24,25 @@ class Create extends Component
 {
     public ProposalForm $form;
 
+
+    public string $author_name = '';
+
+
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        //
+        $this->author_name = Str::title(Auth::user()->name .  ' (' . Auth::user()->identity->identity_id . ')');
+    }
+
+    /**
+     * Handle members updated event from TeamMembersForm
+     */
+    #[On('members-updated')]
+    public function updateMembers(array $members): void
+    {
+        $this->form->members = $members;
     }
 
     /**
@@ -37,6 +51,7 @@ class Create extends Component
     public function save(): void
     {
         $this->form->validate();
+
         try {
             $proposal = $this->form->store(Auth::user()->getKey());
             session()->flash('success', 'Proposal penelitian berhasil dibuat');

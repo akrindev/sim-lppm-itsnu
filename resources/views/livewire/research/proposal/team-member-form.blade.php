@@ -8,7 +8,7 @@
             <table class="card-table table table-vcenter">
                 <thead>
                     <tr>
-                        <th>Nama</th>
+                        <th width="25%">Nama</th>
                         <th>Tugas</th>
                         <th>Peran</th>
                         <th>Status</th>
