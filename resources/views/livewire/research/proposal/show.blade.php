@@ -235,37 +235,30 @@
                 </button>
             </div>
 
+
             <!-- Delete Confirmation Modal -->
-            <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-sm modal-dialog-centered">
-                    <div class="modal-content">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                        <div class="bg-danger modal-status"></div>
-                        <div class="py-4 text-center modal-body">
+            @teleport('body')
+                <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
+                    <x-slot:body>
+                        <div class="py-4 text-center">
                             <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
                             <h3>Hapus Proposal?</h3>
                             <div class="text-secondary">
                                 Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <div class="w-100">
-                                <div class="row">
-                                    <div class="col"><a href="#" class="w-100 btn btn-white"
-                                            data-bs-dismiss="modal">
-                                            Batal
-                                        </a></div>
-                                    <div class="col"><button type="button" wire:click="delete"
-                                            class="w-100 btn btn-danger" data-bs-dismiss="modal">
-                                            Ya, Hapus Proposal
-                                        </button></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    </x-slot:body>
+
+                    <x-slot:footer>
+                        <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="button" wire:click="delete" class="btn btn-danger" data-bs-dismiss="modal">
+                            Ya, Hapus Proposal
+                        </button>
+                    </x-slot:footer>
+                </x-tabler.modal>
+            @endteleport
         </div>
     </div>
 </div>

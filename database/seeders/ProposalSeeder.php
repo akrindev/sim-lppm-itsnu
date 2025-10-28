@@ -12,8 +12,8 @@ class ProposalSeeder extends Seeder
     public function run(): void
     {
         // Get necessary data
-        $dosenUsers = \App\Models\User::with('identity')->whereHas('identity', fn($q) => $q->where('type', 'dosen'))->get();
-        $mahasiswaUsers = \App\Models\User::with('identity')->whereHas('identity', fn($q) => $q->where('type', 'mahasiswa'))->get();
+        $dosenUsers = \App\Models\User::with('identity')->whereHas('identity', fn ($q) => $q->where('type', 'dosen'))->get();
+        $mahasiswaUsers = \App\Models\User::with('identity')->whereHas('identity', fn ($q) => $q->where('type', 'mahasiswa'))->get();
         $keywords = \App\Models\Keyword::all();
         $researchSchemes = \App\Models\ResearchScheme::all();
         $focusAreas = \App\Models\FocusArea::all();

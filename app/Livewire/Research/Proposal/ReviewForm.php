@@ -33,10 +33,11 @@ class ReviewForm extends Component
         // Verify current user is the reviewer
         if (Auth::id() !== $this->review->user_id) {
             session()->flash('error', 'Anda tidak memiliki akses untuk melakukan review ini.');
+
             return;
         }
 
-        $action = new CompleteReviewAction();
+        $action = new CompleteReviewAction;
         $result = $action->execute($this->review, $this->comments, $this->recommendation);
 
         if ($result['success']) {

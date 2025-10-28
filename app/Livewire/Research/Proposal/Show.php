@@ -32,6 +32,7 @@ class Show extends Component
         // Check authorization - user can only delete their own proposals
         if ($this->form->proposal->submitter_id !== Auth::user()->id) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
+
             return;
         }
 
@@ -40,7 +41,7 @@ class Show extends Component
             session()->flash('success', 'Proposal penelitian berhasil dihapus');
             $this->redirect(route('research.proposal.index'));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
         }
     }
 

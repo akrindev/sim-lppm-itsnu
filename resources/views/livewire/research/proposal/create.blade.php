@@ -46,41 +46,43 @@
                             <label class="form-label" for="title">Judul Proposal <span
                                     class="text-danger">*</span></label>
                             <input id="title" type="text"
-                                class="form-control @error('title') is-invalid @enderror" wire:model.defer="title"
+                                class="form-control @error('form.title') is-invalid @enderror" wire:model="form.title"
                                 placeholder="Masukkan judul proposal penelitian" required>
-                            @error('title')
+                            @error('form.title')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label" for="research_scheme">Skema Penelitian <span
-                                    class="text-danger">*</span></label>
-                            <select id="research_scheme"
-                                class="form-select tom-select @error('research_scheme_id') is-invalid @enderror"
-                                wire:model.defer="research_scheme_id" placeholder="Pilih skema penelitian" required>
-                                <option value="">-- Pilih Skema Penelitian --</option>
-                                @foreach ($this->schemes as $scheme)
-                                    <option value="{{ $scheme->id }}">{{ $scheme->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('research_scheme_id')
-                                <div class="d-block invalid-feedback">{{ $message }}</div>
-                            @enderror
+                    @if (request()->routeIs('research.proposal.create'))
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="research_scheme">Skema Penelitian <span
+                                        class="text-danger">*</span></label>
+                                <select id="research_scheme"
+                                    class="form-select tom-select @error('form.research_scheme_id') is-invalid @enderror"
+                                    wire:model="form.research_scheme_id" placeholder="Pilih skema penelitian" required>
+                                    <option value="">-- Pilih Skema Penelitian --</option>
+                                    @foreach ($this->schemes as $scheme)
+                                        <option value="{{ $scheme->id }}">{{ $scheme->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('form.research_scheme_id')
+                                    <div class="d-block invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
+                    @endif
 
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label" for="duration_in_years">Durasi Penelitian (Tahun) <span
+                            <label class="form-label" for="duration_in_years">Durasi (Tahun) <span
                                     class="text-danger">*</span></label>
                             <input id="duration_in_years" type="number"
-                                class="form-control @error('duration_in_years') is-invalid @enderror"
-                                wire:model.defer="duration_in_years" min="1" max="10" value="1"
+                                class="form-control @error('form.duration_in_years') is-invalid @enderror"
+                                wire:model="form.duration_in_years" min="1" max="10" value="1"
                                 required>
-                            @error('duration_in_years')
+                            @error('form.duration_in_years')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -91,14 +93,14 @@
                             <label class="form-label" for="focus_area">Bidang Fokus <span
                                     class="text-danger">*</span></label>
                             <select id="focus_area"
-                                class="form-select tom-select @error('focus_area_id') is-invalid @enderror"
-                                wire:model.defer="focus_area_id" placeholder="Pilih bidang fokus" required>
+                                class="form-select tom-select @error('form.focus_area_id') is-invalid @enderror"
+                                wire:model="form.focus_area_id" placeholder="Pilih bidang fokus" required>
                                 <option value="">-- Pilih Bidang Fokus --</option>
                                 @foreach ($this->focusAreas as $area)
                                     <option value="{{ $area->id }}">{{ $area->name }}</option>
                                 @endforeach
                             </select>
-                            @error('focus_area_id')
+                            @error('form.focus_area_id')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -108,14 +110,14 @@
                         <div class="mb-3">
                             <label class="form-label" for="theme">Tema <span class="text-danger">*</span></label>
                             <select id="theme"
-                                class="form-select tom-select @error('theme_id') is-invalid @enderror"
-                                wire:model.defer="theme_id" placeholder="Pilih tema" required>
+                                class="form-select tom-select @error('form.theme_id') is-invalid @enderror"
+                                wire:model="form.theme_id" placeholder="Pilih tema" required>
                                 <option value="">-- Pilih Tema --</option>
                                 @foreach ($this->themes as $theme)
                                     <option value="{{ $theme->id }}">{{ $theme->name }}</option>
                                 @endforeach
                             </select>
-                            @error('theme_id')
+                            @error('form.theme_id')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -126,7 +128,7 @@
                             <label class="form-label" for="topic">Topik <span class="text-danger">*</span></label>
                             <select id="topic"
                                 class="form-select tom-select @error('topic_id') is-invalid @enderror"
-                                wire:model.defer="topic_id" placeholder="Pilih topik" required>
+                                wire:model="topic_id" placeholder="Pilih topik" required>
                                 <option value="">-- Pilih Topik --</option>
                                 @foreach ($this->topics as $topic)
                                     <option value="{{ $topic->id }}">{{ $topic->name }}</option>
@@ -138,13 +140,12 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label" for="national_priority">Prioritas Nasional</label>
                             <select id="national_priority"
                                 class="form-select tom-select @error('national_priority_id') is-invalid @enderror"
-                                wire:model.defer="national_priority_id"
-                                placeholder="Pilih prioritas nasional (opsional)">
+                                wire:model="national_priority_id" placeholder="Pilih prioritas nasional (opsional)">
                                 <option value="">-- Pilih Prioritas Nasional (Opsional) --</option>
                                 @foreach ($this->nationalPriorities as $priority)
                                     <option value="{{ $priority->id }}">{{ $priority->name }}</option>
@@ -154,20 +155,20 @@
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label" for="sbk_value">Nilai SKB <span
                                     class="text-danger">*</span></label>
                             <input id="sbk_value" type="number" step="0.01"
-                                class="form-control @error('sbk_value') is-invalid @enderror"
-                                wire:model.defer="sbk_value" placeholder="0.00" required>
+                                class="form-control @error('sbk_value') is-invalid @enderror" wire:model="sbk_value"
+                                placeholder="0.00" required>
                             @error('sbk_value')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -180,130 +181,10 @@
                     <h3 class="mb-0 card-title">Anggota Peneliti</h3>
                 </div>
 
-                <!-- Members List -->
-                @if (!empty($this->members))
-                    <div class="mb-4">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-sm">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>NAMA / NIDN</th>
-                                        <th>Tugas</th>
-                                        <th>Status</th>
-                                        <th class="text-end" style="width: 100px;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($this->members as $index => $member)
-                                        <tr>
-                                            <td class="align-middle">
-                                                {{ $member['name'] }}<br />
-                                                <small class="text-muted"><code>{{ $member['nidn'] }}</code></small>
-                                            </td>
-                                            <td class="align-middle">{{ $member['tugas'] }}</td>
-                                            <td class="align-middle">
-                                                @if (($member['status'] ?? 'pending') === 'accepted')
-                                                    <x-tabler.badge color="success">Diterima</x-tabler.badge>
-                                                @elseif (($member['status'] ?? 'pending') === 'rejected')
-                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
-                                                @else
-                                                    <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
-                                                @endif
-                                            </td>
-                                            <td class="text-end align-middle">
-                                                <button type="button" wire:click="removeMember({{ $index }})"
-                                                    class="btn-outline-danger btn btn-sm" title="Hapus">
-                                                    <x-lucide-trash-2 class="icon" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Add Button -->
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#modal-add-member">
-                    <x-lucide-plus class="icon" />
-                    Tambah Anggota
-                </button>
-
-                @error('members')
-                    <div class="d-block mt-2 text-danger">{{ $message }}</div>
-                @enderror
+                <livewire:forms.team-members-form :members="$form->members" modal-title="Tambah Anggota Peneliti"
+                    member-label="Anggota Peneliti" wire:model="form.members" />
             </div>
         </div>
-
-        <!-- Add Member Modal -->
-        @teleport('body')
-            <x-tabler.modal id="modal-add-member" title="Tambah Anggota Peneliti" :component-id="$componentId"
-                on-show="resetMemberForm">
-                <x-slot:body>
-                    <div class="mb-3">
-                        <label class="form-label" for="member_nidn">NIDN / NIP <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <input id="member_nidn" type="text"
-                                class="form-control @error('member_nidn') is-invalid @enderror"
-                                wire:model.live="member_nidn" placeholder="Masukkan NIDN atau NIP anggota">
-                            <button class="btn-outline-primary btn" type="button" wire:click="checkMember"
-                                id="button-addon2">
-                                <x-lucide-search class="icon" />
-                                Cek
-                            </button>
-                        </div>
-                        @error('member_nidn')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    @if ($memberFound && $foundMember)
-                        <div class="mb-3 alert alert-success">
-                            <div class="mb-2">
-                                <strong>Anggota Ditemukan:</strong>
-                            </div>
-                            <div class="small">
-                                <div><strong>Nama:</strong> {{ $foundMember['name'] }}</div>
-                                <div><strong>Email:</strong> {{ $foundMember['email'] }}</div>
-                                @if ($foundMember['institution'])
-                                    <div><strong>Institusi:</strong> {{ $foundMember['institution'] }}</div>
-                                @endif
-                                @if ($foundMember['study_program'])
-                                    <div><strong>Program Studi:</strong> {{ $foundMember['study_program'] }}</div>
-                                @endif
-                                <div><strong>Tipe Identitas:</strong> {{ $foundMember['identity_type'] }}</div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="mb-3">
-                        <label class="form-label" for="member_tugas">Tugas <span class="text-danger">*</span></label>
-                        <textarea id="member_tugas" class="form-control @error('member_tugas') is-invalid @enderror"
-                            wire:model.live="member_tugas" rows="3" placeholder="Jelaskan tugas anggota dalam penelitian ini"
-                            {{ !$memberFound ? 'disabled' : '' }} required></textarea>
-                        @error('member_tugas')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        @if (!$memberFound)
-                            <small class="text-muted">Cek NIDN/NIP terlebih dahulu untuk mengisi tugas</small>
-                        @endif
-                    </div>
-                </x-slot:body>
-
-                <x-slot:footer>
-                    <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
-                        Batal
-                    </button>
-                    <button type="button" wire:click="addMember" class="btn btn-primary"
-                        {{ !$memberFound ? 'disabled' : '' }}>
-                        <x-lucide-plus class="icon" />
-                        Tambah
-                    </button>
-                </x-slot:footer>
-            </x-tabler.modal>
-        @endteleport
 
         <!-- Section: Klasifikasi Ilmu -->
         <div class="mb-3 card">
@@ -320,13 +201,13 @@
                                     class="text-danger">*</span></label>
                             <select id="cluster_level1"
                                 class="form-select tom-select @error('cluster_level1_id') is-invalid @enderror"
-                                wire:model.defer="cluster_level1_id" placeholder="Pilih level 1" required>
+                                wire:model="form.cluster_level1_id" placeholder="Pilih level 1" required>
                                 <option value="">-- Pilih Level 1 --</option>
                                 @foreach ($this->scienceClusters->where('level', 1) as $cluster)
                                     <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
                                 @endforeach
                             </select>
-                            @error('cluster_level1_id')
+                            @error('form.cluster_level1_id')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -337,13 +218,13 @@
                             <label class="form-label" for="cluster_level2">Level 2</label>
                             <select id="cluster_level2"
                                 class="form-select tom-select @error('cluster_level2_id') is-invalid @enderror"
-                                wire:model.defer="cluster_level2_id" placeholder="Pilih level 2 (opsional)">
+                                wire:model="form.cluster_level2_id" placeholder="Pilih level 2 (opsional)">
                                 <option value="">-- Pilih Level 2 (Opsional) --</option>
                                 @foreach ($this->scienceClusters->where('level', 2) as $cluster)
                                     <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
                                 @endforeach
                             </select>
-                            @error('cluster_level2_id')
+                            @error('form.cluster_level2_id')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -354,13 +235,13 @@
                             <label class="form-label" for="cluster_level3">Level 3</label>
                             <select id="cluster_level3"
                                 class="form-select tom-select @error('cluster_level3_id') is-invalid @enderror"
-                                wire:model.defer="cluster_level3_id" placeholder="Pilih level 3 (opsional)">
+                                wire:model="form.cluster_level3_id" placeholder="Pilih level 3 (opsional)">
                                 <option value="">-- Pilih Level 3 (Opsional) --</option>
                                 @foreach ($this->scienceClusters->where('level', 3) as $cluster)
                                     <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
                                 @endforeach
                             </select>
-                            @error('cluster_level3_id')
+                            @error('form.cluster_level3_id')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -379,9 +260,9 @@
 
                 <div class="mb-3">
                     <label class="form-label" for="summary">Ringkasan <span class="text-danger">*</span></label>
-                    <textarea id="summary" class="form-control @error('summary') is-invalid @enderror" wire:model.defer="summary"
+                    <textarea id="summary" class="form-control @error('form.summary') is-invalid @enderror" wire:model="form.summary"
                         rows="4" placeholder="Masukkan ringkasan proposal (minimal 100 karakter)" required></textarea>
-                    @error('summary')
+                    @error('form.summary')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="text-muted">Minimum 100 karakter</small>
@@ -401,9 +282,9 @@
                     <label class="form-label" for="final_tkt_target">Target TKT Final <span
                             class="text-danger">*</span></label>
                     <input id="final_tkt_target" type="text"
-                        class="form-control @error('final_tkt_target') is-invalid @enderror"
-                        wire:model.defer="final_tkt_target" placeholder="Contoh: TKT 5, TKT 6, dsb" required>
-                    @error('final_tkt_target')
+                        class="form-control @error('form.final_tkt_target') is-invalid @enderror"
+                        wire:model="form.final_tkt_target" placeholder="Contoh: TKT 5, TKT 6, dsb" required>
+                    @error('form.final_tkt_target')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="text-muted">Tingkat Kesiapan Teknologi (TKT) yang ditargetkan</small>
@@ -412,10 +293,10 @@
                 <div class="mb-3">
                     <label class="form-label" for="background">Latar Belakang <span
                             class="text-danger">*</span></label>
-                    <textarea id="background" class="form-control @error('background') is-invalid @enderror"
-                        wire:model.defer="background" rows="5"
+                    <textarea id="background" class="form-control @error('form.background') is-invalid @enderror"
+                        wire:model="form.background" rows="5"
                         placeholder="Jelaskan latar belakang penelitian (minimal 200 karakter)" required></textarea>
-                    @error('background')
+                    @error('form.background')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="text-muted">Minimum 200 karakter</small>
@@ -424,10 +305,10 @@
                 <div class="mb-3">
                     <label class="form-label" for="state_of_the_art">State of the Art <span
                             class="text-danger">*</span></label>
-                    <textarea id="state_of_the_art" class="form-control @error('state_of_the_art') is-invalid @enderror"
-                        wire:model.defer="state_of_the_art" rows="5"
+                    <textarea id="state_of_the_art" class="form-control @error('form.state_of_the_art') is-invalid @enderror"
+                        wire:model="form.state_of_the_art" rows="5"
                         placeholder="Jelaskan state of the art penelitian (minimal 200 karakter)" required></textarea>
-                    @error('state_of_the_art')
+                    @error('form.state_of_the_art')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="text-muted">Minimum 200 karakter</small>
@@ -435,10 +316,10 @@
 
                 <div class="mb-3">
                     <label class="form-label" for="methodology">Metodologi <span class="text-danger">*</span></label>
-                    <textarea id="methodology" class="form-control @error('methodology') is-invalid @enderror"
-                        wire:model.defer="methodology" rows="5" placeholder="Jelaskan metodologi penelitian (minimal 200 karakter)"
+                    <textarea id="methodology" class="form-control @error('form.methodology') is-invalid @enderror"
+                        wire:model="form.methodology" rows="5" placeholder="Jelaskan metodologi penelitian (minimal 200 karakter)"
                         required></textarea>
-                    @error('methodology')
+                    @error('form.methodology')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="text-muted">Minimum 200 karakter</small>

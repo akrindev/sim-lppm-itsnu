@@ -118,8 +118,8 @@
                                     @endif
                                     @if (auth()->user()->hasRole('admin lppm'))
                                         <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
-                                            wire:click="deleteProposal({{ $proposal->id }})"
-                                            wire:confirm="Yakin ingin menghapus proposal ini?">
+                                            data-bs-toggle="modal" data-bs-target="#deleteProposalModal"
+                                            wire:click="confirmDeleteProposal({{ $proposal->id }})">
                                             <x-lucide-trash-2 class="icon" />
                                         </button>
                                     @endif
@@ -146,4 +146,36 @@
             </div>
         @endif
     </div>
+
+
+    <!-- Delete Proposal Confirmation Modal -->
+    @teleport('body')
+        <x-tabler.modal id="deleteProposalModal" title="Hapus Proposal?" wire:ignore.self>
+            <x-slot:body>
+                <div class="py-4 text-center">
+                    <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                    <h3>Hapus Proposal?</h3>
+                    <div class="text-secondary">
+                        Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
+                    </div>
+                </div>
+            </x-slot:body>
+
+            <x-slot:footer>
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col"><button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal"
+                                wire:click="cancelDeleteProposal">
+                                Batal
+                            </button></div>
+                        <div class="col"><button type="button"
+                                wire:click="deleteProposal({{ $confirmingDeleteProposalId }})" class="w-100 btn btn-danger"
+                                data-bs-dismiss="modal">
+                                Ya, Hapus Proposal
+                            </button></div>
+                    </div>
+                </div>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
 </div>

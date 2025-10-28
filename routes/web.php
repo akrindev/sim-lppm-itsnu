@@ -2,7 +2,6 @@
 
 use App\Livewire\CommunityService\DailyNote\Index as CommunityServiceDailyNoteIndex;
 use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalReportIndex;
-use App\Livewire\CommunityService\Index as CommunityServiceIndex;
 use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
 use App\Livewire\CommunityService\Proposal\Create as CommunityServiceProposalCreate;
 use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
@@ -92,4 +91,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

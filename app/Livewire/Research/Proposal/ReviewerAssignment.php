@@ -14,6 +14,8 @@ class ReviewerAssignment extends Component
 {
     public string $proposalId = '';
 
+    public string $confirmingRemoveReviewerId = '';
+
     #[Validate('required')]
     public $selectedReviewer = '';
 
@@ -73,6 +75,16 @@ class ReviewerAssignment extends Component
             $reviewer->delete();
             $this->dispatch('success', message: 'Reviewer berhasil dihapus');
         }
+    }
+
+    public function confirmRemoveReviewer(string $reviewerId): void
+    {
+        $this->confirmingRemoveReviewerId = $reviewerId;
+    }
+
+    public function cancelRemoveReviewer(): void
+    {
+        $this->confirmingRemoveReviewerId = '';
     }
 
     public function resetReviewerForm(): void

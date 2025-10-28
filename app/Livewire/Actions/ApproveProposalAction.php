@@ -3,7 +3,6 @@
 namespace App\Livewire\Actions;
 
 use App\Models\Proposal;
-use Illuminate\Support\Facades\Auth;
 
 class ApproveProposalAction
 {

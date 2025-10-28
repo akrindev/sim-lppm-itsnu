@@ -34,19 +34,19 @@ class TeamMemberInvitations extends Component
     #[Computed]
     public function pendingInvitations()
     {
-        return $this->teamMembers->filter(fn($member) => $member->pivot->status === 'pending');
+        return $this->teamMembers->filter(fn ($member) => $member->pivot->status === 'pending');
     }
 
     #[Computed]
     public function acceptedMembers()
     {
-        return $this->teamMembers->filter(fn($member) => $member->pivot->status === 'accepted');
+        return $this->teamMembers->filter(fn ($member) => $member->pivot->status === 'accepted');
     }
 
     #[Computed]
     public function rejectedMembers()
     {
-        return $this->teamMembers->filter(fn($member) => $member->pivot->status === 'rejected');
+        return $this->teamMembers->filter(fn ($member) => $member->pivot->status === 'rejected');
     }
 
     #[Computed]
@@ -69,11 +69,13 @@ class TeamMemberInvitations extends Component
 
         if (! $member) {
             $this->dispatch('error', message: 'Anda bukan anggota proposal ini');
+
             return;
         }
 
         if ($member->pivot->status === 'accepted') {
             $this->dispatch('info', message: 'Anda sudah menerima undangan');
+
             return;
         }
 
@@ -95,6 +97,7 @@ class TeamMemberInvitations extends Component
 
         if (! $member) {
             $this->dispatch('error', message: 'Anda bukan anggota proposal ini');
+
             return;
         }
 

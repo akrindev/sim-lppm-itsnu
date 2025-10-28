@@ -211,8 +211,10 @@
                                                 @endif
                                             </td>
                                             <td class="text-end align-middle">
-                                                <button type="button" wire:click="removeMember({{ $index }})"
-                                                    class="btn-outline-danger btn btn-sm" title="Hapus">
+                                                <button type="button"
+                                                    wire:click="confirmRemoveMember({{ $index }})"
+                                                    class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteMemberModal" title="Hapus">
                                                     <x-lucide-trash-2 class="icon" />
                                                 </button>
                                             </td>
@@ -476,4 +478,36 @@
             </button>
         </div>
     </form>
+
+
+    <!-- Delete Member Confirmation Modal -->
+    @teleport('body')
+        <x-tabler.modal id="deleteMemberModal" title="Hapus Anggota?" wire:ignore.self>
+            <x-slot:body>
+                <div class="py-4 text-center">
+                    <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                    <h3>Hapus Anggota?</h3>
+                    <div class="text-secondary">
+                        Apakah Anda yakin ingin menghapus anggota ini dari proposal?
+                    </div>
+                </div>
+            </x-slot:body>
+
+            <x-slot:footer>
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col"><button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal"
+                                wire:click="cancelRemoveMember">
+                                Batal
+                            </button></div>
+                        <div class="col"><button type="button"
+                                wire:click="removeMember({{ $confirmingRemoveMemberIndex }})"
+                                class="w-100 btn btn-danger" data-bs-dismiss="modal">
+                                Ya, Hapus Anggota
+                            </button></div>
+                    </div>
+                </div>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
 </div>

@@ -74,8 +74,10 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <button wire:click="removeReviewer('{{ $reviewer->user->id }}')"
-                                        class="btn btn-icon btn-ghost-danger btn-sm" wire:confirm="Hapus reviewer ini?">
+                                    <button type="button"
+                                        wire:click="confirmRemoveReviewer('{{ $reviewer->user->id }}')"
+                                        class="btn btn-icon btn-ghost-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#deleteReviewerModal">
                                         <x-lucide-trash-2 class="icon" />
                                     </button>
                                 </td>
@@ -86,4 +88,30 @@
             </div>
         </div>
     @endif
+
+
+    <!-- Delete Reviewer Confirmation Modal -->
+    @teleport('body')
+        <x-tabler.modal id="deleteReviewerModal" title="Hapus Reviewer?" wire:ignore.self>
+            <x-slot:body>
+                <div class="py-4 text-center">
+                    <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                    <h3>Hapus Reviewer?</h3>
+                    <div class="text-secondary">
+                        Apakah Anda yakin ingin menghapus reviewer dari proposal ini?
+                    </div>
+                </div>
+            </x-slot:body>
+
+            <x-slot:footer>
+                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" wire:click="removeReviewer('{{ $confirmingRemoveReviewerId }}')"
+                    class="btn btn-danger" data-bs-dismiss="modal">
+                    Ya, Hapus Reviewer
+                </button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
 </div>

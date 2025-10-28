@@ -3,7 +3,6 @@
 namespace App\Livewire\Research\Proposal;
 
 use App\Models\Proposal;
-use App\Models\ProposalReviewer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -59,11 +58,13 @@ class ReviewerForm extends Component
 
         if (! $review) {
             $this->dispatch('error', message: 'Anda bukan reviewer untuk proposal ini');
+
             return;
         }
 
         if ($review->status !== 'pending') {
             $this->dispatch('error', message: 'Anda sudah mensubmit review');
+
             return;
         }
 
@@ -88,7 +89,7 @@ class ReviewerForm extends Component
             $this->reviewNotes = '';
             $this->recommendation = '';
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal submit review: ' . $e->getMessage());
+            $this->dispatch('error', message: 'Gagal submit review: '.$e->getMessage());
         }
     }
 

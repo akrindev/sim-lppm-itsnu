@@ -24,12 +24,24 @@ class Index extends Component
     #[Url]
     public string $yearFilter = '';
 
+    public int $confirmingDeleteProposalId = 0;
+
     public function resetFilters(): void
     {
         $this->search = '';
         $this->statusFilter = 'all';
         $this->yearFilter = '';
         $this->resetPage();
+    }
+
+    public function confirmDeleteProposal(int $id): void
+    {
+        $this->confirmingDeleteProposalId = $id;
+    }
+
+    public function cancelDeleteProposal(): void
+    {
+        $this->confirmingDeleteProposalId = 0;
     }
 
     public function render(): View
@@ -147,6 +159,7 @@ class Index extends Component
 
         if (! $proposal) {
             session()->flash('error', 'Proposal tidak ditemukan');
+
             return;
         }
 
@@ -154,6 +167,7 @@ class Index extends Component
         // Only admin lppm can delete proposals
         if (! $user->hasRole('admin lppm')) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
+
             return;
         }
 
@@ -161,7 +175,7 @@ class Index extends Component
             $proposal->delete();
             session()->flash('success', 'Proposal berhasil dihapus');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
         }
     }
 }
