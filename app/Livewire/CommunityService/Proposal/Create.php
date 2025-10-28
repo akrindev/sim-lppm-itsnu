@@ -54,12 +54,36 @@ class Create extends Component
             'member_tugas' => 'required|string|max:500',
         ]);
 
+        // Get member details
+        $identity = \App\Models\Identity::where('identity_id', $this->member_nidn)
+            ->with('user')
+            ->first();
+
+        if (! $identity || ! $identity->user) {
+            $this->addError('member_nidn', 'Anggota tidak ditemukan dalam sistem');
+            return;
+        }
+
+        // Check if member already added
+        $alreadyAdded = collect($this->form->members)->contains(function ($member) {
+            return $member['nidn'] === $this->member_nidn;
+        });
+
+        if ($alreadyAdded) {
+            $this->addError('member_nidn', 'Anggota ini sudah ditambahkan');
+            return;
+        }
+
         $this->form->members[] = [
+            'name' => $identity->user->name,
             'nidn' => $this->member_nidn,
             'tugas' => $this->member_tugas,
         ];
 
         $this->resetMemberForm();
+
+        // Close the modal
+        $this->dispatch('close-modal', 'modal-add-member');
     }
 
     /**
@@ -119,6 +143,15 @@ class Create extends Component
      */
     public function save(): void
     {
+        // Validate the form before attempting to store
+        try {
+            $this->form->validate();
+        } catch (\Exception $e) {
+            // Validation failed, errors will be displayed in the form
+            // Do NOT reset the form - keep the data so user can correct errors
+            return;
+        }
+
         try {
             $proposal = $this->form->storeCommunityService(Auth::user()->getKey());
             session()->flash('success', 'Proposal pengabdian masyarakat berhasil dibuat');
@@ -156,6 +189,12 @@ class Create extends Component
     public function scienceClusters()
     {
         return ScienceCluster::all();
+    }
+
+    #[Computed]
+    public function partners()
+    {
+        return \App\Models\Partner::all();
     }
 
     public function render(): View

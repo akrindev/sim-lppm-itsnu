@@ -1,6 +1,6 @@
-<x-slot:title>Usulan Pengabdian Masyarakat Baru</x-slot:title>
-<x-slot:pageTitle>Usulan Pengabdian Masyarakat Baru</x-slot:pageTitle>
-<x-slot:pageSubtitle>Buat proposal pengabdian masyarakat baru dengan mengisi form di bawah ini.</x-slot:pageSubtitle>
+<x-slot:title>Edit Proposal Pengabdian Masyarakat</x-slot:title>
+<x-slot:pageTitle>Edit Proposal Pengabdian Masyarakat</x-slot:pageTitle>
+<x-slot:pageSubtitle>Perbarui proposal pengabdian masyarakat dengan mengisi form di bawah ini.</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn">
         <x-lucide-arrow-left class="icon" />
@@ -446,7 +446,7 @@
                 <span class="me-2 spinner-border spinner-border-sm" wire:loading role="status"
                     aria-hidden="true"></span>
                 <x-lucide-save class="icon" />
-                <span wire:loading.remove>Simpan Proposal</span>
+                <span wire:loading.remove>Simpan Perubahan</span>
                 <span wire:loading>Menyimpan...</span>
             </button>
         </div>

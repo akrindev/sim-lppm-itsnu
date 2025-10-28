@@ -1,16 +1,16 @@
 <x-slot:title>{{ $proposal->title }}</x-slot:title>
 <x-slot:pageTitle>{{ $proposal->title }}</x-slot:pageTitle>
-<x-slot:pageSubtitle>{{ __('Detail Proposal Pengabdian') }}</x-slot:pageSubtitle>
+<x-slot:pageSubtitle>Detail Proposal Pengabdian</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
-        <a href="{{ route('community-service.index') }}" class="btn-outline-secondary btn">
+        <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn">
             <x-lucide-arrow-left class="icon" />
-            {{ __('Kembali') }}
+            Kembali
         </a>
         @if ($proposal->status === 'draft')
-            <a href="#" class="btn btn-primary">
+            <a href="{{ route('community-service.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
-                {{ __('Edit') }}
+                Edit
             </a>
         @endif
     </div>
@@ -22,42 +22,69 @@
         <!-- Basic Information -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">{{ __('Informasi Dasar') }}</h3>
+                <h3 class="card-title">Informasi Dasar</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Judul') }}</label>
+                        <label class="form-label">Judul</label>
                         <p class="text-reset">{{ $proposal->title }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Status') }}</label>
+                        <label class="form-label">Status</label>
                         <p>
-                            <x-tabler.badge :color="$proposal->status" />
+                            @switch($proposal->status)
+                                @case('draft')
+                                    <x-tabler.badge color="warning">Draft</x-tabler.badge>
+                                @break
+
+                                @case('submitted')
+                                    <x-tabler.badge color="info">Submitted</x-tabler.badge>
+                                @break
+
+                                @case('under_review')
+                                    <x-tabler.badge color="info">Under Review</x-tabler.badge>
+                                @break
+
+                                @case('approved')
+                                    <x-tabler.badge color="success">Approved</x-tabler.badge>
+                                @break
+
+                                @case('rejected')
+                                    <x-tabler.badge color="danger">Rejected</x-tabler.badge>
+                                @break
+
+                                @case('completed')
+                                    <x-tabler.badge color="secondary">Completed</x-tabler.badge>
+                                @break
+
+                                @default
+                                    <x-tabler.badge color="secondary">{{ $proposal->status }}</x-tabler.badge>
+                            @endswitch
                         </p>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Pelaksana') }}</label>
+                        <label class="form-label">Pelaksana</label>
                         <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Email') }}</label>
+                        <label class="form-label">Email</label>
                         <p class="text-reset">{{ $proposal->submitter?->email }}</p>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Durasi (Tahun)') }}</label>
+                        <label class="form-label">Durasi (Tahun)</label>
                         <p class="text-reset">{{ $proposal->duration_in_years ?? '—' }}</p>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">{{ __('Ringkasan') }}</label>
+                    <label class="form-label">Ringkasan</label>
                     <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
                 </div>
             </div>
@@ -66,46 +93,89 @@
         <!-- Classification -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">{{ __('Klasifikasi') }}</h3>
+                <h3 class="card-title">Klasifikasi</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Bidang Fokus') }}</label>
+                        <label class="form-label">Bidang Fokus</label>
                         <p class="text-reset">{{ $proposal->focusArea?->name ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Tema') }}</label>
+                        <label class="form-label">Tema</label>
                         <p class="text-reset">{{ $proposal->theme?->name ?? '—' }}</p>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Topik') }}</label>
+                        <label class="form-label">Topik</label>
                         <p class="text-reset">{{ $proposal->topic?->name ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Prioritas Nasional') }}</label>
+                        <label class="form-label">Prioritas Nasional</label>
                         <p class="text-reset">{{ $proposal->nationalPriority?->name ?? '—' }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Team Members -->
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">Tim Pengabdi</h3>
+            </div>
+            <div class="p-0 card-body">
+                @if ($proposal->teamMembers->isNotEmpty())
+                    <div class="table-responsive">
+                        <table class="card-table table table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Email</th>
+                                    <th>Peran</th>
+                                    <th>Tugas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($proposal->teamMembers as $member)
+                                    <tr>
+                                        <td>{{ $member->name }}</td>
+                                        <td>{{ $member->email }}</td>
+                                        <td>
+                                            @if ($member->pivot->role === 'ketua')
+                                                <x-tabler.badge color="primary">Ketua</x-tabler.badge>
+                                            @else
+                                                <x-tabler.badge color="secondary">Anggota</x-tabler.badge>
+                                            @endif
+                                        </td>
+                                        <td>{{ $member->pivot->tasks }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="py-4 text-secondary text-center">
+                        Belum ada anggota tim ditambahkan
+                    </div>
+                @endif
+            </div>
+        </div>
+
         <!-- Timeline -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{{ __('Timeline') }}</h3>
+                <h3 class="card-title">Timeline</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Dibuat') }}</label>
+                        <label class="form-label">Dibuat</label>
                         <p class="text-reset">{{ $proposal->created_at?->format('d M Y H:i') }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Diubah') }}</label>
+                        <label class="form-label">Diubah</label>
                         <p class="text-reset">{{ $proposal->updated_at?->format('d M Y H:i') }}</p>
                     </div>
                 </div>
@@ -118,40 +188,67 @@
         <!-- Status Card -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">{{ __('Status Proposal') }}</h3>
+                <h3 class="card-title">Status Proposal</h3>
             </div>
             <div class="text-center card-body">
                 <div class="mb-3">
-                    <x-tabler.badge :color="$proposal->status" />
+                    @switch($proposal->status)
+                        @case('draft')
+                            <x-tabler.badge color="warning">Draft</x-tabler.badge>
+                        @break
+
+                        @case('submitted')
+                            <x-tabler.badge color="info">Submitted</x-tabler.badge>
+                        @break
+
+                        @case('under_review')
+                            <x-tabler.badge color="info">Under Review</x-tabler.badge>
+                        @break
+
+                        @case('approved')
+                            <x-tabler.badge color="success">Approved</x-tabler.badge>
+                        @break
+
+                        @case('rejected')
+                            <x-tabler.badge color="danger">Rejected</x-tabler.badge>
+                        @break
+
+                        @case('completed')
+                            <x-tabler.badge color="secondary">Completed</x-tabler.badge>
+                        @break
+
+                        @default
+                            <x-tabler.badge color="secondary">{{ $proposal->status }}</x-tabler.badge>
+                    @endswitch
                 </div>
                 <p class="text-secondary text-sm">
                     @switch($proposal->status)
                         @case('draft')
-                            {{ __('Proposal masih dalam tahap penyusunan. Anda dapat mengedit atau mengirimkan proposal ini.') }}
+                            Proposal masih dalam tahap penyusunan. Anda dapat mengedit atau mengirimkan proposal ini.
                         @break
 
                         @case('submitted')
-                            {{ __('Proposal telah diajukan dan sedang menunggu review dari tim LPPM.') }}
+                            Proposal telah diajukan dan sedang menunggu review dari tim LPPM.
                         @break
 
                         @case('under_review')
-                            {{ __('Proposal sedang dalam proses review. Silahkan tunggu hasil evaluasi.') }}
+                            Proposal sedang dalam proses review. Silahkan tunggu hasil evaluasi.
                         @break
 
                         @case('approved')
-                            {{ __('Selamat! Proposal Anda telah disetujui. Silahkan mulai melaksanakan kegiatan.') }}
+                            Selamat! Proposal Anda telah disetujui. Silahkan mulai melaksanakan kegiatan.
                         @break
 
                         @case('rejected')
-                            {{ __('Sayangnya proposal Anda ditolak. Silahkan perbaiki dan ajukan kembali.') }}
+                            Sayangnya proposal Anda ditolak. Silahkan perbaiki dan ajukan kembali.
                         @break
 
                         @case('completed')
-                            {{ __('Proposal ini telah selesai dilaksanakan.') }}
+                            Proposal ini telah selesai dilaksanakan.
                         @break
 
                         @default
-                            {{ __('Status proposal tidak diketahui.') }}
+                            Status proposal tidak diketahui.
                     @endswitch
                 </p>
             </div>
@@ -160,33 +257,34 @@
         <!-- Actions Card -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{{ __('Aksi') }}</h3>
+                <h3 class="card-title">Aksi</h3>
             </div>
             <div class="gap-2 d-grid card-body">
                 @if ($proposal->status === 'draft')
                     <button type="button" class="btn btn-primary">
                         <x-lucide-send class="icon" />
-                        {{ __('Kirim Proposal') }}
+                        Kirim Proposal
                     </button>
                 @endif
 
                 @if (in_array($proposal->status, ['submitted', 'under_review', 'rejected']))
                     <a href="#" class="btn btn-info">
                         <x-lucide-eye class="icon" />
-                        {{ __('Lihat Review') }}
+                        Lihat Review
                     </a>
                 @endif
 
                 @if ($proposal->status === 'approved')
                     <a href="#" class="btn btn-success">
                         <x-lucide-file-text class="icon" />
-                        {{ __('Laporan Progress') }}
+                        Laporan Progress
                     </a>
                 @endif
 
-                <button type="button" class="btn-outline-danger btn">
+                <button type="button" class="btn-outline-danger btn" wire:click="delete"
+                    wire:confirm="Yakin ingin menghapus proposal ini?">
                     <x-lucide-trash-2 class="icon" />
-                    {{ __('Hapus') }}
+                    Hapus
                 </button>
             </div>
         </div>

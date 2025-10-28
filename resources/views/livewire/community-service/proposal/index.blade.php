@@ -184,7 +184,7 @@
                             </td>
                             <td>
                                 <div class="bg-blue-lt badge-outline badge">
-                                    {{ $proposal->communityServiceScheme?->name ?? '—' }}
+                                    {{ 'Pengabdian Masyarakat' }}
                                 </div>
                             </td>
                             <td>
@@ -204,8 +204,8 @@
                                         <x-lucide-eye class="icon" />
                                     </a>
                                     @if ($proposal->status === 'draft')
-                                        <a href="#" class="btn btn-icon btn-ghost-info"
-                                            title="{{ __('Edit') }}">
+                                        <a href="{{ route('community-service.proposal.edit', $proposal) }}"
+                                            class="btn btn-icon btn-ghost-info" title="{{ __('Edit') }}" wire:navigate>
                                             <x-lucide-pencil class="icon" />
                                         </a>
                                     @endif

@@ -193,6 +193,12 @@ class Edit extends Component
         return ScienceCluster::all();
     }
 
+    #[Computed]
+    public function partners()
+    {
+        return \App\Models\Partner::all();
+    }
+
     public function render(): View
     {
         return view('livewire.community-service.proposal.edit');

@@ -120,6 +120,15 @@ class Create extends Component
      */
     public function save(): void
     {
+        // Validate the form before attempting to store
+        try {
+            $this->form->validate();
+        } catch (\Exception $e) {
+            // Validation failed, errors will be displayed in the form
+            // Do NOT reset the form - keep the data so user can correct errors
+            return;
+        }
+
         try {
             $proposal = $this->form->store(Auth::user()->getKey());
             session()->flash('success', 'Proposal penelitian berhasil dibuat');
