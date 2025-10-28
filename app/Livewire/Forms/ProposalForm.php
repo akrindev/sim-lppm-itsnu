@@ -144,6 +144,7 @@ class ProposalForm extends Form
                     'nidn' => $member->identity?->identity_id,
                     'tugas' => $member->pivot->tasks,
                     'role' => $member->pivot->role,
+                    'status' => $member->pivot->status ?? 'pending', // Include status field
                 ];
             })
             ->values()
@@ -341,18 +342,16 @@ class ProposalForm extends Form
         return $rules;
     }
 
-    /**
-     * Attach team members to proposal
-     */
     private function attachTeamMembers(Proposal $proposal, string $submitterId): void
     {
         // Prepare sync data with all team members
         $syncData = [];
 
-        // Add submitter as ketua (team leader)
+        // Add submitter as ketua (team leader) - always accepted
         $syncData[$submitterId] = [
             'tasks' => $proposal->detailable_type === CommunityService::class ? 'Pengabdi Utama' : 'Peneliti Utama',
             'role' => 'ketua',
+            'status' => 'accepted', // Submitter/ketua is always accepted
         ];
 
         // Add other team members (anggota) - filter out ketua if it exists in members array
@@ -369,6 +368,7 @@ class ProposalForm extends Form
                     $syncData[$identity->user_id] = [
                         'tasks' => $member['tugas'],
                         'role' => 'anggota',
+                        'status' => 'pending', // Other team members start as pending
                     ];
                 }
             }

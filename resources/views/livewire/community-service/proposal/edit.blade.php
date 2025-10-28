@@ -171,6 +171,7 @@
                                     <tr>
                                         <th>NAMA / NIDN</th>
                                         <th>Tugas</th>
+                                        <th>Status</th>
                                         <th class="text-end" style="width: 100px;">Aksi</th>
                                     </tr>
                                 </thead>
@@ -182,6 +183,15 @@
                                                 <small class="text-muted"><code>{{ $member['nidn'] }}</code></small>
                                             </td>
                                             <td class="align-middle">{{ $member['tugas'] }}</td>
+                                            <td class="align-middle">
+                                                @if (($member['status'] ?? 'pending') === 'accepted')
+                                                    <x-tabler.badge color="success">Diterima</x-tabler.badge>
+                                                @elseif (($member['status'] ?? 'pending') === 'rejected')
+                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
+                                                @else
+                                                    <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
+                                                @endif
+                                            </td>
                                             <td class="text-end align-middle">
                                                 <button type="button" wire:click="removeMember({{ $index }})"
                                                     class="btn-outline-danger btn btn-sm" title="Hapus">

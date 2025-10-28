@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -137,14 +137,11 @@ class Proposal extends Model
         return $this->belongsTo(ScienceCluster::class, 'cluster_level3_id');
     }
 
-    /**
-     * Get all team members for the proposal.
-     */
     public function teamMembers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'proposal_user')
             ->orderByPivot('created_at', 'desc')
-            ->withPivot('role', 'tasks')
+            ->withPivot('role', 'tasks', 'status')
             ->withTimestamps();
     }
 

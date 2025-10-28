@@ -121,6 +121,7 @@
                                     <th>{{ __('NIDN') }}</th>
                                     <th>{{ __('Peran') }}</th>
                                     <th>{{ __('Tugas') }}</th>
+                                    <th>{{ __('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -128,8 +129,23 @@
                                     <tr>
                                         <td>{{ $member['name'] }}</td>
                                         <td>{{ $member['nidn'] ?? '' }}</td>
-                                        <td>{{ $member['role'] }}</td>
+                                        <td>
+                                            @if ($member['role'] === 'ketua')
+                                                <x-tabler.badge color="primary">Ketua</x-tabler.badge>
+                                            @else
+                                                <x-tabler.badge color="secondary">Anggota</x-tabler.badge>
+                                            @endif
+                                        </td>
                                         <td>{{ $member['tugas'] }}</td>
+                                        <td>
+                                            @if (($member['status'] ?? 'pending') === 'accepted')
+                                                <x-tabler.badge color="success">Diterima</x-tabler.badge>
+                                            @elseif (($member['status'] ?? 'pending') === 'rejected')
+                                                <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
+                                            @else
+                                                <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

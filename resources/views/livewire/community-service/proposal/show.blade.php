@@ -135,6 +135,7 @@
                                     <th>Email</th>
                                     <th>Peran</th>
                                     <th>Tugas</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -150,6 +151,15 @@
                                             @endif
                                         </td>
                                         <td>{{ $member->pivot->tasks }}</td>
+                                        <td>
+                                            @if ($member->pivot->status === 'accepted')
+                                                <x-tabler.badge color="success">Diterima</x-tabler.badge>
+                                            @elseif ($member->pivot->status === 'rejected')
+                                                <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
+                                            @else
+                                                <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
