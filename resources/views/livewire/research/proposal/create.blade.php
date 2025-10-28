@@ -37,7 +37,7 @@
             <div class="card-body">
                 <div class="d-flex align-items-center mb-4">
                     <x-lucide-file-text class="me-3 icon" />
-                    <h3 class="mb-0 card-title">Informasi Dasar Proposal</h3>
+                    <h3 class="mb-0 card-title">1.1 Informasi Dasar Proposal</h3>
                 </div>
 
                 <div class="row g-4">
@@ -54,25 +54,23 @@
                         </div>
                     </div>
 
-                    @if (request()->routeIs('research.proposal.create'))
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="research_scheme">Skema Penelitian <span
-                                        class="text-danger">*</span></label>
-                                <select id="research_scheme"
-                                    class="form-select tom-select @error('form.research_scheme_id') is-invalid @enderror"
-                                    wire:model="form.research_scheme_id" placeholder="Pilih skema penelitian" required>
-                                    <option value="">-- Pilih Skema Penelitian --</option>
-                                    @foreach ($this->schemes as $scheme)
-                                        <option value="{{ $scheme->id }}">{{ $scheme->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('form.research_scheme_id')
-                                    <div class="d-block invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="research_scheme">Skema Penelitian <span
+                                    class="text-danger">*</span></label>
+                            <select id="research_scheme"
+                                class="form-select tom-select @error('form.research_scheme_id') is-invalid @enderror"
+                                wire:model="form.research_scheme_id" placeholder="Pilih skema penelitian" required>
+                                <option value="">-- Pilih Skema Penelitian --</option>
+                                @foreach ($this->schemes as $scheme)
+                                    <option value="{{ $scheme->id }}">{{ $scheme->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('form.research_scheme_id')
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                    @endif
+                    </div>
 
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -127,14 +125,14 @@
                         <div class="mb-3">
                             <label class="form-label" for="topic">Topik <span class="text-danger">*</span></label>
                             <select id="topic"
-                                class="form-select tom-select @error('topic_id') is-invalid @enderror"
-                                wire:model="topic_id" placeholder="Pilih topik" required>
+                                class="form-select tom-select @error('form.topic_id') is-invalid @enderror"
+                                wire:model="form.topic_id" placeholder="Pilih topik" required>
                                 <option value="">-- Pilih Topik --</option>
                                 @foreach ($this->topics as $topic)
                                     <option value="{{ $topic->id }}">{{ $topic->name }}</option>
                                 @endforeach
                             </select>
-                            @error('topic_id')
+                            @error('form.topic_id')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -173,25 +171,12 @@
             </div>
         </div>
 
-        <!-- Section: Anggota -->
-        <div class="mb-3 card">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-4">
-                    <x-lucide-users class="me-3 icon" />
-                    <h3 class="mb-0 card-title">Anggota Peneliti</h3>
-                </div>
-
-                <livewire:forms.team-members-form :members="$form->members" modal-title="Tambah Anggota Peneliti"
-                    member-label="Anggota Peneliti" wire:model="form.members" />
-            </div>
-        </div>
-
         <!-- Section: Klasifikasi Ilmu -->
         <div class="mb-3 card">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-4">
                     <x-lucide-dna class="me-3 icon" />
-                    <h3 class="mb-0 card-title">Klasifikasi Ilmu (Klaster Sains)</h3>
+                    <h3 class="mb-0 card-title">1.2 Klasifikasi Ilmu (Klaster Sains)</h3>
                 </div>
 
                 <div class="row g-4">
@@ -255,7 +240,7 @@
             <div class="card-body">
                 <div class="d-flex align-items-center mb-4">
                     <x-lucide-file-text class="me-3 icon" />
-                    <h3 class="mb-0 card-title">Ringkasan Proposal</h3>
+                    <h3 class="mb-0 card-title">1.3 Ringkasan Proposal</h3>
                 </div>
 
                 <div class="mb-3">
@@ -279,8 +264,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" for="final_tkt_target">Target TKT Final <span
-                            class="text-danger">*</span></label>
+                    <label class="form-label" for="final_tkt_target">Target TKT Final</label>
                     <input id="final_tkt_target" type="text"
                         class="form-control @error('form.final_tkt_target') is-invalid @enderror"
                         wire:model="form.final_tkt_target" placeholder="Contoh: TKT 5, TKT 6, dsb" required>
@@ -291,8 +275,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" for="background">Latar Belakang <span
-                            class="text-danger">*</span></label>
+                    <label class="form-label" for="background">Latar Belakang</label>
                     <textarea id="background" class="form-control @error('form.background') is-invalid @enderror"
                         wire:model="form.background" rows="5"
                         placeholder="Jelaskan latar belakang penelitian (minimal 200 karakter)" required></textarea>
@@ -301,7 +284,7 @@
                     @enderror
                     <small class="text-muted">Minimum 200 karakter</small>
                 </div>
-
+                {{--
                 <div class="mb-3">
                     <label class="form-label" for="state_of_the_art">State of the Art <span
                             class="text-danger">*</span></label>
@@ -312,10 +295,10 @@
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="text-muted">Minimum 200 karakter</small>
-                </div>
+                </div> --}}
 
                 <div class="mb-3">
-                    <label class="form-label" for="methodology">Metodologi <span class="text-danger">*</span></label>
+                    <label class="form-label" for="methodology">Metodologi</label>
                     <textarea id="methodology" class="form-control @error('form.methodology') is-invalid @enderror"
                         wire:model="form.methodology" rows="5" placeholder="Jelaskan metodologi penelitian (minimal 200 karakter)"
                         required></textarea>
@@ -324,6 +307,19 @@
                     @enderror
                     <small class="text-muted">Minimum 200 karakter</small>
                 </div>
+            </div>
+        </div>
+
+        <!-- Section: Anggota -->
+        <div class="mb-3 card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <x-lucide-users class="me-3 icon" />
+                    <h3 class="mb-0 card-title">Anggota Peneliti</h3>
+                </div>
+
+                <livewire:forms.team-members-form :members="$form->members" modal-title="Tambah Anggota Peneliti"
+                    member-label="Anggota Peneliti" wire:model="form.members" />
             </div>
         </div>
 

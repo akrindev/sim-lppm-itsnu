@@ -162,10 +162,8 @@
                     <h3 class="mb-0 card-title">Anggota Pengabdi</h3>
                 </div>
 
-                <livewire:forms.team-members-form :members="$this->form->members" 
-                    modal-title="Tambah Anggota Pengabdi" 
-                    member-label="Anggota Pengabdi"
-                    wire:model="form.members" />
+                <livewire:forms.team-members-form :members="$this->form->members" modal-title="Tambah Anggota Pengabdi"
+                    member-label="Anggota Pengabdi" wire:model="form.members" />
             </div>
         </div>
 

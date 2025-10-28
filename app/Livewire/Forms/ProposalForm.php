@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use App\Models\CommunityService;
 use App\Models\Proposal;
 use App\Models\Research;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -12,11 +13,10 @@ class ProposalForm extends Form
 {
     public ?Proposal $proposal = null;
 
-    #[Validate('required|string|max:255')]
     public string $title = '';
 
     // Research scheme is only required for Research proposals, nullable for CommunityService
-    #[Validate('nullable|exists:research_schemes,id')]
+    #[Validate('required|exists:research_schemes,id')]
     public string $research_scheme_id = '';
 
     #[Validate('required|exists:focus_areas,id')]
@@ -49,17 +49,12 @@ class ProposalForm extends Form
     #[Validate('required|string|min:100')]
     public string $summary = '';
 
-    // Research-specific fields (nullable for CommunityService)
-    #[Validate('nullable|string|max:255')]
     public string $final_tkt_target = '';
 
-    #[Validate('nullable|string|min:200')]
     public string $background = '';
 
-    #[Validate('nullable|string|min:200')]
     public string $state_of_the_art = '';
 
-    #[Validate('nullable|string|min:200')]
     public string $methodology = '';
 
     #[Validate('nullable|array')]
@@ -77,6 +72,9 @@ class ProposalForm extends Form
 
     #[Validate('nullable|array')]
     public array $members = [];
+
+    #[Validate('required')]
+    public string $author_tasks = '';
 
     /**
      * Set proposal data for editing
@@ -155,6 +153,24 @@ class ProposalForm extends Form
      * Store a new proposal
      */
     public function store(string $submitterId): Proposal
+    {
+        return DB::transaction(function () use ($submitterId, &$proposal) {
+            if ($this->research_scheme_id) {
+                // It's a Research proposal
+                $proposal = $this->storeResearch($submitterId);
+            } else {
+                // It's a Community Service proposal
+                $proposal = $this->storeCommunityService($submitterId);
+            }
+
+            return $proposal;
+        });
+    }
+
+    /**
+     * Store a new Research proposal
+     */
+    public function storeResearch(string $submitterId): Proposal
     {
         // Do NOT call validate() again - it was already called in the Create component
         // This prevents double-validation and maintains form data integrity
@@ -304,7 +320,7 @@ class ProposalForm extends Form
 
         $rules = [
             'title' => 'required|string|max:255',
-            'research_scheme_id' => 'nullable|exists:research_schemes,id',
+            'research_scheme_id' => 'required|exists:research_schemes,id',
             'focus_area_id' => 'required|exists:focus_areas,id',
             'theme_id' => 'required|exists:themes,id',
             'topic_id' => 'required|exists:topics,id',
@@ -317,25 +333,32 @@ class ProposalForm extends Form
             'summary' => 'required|string|min:100',
         ];
 
-        // Add conditional rules based on proposal type
-        if ($isResearch) {
-            $rules['background'] = 'required|string|min:200';
-            $rules['methodology'] = 'required|string|min:200';
-            $rules['state_of_the_art'] = 'nullable|string|min:200';
-            $rules['final_tkt_target'] = 'nullable|string|max:255';
-            $rules['roadmap_data'] = 'nullable|array';
-        } elseif ($isCommunityService) {
-            // For CommunityService, background and methodology can be null or shorter
-            $rules['background'] = 'nullable|string|min:50';
-            $rules['methodology'] = 'nullable|string|min:50';
+        if ($isCommunityService) {
             $rules['partner_id'] = 'nullable|exists:partners,id';
             $rules['partner_issue_summary'] = 'nullable|string|min:50';
             $rules['solution_offered'] = 'nullable|string|min:50';
-        } else {
-            // For new proposals (no detailable yet), both Research and CommunityService need these
-            $rules['background'] = 'required|string|min:200';
-            $rules['methodology'] = 'required|string|min:200';
+            $rules['research_scheme_id'] = 'nullable|exists:research_schemes,id';
         }
+
+        // Add conditional rules based on proposal type
+        // if ($isResearch) {
+        // $rules['background'] = 'nullable|string|min:200';
+        // $rules['methodology'] = 'nullable|string|min:200';
+        // $rules['state_of_the_art'] = 'nullable|string|min:200';
+        // $rules['final_tkt_target'] = 'nullable|string|max:255';
+        // $rules['roadmap_data'] = 'nullable|array';
+        // } elseif ($isCommunityService) {
+        // For CommunityService, background and methodology can be null or shorter
+        // $rules['background'] = 'nullable|string|min:50';
+        // $rules['methodology'] = 'nullable|string|min:50';
+        // $rules['partner_id'] = 'nullable|exists:partners,id';
+        // $rules['partner_issue_summary'] = 'nullable|string|min:50';
+        //     $rules['solution_offered'] = 'nullable|string|min:50';
+        // } else {
+        // For new proposals (no detailable yet), both Research and CommunityService need these
+        // $rules['background'] = 'required|string|min:200';
+        // $rules['methodology'] = 'required|string|min:200';
+        // }
 
         $rules['members'] = 'nullable|array';
 
@@ -349,7 +372,7 @@ class ProposalForm extends Form
 
         // Add submitter as ketua (team leader) - always accepted
         $syncData[$submitterId] = [
-            'tasks' => $proposal->detailable_type === CommunityService::class ? 'Pengabdi Utama' : 'Peneliti Utama',
+            'tasks' => $this->author_tasks,
             'role' => 'ketua',
             'status' => 'accepted', // Submitter/ketua is always accepted
         ];
@@ -366,7 +389,7 @@ class ProposalForm extends Form
 
                 if ($identity) {
                     $syncData[$identity->user_id] = [
-                        'tasks' => $member['tugas'],
+                        'tasks' => $member['tugas'] ?? '',
                         'role' => 'anggota',
                         'status' => 'pending', // Other team members start as pending
                     ];

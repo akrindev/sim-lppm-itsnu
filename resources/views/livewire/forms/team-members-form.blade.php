@@ -44,8 +44,7 @@
     @endif
 
     <!-- Add Button -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-        data-bs-target="#modal-add-member">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-add-member">
         <x-lucide-plus class="icon" />
         Tambah Anggota
     </button>
@@ -56,17 +55,15 @@
 
     <!-- Add Member Modal -->
     @teleport('body')
-        <x-tabler.modal id="modal-add-member" :title="$modalTitle" :component-id="$this->getId()"
-            on-show="resetMemberForm">
+        <x-tabler.modal id="modal-add-member" :title="$modalTitle" :component-id="$this->getId()" on-show="resetMemberForm">
             <x-slot:body>
                 <div class="mb-3">
                     <label class="form-label" for="member_nidn">NIDN / NIP <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <input id="member_nidn" type="text"
-                            class="form-control @error('member_nidn') is-invalid @enderror"
-                            wire:model.live="member_nidn" placeholder="Masukkan NIDN atau NIP anggota">
-                        <button class="btn-outline-primary btn" type="button" wire:click="checkMember"
-                            id="button-addon2">
+                            class="form-control @error('member_nidn') is-invalid @enderror" wire:model.live="member_nidn"
+                            placeholder="Masukkan NIDN atau NIP anggota">
+                        <button class="btn-outline-primary btn" type="button" wire:click="checkMember" id="button-addon2">
                             <x-lucide-search class="icon" />
                             Cek
                         </button>
