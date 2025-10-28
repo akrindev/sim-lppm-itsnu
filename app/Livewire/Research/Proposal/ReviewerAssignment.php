@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Research\Proposal;
 
+use App\Livewire\Actions\AssignReviewersAction;
 use App\Models\Proposal;
-use App\Models\ProposalReviewer;
 use App\Models\User;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -51,31 +51,15 @@ class ReviewerAssignment extends Component
         $this->validate();
 
         $proposal = $this->proposal;
+        $action = new AssignReviewersAction;
+        $result = $action->execute($proposal, $this->selectedReviewers);
 
-        try {
-            foreach ($this->selectedReviewers as $userId) {
-                // Check if reviewer already assigned
-                if ($proposal->reviewers()->where('user_id', $userId)->exists()) {
-                    continue;
-                }
-
-                ProposalReviewer::create([
-                    'proposal_id' => $proposal->id,
-                    'user_id' => $userId,
-                    'status' => 'pending',
-                ]);
-            }
-
-            // Update proposal status to under_review if not already
-            if ($proposal->status === 'submitted') {
-                $proposal->update(['status' => 'under_review']);
-            }
-
-            $this->dispatch('success', message: 'Reviewer berhasil ditugaskan');
+        if ($result['success']) {
+            $this->dispatch('success', message: $result['message']);
             $this->dispatch('reviewers-assigned', proposalId: $proposal->id);
             $this->selectedReviewers = [];
-        } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menugaskan reviewer: ' . $e->getMessage());
+        } else {
+            $this->dispatch('error', message: $result['message']);
         }
     }
 

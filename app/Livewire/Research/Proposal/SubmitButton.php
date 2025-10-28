@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Research\Proposal;
 
+use App\Livewire\Actions\SubmitProposalAction;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -50,30 +51,15 @@ class SubmitButton extends Component
     public function submit(): void
     {
         $proposal = $this->proposal;
+        $action = new SubmitProposalAction;
+        $result = $action->execute($proposal);
 
-        if ($proposal->status !== 'draft') {
-            $this->dispatch('error', message: 'Proposal harus dalam status draft untuk disubmit');
-            return;
-        }
-
-        if (! $proposal->allTeamMembersAccepted()) {
-            $this->dispatch('error', message: 'Semua anggota tim harus menerima undangan terlebih dahulu');
-            return;
-        }
-
-        if (Auth::id() !== $proposal->submitter_id) {
-            $this->dispatch('error', message: 'Hanya pengaju dapat mensubmit proposal');
-            return;
-        }
-
-        try {
-            $proposal->update(['status' => 'submitted']);
-
-            $this->dispatch('success', message: 'Proposal berhasil disubmit');
+        if ($result['success']) {
+            $this->dispatch('success', message: $result['message']);
             $this->dispatch('proposal-submitted', proposalId: $proposal->id);
             $this->redirect(route('research.proposal.show', $proposal->id));
-        } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal submit proposal: ' . $e->getMessage());
+        } else {
+            $this->dispatch('error', message: $result['message']);
         }
     }
 

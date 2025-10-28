@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Research\Proposal;
 
+use App\Livewire\Actions\ApproveProposalAction;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -56,28 +57,19 @@ class ApprovalButton extends Component
 
         if (! $isAdmin) {
             $this->dispatch('error', message: 'Anda tidak memiliki akses untuk approve proposal');
+
             return;
         }
 
         $proposal = $this->proposal;
+        $action = new ApproveProposalAction;
+        $result = $action->execute($proposal, 'approved');
 
-        if ($proposal->status !== 'reviewed') {
-            $this->dispatch('error', message: 'Proposal harus dalam status reviewed untuk diapprove');
-            return;
-        }
-
-        if (! $proposal->allReviewsCompleted()) {
-            $this->dispatch('error', message: 'Semua reviewer harus menyelesaikan review terlebih dahulu');
-            return;
-        }
-
-        try {
-            $proposal->update(['status' => 'approved']);
-
-            $this->dispatch('success', message: 'Proposal berhasil disetujui');
+        if ($result['success']) {
+            $this->dispatch('success', message: $result['message']);
             $this->dispatch('proposal-approved', proposalId: $proposal->id);
-        } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal approve proposal: ' . $e->getMessage());
+        } else {
+            $this->dispatch('error', message: $result['message']);
         }
     }
 
@@ -88,23 +80,19 @@ class ApprovalButton extends Component
 
         if (! $isAdmin) {
             $this->dispatch('error', message: 'Anda tidak memiliki akses untuk reject proposal');
+
             return;
         }
 
         $proposal = $this->proposal;
+        $action = new ApproveProposalAction;
+        $result = $action->execute($proposal, 'rejected');
 
-        if ($proposal->status !== 'reviewed' && $proposal->status !== 'under_review') {
-            $this->dispatch('error', message: 'Hanya proposal yang belum diapprove yang bisa ditolak');
-            return;
-        }
-
-        try {
-            $proposal->update(['status' => 'rejected']);
-
-            $this->dispatch('warning', message: 'Proposal ditolak');
+        if ($result['success']) {
+            $this->dispatch('warning', message: $result['message']);
             $this->dispatch('proposal-rejected', proposalId: $proposal->id);
-        } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal reject proposal: ' . $e->getMessage());
+        } else {
+            $this->dispatch('error', message: $result['message']);
         }
     }
 
