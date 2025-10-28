@@ -7,8 +7,8 @@
     'backdrop' => 'static',
     'keyboard' => false,
     'scrollable' => false,
-    'centered' => false,
-    'size' => 'lg',
+    'centered' => true,
+    'size' => 'md',
     'variant' => 'default', // simple, large, small, full-width, scrollable, form, success, danger, confirmation
     'type' => 'default', // success, danger, warning, info, primary (for colored headers)
     'icon' => null, // icon class for header

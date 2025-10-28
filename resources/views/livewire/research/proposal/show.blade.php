@@ -7,7 +7,7 @@
             <x-lucide-arrow-left class="icon" />
             Kembali
         </a>
-        @if ($proposal->status === 'draft')
+        @if ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id())
             <a href="{{ route('research.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
                 Edit
@@ -247,37 +247,60 @@
                     </a>
                 @endif
 
-                <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
-                    data-bs-target="#deleteModal">
-                    <x-lucide-trash-2 class="icon" />
-                    Hapus
-                </button>
+                {{-- Accept/Reject for team members --}}
+                @php
+                    $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
+                @endphp
+                @if ($currentMember && $currentMember->pivot->status === 'pending')
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success" wire:click="acceptMember">
+                            <x-lucide-check class="icon" />
+                            Terima Undangan
+                        </button>
+                        <button type="button" class="btn btn-danger" wire:click="rejectMember">
+                            <x-lucide-x class="icon" />
+                            Tolak Undangan
+                        </button>
+                    </div>
+                @endif
+
+                @if (
+                    ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id()) ||
+                        auth()->user()->hasRole(['admin lppm', 'superadmin']))
+                    <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                        <x-lucide-trash-2 class="icon" />
+                        Hapus
+                    </button>
+
+                    <!-- Delete Confirmation Modal -->
+                    @teleport('body')
+                        <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
+                            <x-slot:body>
+                                <div class="py-1 text-center">
+                                    <x-lucide-alert-circle class="mb-2 text-danger icon"
+                                        style="width: 3rem; height: 3rem;" />
+                                    <h3>Hapus Proposal?</h3>
+                                    <div class="text-secondary">
+                                        Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
+                                    </div>
+                                </div>
+                            </x-slot:body>
+
+                            <x-slot:footer>
+                                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                                    Batal
+                                </button>
+                                <button type="button" wire:click="delete" class="btn btn-danger"
+                                    data-bs-dismiss="modal">
+                                    Ya, Hapus Proposal
+                                </button>
+                            </x-slot:footer>
+                        </x-tabler.modal>
+                    @endteleport
+                @endif
+
             </div>
-
-
-            <!-- Delete Confirmation Modal -->
-            @teleport('body')
-                <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
-                    <x-slot:body>
-                        <div class="py-4 text-center">
-                            <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
-                            <h3>Hapus Proposal?</h3>
-                            <div class="text-secondary">
-                                Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
-                            </div>
-                        </div>
-                    </x-slot:body>
-
-                    <x-slot:footer>
-                        <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
-                            Batal
-                        </button>
-                        <button type="button" wire:click="delete" class="btn btn-danger" data-bs-dismiss="modal">
-                            Ya, Hapus Proposal
-                        </button>
-                    </x-slot:footer>
-                </x-tabler.modal>
-            @endteleport
         </div>
     </div>
 </div>

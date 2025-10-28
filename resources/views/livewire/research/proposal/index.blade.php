@@ -67,9 +67,9 @@
                 <thead>
                     <tr>
                         <th>Judul</th>
-                        <th>Peneliti</th>
+                        <th>Author</th>
                         <th>Status</th>
-                        <th>Skema</th>
+                        {{-- <th>Skema</th> --}}
                         <th>Bidang Fokus</th>
                         <th>Tanggal Dibuat</th>
                         <th class="w-1">Aksi</th>
@@ -83,18 +83,18 @@
                             </td>
                             <td>
                                 <div>{{ $proposal->submitter?->name }}</div>
-                                <small class="text-secondary">{{ $proposal->submitter?->email }}</small>
+                                <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
                             </td>
                             <td>
                                 <x-tabler.badge :color="$proposal->status" class="fw-normal">
                                     {{ ucfirst($proposal->status) }}
                                 </x-tabler.badge>
                             </td>
-                            <td>
+                            {{-- <td>
                                 <div class="bg-blue-lt badge-outline badge">
                                     {{ $proposal->researchScheme?->name ?? '—' }}
                                 </div>
-                            </td>
+                            </td> --}}
                             <td>
                                 <div class="badge-outline badge">
                                     {{ $proposal->focusArea?->name ?? '—' }}

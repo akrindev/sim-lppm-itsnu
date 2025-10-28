@@ -41,7 +41,7 @@ class Show extends Component
             session()->flash('success', 'Proposal penelitian berhasil dihapus');
             $this->redirect(route('research.proposal.index'));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
         }
     }
 
@@ -58,5 +58,31 @@ class Show extends Component
                 'teamMembers',
             ]),
         ]);
+    }
+
+    /**
+     * Accept proposal team member invitation.
+     */
+    public function acceptMember(): void
+    {
+        $user = request()->user();
+        $proposal = $this->form->proposal;
+        if ($proposal->teamMembers->contains($user)) {
+            $proposal->teamMembers()->updateExistingPivot($user->id, ['status' => 'accepted']);
+            $this->dispatch('memberAccepted');
+        }
+    }
+
+    /**
+     * Reject proposal team member invitation.
+     */
+    public function rejectMember(): void
+    {
+        $user = request()->user();
+        $proposal = $this->form->proposal;
+        if ($proposal->teamMembers->contains($user)) {
+            $proposal->teamMembers()->updateExistingPivot($user->id, ['status' => 'rejected']);
+            $this->dispatch('memberRejected');
+        }
     }
 }

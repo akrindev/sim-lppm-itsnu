@@ -1,6 +1,6 @@
 <div>
     @if ($this->canSubmit)
-        <button wire:click="submit" class="btn btn-success">
+        <button wire:click="submit" class="w-full btn btn-success">
             <x-lucide-send class="icon" />
             Submit Proposal
         </button>
@@ -15,7 +15,7 @@
         </div>
     @else
         <div class="d-inline-block alert alert-info" role="alert">
-            Proposal tidak dapat disubmit
+            Proposal dapat disubmit oleh Author setelah semua anggota menerima undangan.
         </div>
     @endif
 </div>
