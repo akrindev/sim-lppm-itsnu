@@ -68,9 +68,9 @@
                     <tr>
                         <th>Judul</th>
                         <th>Author</th>
-                        <th>Status</th>
                         {{-- <th>Skema</th> --}}
                         <th>Bidang Fokus</th>
+                        <th>Status</th>
                         <th>Tanggal Dibuat</th>
                         <th class="w-1">Aksi</th>
                     </tr>
@@ -85,11 +85,6 @@
                                 <div>{{ $proposal->submitter?->name }}</div>
                                 <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
                             </td>
-                            <td>
-                                <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                                    {{ ucfirst($proposal->status) }}
-                                </x-tabler.badge>
-                            </td>
                             {{-- <td>
                                 <div class="bg-blue-lt badge-outline badge">
                                     {{ $proposal->researchScheme?->name ?? '—' }}
@@ -101,6 +96,11 @@
                                 </div>
                             </td>
                             <td>
+                                <x-tabler.badge :color="$proposal->status" class="fw-normal">
+                                    {{ ucfirst($proposal->status) }}
+                                </x-tabler.badge>
+                            </td>
+                            <td>
                                 <small class="text-secondary">
                                     {{ $proposal->created_at?->format('d M Y') }}
                                 </small>
@@ -108,7 +108,7 @@
                             <td>
                                 <div class="flex-nowrap btn-list">
                                     <a href="{{ route('research.proposal.show', $proposal) }}"
-                                        class="btn btn-icon btn-ghost-primary" title="Lihat">
+                                        class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
                                         <x-lucide-eye class="icon" />
                                     </a>
                                     @if ($proposal->status === 'draft')
