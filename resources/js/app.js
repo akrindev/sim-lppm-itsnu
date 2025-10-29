@@ -1,4 +1,3 @@
-
 import '@tabler/core/dist/libs/nouislider/dist/nouislider.min.js';
 import TomSelect from '@tabler/core/dist/libs/tom-select/dist/js/tom-select.base.js';
 import '@tabler/core/js/tabler';

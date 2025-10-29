@@ -8,6 +8,7 @@ use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
 use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalIndex;
 use App\Livewire\CommunityService\Proposal\Show as CommunityServiceProposalShow;
 use App\Livewire\CommunityService\ProposalRevision\Index as CommunityServiceProposalRevisionIndex;
+use App\Livewire\Dashboard;
 use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
 use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
 use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
@@ -33,7 +34,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
