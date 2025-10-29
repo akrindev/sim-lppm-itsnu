@@ -1,6 +1,11 @@
+
+import '@tabler/core/dist/libs/nouislider/dist/nouislider.min.js';
+import TomSelect from '@tabler/core/dist/libs/tom-select/dist/js/tom-select.base.js';
 import '@tabler/core/js/tabler';
 import './theme-config';
 
+// Make TomSelect available globally
+window.TomSelect = TomSelect;
 /**
  * Configuration items for menu and layout settings
  */
@@ -135,6 +140,34 @@ const initializeSettings = () => {
 };
 
 /**
+ * TomSelect Configuration
+ */
+const TOM_SELECT_CONFIG = {
+	create: false,
+	placeholder: 'Pilih opsi...',
+	searchField: ['text'],
+	valueField: 'value',
+	labelField: 'text',
+	copyClassesToDropdown: false,
+	dropdownParent: 'body',
+	controlInput: '<input>',
+	render: {
+		item: (data, escapeFunc) => {
+			if (data.customProperties) {
+				return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escapeFunc(data.text) + '</div>';
+			}
+			return '<div>' + escapeFunc(data.text) + '</div>';
+		},
+		option: (data, escapeFunc) => {
+			if (data.customProperties) {
+				return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escapeFunc(data.text) + '</div>';
+			}
+			return '<div>' + escapeFunc(data.text) + '</div>';
+		},
+	},
+};
+
+/**
  * Initialize Tom Select for all select elements with class 'tom-select'
  */
 const initializeTomSelect = () => {
@@ -142,20 +175,263 @@ const initializeTomSelect = () => {
 	if (!TomSelect) return;
 
 	document.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)').forEach((selectEl) => {
-		if (selectEl.tomSelect) {
-			selectEl.tomSelect.destroy();
-		}
+		try {
+			// Destroy existing instance if it exists
+			if (selectEl.tomSelect) {
+				selectEl.tomSelect.destroy();
+			}
 
-		new TomSelect(selectEl, {
-			create: false,
-			placeholder: selectEl.getAttribute('placeholder') || 'Pilih opsi...',
-			searchField: ['text'],
-			valueField: 'value',
-			labelField: 'text',
-		});
+			// Double check - if element is already transformed, skip
+			if (selectEl.classList.contains('ts-hidden-accessible')) {
+				return;
+			}
+
+			// Get current value(s) from the select element
+			const currentValue = selectEl.value;
+			const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+			const config = {
+				...TOM_SELECT_CONFIG,
+				placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+			};
+
+			// Set initial items if there's a current value
+			if (currentValue && currentValue !== '') {
+				config.items = [currentValue];
+			} else if (currentValues.length > 0) {
+				config.items = currentValues;
+			}
+
+			new TomSelect(selectEl, config);
+		} catch (error) {
+			console.warn('Failed to initialize Tom Select on element:', selectEl, error);
+		}
 	});
 };
 
+/**
+ * Initialize Tom Select for select elements within a specific element (like a modal)
+ */
+const initializeTomSelectInElement = (element) => {
+	const { TomSelect } = window;
+	if (!TomSelect) return;
+
+	element.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)').forEach((selectEl) => {
+		try {
+			// Destroy existing instance if it exists
+			if (selectEl.tomSelect) {
+				selectEl.tomSelect.destroy();
+			}
+
+			// Double check - if element is already transformed, skip
+			if (selectEl.classList.contains('ts-hidden-accessible')) {
+				return;
+			}
+
+			// Get current value(s) from the select element
+			const currentValue = selectEl.value;
+			const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+			const config = {
+				...TOM_SELECT_CONFIG,
+				placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+			};
+
+			// Set initial items if there's a current value
+			if (currentValue && currentValue !== '') {
+				config.items = [currentValue];
+			} else if (currentValues.length > 0) {
+				config.items = currentValues;
+			}
+
+			new TomSelect(selectEl, config);
+		} catch (error) {
+			console.warn('Failed to initialize Tom Select in element:', selectEl, error);
+		}
+	});
+};
+
+/**
+ * Livewire Lifecycle Hooks Integration
+ * Initialize TomSelect on all relevant Livewire events
+ */
+document.addEventListener('livewire:init', () => {
+	// Register Livewire hooks after Livewire initializes
+
+	// Component initialization hook - fires when a new component is discovered
+	Livewire.hook('component.init', ({ component, cleanup }) => {
+		// Use queueMicrotask to ensure Livewire has finished setting initial values
+		queueMicrotask(() => {
+			const selectElements = component.el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
+			if (selectElements.length > 0) {
+				selectElements.forEach((selectEl) => {
+					try {
+						// Destroy existing instance if it exists
+						if (selectEl.tomSelect) {
+							selectEl.tomSelect.destroy();
+						}
+
+						// Double check - if element is already transformed, skip
+						if (selectEl.classList.contains('ts-hidden-accessible')) {
+							return;
+						}
+
+						// Get current value(s) from the select element
+						const currentValue = selectEl.value;
+						const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+						const config = {
+							...TOM_SELECT_CONFIG,
+							placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+						};
+
+						// Set initial items if there's a current value
+						if (currentValue && currentValue !== '') {
+							config.items = [currentValue];
+						} else if (currentValues.length > 0) {
+							config.items = currentValues;
+						}
+
+						new TomSelect(selectEl, config);
+					} catch (error) {
+						console.warn('Failed to initialize Tom Select in component:', selectEl, error);
+					}
+				});
+			}
+
+			// Cleanup TomSelect instances when component is removed
+			cleanup(() => {
+				selectElements.forEach((selectEl) => {
+					if (selectEl.tomSelect) {
+						selectEl.tomSelect.destroy();
+					}
+				});
+			});
+		});
+	});
+
+	// DOM Morph hooks - fires during morphing phase after network roundtrip
+	Livewire.hook('element.init', ({ el }) => {
+		if (el.classList?.contains('tom-select')) {
+			// Re-initialize if the select element itself was added
+			if (el.tagName === 'SELECT') {
+				try {
+					// Destroy existing instance if it exists
+					if (el.tomSelect) {
+						el.tomSelect.destroy();
+					}
+
+					// Double check - if element is already transformed, skip
+					if (el.classList.contains('ts-hidden-accessible')) {
+						return;
+					}
+
+					// Get current value(s) from the select element
+					const currentValue = el.value;
+					const currentValues = Array.from(el.selectedOptions).map(option => option.value);
+
+					const config = {
+						...TOM_SELECT_CONFIG,
+						placeholder: el.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+					};
+
+					// Set initial items if there's a current value
+					if (currentValue && currentValue !== '') {
+						config.items = [currentValue];
+					} else if (currentValues.length > 0) {
+						config.items = currentValues;
+					}
+
+					new TomSelect(el, config);
+				} catch (error) {
+					console.warn('Failed to initialize Tom Select on element:', el, error);
+				}
+			}
+		} else if (el.querySelectorAll) {
+			// Check for select elements within the added element
+			const selectElements = el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
+			selectElements.forEach((selectEl) => {
+				try {
+					// Destroy existing instance if it exists
+					if (selectEl.tomSelect) {
+						selectEl.tomSelect.destroy();
+					}
+
+					// Double check - if element is already transformed, skip
+					if (selectEl.classList.contains('ts-hidden-accessible')) {
+						return;
+					}
+
+					// Get current value(s) from the select element
+					const currentValue = selectEl.value;
+					const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+					const config = {
+						...TOM_SELECT_CONFIG,
+						placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+					};
+
+					// Set initial items if there's a current value
+					if (currentValue && currentValue !== '') {
+						config.items = [currentValue];
+					} else if (currentValues.length > 0) {
+						config.items = currentValues;
+					}
+
+					new TomSelect(selectEl, config);
+				} catch (error) {
+					console.warn('Failed to initialize Tom Select in added element:', selectEl, error);
+				}
+			});
+		}
+	});
+
+	// Before morphing - optionally destroy instances to prevent conflicts
+	Livewire.hook('morph.updating', ({ el }) => {
+		if (el.classList?.contains('tom-select') && el.tagName === 'SELECT') {
+			if (el.tomSelect) {
+				el.tomSelect.destroy();
+			}
+		} else if (el.querySelectorAll) {
+			const selectElements = el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
+			selectElements.forEach((selectEl) => {
+				if (selectEl.tomSelect) {
+					selectEl.tomSelect.destroy();
+				}
+			});
+		}
+	});
+
+	// After morphing completes for the component
+	Livewire.hook('morphed', ({ component }) => {
+		// Use setTimeout to ensure DOM is fully updated
+		setTimeout(() => {
+			initializeTomSelectInElement(component.el);
+		}, 0);
+	});
+
+    Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
+        // Equivalent of 'message.sent'
+
+        succeed(({ snapshot, effects }) => {
+            // Equivalent of 'message.received'
+
+            queueMicrotask(() => {
+                // Equivalent of 'message.processed'
+                // Use setTimeout to ensure DOM is fully updated
+                setTimeout(() => {
+                    initializeTomSelectInElement(component.el);
+                }, 500);
+            })
+        })
+
+        fail(() => {
+            // Equivalent of 'message.failed'
+        })
+    })
+});
+
+// Fallback: Initialize on page navigation (e.g., wire:navigate)
 document.addEventListener('livewire:navigated', () => {
 	initializeSettings();
 	initializeTomSelect();
@@ -167,30 +443,8 @@ document.addEventListener('shown.bs.modal', (event) => {
 	initializeTomSelectInElement(modal);
 });
 
-// Initialize on first page load
+// Fallback: Initialize on first page load if Livewire hooks don't fire
 document.addEventListener('DOMContentLoaded', () => {
 	initializeSettings();
 	initializeTomSelect();
 });
-
-/**
- * Initialize Tom Select for select elements within a specific element (like a modal)
- */
-const initializeTomSelectInElement = (element) => {
-	const { TomSelect } = window;
-	if (!TomSelect) return;
-
-	element.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)').forEach((selectEl) => {
-		if (selectEl.tomSelect) {
-			selectEl.tomSelect.destroy();
-		}
-
-		new TomSelect(selectEl, {
-			create: false,
-			placeholder: selectEl.getAttribute('placeholder') || 'Pilih opsi...',
-			searchField: ['text'],
-			valueField: 'value',
-			labelField: 'text',
-		});
-	});
-};

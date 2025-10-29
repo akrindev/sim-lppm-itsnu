@@ -24,7 +24,7 @@ class Index extends Component
     #[Url]
     public string $yearFilter = '';
 
-    public int $confirmingDeleteProposalId = 0;
+    public string $confirmingDeleteProposalId = '';
 
     public function resetFilters(): void
     {
@@ -34,14 +34,14 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function confirmDeleteProposal(int $id): void
+    public function confirmDeleteProposal(string $id): void
     {
         $this->confirmingDeleteProposalId = $id;
     }
 
     public function cancelDeleteProposal(): void
     {
-        $this->confirmingDeleteProposalId = 0;
+        $this->confirmingDeleteProposalId = '';
     }
 
     public function render(): View
@@ -71,6 +71,10 @@ class Index extends Component
                     $q->where('title', 'like', "%{$this->search}%")
                         ->orWhere('summary', 'like', "%{$this->search}%");
                 });
+            })
+            ->when($isAdmin, function ($query) {
+                // where status is not draft for admin users
+                $query->where('status', '!=', 'draft');
             })
             ->when($this->statusFilter !== 'all', function ($query) {
                 $query->where('status', $this->statusFilter);
@@ -153,7 +157,7 @@ class Index extends Component
         return $years;
     }
 
-    public function deleteProposal(int $id): void
+    public function deleteProposal(string $id): void
     {
         $proposal = Proposal::find($id);
 
@@ -163,9 +167,16 @@ class Index extends Component
             return;
         }
 
+        // if proposal is completed, it cannot be deleted
+        if ($proposal->status === 'completed') {
+            session()->flash('error', 'Proposal yang sudah selesai tidak dapat dihapus');
+
+            return;
+        }
+
         $user = Auth::user();
-        // Only admin lppm can delete proposals
-        if (! $user->hasRole('admin lppm')) {
+        // Only admin lppm and submitter with status is not completed can delete proposals
+        if (! $user->hasRole('admin lppm') && $proposal->submitter_id !== $user->id) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
 
             return;
@@ -175,7 +186,7 @@ class Index extends Component
             $proposal->delete();
             session()->flash('success', 'Proposal berhasil dihapus');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
         }
     }
 }

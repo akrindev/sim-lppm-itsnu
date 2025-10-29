@@ -1,3 +1,5 @@
+@import '@tabler/core/dist/libs/nouislider/dist/nouislider.min.css';
+@import '@tabler/core/dist/libs/tom-select/dist/css/tom-select.bootstrap5.min.css';
 @import '@tabler/core/dist/css/tabler.min.css';
 @import '@tabler/core/dist/css/tabler-flags.min.css';
 @import '@tabler/core/dist/css/tabler-socials.min.css';
@@ -5,3 +7,7 @@
 @import '@tabler/core/dist/css/tabler-vendors.min.css';
 @import '@tabler/core/dist/css/tabler-marketing.min.css';
 @import '@tabler/core/dist/css/tabler-themes.min.css';
+
+.ts-dropdown {
+    z-index: 10500; /* Ensure dropdowns appear above other elements */
+}

@@ -16,7 +16,11 @@
     </div>
 </x-slot:pageActions>
 
+
 <div class="row">
+    <div class="col-md-12">
+        <x-tabler.alert />
+    </div>
     <!-- Main Content -->
     <div class="col-lg-8">
         <!-- Basic Information -->
@@ -27,11 +31,11 @@
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Judul</label>
+                        <label class="form-label"><x-lucide-file-text class="me-2 icon" />Judul</label>
                         <p class="text-reset">{{ $proposal->title }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Status</label>
+                        <label class="form-label"><x-lucide-info class="me-2 icon" />Status</label>
                         <p>
                             <x-tabler.badge :color="$proposal->status" class="fw-normal">
                                 {{ ucfirst($proposal->status) }}
@@ -42,64 +46,60 @@
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Author</label>
+                        <label class="form-label"><x-lucide-user class="me-2 icon" />Author</label>
                         <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Email</label>
+                        <label class="form-label"><x-lucide-mail class="me-2 icon" />Email</label>
                         <p class="text-reset">{{ $proposal->submitter?->email }}</p>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Skema Penelitian</label>
+                        <label class="form-label"><x-lucide-clipboard-list class="me-2 icon" />Skema
+                            Penelitian</label>
                         <p class="text-reset">{{ $proposal->researchScheme?->name ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Durasi (Tahun)</label>
+                        <label class="form-label"><x-lucide-calendar class="me-2 icon" />Durasi (Tahun)</label>
                         <p class="text-reset">{{ $proposal->duration_in_years ?? '—' }}</p>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Ringkasan</label>
-                    <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Classification -->
+        <!-- Informasi Dasar Proposal -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">1.2 Klasifikasi</h3>
+                <h3 class="card-title">1.2 Informasi Dasar Proposal</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Bidang Fokus</label>
+                        <label class="form-label"><x-lucide-focus class="me-2 icon" />Bidang Fokus</label>
                         <p class="text-reset">{{ $proposal->focusArea?->name ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Tema</label>
+                        <label class="form-label"><x-lucide-tag class="me-2 icon" />Tema</label>
                         <p class="text-reset">{{ $proposal->theme?->name ?? '—' }}</p>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Topik</label>
+                        <label class="form-label"><x-lucide-hash class="me-2 icon" />Topik</label>
                         <p class="text-reset">{{ $proposal->topic?->name ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Prioritas Nasional</label>
+                        <label class="form-label"><x-lucide-star class="me-2 icon" />Prioritas Nasional</label>
                         <p class="text-reset">{{ $proposal->nationalPriority?->name ?? '—' }}</p>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="form-label">Nilai SBK</label>
+                        <label class="form-label"><x-lucide-dollar-sign class="me-2 icon" />Nilai SBK</label>
                         <p class="text-reset">{{ number_format($proposal->sbk_value, 2) ?? '—' }}</p>
                     </div>
                 </div>
@@ -129,6 +129,40 @@
             </div>
         </div>
 
+        {{-- ringkasan --}}
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.4 Ringkasan</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- detail penelitian --}}
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.5 Detail Penelitian</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Target TKT Final</label>
+                    <p class="text-reset">{{ $form->final_tkt_target ?? '—' }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Latar Belakang</label>
+                    <p class="text-reset">{{ $form->background ?? '—' }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Metodologi</label>
+                    <p class="text-reset">{{ $form->methodology ?? '—' }}</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Team Members Management -->
         <div class="mb-3">
@@ -141,7 +175,8 @@
         </div> --}}
 
         <!-- Reviewer Assignment (Admin Only - Submitted Status) -->
-        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
+        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
+                $proposal->status === 'submitted')
             <div class="mb-3">
                 <livewire:research.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
             </div>
@@ -170,11 +205,11 @@
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Dibuat</label>
+                        <label class="form-label"><x-lucide-plus-circle class="me-2 icon" />Dibuat</label>
                         <p class="text-reset">{{ $proposal->created_at?->format('d M Y H:i') }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Diubah</label>
+                        <label class="form-label"><x-lucide-edit-3 class="me-2 icon" />Diubah</label>
                         <p class="text-reset">{{ $proposal->updated_at?->format('d M Y H:i') }}</p>
                     </div>
                 </div>
@@ -223,84 +258,85 @@
             </div>
         </div>
 
-        <!-- Actions Card -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Aksi</h3>
-            </div>
-            <div class="gap-2 d-grid card-body">
-                @if ($proposal->status === 'draft')
-                    <livewire:research.proposal.submit-button :proposalId="$proposal->id" :key="'submit-button-' . $proposal->id" />
-                @endif
+        @if ($proposal->status !== 'completed')
+            <!-- Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Aksi</h3>
+                </div>
+                <div class="gap-2 d-grid card-body">
+                    @if ($proposal->status === 'draft')
+                        <livewire:research.proposal.submit-button :proposalId="$proposal->id" :key="'submit-button-' . $proposal->id" />
+                    @endif
 
-                @if (in_array($proposal->status, ['submitted', 'under_review', 'rejected']))
-                    <a href="#" class="btn btn-info">
-                        <x-lucide-eye class="icon" />
-                        Lihat Review
-                    </a>
-                @endif
+                    @if (in_array($proposal->status, ['submitted', 'under_review', 'rejected']))
+                        <a href="#" class="btn btn-info">
+                            <x-lucide-eye class="icon" />
+                            Lihat Review
+                        </a>
+                    @endif
 
-                @if ($proposal->status === 'approved')
-                    <a href="#" class="btn btn-success">
-                        <x-lucide-file-text class="icon" />
-                        Laporan Progress
-                    </a>
-                @endif
+                    @if ($proposal->status === 'approved')
+                        <a href="#" class="btn btn-success">
+                            <x-lucide-file-text class="icon" />
+                            Laporan Progress
+                        </a>
+                    @endif
 
-                {{-- Accept/Reject for team members --}}
-                @php
-                    $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
-                @endphp
-                @if ($currentMember && $currentMember->pivot->status === 'pending')
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-success" wire:click="acceptMember">
-                            <x-lucide-check class="icon" />
-                            Terima Undangan
+                    {{-- Accept/Reject for team members --}}
+                    @php
+                        $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
+                    @endphp
+                    @if ($currentMember && $currentMember->pivot->status === 'pending')
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" wire:click="acceptMember">
+                                <x-lucide-check class="icon" />
+                                Terima Undangan
+                            </button>
+                            <button type="button" class="btn btn-danger" wire:click="rejectMember">
+                                <x-lucide-x class="icon" />
+                                Tolak Undangan
+                            </button>
+                        </div>
+                    @endif
+
+                    @if ($proposal->status !== 'completed' && $proposal->submitter_id === auth()->id())
+                        <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
+                            <x-lucide-trash-2 class="icon" />
+                            Hapus
                         </button>
-                        <button type="button" class="btn btn-danger" wire:click="rejectMember">
-                            <x-lucide-x class="icon" />
-                            Tolak Undangan
-                        </button>
-                    </div>
-                @endif
 
-                @if (
-                    ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id()) ||
-                        auth()->user()->hasRole(['admin lppm', 'superadmin']))
-                    <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
-                        data-bs-target="#deleteModal">
-                        <x-lucide-trash-2 class="icon" />
-                        Hapus
-                    </button>
-
-                    <!-- Delete Confirmation Modal -->
-                    @teleport('body')
-                        <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
-                            <x-slot:body>
-                                <div class="py-1 text-center">
-                                    <x-lucide-alert-circle class="mb-2 text-danger icon"
-                                        style="width: 3rem; height: 3rem;" />
-                                    <h3>Hapus Proposal?</h3>
-                                    <div class="text-secondary">
-                                        Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
+                        <!-- Delete Confirmation Modal -->
+                        @teleport('body')
+                            <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
+                                <x-slot:body>
+                                    <div class="py-1 text-center">
+                                        <x-lucide-alert-circle class="mb-2 text-danger icon"
+                                            style="width: 3rem; height: 3rem;" />
+                                        <h3>Hapus Proposal?</h3>
+                                        <div class="text-secondary">
+                                            Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat
+                                            dibatalkan.
+                                        </div>
                                     </div>
-                                </div>
-                            </x-slot:body>
+                                </x-slot:body>
 
-                            <x-slot:footer>
-                                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
-                                    Batal
-                                </button>
-                                <button type="button" wire:click="delete" class="btn btn-danger"
-                                    data-bs-dismiss="modal">
-                                    Ya, Hapus Proposal
-                                </button>
-                            </x-slot:footer>
-                        </x-tabler.modal>
-                    @endteleport
-                @endif
+                                <x-slot:footer>
+                                    <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                                        Batal
+                                    </button>
+                                    <button type="button" wire:click="delete" class="btn btn-danger"
+                                        data-bs-dismiss="modal">
+                                        Ya, Hapus Proposal
+                                    </button>
+                                </x-slot:footer>
+                            </x-tabler.modal>
+                        @endteleport
+                    @endif
 
+                </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>

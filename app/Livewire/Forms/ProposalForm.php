@@ -147,6 +147,15 @@ class ProposalForm extends Form
             })
             ->values()
             ->toArray();
+
+        // Load author tasks from ketua's pivot data
+        $ketuaMember = $proposal->teamMembers()
+            ->wherePivot('role', 'ketua')
+            ->first();
+
+        if ($ketuaMember) {
+            $this->author_tasks = $ketuaMember->pivot->tasks ?? '';
+        }
     }
 
     /**
@@ -289,7 +298,7 @@ class ProposalForm extends Form
             'cluster_level1_id' => $this->cluster_level1_id,
             'cluster_level2_id' => $this->cluster_level2_id ?: null,
             'cluster_level3_id' => $this->cluster_level3_id ?: null,
-            'sbk_value' => $this->sbk_value,
+            'sbk_value' => $this->sbk_value ?: null,
             'duration_in_years' => (int) $this->duration_in_years,
             'summary' => $this->summary,
         ]);

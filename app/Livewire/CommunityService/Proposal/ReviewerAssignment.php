@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Research\Proposal;
+namespace App\Livewire\CommunityService\Proposal;
 
 use App\Livewire\Actions\AssignReviewersAction;
 use App\Models\Proposal;
@@ -95,6 +95,6 @@ class ReviewerAssignment extends Component
 
     public function render(): View
     {
-        return view('livewire.research.proposal.reviewer-assignment');
+        return view('livewire.community-service.proposal.reviewer-assignment');
     }
 }

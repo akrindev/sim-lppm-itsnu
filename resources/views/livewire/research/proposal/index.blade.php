@@ -12,7 +12,9 @@
     @endunless
 </x-slot:pageActions>
 
+
 <div>
+    <x-tabler.alert />
     <div class="mb-3 row">
         <div class="col-12">
             <div class="card">
@@ -111,15 +113,15 @@
                                         class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
                                         <x-lucide-eye class="icon" />
                                     </a>
-                                    @if ($proposal->status === 'draft')
+                                    {{-- @if ($proposal->status === 'draft')
                                         <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
                                             <x-lucide-pencil class="icon" />
                                         </a>
-                                    @endif
-                                    @if (auth()->user()->hasRole('admin lppm'))
+                                    @endif --}}
+                                    @if (auth()->user()->hasRole('admin lppm') && $proposal->status !== 'completed')
                                         <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
                                             data-bs-toggle="modal" data-bs-target="#deleteProposalModal"
-                                            wire:click="confirmDeleteProposal({{ $proposal->id }})">
+                                            wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
                                             <x-lucide-trash-2 class="icon" />
                                         </button>
                                     @endif
@@ -169,8 +171,8 @@
                                 Batal
                             </button></div>
                         <div class="col"><button type="button"
-                                wire:click="deleteProposal({{ $confirmingDeleteProposalId }})" class="w-100 btn btn-danger"
-                                data-bs-dismiss="modal">
+                                wire:click="deleteProposal('{{ $confirmingDeleteProposalId }}')"
+                                class="w-100 btn btn-danger" data-bs-dismiss="modal">
                                 Ya, Hapus Proposal
                             </button></div>
                     </div>
