@@ -12,7 +12,9 @@
     @endunless
 </x-slot:pageActions>
 
+
 <div>
+    <x-tabler.alert />
     <div class="mb-3 row">
         <div class="col-12">
             <div class="card">
@@ -111,11 +113,11 @@
                                         class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
                                         <x-lucide-eye class="icon" />
                                     </a>
-                                    @if ($proposal->status === 'draft')
+                                    {{-- @if ($proposal->status === 'draft')
                                         <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
                                             <x-lucide-pencil class="icon" />
                                         </a>
-                                    @endif
+                                    @endif --}}
                                     @if (auth()->user()->hasRole('admin lppm'))
                                         <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
                                             data-bs-toggle="modal" data-bs-target="#deleteProposalModal"

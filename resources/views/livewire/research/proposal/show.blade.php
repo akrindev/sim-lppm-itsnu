@@ -16,7 +16,11 @@
     </div>
 </x-slot:pageActions>
 
+
 <div class="row">
+    <div class="col-md-12">
+        <x-tabler.alert />
+    </div>
     <!-- Main Content -->
     <div class="col-lg-8">
         <!-- Basic Information -->
