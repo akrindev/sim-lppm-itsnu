@@ -22,16 +22,16 @@
         <!-- Basic Information -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">Informasi Dasar</h3>
+                <h3 class="card-title">1.1 Informasi Dasar</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Judul</label>
+                        <label class="form-label"><x-lucide-file-text class="me-2 icon" />Judul</label>
                         <p class="text-reset">{{ $proposal->title }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Status</label>
+                        <label class="form-label"><x-lucide-info class="me-2 icon" />Status</label>
                         <p>
                             @switch($proposal->status)
                                 @case('draft')
@@ -67,25 +67,24 @@
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Pelaksana</label>
+                        <label class="form-label"><x-lucide-user class="me-2 icon" />Pelaksana</label>
                         <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Email</label>
+                        <label class="form-label"><x-lucide-mail class="me-2 icon" />Email</label>
                         <p class="text-reset">{{ $proposal->submitter?->email }}</p>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Durasi (Tahun)</label>
+                        <label class="form-label"><x-lucide-clipboard-list class="me-2 icon" />Durasi (Tahun)</label>
                         <p class="text-reset">{{ $proposal->duration_in_years ?? '—' }}</p>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Ringkasan</label>
-                    <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
+                    <div class="col-md-6">
+                        <label class="form-label"><x-lucide-dollar-sign class="me-2 icon" />Nilai SKB</label>
+                        <p class="text-reset">{{ number_format($proposal->sbk_value, 2) ?? '—' }}</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,29 +92,111 @@
         <!-- Classification -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">Klasifikasi</h3>
+                <h3 class="card-title">1.2 Klasifikasi</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Bidang Fokus</label>
+                        <label class="form-label"><x-lucide-focus class="me-2 icon" />Bidang Fokus</label>
                         <p class="text-reset">{{ $proposal->focusArea?->name ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Tema</label>
+                        <label class="form-label"><x-lucide-tag class="me-2 icon" />Tema</label>
                         <p class="text-reset">{{ $proposal->theme?->name ?? '—' }}</p>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Topik</label>
+                        <label class="form-label"><x-lucide-hash class="me-2 icon" />Topik</label>
                         <p class="text-reset">{{ $proposal->topic?->name ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Prioritas Nasional</label>
+                        <label class="form-label"><x-lucide-star class="me-2 icon" />Prioritas Nasional</label>
                         <p class="text-reset">{{ $proposal->nationalPriority?->name ?? '—' }}</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Science Classification -->
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.3 Klasifikasi Ilmu (Klaster Sains)</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 row">
+                    <div class="col-md-12">
+                        <label class="form-label">Level 1</label>
+                        <p class="text-reset">{{ $proposal->clusterLevel1?->name ?? '—' }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Level 2</label>
+                        <p class="text-reset">{{ $proposal->clusterLevel2?->name ?? '—' }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Level 3</label>
+                        <p class="text-reset">{{ $proposal->clusterLevel3?->name ?? '—' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ringkasan -->
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.4 Ringkasan Proposal</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Pengabdian -->
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.5 Detail Pengabdian</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label"><x-lucide-building-2 class="me-2 icon" />Mitra Pengabdian</label>
+                    <p class="text-reset">{{ $proposal->partner?->name ?? '—' }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><x-lucide-alert-triangle class="me-2 icon" />Ringkasan Masalah
+                        Mitra</label>
+                    <p class="text-reset">{{ $form->partner_issue_summary ?? '—' }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><x-lucide-lightbulb class="me-2 icon" />Solusi yang Ditawarkan</label>
+                    <p class="text-reset">{{ $form->solution_offered ?? '—' }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><x-lucide-target class="me-2 icon" />Target Luaran</label>
+                    <p class="text-reset">{{ $form->output_target ?? '—' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chairman Tasks -->
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.6 Tugas Ketua Pengabdi</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label"><x-lucide-user-check class="me-2 icon" />Ketua Pengabdi</label>
+                    <p class="text-reset">{{ $proposal->submitter?->name ?? '—' }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><x-lucide-clipboard-check class="me-2 icon" />Tugas Ketua</label>
+                    <p class="text-reset">{{ $form->author_tasks ?? '—' }}</p>
                 </div>
             </div>
         </div>
@@ -123,7 +204,7 @@
         <!-- Team Members -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">Anggota</h3>
+                <h3 class="card-title">1.7 Anggota Tim</h3>
             </div>
             <div class="p-0 card-body">
                 @if ($proposal->teamMembers->isNotEmpty())
@@ -204,11 +285,11 @@
             <div class="card-body">
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label class="form-label">Dibuat</label>
+                        <label class="form-label"><x-lucide-plus-circle class="me-2 icon" />Dibuat</label>
                         <p class="text-reset">{{ $proposal->created_at?->format('d M Y H:i') }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Diubah</label>
+                        <label class="form-label"><x-lucide-edit-3 class="me-2 icon" />Diubah</label>
                         <p class="text-reset">{{ $proposal->updated_at?->format('d M Y H:i') }}</p>
                     </div>
                 </div>
@@ -224,36 +305,6 @@
                 <h3 class="card-title">Status Proposal</h3>
             </div>
             <div class="text-center card-body">
-                <div class="mb-3">
-                    @switch($proposal->status)
-                        @case('draft')
-                            <x-tabler.badge color="warning">Draft</x-tabler.badge>
-                        @break
-
-                        @case('submitted')
-                            <x-tabler.badge color="info">Submitted</x-tabler.badge>
-                        @break
-
-                        @case('under_review')
-                            <x-tabler.badge color="info">Under Review</x-tabler.badge>
-                        @break
-
-                        @case('approved')
-                            <x-tabler.badge color="success">Approved</x-tabler.badge>
-                        @break
-
-                        @case('rejected')
-                            <x-tabler.badge color="danger">Rejected</x-tabler.badge>
-                        @break
-
-                        @case('completed')
-                            <x-tabler.badge color="secondary">Completed</x-tabler.badge>
-                        @break
-
-                        @default
-                            <x-tabler.badge color="secondary">{{ $proposal->status }}</x-tabler.badge>
-                    @endswitch
-                </div>
                 <p class="text-secondary text-sm">
                     @switch($proposal->status)
                         @case('draft')
@@ -273,7 +324,7 @@
                         @break
 
                         @case('rejected')
-                            Sayangnya proposal Anda ditolak. Silahkan perbaiki dan ajukan kembali.
+                            Padahal proposal Anda ditolak. Silahkan perbaiki dan ajukan kembali.
                         @break
 
                         @case('completed')
@@ -311,11 +362,57 @@
                     </a>
                 @endif
 
-                <button type="button" class="btn-outline-danger btn" wire:click="delete"
-                    wire:confirm="Yakin ingin menghapus proposal ini?">
-                    <x-lucide-trash-2 class="icon" />
-                    Hapus
-                </button>
+                {{-- Accept/Reject for team members --}}
+                @php
+                    $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
+                @endphp
+                @if ($currentMember && $currentMember->pivot->status === 'pending')
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success" wire:click="acceptMember">
+                            <x-lucide-check class="icon" />
+                            Terima Undangan
+                        </button>
+                        <button type="button" class="btn btn-danger" wire:click="rejectMember">
+                            <x-lucide-x class="icon" />
+                            Tolak Undangan
+                        </button>
+                    </div>
+                @endif
+
+                @if ($proposal->status !== 'completed' && $proposal->submitter_id === auth()->id())
+                    <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                        <x-lucide-trash-2 class="icon" />
+                        Hapus
+                    </button>
+
+                    <!-- Delete Confirmation Modal -->
+                    @teleport('body')
+                        <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
+                            <x-slot:body>
+                                <div class="py-1 text-center">
+                                    <x-lucide-alert-circle class="mb-2 text-danger icon"
+                                        style="width: 3rem; height: 3rem;" />
+                                    <h3>Hapus Proposal?</h3>
+                                    <div class="text-secondary">
+                                        Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat
+                                        dibatalkan.
+                                    </div>
+                                </div>
+                            </x-slot:body>
+
+                            <x-slot:footer>
+                                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                                    Batal
+                                </button>
+                                <button type="button" wire:click="delete" class="btn btn-danger"
+                                    data-bs-dismiss="modal">
+                                    Ya, Hapus Proposal
+                                </button>
+                            </x-slot:footer>
+                        </x-tabler.modal>
+                    @endteleport
+                @endif
             </div>
         </div>
     </div>
