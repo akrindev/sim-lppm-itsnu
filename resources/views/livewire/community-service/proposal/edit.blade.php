@@ -265,29 +265,6 @@
                     @enderror
                     <small class="text-muted">Minimum 50 karakter</small>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label" for="background">Latar Belakang <span
-                            class="text-danger">*</span></label>
-                    <textarea id="background" class="form-control @error('form.background') is-invalid @enderror"
-                        wire:model="form.background" rows="5"
-                        placeholder="Jelaskan latar belakang pengabdian (minimal 200 karakter)" required></textarea>
-                    @error('form.background')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small class="text-muted">Minimum 200 karakter</small>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label" for="methodology">Metodologi <span class="text-danger">*</span></label>
-                    <textarea id="methodology" class="form-control @error('form.methodology') is-invalid @enderror"
-                        wire:model="form.methodology" rows="5"
-                        placeholder="Jelaskan metodologi pengabdian (minimal 200 karakter)" required></textarea>
-                    @error('form.methodology')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small class="text-muted">Minimum 200 karakter</small>
-                </div>
             </div>
         </div>
 
