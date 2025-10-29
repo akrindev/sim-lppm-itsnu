@@ -123,7 +123,7 @@
         <!-- Team Members -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">Tim Pengabdi</h3>
+                <h3 class="card-title">Anggota</h3>
             </div>
             <div class="p-0 card-body">
                 @if ($proposal->teamMembers->isNotEmpty())
@@ -172,6 +172,29 @@
                 @endif
             </div>
         </div>
+
+        <!-- Reviewer Assignment (Admin Only - Submitted Status) -->
+        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
+                $proposal->status === 'submitted')
+            <div class="mb-3">
+                <livewire:community-service.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
+            </div>
+        @endif
+
+        <!-- Reviewer Form (For Reviewers - Under Review Status) -->
+        @if ($proposal->status === 'reviewed' || $proposal->status === 'under_review')
+            <div class="mb-3">
+                <livewire:community-service.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
+            </div>
+        @endif
+
+        <!-- Approval Button (Admin Only - Reviewed Status) -->
+        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
+                in_array($proposal->status, ['reviewed', 'under_review']))
+            <div class="mb-3">
+                <livewire:community-service.proposal.approval-button :proposalId="$proposal->id" :key="'approval-button-' . $proposal->id" />
+            </div>
+        @endif
 
         <!-- Timeline -->
         <div class="card">
@@ -271,10 +294,7 @@
             </div>
             <div class="gap-2 d-grid card-body">
                 @if ($proposal->status === 'draft')
-                    <button type="button" class="btn btn-primary">
-                        <x-lucide-send class="icon" />
-                        Kirim Proposal
-                    </button>
+                    <livewire:community-service.proposal.submit-button :proposalId="$proposal->id" :key="'submit-button-' . $proposal->id" />
                 @endif
 
                 @if (in_array($proposal->status, ['submitted', 'under_review', 'rejected']))
