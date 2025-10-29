@@ -5,6 +5,7 @@ namespace App\Livewire\Review;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class CommunityService extends Component
@@ -16,7 +17,8 @@ class CommunityService extends Component
         }
     }
 
-    public function getProposalsProperty(): Collection
+    #[Computed]
+    public function proposals(): Collection
     {
         return Proposal::where('detailable_type', 'App\Models\CommunityService')
             ->whereHas('reviewers', function ($query) {
