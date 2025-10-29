@@ -7,3 +7,7 @@
 @import '@tabler/core/dist/css/tabler-vendors.min.css';
 @import '@tabler/core/dist/css/tabler-marketing.min.css';
 @import '@tabler/core/dist/css/tabler-themes.min.css';
+
+.ts-dropdown {
+    z-index: 10500; /* Ensure dropdowns appear above other elements */
+}

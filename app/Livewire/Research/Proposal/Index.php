@@ -72,6 +72,10 @@ class Index extends Component
                         ->orWhere('summary', 'like', "%{$this->search}%");
                 });
             })
+            ->when($isAdmin, function ($query) {
+                // where status is not draft for admin users
+                $query->where('status', '!=', 'draft');
+            })
             ->when($this->statusFilter !== 'all', function ($query) {
                 $query->where('status', $this->statusFilter);
             })
@@ -163,9 +167,16 @@ class Index extends Component
             return;
         }
 
+        // if proposal is completed, it cannot be deleted
+        if ($proposal->status === 'completed') {
+            session()->flash('error', 'Proposal yang sudah selesai tidak dapat dihapus');
+
+            return;
+        }
+
         $user = Auth::user();
         // Only admin lppm and submitter with status is not completed can delete proposals
-        if (! $user->hasRole('admin lppm') && $proposal->submitter_id !== $user->id && $proposal->status === 'completed') {
+        if (! $user->hasRole('admin lppm') && $proposal->submitter_id !== $user->id) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
 
             return;

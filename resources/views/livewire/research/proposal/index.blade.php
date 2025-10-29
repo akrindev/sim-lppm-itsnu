@@ -118,7 +118,7 @@
                                             <x-lucide-pencil class="icon" />
                                         </a>
                                     @endif --}}
-                                    @if (auth()->user()->hasRole('admin lppm'))
+                                    @if (auth()->user()->hasRole('admin lppm') && $proposal->status !== 'completed')
                                         <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
                                             data-bs-toggle="modal" data-bs-target="#deleteProposalModal"
                                             wire:click="confirmDeleteProposal('{{ $proposal->id }}')">

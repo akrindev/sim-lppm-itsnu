@@ -281,7 +281,7 @@ document.addEventListener('livewire:init', () => {
 	});
 
 	// DOM Morph hooks - fires during morphing phase after network roundtrip
-	Livewire.hook('morph.added', ({ el }) => {
+	Livewire.hook('element.init', ({ el }) => {
 		if (el.classList?.contains('tom-select')) {
 			// Re-initialize if the select element itself was added
 			if (el.tagName === 'SELECT') {
@@ -360,13 +360,25 @@ document.addEventListener('livewire:init', () => {
 		}, 0);
 	});
 
-	// Commit hook - after server response is processed
-	Livewire.hook('commit.success', ({ component }) => {
-		// Use setTimeout to ensure DOM is fully updated
-		setTimeout(() => {
-			initializeTomSelectInElement(component.el);
-		}, 0);
-	});
+    Livewire.hook('commit', ({ component, commit, respond, succeed, fail }) => {
+        // Equivalent of 'message.sent'
+
+        succeed(({ snapshot, effects }) => {
+            // Equivalent of 'message.received'
+
+            queueMicrotask(() => {
+                // Equivalent of 'message.processed'
+                // Use setTimeout to ensure DOM is fully updated
+                setTimeout(() => {
+                    initializeTomSelectInElement(component.el);
+                }, 500);
+            })
+        })
+
+        fail(() => {
+            // Equivalent of 'message.failed'
+        })
+    })
 });
 
 // Fallback: Initialize on page navigation (e.g., wire:navigate)

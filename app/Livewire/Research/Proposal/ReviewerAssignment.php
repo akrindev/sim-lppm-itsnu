@@ -37,7 +37,7 @@ class ReviewerAssignment extends Component
             $query->whereIn('name', ['reviewer']);
         })
             ->with('identity:id,user_id,identity_id')
-            ->get(['id', 'name', 'email']);
+            ->get();
     }
 
     #[Computed]
@@ -91,6 +91,9 @@ class ReviewerAssignment extends Component
     {
         $this->selectedReviewer = null;
         $this->resetValidation();
+
+        // Dispatch event to reinitialize TomSelect in modal
+        $this->dispatch('reinitialize-tom-select');
     }
 
     public function render(): View

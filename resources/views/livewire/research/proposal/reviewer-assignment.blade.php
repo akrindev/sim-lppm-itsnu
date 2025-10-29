@@ -17,7 +17,8 @@
                             placeholder="Pilih reviewer..." required>
                             <option value="" selected disabled>Pilih reviewer...</option>
                             @foreach ($this->availableReviewers as $reviewer)
-                                <option value="{{ $reviewer->id }}">{{ $reviewer->name }}
+                                <option wire:key="reviewer-{{ $reviewer->id }}" value="{{ $reviewer->id }}">
+                                    {{ $reviewer->name }}
                                     ({{ $reviewer->identity->identity_id }})
                                 </option>
                             @endforeach
@@ -115,3 +116,42 @@
         </x-tabler.modal>
     @endteleport
 </div>
+
+@script
+    <script>
+        // Listen for TomSelect reinitialization event
+        $wire.on('reinitialize-tom-select', () => {
+            setTimeout(() => {
+                // Find the modal and reinitialize TomSelect within it
+                const modal = document.getElementById('modal-assign-reviewer');
+                if (modal) {
+                    const {
+                        TomSelect
+                    } = window;
+                    if (TomSelect) {
+                        modal.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)').forEach((
+                            selectEl) => {
+                            if (selectEl.tomSelect) {
+                                selectEl.tomSelect.destroy();
+                            }
+
+                            const config = {
+                                create: false,
+                                placeholder: selectEl.getAttribute('placeholder') ||
+                                    'Pilih opsi...',
+                                searchField: ['text'],
+                                valueField: 'value',
+                                labelField: 'text',
+                                copyClassesToDropdown: false,
+                                dropdownParent: 'body',
+                                controlInput: '<input>',
+                            };
+
+                            new TomSelect(selectEl, config);
+                        });
+                    }
+                }
+            }, 100);
+        });
+    </script>
+@endscript
