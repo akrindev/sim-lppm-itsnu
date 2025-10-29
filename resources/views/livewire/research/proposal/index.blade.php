@@ -121,7 +121,7 @@
                                     @if (auth()->user()->hasRole('admin lppm'))
                                         <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
                                             data-bs-toggle="modal" data-bs-target="#deleteProposalModal"
-                                            wire:click="confirmDeleteProposal({{ $proposal->id }})">
+                                            wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
                                             <x-lucide-trash-2 class="icon" />
                                         </button>
                                     @endif
@@ -171,8 +171,8 @@
                                 Batal
                             </button></div>
                         <div class="col"><button type="button"
-                                wire:click="deleteProposal({{ $confirmingDeleteProposalId }})" class="w-100 btn btn-danger"
-                                data-bs-dismiss="modal">
+                                wire:click="deleteProposal('{{ $confirmingDeleteProposalId }}')"
+                                class="w-100 btn btn-danger" data-bs-dismiss="modal">
                                 Ya, Hapus Proposal
                             </button></div>
                     </div>
