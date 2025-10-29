@@ -1,6 +1,11 @@
+
+import '@tabler/core/dist/libs/nouislider/dist/nouislider.min.js';
+import TomSelect from '@tabler/core/dist/libs/tom-select/dist/js/tom-select.base.js';
 import '@tabler/core/js/tabler';
 import './theme-config';
 
+// Make TomSelect available globally
+window.TomSelect = TomSelect;
 /**
  * Configuration items for menu and layout settings
  */
@@ -135,6 +140,34 @@ const initializeSettings = () => {
 };
 
 /**
+ * TomSelect Configuration
+ */
+const TOM_SELECT_CONFIG = {
+	create: false,
+	placeholder: 'Pilih opsi...',
+	searchField: ['text'],
+	valueField: 'value',
+	labelField: 'text',
+	copyClassesToDropdown: false,
+	dropdownParent: 'body',
+	controlInput: '<input>',
+	render: {
+		item: (data, escapeFunc) => {
+			if (data.customProperties) {
+				return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escapeFunc(data.text) + '</div>';
+			}
+			return '<div>' + escapeFunc(data.text) + '</div>';
+		},
+		option: (data, escapeFunc) => {
+			if (data.customProperties) {
+				return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escapeFunc(data.text) + '</div>';
+			}
+			return '<div>' + escapeFunc(data.text) + '</div>';
+		},
+	},
+};
+
+/**
  * Initialize Tom Select for all select elements with class 'tom-select'
  */
 const initializeTomSelect = () => {
@@ -147,31 +180,11 @@ const initializeTomSelect = () => {
 		}
 
 		new TomSelect(selectEl, {
-			create: false,
-			placeholder: selectEl.getAttribute('placeholder') || 'Pilih opsi...',
-			searchField: ['text'],
-			valueField: 'value',
-			labelField: 'text',
+			...TOM_SELECT_CONFIG,
+			placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
 		});
 	});
 };
-
-document.addEventListener('livewire:navigated', () => {
-	initializeSettings();
-	initializeTomSelect();
-});
-
-// Initialize Tom Select specifically for modal content when modals are shown
-document.addEventListener('shown.bs.modal', (event) => {
-	const modal = event.target;
-	initializeTomSelectInElement(modal);
-});
-
-// Initialize on first page load
-document.addEventListener('DOMContentLoaded', () => {
-	initializeSettings();
-	initializeTomSelect();
-});
 
 /**
  * Initialize Tom Select for select elements within a specific element (like a modal)
@@ -186,11 +199,113 @@ const initializeTomSelectInElement = (element) => {
 		}
 
 		new TomSelect(selectEl, {
-			create: false,
-			placeholder: selectEl.getAttribute('placeholder') || 'Pilih opsi...',
-			searchField: ['text'],
-			valueField: 'value',
-			labelField: 'text',
+			...TOM_SELECT_CONFIG,
+			placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
 		});
 	});
 };
+
+/**
+ * Livewire Lifecycle Hooks Integration
+ * Initialize TomSelect on all relevant Livewire events
+ */
+document.addEventListener('livewire:init', () => {
+	// Register Livewire hooks after Livewire initializes
+
+	// Component initialization hook - fires when a new component is discovered
+	Livewire.hook('component.init', ({ component, cleanup }) => {
+		const selectElements = component.el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
+		if (selectElements.length > 0) {
+			selectElements.forEach((selectEl) => {
+				if (selectEl.tomSelect) {
+					selectEl.tomSelect.destroy();
+				}
+				new TomSelect(selectEl, {
+					...TOM_SELECT_CONFIG,
+					placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+				});
+			});
+		}
+
+		// Cleanup TomSelect instances when component is removed
+		cleanup(() => {
+			selectElements.forEach((selectEl) => {
+				if (selectEl.tomSelect) {
+					selectEl.tomSelect.destroy();
+				}
+			});
+		});
+	});
+
+	// DOM Morph hooks - fires during morphing phase after network roundtrip
+	Livewire.hook('morph.added', ({ el }) => {
+		if (el.classList?.contains('tom-select')) {
+			// Re-initialize if the select element itself was added
+			if (el.tagName === 'SELECT') {
+				if (el.tomSelect) {
+					el.tomSelect.destroy();
+				}
+				new TomSelect(el, {
+					...TOM_SELECT_CONFIG,
+					placeholder: el.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+				});
+			}
+		} else if (el.querySelectorAll) {
+			// Check for select elements within the added element
+			const selectElements = el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
+			selectElements.forEach((selectEl) => {
+				if (selectEl.tomSelect) {
+					selectEl.tomSelect.destroy();
+				}
+				new TomSelect(selectEl, {
+					...TOM_SELECT_CONFIG,
+					placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+				});
+			});
+		}
+	});
+
+	// Before morphing - optionally destroy instances to prevent conflicts
+	Livewire.hook('morph.updating', ({ el }) => {
+		if (el.classList?.contains('tom-select') && el.tagName === 'SELECT') {
+			if (el.tomSelect) {
+				el.tomSelect.destroy();
+			}
+		} else if (el.querySelectorAll) {
+			const selectElements = el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
+			selectElements.forEach((selectEl) => {
+				if (selectEl.tomSelect) {
+					selectEl.tomSelect.destroy();
+				}
+			});
+		}
+	});
+
+	// After morphing completes for the component
+	Livewire.hook('morphed', ({ component }) => {
+		initializeTomSelectInElement(component.el);
+	});
+
+	// Commit hook - after server response is processed
+	Livewire.hook('commit.success', ({ component }) => {
+		initializeTomSelectInElement(component.el);
+	});
+});
+
+// Fallback: Initialize on page navigation (e.g., wire:navigate)
+document.addEventListener('livewire:navigated', () => {
+	initializeSettings();
+	initializeTomSelect();
+});
+
+// Initialize Tom Select specifically for modal content when modals are shown
+document.addEventListener('shown.bs.modal', (event) => {
+	const modal = event.target;
+	initializeTomSelectInElement(modal);
+});
+
+// Fallback: Initialize on first page load if Livewire hooks don't fire
+document.addEventListener('DOMContentLoaded', () => {
+	initializeSettings();
+	initializeTomSelect();
+});
