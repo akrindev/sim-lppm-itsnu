@@ -105,7 +105,7 @@ class Create extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Role $role) => [
+            ->map(fn (Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
             ])

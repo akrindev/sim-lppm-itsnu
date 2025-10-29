@@ -113,10 +113,10 @@ return [
     ],
 
     'ignore_paths' => [
-        'livewire*',
+        // 'livewire*',
         'nova-api*',
         'pulse*',
-        '_boost*',
+        // '_boost*',
     ],
 
     'ignore_commands' => [

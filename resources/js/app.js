@@ -134,4 +134,63 @@ const initializeSettings = () => {
 	}
 };
 
-document.addEventListener('livewire:navigated', initializeSettings);
+/**
+ * Initialize Tom Select for all select elements with class 'tom-select'
+ */
+const initializeTomSelect = () => {
+	const { TomSelect } = window;
+	if (!TomSelect) return;
+
+	document.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)').forEach((selectEl) => {
+		if (selectEl.tomSelect) {
+			selectEl.tomSelect.destroy();
+		}
+
+		new TomSelect(selectEl, {
+			create: false,
+			placeholder: selectEl.getAttribute('placeholder') || 'Pilih opsi...',
+			searchField: ['text'],
+			valueField: 'value',
+			labelField: 'text',
+		});
+	});
+};
+
+document.addEventListener('livewire:navigated', () => {
+	initializeSettings();
+	initializeTomSelect();
+});
+
+// Initialize Tom Select specifically for modal content when modals are shown
+document.addEventListener('shown.bs.modal', (event) => {
+	const modal = event.target;
+	initializeTomSelectInElement(modal);
+});
+
+// Initialize on first page load
+document.addEventListener('DOMContentLoaded', () => {
+	initializeSettings();
+	initializeTomSelect();
+});
+
+/**
+ * Initialize Tom Select for select elements within a specific element (like a modal)
+ */
+const initializeTomSelectInElement = (element) => {
+	const { TomSelect } = window;
+	if (!TomSelect) return;
+
+	element.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)').forEach((selectEl) => {
+		if (selectEl.tomSelect) {
+			selectEl.tomSelect.destroy();
+		}
+
+		new TomSelect(selectEl, {
+			create: false,
+			placeholder: selectEl.getAttribute('placeholder') || 'Pilih opsi...',
+			searchField: ['text'],
+			valueField: 'value',
+			labelField: 'text',
+		});
+	});
+};

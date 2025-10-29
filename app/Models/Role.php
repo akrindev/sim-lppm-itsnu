@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Permission\Models\Role as SpatieRole;
+
+class Role extends SpatieRole
+{
+    use HasFactory, HasUuids;
+
+    /**
+     * The primary key associated with the table.
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * The type of the auto-incrementing ID's primary key.
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the ID is auto-incrementing.
+     */
+    public $incrementing = false;
+}
