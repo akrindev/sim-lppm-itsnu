@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Anggota Tim</h3>
+        <h3 class="card-title">1.5 Anggota Tim</h3>
     </div>
 
     @if ($this->teamMembers->count() > 0)

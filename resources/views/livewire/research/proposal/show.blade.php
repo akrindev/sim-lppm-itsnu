@@ -65,18 +65,13 @@
                         <p class="text-reset">{{ $proposal->duration_in_years ?? '—' }}</p>
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Ringkasan</label>
-                    <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
-                </div>
             </div>
         </div>
 
-        <!-- Classification -->
+        <!-- Informasi Dasar Proposal -->
         <div class="mb-3 card">
             <div class="card-header">
-                <h3 class="card-title">1.2 Klasifikasi</h3>
+                <h3 class="card-title">1.2 Informasi Dasar Proposal</h3>
             </div>
             <div class="card-body">
                 <div class="mb-3 row">
@@ -129,6 +124,18 @@
                         <label class="form-label">Level 3</label>
                         <p class="text-reset">{{ $proposal->clusterLevel3?->name ?? '—' }}</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ringkasan --}}
+        <div class="mb-3 card">
+            <div class="card-header">
+                <h3 class="card-title">1.4 Ringkasan</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
                 </div>
             </div>
         </div>
