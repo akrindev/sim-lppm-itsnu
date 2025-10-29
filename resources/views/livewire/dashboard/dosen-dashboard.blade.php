@@ -89,48 +89,6 @@
             </div>
 
             <div class="mt-3 row row-cards">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Pengmas Menunggu Review</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3 h1">{{ $stats['community_service_pending'] ?? 0 }}</div>
-                            <div class="progress progress-sm">
-                                <div class="bg-warning progress-bar" role="progressbar"
-                                    style="width: {{ ($stats['community_service_pending'] / ($stats['my_community_service'] ?? 1)) * 100 }}%">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-header">
-                            <h3 class="card-title">Penelitian Disetujui</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3 h1">{{ $stats['research_approved'] ?? 0 }}</div>
-                            <div class="progress progress-sm">
-                                <div class="bg-success progress-bar" role="progressbar"
-                                    style="width: {{ ($stats['research_approved'] / ($stats['my_research'] ?? 1)) * 100 }}%">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-header">
-                            <h3 class="card-title">Pengmas Disetujui</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3 h1">{{ $stats['community_service_approved'] ?? 0 }}</div>
-                            <div class="progress progress-sm">
-                                <div class="bg-success progress-bar" role="progressbar"
-                                    style="width: {{ ($stats['community_service_approved'] / ($stats['my_community_service'] ?? 1)) * 100 }}%">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-3 row row-cards">
                 <!-- Penelitian Terbaru -->
                 <div class="col-12 col-lg-6">
                     <div class="card">

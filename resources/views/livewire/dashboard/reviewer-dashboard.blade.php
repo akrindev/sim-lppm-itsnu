@@ -60,7 +60,7 @@
                             <div class="mb-3 h1">{{ $stats['research_completed'] ?? 0 }}</div>
                             <div class="progress progress-sm">
                                 <div class="bg-success progress-bar" role="progressbar"
-                                    style="width: {{ ($stats['research_completed'] / ($stats['research_assigned'] ?? 1)) * 100 }}%">
+                                    style="width: {{ max(0, min(100, ($stats['research_assigned'] ?? 0) > 0 ? ($stats['research_completed'] / $stats['research_assigned']) * 100 : 0)) }}%">
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
                             <div class="mb-3 h1">{{ $stats['community_service_completed'] ?? 0 }}</div>
                             <div class="progress progress-sm">
                                 <div class="bg-success progress-bar" role="progressbar"
-                                    style="width: {{ ($stats['community_service_completed'] / ($stats['community_service_assigned'] ?? 1)) * 100 }}%">
+                                    style="width: {{ max(0, min(100, ($stats['community_service_assigned'] ?? 0) > 0 ? ($stats['community_service_completed'] / $stats['community_service_assigned']) * 100 : 0)) }}%">
                                 </div>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
                             <div class="mb-3 h1">{{ $stats['research_pending'] ?? 0 }}</div>
                             <div class="progress progress-sm">
                                 <div class="bg-warning progress-bar" role="progressbar"
-                                    style="width: {{ ($stats['research_pending'] / ($stats['research_assigned'] ?? 1)) * 100 }}%">
+                                    style="width: {{ max(0, min(100, ($stats['research_assigned'] ?? 0) > 0 ? ($stats['research_pending'] / $stats['research_assigned']) * 100 : 0)) }}%">
                                 </div>
                             </div>
                         </div>
@@ -120,7 +120,7 @@
                             <div class="mb-3 h1">{{ $stats['community_service_pending'] ?? 0 }}</div>
                             <div class="progress progress-sm">
                                 <div class="bg-warning progress-bar" role="progressbar"
-                                    style="width: {{ ($stats['community_service_pending'] / ($stats['community_service_assigned'] ?? 1)) * 100 }}%">
+                                    style="width: {{ max(0, min(100, ($stats['community_service_assigned'] ?? 0) > 0 ? ($stats['community_service_pending'] / $stats['community_service_assigned']) * 100 : 0)) }}%">
                                 </div>
                             </div>
                         </div>
