@@ -3,10 +3,17 @@
 <x-slot:pageSubtitle>Detail Proposal Pengabdian</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
-        <a href="{{ route('community-service.proposal.index') }}" wire:navigate class="btn-outline-secondary btn">
-            <x-lucide-arrow-left class="icon" />
-            Kembali
-        </a>
+        @if (auth()->user()->hasRole('reviewer'))
+            <a href="{{ route('review.community-service') }}" class="btn-outline-secondary btn" wire:navigate>
+                <x-lucide-arrow-left class="icon" />
+                Kembali
+            </a>
+        @else
+            <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn" wire:navigate>
+                <x-lucide-arrow-left class="icon" />
+                Kembali
+            </a>
+        @endif
         @if ($proposal->status === 'draft')
             <a href="{{ route('community-service.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
@@ -262,12 +269,10 @@
             </div>
         @endif
 
-        <!-- Reviewer Form (For Reviewers - Under Review Status) -->
-        @if ($proposal->status === 'reviewed' || $proposal->status === 'under_review')
-            <div class="mb-3">
-                <livewire:community-service.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
-            </div>
-        @endif
+        <!-- Reviewer Form (Visible to All Roles) -->
+        <div class="mb-3">
+            <livewire:community-service.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
+        </div>
 
         <!-- Approval Button (Admin Only - Reviewed Status) -->
         @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
