@@ -30,7 +30,8 @@
                                     @endif
                                 </td>
                                 <td class="text-end align-middle">
-                                    <button type="button" wire:click="removeMember({{ $index }})"
+                                    <button type="button" data-bs-toggle="modal"
+                                        data-bs-target="#modal-confirm-delete-{{ $index }}"
                                         class="btn-outline-danger btn btn-sm" title="Hapus">
                                         <x-lucide-trash-2 class="icon" />
                                     </button>
@@ -140,4 +141,40 @@
             </x-slot:footer>
         </x-tabler.modal>
     @endteleport
+
+    <!-- Delete Confirmation Modals -->
+    @if (!empty($members))
+        @foreach ($members as $index => $member)
+            @teleport('body')
+                <x-tabler.modal id="modal-confirm-delete-{{ $index }}" title="Konfirmasi Hapus" :component-id="$this->getId()">
+                    <x-slot:body>
+                        <div class="text-center">
+                            <div class="mb-3">
+                                <x-lucide-alert-triangle class="text-danger" style="width: 64px; height: 64px;" />
+                            </div>
+                            <h3 class="mb-2">Hapus Anggota?</h3>
+                            <p class="text-muted">
+                                Apakah Anda yakin ingin menghapus <strong>{{ $member['name'] }}</strong> dari daftar
+                                {{ strtolower($memberLabel) }}?
+                            </p>
+                            <p class="mb-0 text-danger small">
+                                Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                    </x-slot:body>
+
+                    <x-slot:footer>
+                        <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="button" wire:click="removeMember({{ $index }})" class="btn btn-danger"
+                            data-bs-dismiss="modal">
+                            <x-lucide-trash-2 class="icon" />
+                            Ya, Hapus
+                        </button>
+                    </x-slot:footer>
+                </x-tabler.modal>
+            @endteleport
+        @endforeach
+    @endif
 </div>

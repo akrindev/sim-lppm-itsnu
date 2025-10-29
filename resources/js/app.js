@@ -179,10 +179,23 @@ const initializeTomSelect = () => {
 			selectEl.tomSelect.destroy();
 		}
 
-		new TomSelect(selectEl, {
+		// Get current value(s) from the select element
+		const currentValue = selectEl.value;
+		const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+		const config = {
 			...TOM_SELECT_CONFIG,
 			placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
-		});
+		};
+
+		// Set initial items if there's a current value
+		if (currentValue && currentValue !== '') {
+			config.items = [currentValue];
+		} else if (currentValues.length > 0) {
+			config.items = currentValues;
+		}
+
+		new TomSelect(selectEl, config);
 	});
 };
 
@@ -198,10 +211,23 @@ const initializeTomSelectInElement = (element) => {
 			selectEl.tomSelect.destroy();
 		}
 
-		new TomSelect(selectEl, {
+		// Get current value(s) from the select element
+		const currentValue = selectEl.value;
+		const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+		const config = {
 			...TOM_SELECT_CONFIG,
 			placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
-		});
+		};
+
+		// Set initial items if there's a current value
+		if (currentValue && currentValue !== '') {
+			config.items = [currentValue];
+		} else if (currentValues.length > 0) {
+			config.items = currentValues;
+		}
+
+		new TomSelect(selectEl, config);
 	});
 };
 
@@ -214,25 +240,42 @@ document.addEventListener('livewire:init', () => {
 
 	// Component initialization hook - fires when a new component is discovered
 	Livewire.hook('component.init', ({ component, cleanup }) => {
-		const selectElements = component.el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
-		if (selectElements.length > 0) {
-			selectElements.forEach((selectEl) => {
-				if (selectEl.tomSelect) {
-					selectEl.tomSelect.destroy();
-				}
-				new TomSelect(selectEl, {
-					...TOM_SELECT_CONFIG,
-					placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
-				});
-			});
-		}
+		// Use queueMicrotask to ensure Livewire has finished setting initial values
+		queueMicrotask(() => {
+			const selectElements = component.el.querySelectorAll('select.tom-select:not(.ts-hidden-accessible)');
+			if (selectElements.length > 0) {
+				selectElements.forEach((selectEl) => {
+					if (selectEl.tomSelect) {
+						selectEl.tomSelect.destroy();
+					}
 
-		// Cleanup TomSelect instances when component is removed
-		cleanup(() => {
-			selectElements.forEach((selectEl) => {
-				if (selectEl.tomSelect) {
-					selectEl.tomSelect.destroy();
-				}
+					// Get current value(s) from the select element
+					const currentValue = selectEl.value;
+					const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+					const config = {
+						...TOM_SELECT_CONFIG,
+						placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
+					};
+
+					// Set initial items if there's a current value
+					if (currentValue && currentValue !== '') {
+						config.items = [currentValue];
+					} else if (currentValues.length > 0) {
+						config.items = currentValues;
+					}
+
+					new TomSelect(selectEl, config);
+				});
+			}
+
+			// Cleanup TomSelect instances when component is removed
+			cleanup(() => {
+				selectElements.forEach((selectEl) => {
+					if (selectEl.tomSelect) {
+						selectEl.tomSelect.destroy();
+					}
+				});
 			});
 		});
 	});
@@ -245,10 +288,24 @@ document.addEventListener('livewire:init', () => {
 				if (el.tomSelect) {
 					el.tomSelect.destroy();
 				}
-				new TomSelect(el, {
+
+				// Get current value(s) from the select element
+				const currentValue = el.value;
+				const currentValues = Array.from(el.selectedOptions).map(option => option.value);
+
+				const config = {
 					...TOM_SELECT_CONFIG,
 					placeholder: el.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
-				});
+				};
+
+				// Set initial items if there's a current value
+				if (currentValue && currentValue !== '') {
+					config.items = [currentValue];
+				} else if (currentValues.length > 0) {
+					config.items = currentValues;
+				}
+
+				new TomSelect(el, config);
 			}
 		} else if (el.querySelectorAll) {
 			// Check for select elements within the added element
@@ -257,10 +314,24 @@ document.addEventListener('livewire:init', () => {
 				if (selectEl.tomSelect) {
 					selectEl.tomSelect.destroy();
 				}
-				new TomSelect(selectEl, {
+
+				// Get current value(s) from the select element
+				const currentValue = selectEl.value;
+				const currentValues = Array.from(selectEl.selectedOptions).map(option => option.value);
+
+				const config = {
 					...TOM_SELECT_CONFIG,
 					placeholder: selectEl.getAttribute('placeholder') || TOM_SELECT_CONFIG.placeholder,
-				});
+				};
+
+				// Set initial items if there's a current value
+				if (currentValue && currentValue !== '') {
+					config.items = [currentValue];
+				} else if (currentValues.length > 0) {
+					config.items = currentValues;
+				}
+
+				new TomSelect(selectEl, config);
 			});
 		}
 	});
@@ -283,12 +354,18 @@ document.addEventListener('livewire:init', () => {
 
 	// After morphing completes for the component
 	Livewire.hook('morphed', ({ component }) => {
-		initializeTomSelectInElement(component.el);
+		// Use setTimeout to ensure DOM is fully updated
+		setTimeout(() => {
+			initializeTomSelectInElement(component.el);
+		}, 0);
 	});
 
 	// Commit hook - after server response is processed
 	Livewire.hook('commit.success', ({ component }) => {
-		initializeTomSelectInElement(component.el);
+		// Use setTimeout to ensure DOM is fully updated
+		setTimeout(() => {
+			initializeTomSelectInElement(component.el);
+		}, 0);
 	});
 });
 

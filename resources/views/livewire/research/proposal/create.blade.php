@@ -185,7 +185,7 @@
                             <label class="form-label" for="cluster_level1">Level 1 <span
                                     class="text-danger">*</span></label>
                             <select id="cluster_level1"
-                                class="form-select tom-select @error('cluster_level1_id') is-invalid @enderror"
+                                class="form-select tom-select @error('form.cluster_level1_id') is-invalid @enderror"
                                 wire:model="form.cluster_level1_id" placeholder="Pilih level 1" required>
                                 <option value="">-- Pilih Level 1 --</option>
                                 @foreach ($this->scienceClusters->where('level', 1) as $cluster)
@@ -202,7 +202,7 @@
                         <div class="mb-3">
                             <label class="form-label" for="cluster_level2">Level 2</label>
                             <select id="cluster_level2"
-                                class="form-select tom-select @error('cluster_level2_id') is-invalid @enderror"
+                                class="form-select tom-select @error('form.cluster_level2_id') is-invalid @enderror"
                                 wire:model="form.cluster_level2_id" placeholder="Pilih level 2 (opsional)">
                                 <option value="">-- Pilih Level 2 (Opsional) --</option>
                                 @foreach ($this->scienceClusters->where('level', 2) as $cluster)
@@ -219,7 +219,7 @@
                         <div class="mb-3">
                             <label class="form-label" for="cluster_level3">Level 3</label>
                             <select id="cluster_level3"
-                                class="form-select tom-select @error('cluster_level3_id') is-invalid @enderror"
+                                class="form-select tom-select @error('form.cluster_level3_id') is-invalid @enderror"
                                 wire:model="form.cluster_level3_id" placeholder="Pilih level 3 (opsional)">
                                 <option value="">-- Pilih Level 3 (Opsional) --</option>
                                 @foreach ($this->scienceClusters->where('level', 3) as $cluster)
