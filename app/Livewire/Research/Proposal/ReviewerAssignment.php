@@ -17,7 +17,7 @@ class ReviewerAssignment extends Component
     public string $confirmingRemoveReviewerId = '';
 
     #[Validate('required')]
-    public $selectedReviewer = '';
+    public string $selectedReviewer = '';
 
     public function mount(string $proposalId): void
     {
@@ -59,7 +59,7 @@ class ReviewerAssignment extends Component
         if ($result['success']) {
             $this->dispatch('success', message: $result['message']);
             $this->dispatch('reviewers-assigned', proposalId: $proposal->id);
-            $this->selectedReviewer = null;
+            $this->selectedReviewer = '';
         } else {
             $this->dispatch('error', message: $result['message']);
         }
@@ -89,11 +89,8 @@ class ReviewerAssignment extends Component
 
     public function resetReviewerForm(): void
     {
-        $this->selectedReviewer = null;
+        $this->selectedReviewer = '';
         $this->resetValidation();
-
-        // Dispatch event to reinitialize TomSelect in modal
-        $this->dispatch('reinitialize-tom-select');
     }
 
     public function render(): View
