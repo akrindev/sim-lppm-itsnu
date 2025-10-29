@@ -4,6 +4,43 @@
 
 <div>
     <x-tabler.alert />
+
+    <!-- Filters -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label" for="search">
+                        <x-lucide-search class="icon me-2" />
+                        Cari Proposal
+                    </label>
+                    <input type="text" id="search" class="form-control" placeholder="Cari berdasarkan judul atau nama author..."
+                        wire:model.live="search">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="year">
+                        <x-lucide-calendar class="icon me-2" />
+                        Tahun
+                    </label>
+                    <select id="year" class="form-select" wire:model.live="selectedYear">
+                        <option value="">Semua Tahun</option>
+                        @foreach ($this->availableYears as $year)
+                            <option value="{{ $year }}">{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            @if (!empty($search) || !empty($selectedYear))
+                <div class="mt-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" wire:click="resetFilters">
+                        <x-lucide-x class="icon me-1" />
+                        Reset Filter
+                    </button>
+                </div>
+            @endif
+        </div>
+    </div>
+
     <!-- Proposals Table -->
     <div class="card">
         <div class="table-responsive">
