@@ -3,7 +3,7 @@
 <x-slot:pageSubtitle>Kelola proposal pengabdian Anda dengan fitur lengkap.</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
-        <a href="{{ route('community-service.proposal.create') }}" class="btn btn-primary">
+        <a href="{{ route('community-service.proposal.create') }}" wire:navigate class="btn btn-primary">
             <x-lucide-plus class="icon" />
             Usulan Pengabdian Baru
         </a>
@@ -141,7 +141,7 @@
                                 @endif
                             </button>
                         </th>
-                        <th>Pengabdi</th>
+                        <th>Author</th>
                         <th>
                             <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('status')">
                                 Status
@@ -151,7 +151,6 @@
                                 @endif
                             </button>
                         </th>
-                        <th>Skema</th>
                         <th>Bidang Fokus</th>
                         <th>
                             <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('created_at')">
@@ -168,10 +167,8 @@
                 <tbody>
                     @forelse ($proposals as $proposal)
                         <tr wire:key="proposal-{{ $proposal->id }}">
-                            <td class="text-truncate" style="max-width: 250px;">
+                            <td style="max-width: 250px;">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
-                                <div class="text-secondary text-truncate">{{ Str::limit($proposal->summary, 60) }}
-                                </div>
                             </td>
                             <td>
                                 <div>{{ $proposal->submitter?->name }}</div>
@@ -179,13 +176,8 @@
                             </td>
                             <td>
                                 <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                                    {{ 'Status: ' . ucfirst($proposal->status) }}
+                                    {{ ucfirst($proposal->status) }}
                                 </x-tabler.badge>
-                            </td>
-                            <td>
-                                <div class="bg-blue-lt badge-outline badge">
-                                    {{ 'Pengabdian Masyarakat' }}
-                                </div>
                             </td>
                             <td>
                                 <div class="badge-outline badge">
@@ -200,7 +192,7 @@
                             <td>
                                 <div class="flex-nowrap btn-list">
                                     <a href="{{ route('community-service.proposal.show', $proposal) }}"
-                                        class="btn btn-icon btn-ghost-primary" title="Lihat">
+                                        class="btn btn-icon btn-ghost-primary" wire:navigate title="Lihat">
                                         <x-lucide-eye class="icon" />
                                     </a>
                                     @if ($proposal->status === 'draft')
@@ -209,8 +201,8 @@
                                             <x-lucide-pencil class="icon" />
                                         </a>
                                     @endif
-                                    <button type="button" class="btn btn-icon btn-ghost-danger"
-                                        title="Hapus" wire:click="deleteProposal({{ $proposal->id }})"
+                                    <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
+                                        wire:click="deleteProposal({{ $proposal->id }})"
                                         wire:confirm="Yakin ingin menghapus proposal ini?">
                                         <x-lucide-trash-2 class="icon" />
                                     </button>

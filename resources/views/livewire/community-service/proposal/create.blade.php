@@ -2,7 +2,7 @@
 <x-slot:pageTitle>Usulan Pengabdian Masyarakat Baru</x-slot:pageTitle>
 <x-slot:pageSubtitle>Buat proposal pengabdian masyarakat baru dengan mengisi form di bawah ini.</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn">
+    <a href="{{ route('community-service.proposal.index') }}" wire:navigate class="btn-outline-secondary btn">
         <x-lucide-arrow-left class="icon" />
         Kembali ke Daftar
     </a>

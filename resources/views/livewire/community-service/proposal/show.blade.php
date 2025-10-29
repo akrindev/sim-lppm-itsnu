@@ -3,7 +3,7 @@
 <x-slot:pageSubtitle>Detail Proposal Pengabdian</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
-        <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn">
+        <a href="{{ route('community-service.proposal.index') }}" wire:navigate class="btn-outline-secondary btn">
             <x-lucide-arrow-left class="icon" />
             Kembali
         </a>
