@@ -12,6 +12,7 @@ use Livewire\Component;
 class ReviewerForm extends Component
 {
     public string $proposalId = '';
+    public bool $showForm = false;
 
     #[Validate('required|min:10')]
     public string $reviewNotes = '';
@@ -22,6 +23,13 @@ class ReviewerForm extends Component
     public function mount(string $proposalId): void
     {
         $this->proposalId = $proposalId;
+
+        // Load existing review data if available
+        $myReview = $this->myReview;
+        if ($myReview && $myReview->status === 'completed') {
+            $this->reviewNotes = $myReview->review_notes ?? '';
+            $this->recommendation = $myReview->recommendation ?? '';
+        }
     }
 
     #[Computed]
@@ -39,15 +47,45 @@ class ReviewerForm extends Component
     }
 
     #[Computed]
+    public function allReviews()
+    {
+        return $this->proposal->reviewers()
+            ->with('user')
+            ->get();
+    }
+
+    #[Computed]
     public function canReview(): bool
     {
-        $review = $this->myReview;
+        return $this->myReview !== null;
+    }
 
-        if (! $review) {
+    #[Computed]
+    public function hasReviewed(): bool
+    {
+        $review = $this->myReview;
+        return $review && $review->status === 'completed';
+    }
+
+    #[Computed]
+    public function canEditReview(): bool
+    {
+        $review = $this->myReview;
+        if (!$review) {
             return false;
         }
 
-        return $review->status === 'pending';
+        // Jika rekomendasi sudah approved, tidak bisa edit
+        if ($review->recommendation === 'approved') {
+            return false;
+        }
+
+        return $review->status === 'completed';
+    }
+
+    public function toggleForm(): void
+    {
+        $this->showForm = !$this->showForm;
     }
 
     public function submitReview(): void
@@ -62,13 +100,8 @@ class ReviewerForm extends Component
             return;
         }
 
-        if ($review->status !== 'pending') {
-            $this->dispatch('error', message: 'Anda sudah mensubmit review');
-
-            return;
-        }
-
         try {
+            // Allow updating review even after submission
             $review->update([
                 'status' => 'completed',
                 'review_notes' => $this->reviewNotes,
@@ -83,13 +116,11 @@ class ReviewerForm extends Component
                 $this->proposal->update(['status' => 'reviewed']);
             }
 
-            $this->dispatch('success', message: 'Review berhasil disubmit');
+            $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
+            $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
-
-            $this->reviewNotes = '';
-            $this->recommendation = '';
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal submit review: '.$e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }
     }
 

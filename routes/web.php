@@ -16,6 +16,8 @@ use App\Livewire\Research\Proposal\Edit as ResearchProposalEdit;
 use App\Livewire\Research\Proposal\Index as ResearchProposalIndex;
 use App\Livewire\Research\Proposal\Show as ResearchProposalShow;
 use App\Livewire\Research\ProposalRevision\Index as ResearchProposalRevisionIndex;
+use App\Livewire\Review\CommunityService as ReviewCommunityService;
+use App\Livewire\Review\Research as ReviewResearch;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -71,6 +73,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
         Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
+    });
+
+    // Review Routes
+    Route::middleware(['role:reviewer'])->prefix('review')->name('review.')->group(function () {
+        Route::get('research', ReviewResearch::class)->name('research');
+        Route::get('community-service', ReviewCommunityService::class)->name('community-service');
     });
 
     Route::redirect('settings', 'settings/profile');
