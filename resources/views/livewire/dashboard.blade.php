@@ -192,41 +192,93 @@
                     </div>
                 </div>
 
-                <div class="mt-3 row row-cards">
-                    <div class="col-lg-8">
+                <div class="mt-3 row row-cards" x-data="dashboardCharts()">
+                    <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Distribusi Proposal Berdasarkan Status</h3>
+                                <h3 class="card-title">Status Distribution</h3>
                             </div>
                             <div class="card-body">
-                                @foreach ($proposalsByStatus as $item)
-                                    <div class="mb-3">
-                                        <div class="align-items-center row">
-                                            <div class="col-auto">
-                                                <span
-                                                    class="status status-{{ $item->status === 'approved' ? 'success' : ($item->status === 'rejected' ? 'danger' : ($item->status === 'submitted' ? 'warning' : 'secondary')) }} d-inline-block"
-                                                    style="width: 10px; height: 10px; border-radius: 50%;"></span>
-                                            </div>
-                                            <div class="col">
-                                                <div class="text-truncate">
-                                                    <strong>{{ ucfirst($item->status) }}</strong>
-                                                    <span class="text-muted">- {{ $item->count }} proposal</span>
-                                                </div>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar {{ $item->status === 'approved' ? 'bg-success' : ($item->status === 'rejected' ? 'bg-danger' : ($item->status === 'submitted' ? 'bg-warning' : 'bg-secondary')) }}"
-                                                        role="progressbar"
-                                                        style="width: {{ ($item->count / ($stats['total_proposals'] ?? 1)) * 100 }}%">
-                                                        <span
-                                                            class="sr-only">{{ ($item->count / ($stats['total_proposals'] ?? 1)) * 100 }}%</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                <div x-ref="statusDistributionChart"
+                                     id="status-distribution-chart-admin"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['status_distribution']) }}"
+                                     style="width: 100%; max-width: 300px; margin: 0 auto;">
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Proposal Trends ({{ $selectedYear }})</h3>
+                            </div>
+                            <div class="card-body">
+                                <div x-ref="monthlyTrendsChart"
+                                     id="monthly-trends-chart-admin"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['monthly_trends']) }}"
+                                     style="width: 100%; height: 300px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function dashboardCharts() {
+                        return {
+                            init() {
+                                this.initStatusDistributionChart();
+                                this.initMonthlyTrendsChart();
+                                this.initProposalTypesChart();
+                            },
+
+                            initStatusDistributionChart() {
+                                const element = this.$refs.statusDistributionChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData) return;
+
+                                const config = window.ChartConfig.donut({
+                                    ...chartData,
+                                    height: 240,
+                                    colors: ['#2fb344', '#e03131', '#fcc419', '#495057', '#0ca678'],
+                                });
+
+                                window.initChart('status-distribution-chart-admin', config);
+                            },
+
+                            initMonthlyTrendsChart() {
+                                const element = this.$refs.monthlyTrendsChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData || !chartData.series || !chartData.categories) return;
+
+                                const config = window.ChartConfig.area({
+                                    ...chartData,
+                                    height: 300,
+                                });
+
+                                window.initChart('monthly-trends-chart-admin', config);
+                            },
+
+                            initProposalTypesChart() {
+                                const element = document.getElementById('proposal-types-chart');
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData) return;
+
+                                const config = window.ChartConfig.donut({
+                                    ...chartData,
+                                    height: 240,
+                                    colors: ['#206bc4', '#0ea5e9'],
+                                });
+
+                                window.initChart('proposal-types-chart', config);
+                            },
+                        };
+                    }
+                </script>
 
                     <div class="col-lg-4">
                         <div class="card">
@@ -359,40 +411,77 @@
                     </div>
                 </div>
 
-                <div class="mt-3 row row-cards">
-                    <div class="col-lg-12">
+                <div class="mt-3 row row-cards" x-data="kepalaDashboardCharts()">
+                    <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Distribusi Proposal</h3>
+                                <h3 class="card-title">Status Distribution</h3>
                             </div>
                             <div class="card-body">
-                                @foreach ($proposalsByStatus as $item)
-                                    <div class="mb-3">
-                                        <div class="align-items-center row">
-                                            <div class="col-auto">
-                                                <span
-                                                    class="status status-{{ $item->status === 'approved' ? 'success' : ($item->status === 'rejected' ? 'danger' : ($item->status === 'submitted' ? 'warning' : 'secondary')) }} d-inline-block"
-                                                    style="width: 10px; height: 10px; border-radius: 50%;"></span>
-                                            </div>
-                                            <div class="col">
-                                                <div class="text-truncate">
-                                                    <strong>{{ ucfirst($item->status) }}</strong>
-                                                    <span class="text-muted">- {{ $item->count }} proposal</span>
-                                                </div>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar {{ $item->status === 'approved' ? 'bg-success' : ($item->status === 'rejected' ? 'bg-danger' : ($item->status === 'submitted' ? 'bg-warning' : 'bg-secondary')) }}"
-                                                        role="progressbar"
-                                                        style="width: {{ ($item->count / ($stats['total_proposals'] ?? 1)) * 100 }}%">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                <div x-ref="statusDistributionChart"
+                                     id="status-distribution-chart-kepala"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['status_distribution']) }}"
+                                     style="width: 100%; max-width: 300px; margin: 0 auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Proposal Trends ({{ $selectedYear }})</h3>
+                            </div>
+                            <div class="card-body">
+                                <div x-ref="monthlyTrendsChart"
+                                     id="monthly-trends-chart-kepala"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['monthly_trends']) }}"
+                                     style="width: 100%; height: 300px;">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <script>
+                    function kepalaDashboardCharts() {
+                        return {
+                            init() {
+                                this.initStatusDistributionChart();
+                                this.initMonthlyTrendsChart();
+                            },
+
+                            initStatusDistributionChart() {
+                                const element = this.$refs.statusDistributionChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData) return;
+
+                                const config = window.ChartConfig.donut({
+                                    ...chartData,
+                                    height: 240,
+                                    colors: ['#2fb344', '#e03131', '#fcc419', '#495057', '#0ca678'],
+                                });
+
+                                window.initChart('status-distribution-chart-kepala', config);
+                            },
+
+                            initMonthlyTrendsChart() {
+                                const element = this.$refs.monthlyTrendsChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData || !chartData.series || !chartData.categories) return;
+
+                                const config = window.ChartConfig.area({
+                                    ...chartData,
+                                    height: 300,
+                                });
+
+                                window.initChart('monthly-trends-chart-kepala', config);
+                            },
+                        };
+                    }
+                </script>
             @elseif($roleName === 'dosen')
                 <div class="row row-deck row-cards">
                     <div class="col-sm-6 col-lg-3">
@@ -452,40 +541,77 @@
                     </div>
                 </div>
 
-                <div class="mt-3 row row-cards">
-                    <div class="col-lg-12">
+                <div class="mt-3 row row-cards" x-data="dosenDashboardCharts()">
+                    <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Status Proposal Saya</h3>
                             </div>
                             <div class="card-body">
-                                @foreach ($proposalsByStatus as $item)
-                                    <div class="mb-3">
-                                        <div class="align-items-center row">
-                                            <div class="col-auto">
-                                                <span
-                                                    class="status status-{{ $item->status === 'approved' ? 'success' : ($item->status === 'rejected' ? 'danger' : ($item->status === 'submitted' ? 'warning' : 'secondary')) }} d-inline-block"
-                                                    style="width: 10px; height: 10px; border-radius: 50%;"></span>
-                                            </div>
-                                            <div class="col">
-                                                <div class="text-truncate">
-                                                    <strong>{{ ucfirst($item->status) }}</strong>
-                                                    <span class="text-muted">- {{ $item->count }} proposal</span>
-                                                </div>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar {{ $item->status === 'approved' ? 'bg-success' : ($item->status === 'rejected' ? 'bg-danger' : ($item->status === 'submitted' ? 'bg-warning' : 'bg-secondary')) }}"
-                                                        role="progressbar"
-                                                        style="width: {{ ($item->count / ($stats['my_proposals'] + $stats['as_team_member'] ?? 1)) * 100 }}%">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                <div x-ref="statusDistributionChart"
+                                     id="status-distribution-chart-dosen"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['status_distribution']) }}"
+                                     style="width: 100%; max-width: 300px; margin: 0 auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Proposal Trends ({{ $selectedYear }})</h3>
+                            </div>
+                            <div class="card-body">
+                                <div x-ref="monthlyTrendsChart"
+                                     id="monthly-trends-chart-dosen"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['monthly_trends']) }}"
+                                     style="width: 100%; height: 300px;">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <script>
+                    function dosenDashboardCharts() {
+                        return {
+                            init() {
+                                this.initStatusDistributionChart();
+                                this.initMonthlyTrendsChart();
+                            },
+
+                            initStatusDistributionChart() {
+                                const element = this.$refs.statusDistributionChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData) return;
+
+                                const config = window.ChartConfig.donut({
+                                    ...chartData,
+                                    height: 240,
+                                    colors: ['#2fb344', '#e03131', '#fcc419', '#495057', '#0ca678'],
+                                });
+
+                                window.initChart('status-distribution-chart-dosen', config);
+                            },
+
+                            initMonthlyTrendsChart() {
+                                const element = this.$refs.monthlyTrendsChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData || !chartData.series || !chartData.categories) return;
+
+                                const config = window.ChartConfig.area({
+                                    ...chartData,
+                                    height: 300,
+                                });
+
+                                window.initChart('monthly-trends-chart-dosen', config);
+                            },
+                        };
+                    }
+                </script>
             @elseif($roleName === 'reviewer')
                 <div class="row row-deck row-cards">
                     <div class="col-sm-6 col-lg-4">
@@ -532,40 +658,77 @@
                     </div>
                 </div>
 
-                <div class="mt-3 row row-cards">
-                    <div class="col-lg-12">
+                <div class="mt-3 row row-cards" x-data="reviewerDashboardCharts()">
+                    <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Status Review Proposal</h3>
                             </div>
                             <div class="card-body">
-                                @foreach ($proposalsByStatus as $item)
-                                    <div class="mb-3">
-                                        <div class="align-items-center row">
-                                            <div class="col-auto">
-                                                <span
-                                                    class="status status-{{ $item->status === 'approved' ? 'success' : ($item->status === 'rejected' ? 'danger' : ($item->status === 'submitted' ? 'warning' : 'secondary')) }} d-inline-block"
-                                                    style="width: 10px; height: 10px; border-radius: 50%;"></span>
-                                            </div>
-                                            <div class="col">
-                                                <div class="text-truncate">
-                                                    <strong>{{ ucfirst($item->status) }}</strong>
-                                                    <span class="text-muted">- {{ $item->count }} proposal</span>
-                                                </div>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar {{ $item->status === 'approved' ? 'bg-success' : ($item->status === 'rejected' ? 'bg-danger' : ($item->status === 'submitted' ? 'bg-warning' : 'bg-secondary')) }}"
-                                                        role="progressbar"
-                                                        style="width: {{ ($item->count / ($stats['assigned_to_review'] ?? 1)) * 100 }}%">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                <div x-ref="statusDistributionChart"
+                                     id="status-distribution-chart-reviewer"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['status_distribution']) }}"
+                                     style="width: 100%; max-width: 300px; margin: 0 auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Proposal Trends ({{ $selectedYear }})</h3>
+                            </div>
+                            <div class="card-body">
+                                <div x-ref="monthlyTrendsChart"
+                                     id="monthly-trends-chart-reviewer"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['monthly_trends']) }}"
+                                     style="width: 100%; height: 300px;">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <script>
+                    function reviewerDashboardCharts() {
+                        return {
+                            init() {
+                                this.initStatusDistributionChart();
+                                this.initMonthlyTrendsChart();
+                            },
+
+                            initStatusDistributionChart() {
+                                const element = this.$refs.statusDistributionChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData) return;
+
+                                const config = window.ChartConfig.donut({
+                                    ...chartData,
+                                    height: 240,
+                                    colors: ['#2fb344', '#e03131', '#fcc419', '#495057', '#0ca678'],
+                                });
+
+                                window.initChart('status-distribution-chart-reviewer', config);
+                            },
+
+                            initMonthlyTrendsChart() {
+                                const element = this.$refs.monthlyTrendsChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData || !chartData.series || !chartData.categories) return;
+
+                                const config = window.ChartConfig.area({
+                                    ...chartData,
+                                    height: 300,
+                                });
+
+                                window.initChart('monthly-trends-chart-reviewer', config);
+                            },
+                        };
+                    }
+                </script>
             @elseif(in_array($roleName, ['rektor', 'dekan']))
                 <div class="row row-deck row-cards">
                     <div class="col-sm-6 col-lg-3">
@@ -613,36 +776,18 @@
                     </div>
                 </div>
 
-                <div class="mt-3 row row-cards">
-                    <div class="col-lg-8">
+                <div class="mt-3 row row-cards" x-data="rektorDashboardCharts()">
+                    <div class="col-lg-4">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Status Proposal</h3>
+                                <h3 class="card-title">Status Distribution</h3>
                             </div>
                             <div class="card-body">
-                                @foreach ($proposalsByStatus as $item)
-                                    <div class="mb-3">
-                                        <div class="align-items-center row">
-                                            <div class="col-auto">
-                                                <span
-                                                    class="status status-{{ $item->status === 'approved' ? 'success' : ($item->status === 'rejected' ? 'danger' : ($item->status === 'submitted' ? 'warning' : 'secondary')) }} d-inline-block"
-                                                    style="width: 10px; height: 10px; border-radius: 50%;"></span>
-                                            </div>
-                                            <div class="col">
-                                                <div class="text-truncate">
-                                                    <strong>{{ ucfirst($item->status) }}</strong>
-                                                    <span class="text-muted">- {{ $item->count }} proposal</span>
-                                                </div>
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar {{ $item->status === 'approved' ? 'bg-success' : ($item->status === 'rejected' ? 'bg-danger' : ($item->status === 'submitted' ? 'bg-warning' : 'bg-secondary')) }}"
-                                                        role="progressbar"
-                                                        style="width: {{ ($item->count / ($stats['total_proposals'] ?? 1)) * 100 }}%">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                <div x-ref="statusDistributionChart"
+                                     id="status-distribution-chart-rektor"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['status_distribution']) }}"
+                                     style="width: 100%; max-width: 300px; margin: 0 auto;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -650,14 +795,15 @@
                     <div class="col-lg-4">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Distribusi Jenis</h3>
+                                <h3 class="card-title">Proposal Types</h3>
                             </div>
                             <div class="card-body">
                                 <div class="align-items-center mb-4 row">
                                     <div class="col-auto">
-                                        <div id="proposal-types-chart-rektor" data-chart="proposal-types"
-                                            data-chart-data="{{ json_encode($this->getChartDataProperty()['proposal_types']) }}"
-                                            style="width: 100%; max-width: 240px; margin: 0 auto;">
+                                        <div x-ref="proposalTypesChart"
+                                             id="proposal-types-chart-rektor"
+                                             data-chart-data="{{ json_encode($this->getChartDataProperty()['proposal_types']) }}"
+                                             style="width: 100%; max-width: 240px; margin: 0 auto;">
                                         </div>
                                     </div>
                                     <div class="col">
@@ -725,7 +871,78 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Proposal Trends ({{ $selectedYear }})</h3>
+                            </div>
+                            <div class="card-body">
+                                <div x-ref="monthlyTrendsChart"
+                                     id="monthly-trends-chart-rektor"
+                                     data-chart-data="{{ json_encode($this->getChartDataProperty()['monthly_trends']) }}"
+                                     style="width: 100%; height: 300px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <script>
+                    function rektorDashboardCharts() {
+                        return {
+                            init() {
+                                this.initStatusDistributionChart();
+                                this.initProposalTypesChart();
+                                this.initMonthlyTrendsChart();
+                            },
+
+                            initStatusDistributionChart() {
+                                const element = this.$refs.statusDistributionChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData) return;
+
+                                const config = window.ChartConfig.donut({
+                                    ...chartData,
+                                    height: 240,
+                                    colors: ['#2fb344', '#e03131', '#fcc419', '#495057', '#0ca678'],
+                                });
+
+                                window.initChart('status-distribution-chart-rektor', config);
+                            },
+
+                            initProposalTypesChart() {
+                                const element = this.$refs.proposalTypesChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData) return;
+
+                                const config = window.ChartConfig.donut({
+                                    ...chartData,
+                                    height: 240,
+                                    colors: ['#206bc4', '#0ea5e9'],
+                                });
+
+                                window.initChart('proposal-types-chart-rektor', config);
+                            },
+
+                            initMonthlyTrendsChart() {
+                                const element = this.$refs.monthlyTrendsChart;
+                                const chartData = window.parseChartData(element);
+
+                                if (!chartData || !chartData.series || !chartData.categories) return;
+
+                                const config = window.ChartConfig.area({
+                                    ...chartData,
+                                    height: 300,
+                                });
+
+                                window.initChart('monthly-trends-chart-rektor', config);
+                            },
+                        };
+                    }
+                </script>
             @else
                 <div class="row row-deck row-cards">
                     <div class="col-sm-6 col-lg-4">
