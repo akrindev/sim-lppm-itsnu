@@ -40,4 +40,13 @@ class Password extends Component
 
         $this->dispatch('password-updated');
     }
+
+    /**
+     * Reset the form to original values.
+     */
+    public function resetForm(): void
+    {
+        $this->reset('current_password', 'password', 'password_confirmation');
+        $this->resetErrorBag();
+    }
 }

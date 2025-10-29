@@ -1,39 +1,74 @@
-<section class="w-full">
-    @include('partials.settings-heading')
-
-    <x-settings.layout :heading="__('Perbarui kata sandi')" :subheading="__('Pastikan akun Anda menggunakan kata sandi yang panjang dan acak untuk tetap aman')">
-        <form method="POST" wire:submit="updatePassword" class="space-y-6 mt-6">
-            <flux:input
-                wire:model="current_password"
-                :label="__('Kata sandi saat ini')"
+<div>
+    <div class="mb-3">
+        <div class="form-label">Kata Sandi Saat Ini</div>
+        <div class="input-group input-group-flat">
+            <input
                 type="password"
-                required
+                class="form-control @error('current_password') is-invalid @enderror"
+                wire:model="current_password"
+                placeholder="Masukkan kata sandi saat ini"
                 autocomplete="current-password"
             />
-            <flux:input
+            @error('current_password')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <div class="form-label">Kata Sandi Baru</div>
+        <div class="input-group input-group-flat">
+            <input
+                type="password"
+                class="form-control @error('password') is-invalid @enderror"
                 wire:model="password"
-                :label="__('Kata sandi baru')"
-                type="password"
-                required
+                placeholder="Masukkan kata sandi baru"
                 autocomplete="new-password"
             />
-            <flux:input
+            @error('password')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <div class="form-label">Konfirmasi Kata Sandi</div>
+        <div class="input-group input-group-flat">
+            <input
+                type="password"
+                class="form-control @error('password_confirmation') is-invalid @enderror"
                 wire:model="password_confirmation"
-                :label="__('Konfirmasi Kata Sandi')"
-                type="password"
-                required
+                placeholder="Konfirmasi kata sandi baru"
                 autocomplete="new-password"
             />
+            @error('password_confirmation')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
 
-            <div class="flex items-center gap-4">
-                <div class="flex justify-end items-center">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Simpan') }}</flux:button>
-                </div>
+    <div class="card-footer bg-transparent mt-auto">
+        <div class="btn-list justify-content-end">
+            <button type="button" class="btn" wire:click="resetForm">
+                Batal
+            </button>
+            <button type="submit" class="btn btn-primary" wire:click="updatePassword" wire:loading.attr="disabled">
+                <span wire:loading.remove>Simpan Kata Sandi</span>
+                <span wire:loading>Menyimpan...</span>
+            </button>
+        </div>
+    </div>
 
-                <x-action-message class="me-3" on="password-updated">
-                    {{ __('Tersimpan.') }}
-                </x-action-message>
-            </div>
-        </form>
-    </x-settings.layout>
-</section>
+    @session('status')
+        <div class="alert alert-success mt-3">
+            Kata sandi berhasil diperbarui.
+        </div>
+    @endsession
+
+    <div class="alert alert-info mt-3">
+        <h4 class="alert-title">Tips Keamanan Kata Sandi</h4>
+        <div class="text-muted">
+            Gunakan minimal 8 karakter dengan kombinasi huruf besar, huruf kecil, angka, dan simbol untuk keamanan maksimal.
+        </div>
+    </div>
+</div>

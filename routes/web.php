@@ -22,6 +22,7 @@ use App\Livewire\Review\Research as ReviewResearch;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use App\Livewire\Settings\SettingsIndex;
 use App\Livewire\Settings\TwoFactor;
 use App\Livewire\Users\Create as UsersCreate;
 use App\Livewire\Users\Edit as UsersEdit;
@@ -80,7 +81,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('community-service', ReviewCommunityService::class)->name('community-service');
     });
 
-    Route::redirect('settings', 'settings/profile');
+    Route::get('settings', SettingsIndex::class)
+        ->middleware(['auth', 'verified'])
+        ->name('settings');
 
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
@@ -98,4 +101,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
