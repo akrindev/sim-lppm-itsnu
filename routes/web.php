@@ -85,7 +85,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['auth', 'verified'])
         ->name('settings');
 
-    Route::get('settings/profile', Profile::class)->name('settings.profile');
+    Route::redirect('settings/profile', '/settings')->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
@@ -101,4 +101,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

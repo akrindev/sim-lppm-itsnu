@@ -20,11 +20,11 @@
                             <x-lucide-lock class="me-2 icon" />
                             Ubah Kata Sandi
                         </button>
-                        <button wire:click="setActiveTab('two-factor')"
+                        {{-- <button wire:click="setActiveTab('two-factor')"
                             class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'two-factor' ? 'active' : '' }}">
                             <x-lucide-shield class="me-2 icon" />
                             Autentikasi Dua Faktor
-                        </button>
+                        </button> --}}
                     </div>
                     <h4 class="mt-4 subheader">Pengaturan Sistem</h4>
                     <div class="list-group list-group-transparent">
@@ -64,10 +64,10 @@
                                 acak untuk tetap aman.</p>
                             <livewire:settings.password />
                         </div>
-                    @elseif ($activeTab === 'two-factor')
+                        {{-- @elseif ($activeTab === 'two-factor')
                         <div>
                             <livewire:settings.two-factor />
-                        </div>
+                        </div> --}}
                     @elseif ($activeTab === 'appearance')
                         <div>
                             <livewire:settings.appearance />
