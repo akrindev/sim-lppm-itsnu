@@ -111,10 +111,28 @@ class MenuComposer
                 'route' => 'review.community-service',
                 'roles' => ['reviewer'],
             ],
+            // kelola pengguna - admin lppm
+            [
+                'title' => 'Kelola Pengguna',
+                'icon' => 'users',
+                'roles' => ['admin lppm'],
+                'children' => [
+                    [
+                        'title' => 'Daftar Pengguna',
+                        'icon' => 'list',
+                        'route' => 'users.index',
+                    ],
+                    [
+                        'title' => 'Buat Pengguna',
+                        'icon' => 'user-plus',
+                        'route' => 'users.create',
+                    ],
+                ],
+            ],
         ];
 
         return array_values(array_filter(array_map(
-            fn(array $item) => $this->formatItem($item, $user),
+            fn (array $item) => $this->formatItem($item, $user),
             $items,
         )));
     }
@@ -133,7 +151,7 @@ class MenuComposer
         $children = null;
         if (isset($item['children']) && is_array($item['children'])) {
             $children = array_values(array_filter(array_map(
-                fn(array $child) => $this->formatDropdownItem($child, $user),
+                fn (array $child) => $this->formatDropdownItem($child, $user),
                 $item['children'],
             )));
         }

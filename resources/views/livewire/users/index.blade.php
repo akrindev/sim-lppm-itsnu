@@ -1,6 +1,9 @@
 <div>
+    <x-slot:title>Daftar Pengguna</x-slot:title>
+    <x-slot:pageTitle>Daftar Pengguna</x-slot:pageTitle>
+    <x-slot:pageSubtitle>Kelola pengguna dalam sistem.</x-slot:pageSubtitle>
     <x-slot:pageActions>
-        <a href="{{ route('users.create') }}" class="btn btn-primary">
+        <a href="{{ route('users.create') }}" class="btn btn-primary" wire:navigate>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
                 <path d="M12 5v14"></path>
@@ -79,7 +82,8 @@
                             <td>{{ $user->email }}</td>
                             <td>
                                 @if ($user->roles->isNotEmpty())
-                                    <span class="bg-primary-lt text-primary badge">{{ str($user->roles->first()->name)->title() }}</span>
+                                    <span
+                                        class="bg-primary-lt text-primary badge">{{ str($user->roles->first()->name)->title() }}</span>
                                 @else
                                     <span class="text-secondary">{{ __('Tidak ada peran') }}</span>
                                 @endif
@@ -96,11 +100,12 @@
                             </td>
                             <td class="text-end">
                                 <div class="justify-content-end btn-list">
-                                    <a href="{{ route('users.show', $user) }}"
+                                    <a href="{{ route('users.show', $user) }}" wire:navigate
                                         class="btn-outline-secondary btn btn-sm">
                                         {{ __('Lihat') }}
                                     </a>
-                                    <a href="{{ route('users.edit', $user) }}" class="btn btn-primary btn-sm">
+                                    <a href="{{ route('users.edit', $user) }}" wire:navigate
+                                        class="btn btn-primary btn-sm">
                                         {{ __('Ubah') }}
                                     </a>
                                 </div>

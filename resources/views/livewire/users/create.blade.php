@@ -1,6 +1,9 @@
 <div>
+    <x-slot:title>Tambah Pengguna</x-slot:title>
+    <x-slot:pageTitle>Tambah Pengguna Baru</x-slot:pageTitle>
+    <x-slot:pageSubtitle>Tambahkan pengguna baru ke sistem dengan informasi lengkap.</x-slot:pageSubtitle>
     <x-slot:pageActions>
-        <a href="{{ route('users.index') }}" class="btn-outline-secondary btn">
+        <a href="{{ route('users.index') }}" class="btn-outline-secondary btn" wire:navigate>
             Kembali ke daftar pengguna
         </a>
     </x-slot:pageActions>
@@ -11,14 +14,8 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="create-name">Nama</label>
-                        <input
-                            id="create-name"
-                            type="text"
-                            class="form-control @error('name') is-invalid @enderror"
-                            wire:model.defer="name"
-                            autocomplete="name"
-                            required
-                        >
+                        <input id="create-name" type="text" class="form-control @error('name') is-invalid @enderror"
+                            wire:model.defer="name" autocomplete="name" placeholder="Masukkan nama lengkap" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -28,14 +25,9 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="create-email">Alamat email</label>
-                        <input
-                            id="create-email"
-                            type="email"
-                            class="form-control @error('email') is-invalid @enderror"
-                            wire:model.defer="email"
-                            autocomplete="email"
-                            required
-                        >
+                        <input id="create-email" type="email"
+                            class="form-control @error('email') is-invalid @enderror" wire:model.defer="email"
+                            autocomplete="email" placeholder="nama@contoh.com" required>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -45,14 +37,9 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="create-password">Kata sandi</label>
-                        <input
-                            id="create-password"
-                            type="password"
-                            class="form-control @error('password') is-invalid @enderror"
-                            wire:model.defer="password"
-                            autocomplete="new-password"
-                            required
-                        >
+                        <input id="create-password" type="password"
+                            class="form-control @error('password') is-invalid @enderror" wire:model.defer="password"
+                            autocomplete="new-password" placeholder="Masukkan kata sandi yang kuat" required>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -62,14 +49,10 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="create-password-confirmation">Konfirmasi kata sandi</label>
-                        <input
-                            id="create-password-confirmation"
-                            type="password"
+                        <input id="create-password-confirmation" type="password"
                             class="form-control @error('password_confirmation') is-invalid @enderror"
-                            wire:model.defer="password_confirmation"
-                            autocomplete="new-password"
-                            required
-                        >
+                            wire:model.defer="password_confirmation" autocomplete="new-password"
+                            placeholder="Ulangi kata sandi" required>
                         @error('password_confirmation')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -84,14 +67,9 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="identity-id">ID Identitas</label>
-                        <input
-                            id="identity-id"
-                            type="text"
+                        <input id="identity-id" type="text"
                             class="form-control @error('identity_id') is-invalid @enderror"
-                            wire:model.defer="identity_id"
-                            placeholder="mis., NIP, NIDN, atau ID Karyawan"
-                            required
-                        >
+                            wire:model.defer="identity_id" placeholder="mis., NIP, NIDN, atau ID Karyawan" required>
                         @error('identity_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -101,12 +79,9 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="birthplace">Tempat Lahir</label>
-                        <input
-                            id="birthplace"
-                            type="text"
-                            class="form-control @error('birthplace') is-invalid @enderror"
-                            wire:model.defer="birthplace"
-                        >
+                        <input id="birthplace" type="text"
+                            class="form-control @error('birthplace') is-invalid @enderror" wire:model.defer="birthplace"
+                            placeholder="Contoh: Kota, Provinsi">
                         @error('birthplace')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -116,12 +91,8 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="birthdate">Tanggal Lahir</label>
-                        <input
-                            id="birthdate"
-                            type="date"
-                            class="form-control @error('birthdate') is-invalid @enderror"
-                            wire:model.defer="birthdate"
-                        >
+                        <input id="birthdate" type="date"
+                            class="form-control @error('birthdate') is-invalid @enderror" wire:model.defer="birthdate">
                         @error('birthdate')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -131,12 +102,8 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="address">Alamat</label>
-                        <textarea
-                            id="address"
-                            class="form-control @error('address') is-invalid @enderror"
-                            wire:model.defer="address"
-                            rows="3"
-                        ></textarea>
+                        <textarea id="address" class="form-control @error('address') is-invalid @enderror" wire:model.defer="address"
+                            rows="3" placeholder="Masukkan alamat lengkap"></textarea>
                         @error('address')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -149,15 +116,13 @@
                         <div class="form-selectgroup @error('selectedRole') is-invalid @enderror">
                             @foreach ($roleOptions as $option)
                                 <label class="form-selectgroup-item">
-                                    <input
-                                        type="radio"
-                                        name="create-role"
-                                        value="{{ $option['value'] }}"
-                                        class="form-selectgroup-input"
-                                        wire:model.defer="selectedRole"
-                                    >
+                                    <input type="radio" name="create-role" value="{{ $option['value'] }}"
+                                        class="form-selectgroup-input" wire:model.defer="selectedRole">
                                     <span class="form-selectgroup-label">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1 icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="me-1 icon">
                                             <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
                                             <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
                                         </svg>
