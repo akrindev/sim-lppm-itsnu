@@ -71,4 +71,14 @@ class Profile extends Component
 
         Session::flash('status', 'verification-link-sent');
     }
+
+    /**
+     * Reset the form to original values.
+     */
+    public function resetForm(): void
+    {
+        $this->name = Auth::user()->name;
+        $this->email = Auth::user()->email;
+        $this->resetErrorBag();
+    }
 }

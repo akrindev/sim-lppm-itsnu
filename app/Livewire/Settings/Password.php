@@ -36,8 +36,19 @@ class Password extends Component
             'password' => Hash::make($validated['password']),
         ]);
 
+        session()->flash('status', 'Kata sandi berhasil diperbarui.');
+
         $this->reset('current_password', 'password', 'password_confirmation');
 
         $this->dispatch('password-updated');
+    }
+
+    /**
+     * Reset the form to original values.
+     */
+    public function resetForm(): void
+    {
+        $this->reset('current_password', 'password', 'password_confirmation');
+        $this->resetErrorBag();
     }
 }

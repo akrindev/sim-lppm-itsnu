@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\TwoFactorChallengeController;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
@@ -24,6 +25,13 @@ Route::middleware('auth')->group(function () {
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
 });
+
+// Two-factor authentication challenge routes
+Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])
+    ->name('two-factor.login');
+
+Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store'])
+    ->name('two-factor.login.store');
 
 Route::post('logout', Logout::class)
     ->name('logout');

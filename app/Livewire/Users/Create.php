@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Models\Institution;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -33,6 +34,14 @@ class Create extends Component
 
     public string $birthplace = '';
 
+    public ?string $sinta_id = null;
+
+    public ?string $type = null;
+
+    public ?string $institution_id = '1';
+
+    public ?string $study_program_id = null;
+
     /**
      * Persist the newly created user.
      */
@@ -53,6 +62,9 @@ class Create extends Component
                 'address' => $validated['address'],
                 'birthdate' => $validated['birthdate'],
                 'birthplace' => $validated['birthplace'],
+                'sinta_id' => $validated['sinta_id'],
+                'type' => $validated['type'],
+                'study_program_id' => $validated['study_program_id'],
             ]);
 
             if ($validated['selectedRole']) {
@@ -60,7 +72,7 @@ class Create extends Component
             }
         });
 
-        session()->flash('users.status', __('New user created successfully.'));
+        session()->flash('success', 'Pengguna baru telah dibuat.');
 
         $this->redirect(route('users.index'), navigate: true);
     }
@@ -72,6 +84,8 @@ class Create extends Component
     {
         return view('livewire.users.create', [
             'roleOptions' => $this->roleOptions(),
+            'institutionOptions' => $this->institutionOptions(),
+            'studyProgramOptions' => $this->studyProgramOptions(),
         ]);
     }
 
@@ -92,6 +106,10 @@ class Create extends Component
             'address' => ['nullable', 'string', 'max:500'],
             'birthdate' => ['nullable', 'date', 'before:today'],
             'birthplace' => ['nullable', 'string', 'max:255'],
+            'sinta_id' => ['nullable', 'string', 'max:255'],
+            'type' => ['required', Rule::in('dosen', 'mahasiswa')],
+            'institution_id' => ['required', 'exists:institutions,id'],
+            'study_program_id' => ['required', 'exists:study_programs,id'],
         ];
     }
 
@@ -105,9 +123,50 @@ class Create extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn (Role $role) => [
+            ->map(fn(Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Retrieve institution options for the selection control.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function institutionOptions(): array
+    {
+        return Institution::query()
+            ->orderBy('name')
+            ->get()
+            ->map(fn(Institution $institution) => [
+                'value' => $institution->id,
+                'label' => $institution->name,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Retrieve study program options for the current institution.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function studyProgramOptions(): array
+    {
+        if (! $this->institution_id) {
+            return [];
+        }
+
+        return \App\Models\StudyProgram::query()
+            ->where('institution_id', $this->institution_id)
+            ->orderBy('name')
+            ->get()
+            ->map(fn(\App\Models\StudyProgram $program) => [
+                'value' => $program->id,
+                'label' => $program->name,
             ])
             ->values()
             ->all();

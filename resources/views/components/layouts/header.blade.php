@@ -22,18 +22,19 @@
                         <a href="?theme=dark" class="px-0 nav-link hide-theme-dark" title="Enable dark mode"
                             data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/moon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="icon icon-1">
-                                <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="icon icon-1">
+                                <path
+                                    d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
                             </svg>
                         </a>
                         <a href="?theme=light" class="px-0 nav-link hide-theme-light" title="Enable light mode"
                             data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/sun -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="icon icon-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="icon icon-1">
                                 <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
                                 <path
                                     d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
@@ -44,9 +45,9 @@
                         <a href="#" class="px-0 nav-link" data-bs-toggle="dropdown" tabindex="-1"
                             aria-label="Show notifications" data-bs-auto-close="outside" aria-expanded="false">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/bell -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="icon icon-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="icon icon-1">
                                 <path
                                     d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                                 <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
@@ -73,10 +74,10 @@
                                             <div class="col-auto">
                                                 <a href="#" class="list-group-item-actions">
                                                     <!-- Download SVG icon from http://tabler.io/icons/icon/star -->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                        class="text-muted icon icon-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="text-muted icon icon-2">
                                                         <path
                                                             d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                                                     </svg>
@@ -96,10 +97,10 @@
                                             <div class="col-auto">
                                                 <a href="#" class="list-group-item-actions show">
                                                     <!-- Download SVG icon from http://tabler.io/icons/icon/star -->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                        class="text-yellow icon icon-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="text-yellow icon icon-2">
                                                         <path
                                                             d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                                                     </svg>
@@ -118,10 +119,10 @@
                                             <div class="col-auto">
                                                 <a href="#" class="list-group-item-actions">
                                                     <!-- Download SVG icon from http://tabler.io/icons/icon/star -->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                        class="text-muted icon icon-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="text-muted icon icon-2">
                                                         <path
                                                             d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                                                     </svg>
@@ -142,10 +143,10 @@
                                             <div class="col-auto">
                                                 <a href="#" class="list-group-item-actions">
                                                     <!-- Download SVG icon from http://tabler.io/icons/icon/star -->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                        class="text-muted icon icon-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="text-muted icon icon-2">
                                                         <path
                                                             d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
                                                     </svg>
@@ -169,7 +170,8 @@
                     </div>
                 </div>
                 <div class="nav-item dropdown">
-                    <a href="#" class="d-flex p-0 px-2 nav-link lh-1" data-bs-toggle="dropdown" aria-label="Open user menu">
+                    <a href="#" class="d-flex p-0 px-2 nav-link lh-1" data-bs-toggle="dropdown"
+                        aria-label="Open user menu">
                         <span class="avatar avatar-sm" style="background-image: url(./static/avatars/000m.jpg)">
                         </span>
                         <div class="d-xl-block ps-2 d-none">
@@ -179,10 +181,10 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                         <a href="#" class="dropdown-item">Status</a>
-                        <a href="./profile.html" class="dropdown-item">Profile</a>
+                        <a href="{{ route('settings.profile') }}" class="dropdown-item">Profile</a>
                         <a href="#" class="dropdown-item">Feedback</a>
                         <div class="dropdown-divider"></div>
-                        <a href="./settings.html" class="dropdown-item">Settings</a>
+                        <a href="{{ route('settings') }}" class="dropdown-item">Settings</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="w-100 text-start dropdown-item">Logout</button>
@@ -209,35 +211,45 @@
 
                                         @if ($isDropdown)
                                             <li class="nav-item dropdown{{ $isActive ? ' active' : '' }}">
-                                                <a class="nav-link dropdown-toggle"
-                                                    href="#" data-bs-toggle="dropdown"
+                                                <a class="nav-link dropdown-toggle" href="#"
+                                                    data-bs-toggle="dropdown"
                                                     data-bs-auto-close="{{ $menuItem['dropdown']['auto_close'] ?? 'outside' }}"
                                                     role="button" aria-expanded="false">
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
                                                         @if (!empty($menuItem['icon']))
-                                                            @include('components.layouts.partials.menu.icon', [
-                                                                'name' => $menuItem['icon'],
-                                                                'class' => 'icon icon-1',
-                                                            ])
+                                                            @include(
+                                                                'components.layouts.partials.menu.icon',
+                                                                [
+                                                                    'name' => $menuItem['icon'],
+                                                                    'class' => 'icon icon-1',
+                                                                ]
+                                                            )
                                                         @endif
                                                     </span>
                                                     <span class="nav-link-title"> {{ $menuItem['title'] }} </span>
                                                 </a>
                                                 <div class="dropdown-menu">
-                                                    @include('components.layouts.partials.menu.dropdown-content', [
-                                                        'dropdown' => $menuItem['dropdown'] ?? [],
-                                                    ])
+                                                    @include(
+                                                        'components.layouts.partials.menu.dropdown-content',
+                                                        [
+                                                            'dropdown' => $menuItem['dropdown'] ?? [],
+                                                        ]
+                                                    )
                                                 </div>
                                             </li>
                                         @else
                                             <li class="nav-item{{ $isActive ? ' active' : '' }}">
-                                                <a class="nav-link" href="{{ $menuItem['href'] ?? '#' }}" wire:navigate>
+                                                <a class="nav-link" href="{{ $menuItem['href'] ?? '#' }}"
+                                                    wire:navigate>
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
                                                         @if (!empty($menuItem['icon']))
-                                                            @include('components.layouts.partials.menu.icon', [
-                                                                'name' => $menuItem['icon'],
-                                                                'class' => 'icon icon-1',
-                                                            ])
+                                                            @include(
+                                                                'components.layouts.partials.menu.icon',
+                                                                [
+                                                                    'name' => $menuItem['icon'],
+                                                                    'class' => 'icon icon-1',
+                                                                ]
+                                                            )
                                                         @endif
                                                     </span>
                                                     <span class="nav-link-title"> {{ $menuItem['title'] }} </span>

@@ -10,7 +10,7 @@ use Livewire\Component;
 #[Layout('components.layouts.app', ['title' => 'User Details', 'pageTitle' => '', 'pageSubtitle' => 'User profile and metadata overview'])]
 class Show extends Component
 {
-    public int $userId;
+    public string $userId;
 
     /**
      * Boot the component with the selected user.
