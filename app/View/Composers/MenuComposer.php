@@ -133,7 +133,7 @@ class MenuComposer
             // - master data - admin lppm
             [
                 'title' => 'Pengaturan',
-                'icon' => 'database',
+                'icon' => 'settings',
                 'roles' => ['admin lppm'],
                 'children' => [
                     [
