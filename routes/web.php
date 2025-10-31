@@ -20,6 +20,7 @@ use App\Livewire\Research\ProposalRevision\Index as ResearchProposalRevisionInde
 use App\Livewire\Review\CommunityService as ReviewCommunityService;
 use App\Livewire\Review\Research as ReviewResearch;
 use App\Livewire\Settings\Appearance;
+use App\Livewire\Settings\MasterData;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\SettingsIndex;
@@ -88,6 +89,10 @@ Route::middleware(['auth'])->group(function () {
     Route::redirect('settings/profile', '/settings')->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
+
+    Route::middleware(['role:admin lppm'])->group(function () {
+        Route::get('settings/master-data', MasterData::class)->name('settings.master-data');
+    });
 
     Route::get('settings/two-factor', TwoFactor::class)
         ->middleware(

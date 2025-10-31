@@ -9,17 +9,17 @@
             </button>
             <!-- END NAVBAR TOGGLER -->
             <!-- BEGIN NAVBAR LOGO -->
-            <div class="pe-0 pe-md-3 navbar-brand navbar-brand-autodark d-none-navbar-horizontal">
+            <div class="pe-md-3 navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0">
                 <a href="/" aria-label="{{ config('app.name') }}">
                     <img src="/logo.png" alt="LPPM ITSNU Pekalongan" width="45" height="45">
                     <span>{{ config('app.name') }}</span>
                 </a>
             </div>
             <!-- END NAVBAR LOGO -->
-            <div class="flex-row order-md-last navbar-nav">
+            <div class="order-md-last navbar-nav flex-row">
                 <div class="d-md-flex d-none">
                     <div class="nav-item">
-                        <a href="?theme=dark" class="px-0 nav-link hide-theme-dark" title="Enable dark mode"
+                        <a href="?theme=dark" class="nav-link hide-theme-dark px-0" title="Enable dark mode"
                             data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/moon -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -29,7 +29,7 @@
                                     d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
                             </svg>
                         </a>
-                        <a href="?theme=light" class="px-0 nav-link hide-theme-light" title="Enable light mode"
+                        <a href="?theme=light" class="nav-link hide-theme-light px-0" title="Enable light mode"
                             data-bs-toggle="tooltip" data-bs-placement="bottom">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/sun -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -42,7 +42,7 @@
                         </a>
                     </div>
                     <div class="d-md-flex nav-item dropdown d-none">
-                        <a href="#" class="px-0 nav-link" data-bs-toggle="dropdown" tabindex="-1"
+                        <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1"
                             aria-label="Show notifications" data-bs-auto-close="outside" aria-expanded="false">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/bell -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -58,7 +58,7 @@
                             <div class="card">
                                 <div class="d-flex card-header">
                                     <h3 class="card-title">Notifications</h3>
-                                    <div class="ms-auto btn-close" data-bs-dismiss="dropdown"></div>
+                                    <div class="btn-close ms-auto" data-bs-dismiss="dropdown"></div>
                                 </div>
                                 <div class="list-group list-group-flush list-group-hoverable">
                                     <div class="list-group-item">
@@ -170,13 +170,13 @@
                     </div>
                 </div>
                 <div class="nav-item dropdown">
-                    <a href="#" class="d-flex p-0 px-2 nav-link lh-1" data-bs-toggle="dropdown"
+                    <a href="#" class="d-flex nav-link lh-1 p-0 px-2" data-bs-toggle="dropdown"
                         aria-label="Open user menu">
                         <span class="avatar avatar-sm" style="background-image: url(./static/avatars/000m.jpg)">
                         </span>
-                        <div class="d-xl-block ps-2 d-none">
+                        <div class="d-xl-block d-none ps-2">
                             <div>{{ Auth::user()->name }}</div>
-                            <div class="mt-1 text-secondary small">{{ Auth::user()->email }}</div>
+                            <div class="text-secondary small mt-1">{{ Auth::user()->email }}</div>
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -187,7 +187,7 @@
                         <a href="{{ route('settings') }}" class="dropdown-item">Settings</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-100 text-start dropdown-item">Logout</button>
+                            <button type="submit" class="w-100 dropdown-item text-start">Logout</button>
                         </form>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
         </div>
     </header>
     <header class="navbar-expand-md">
-        <div class="collapse navbar-collapse" id="navbar-menu">
+        <div class="navbar-collapse collapse" id="navbar-menu">
             <div class="navbar">
                 <div class="container-xl">
                     <div class="flex-column flex-fill flex-md-row align-items-center row">
