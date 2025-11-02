@@ -77,7 +77,7 @@
             <div class="card" wire:key="focus-areas">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Area Fokus</h3>
-                    <button wire:click="createFocusArea" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-focus-area" wire:click="createFocusArea">
                         <x-lucide-plus class="icon" />
                         Tambah Area Fokus
                     </button>
@@ -96,11 +96,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editFocusArea({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-focus-area" wire:click="editFocusArea({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('focus-area', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('focus-area', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -122,7 +122,7 @@
             <div class="card" wire:key="keywords">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Kata Kunci</h3>
-                    <button wire:click="createKeyword" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-keyword" wire:click="createKeyword">
                         <x-lucide-plus class="icon" />
                         Tambah Kata Kunci
                     </button>
@@ -141,11 +141,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editKeyword({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-keyword" wire:click="editKeyword({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('keyword', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('keyword', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -167,7 +167,7 @@
             <div class="card" wire:key="national-priorities">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Prioritas Nasional</h3>
-                    <button wire:click="createNationalPriority" class="btn btn-primary">
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#modal-national-priority" wire:click="createNationalPriority" class="btn btn-primary">
                         <x-lucide-plus class="icon" />
                         Tambah Prioritas Nasional
                     </button>
@@ -186,11 +186,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editNationalPriority({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-national-priority" wire:click="editNationalPriority({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('national-priority', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('national-priority', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -241,11 +241,11 @@
                                     <td>{{ Str::limit($item->address, 50) ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editPartner({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-partner" wire:click="editpartner({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('partner', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('partner', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -290,11 +290,11 @@
                                     </td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editResearchScheme({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-researchscheme" wire:click="editresearchscheme({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('research-scheme', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('research-scheme', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -335,11 +335,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editScienceCluster({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-sciencecluster" wire:click="editsciencecluster({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('science-cluster', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('science-cluster', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -382,11 +382,11 @@
                                     <td>{{ $item->institution->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editStudyProgram({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-studyprogram" wire:click="editstudyprogram({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('study-program', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('study-program', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -429,11 +429,11 @@
                                     <td>{{ $item->focusArea->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editTheme({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-theme" wire:click="edittheme({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('theme', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('theme', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -476,11 +476,11 @@
                                     <td>{{ $item->theme->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editTopic({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-topic" wire:click="edittopic({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('topic', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('topic', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -521,11 +521,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button wire:click="editInstitution({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-institution" wire:click="editinstitution({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="confirmDelete('institution', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('institution', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -544,255 +544,303 @@
     </div>
 </div>
 
-<!-- Modal Form -->
-@if ($showModal)
-    <div class="modal modal-blur fade show" id="formModal" style="display: block;" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <button type="button" class="btn-close" wire:click="closeModal()" aria-label="Close"></button>
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $modalTitle }}</h5>
+<!-- Modals using @teleport -->
+@teleport('body')
+    <!-- Focus Area Modal -->
+    <x-tabler.modal id="modal-focus-area" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-focus-area">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="focusAreaName" class="form-control"
+                        placeholder="Masukkan nama area fokus">
+                    @error('focusAreaName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                 </div>
-                <form wire:submit="save">
-                    <div class="modal-body">
-                        {{-- Focus Area Form --}}
-                        @if ($modalFor === 'focus-area')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="focusAreaName" class="form-control"
-                                    placeholder="Masukkan nama area fokus">
-                                @error('focusAreaName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-focus-area" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Keyword Form --}}
-                        @if ($modalFor === 'keyword')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="keywordName" class="form-control"
-                                    placeholder="Masukkan kata kunci">
-                                @error('keywordName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- Keyword Modal -->
+    <x-tabler.modal id="modal-keyword" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-keyword">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="keywordName" class="form-control"
+                        placeholder="Masukkan kata kunci">
+                    @error('keywordName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-keyword" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- National Priority Form --}}
-                        @if ($modalFor === 'national-priority')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="nationalPriorityName" class="form-control"
-                                    placeholder="Masukkan prioritas nasional">
-                                @error('nationalPriorityName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- National Priority Modal -->
+    <x-tabler.modal id="modal-national-priority" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-national-priority">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="nationalPriorityName" class="form-control"
+                        placeholder="Masukkan prioritas nasional">
+                    @error('nationalPriorityName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-national-priority" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Partner Form --}}
-                        @if ($modalFor === 'partner')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="partnerName" class="form-control"
-                                    placeholder="Masukkan nama mitra">
-                                @error('partnerName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tipe</label>
-                                <input type="text" wire:model="partnerType" class="form-control"
-                                    placeholder="Masukkan tipe mitra">
-                                @error('partnerType')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Alamat</label>
-                                <textarea wire:model="partnerAddress" class="form-control" rows="3" placeholder="Masukkan alamat mitra"></textarea>
-                                @error('partnerAddress')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- Partner Modal -->
+    <x-tabler.modal id="modal-partner" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-partner">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="partnerName" class="form-control"
+                        placeholder="Masukkan nama mitra">
+                    @error('partnerName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tipe</label>
+                    <input type="text" wire:model="partnerType" class="form-control"
+                        placeholder="Masukkan tipe mitra">
+                    @error('partnerType')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Alamat</label>
+                    <textarea wire:model="partnerAddress" class="form-control" rows="3" placeholder="Masukkan alamat mitra"></textarea>
+                    @error('partnerAddress')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-partner" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Research Scheme Form --}}
-                        @if ($modalFor === 'research-scheme')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="researchSchemeName" class="form-control"
-                                    placeholder="Masukkan nama skema penelitian">
-                                @error('researchSchemeName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Strata</label>
-                                <select wire:model="researchSchemeStrata" class="form-control">
-                                    <option value="">Pilih Strata</option>
-                                    <option value="s1">S1</option>
-                                    <option value="s2">S2</option>
-                                    <option value="s3">S3</option>
-                                </select>
-                                @error('researchSchemeStrata')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- Research Scheme Modal -->
+    <x-tabler.modal id="modal-research-scheme" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-research-scheme">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="researchSchemeName" class="form-control"
+                        placeholder="Masukkan nama skema penelitian">
+                    @error('researchSchemeName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Strata</label>
+                    <select wire:model="researchSchemeStrata" class="form-select">
+                        <option value="">Pilih Strata</option>
+                        <option value="s1">S1</option>
+                        <option value="s2">S2</option>
+                        <option value="s3">S3</option>
+                    </select>
+                    @error('researchSchemeStrata')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-research-scheme" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Science Cluster Form --}}
-                        @if ($modalFor === 'science-cluster')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="scienceClusterName" class="form-control"
-                                    placeholder="Masukkan nama klaster sains">
-                                @error('scienceClusterName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Parent Klaster (Opsional)</label>
-                                <select wire:model="scienceClusterParentId" class="form-control">
-                                    <option value="">Tidak ada parent</option>
-                                    @foreach ($scienceClusters as $cluster)
-                                        <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('scienceClusterParentId')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- Science Cluster Modal -->
+    <x-tabler.modal id="modal-science-cluster" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-science-cluster">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="scienceClusterName" class="form-control"
+                        placeholder="Masukkan nama klaster sains">
+                    @error('scienceClusterName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Parent Klaster (Opsional)</label>
+                    <select wire:model="scienceClusterParentId" class="form-select">
+                        <option value="">Tidak ada parent</option>
+                        @foreach ($scienceClusters as $cluster)
+                            <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('scienceClusterParentId')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-science-cluster" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Study Program Form --}}
-                        @if ($modalFor === 'study-program')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="studyProgramName" class="form-control"
-                                    placeholder="Masukkan nama program studi">
-                                @error('studyProgramName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Institusi</label>
-                                <select wire:model="institutionId" class="form-control">
-                                    <option value="">Pilih Institusi</option>
-                                    @foreach ($allInstitutions as $institution)
-                                        <option value="{{ $institution->id }}">{{ $institution->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('institutionId')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- Study Program Modal -->
+    <x-tabler.modal id="modal-study-program" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-study-program">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="studyProgramName" class="form-control"
+                        placeholder="Masukkan nama program studi">
+                    @error('studyProgramName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Institusi</label>
+                    <select wire:model="institutionId" class="form-select">
+                        <option value="">Pilih Institusi</option>
+                        @foreach ($allInstitutions as $institution)
+                            <option value="{{ $institution->id }}">{{ $institution->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('institutionId')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-study-program" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Theme Form --}}
-                        @if ($modalFor === 'theme')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="themeName" class="form-control"
-                                    placeholder="Masukkan nama tema">
-                                @error('themeName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Area Fokus</label>
-                                <select wire:model="themesFocusAreaId" class="form-control">
-                                    <option value="">Pilih Area Fokus</option>
-                                    @foreach ($allFocusAreas as $focusArea)
-                                        <option value="{{ $focusArea->id }}">{{ $focusArea->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('themesFocusAreaId')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- Theme Modal -->
+    <x-tabler.modal id="modal-theme" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-theme">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="themeName" class="form-control"
+                        placeholder="Masukkan nama tema">
+                    @error('themeName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Area Fokus</label>
+                    <select wire:model="themesFocusAreaId" class="form-select">
+                        <option value="">Pilih Area Fokus</option>
+                        @foreach ($allFocusAreas as $focusArea)
+                            <option value="{{ $focusArea->id }}">{{ $focusArea->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('themesFocusAreaId')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-theme" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Topic Form --}}
-                        @if ($modalFor === 'topic')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="topicName" class="form-control"
-                                    placeholder="Masukkan nama topik">
-                                @error('topicName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tema</label>
-                                <select wire:model="topicsThemeId" class="form-control">
-                                    <option value="">Pilih Tema</option>
-                                    @foreach ($allThemes as $theme)
-                                        <option value="{{ $theme->id }}">{{ $theme->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('topicsThemeId')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
+    <!-- Topic Modal -->
+    <x-tabler.modal id="modal-topic" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-topic">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="topicName" class="form-control"
+                        placeholder="Masukkan nama topik">
+                    @error('topicName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tema</label>
+                    <select wire:model="topicsThemeId" class="form-select">
+                        <option value="">Pilih Tema</option>
+                        @foreach ($allThemes as $theme)
+                            <option value="{{ $theme->id }}">{{ $theme->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('topicsThemeId')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-topic" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-                        {{-- Institution Form --}}
-                        @if ($modalFor === 'institution')
-                            <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" wire:model="institutionName" class="form-control"
-                                    placeholder="Masukkan nama institusi">
-                                @error('institutionName')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endif
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" wire:click="closeModal()">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
+    <!-- Institution Modal -->
+    <x-tabler.modal id="modal-institution" :title="$modalTitle" on-hide="resetFormFields">
+        <x-slot:body>
+            <form wire:submit="save" id="form-institution">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="institutionName" class="form-control"
+                        placeholder="Masukkan nama institusi">
+                    @error('institutionName')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-institution" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
+
+    <!-- Delete Confirmation Modal -->
+    <x-tabler.modal id="modal-delete-confirm" title="Konfirmasi Penghapusan" size="sm" type="danger" on-hide="closeDeleteModal">
+        <x-slot:body>
+            <div class="text-center py-4">
+                <x-lucide-alert-triangle class="mb-2 icon icon-lg text-danger" />
+                <h3>{{ $deleteModalTitle }}</h3>
+                <div class="text-secondary">{{ $deleteModalMessage }}</div>
             </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show" wire:click="closeModal()"></div>
-@endif
-
-<!-- Delete Confirmation Modal -->
-@if ($showDeleteModal)
-    <div class="modal modal-blur fade show" id="deleteModal" style="display: block;" role="dialog">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <button type="button" class="btn-close" wire:click="closeDeleteModal()" aria-label="Close"></button>
-                <div class="modal-status bg-danger"></div>
-                <div class="modal-body text-center py-4">
-                    <x-lucide-alert-triangle class="mb-2 icon icon-lg text-danger" />
-                    <h3>{{ $deleteModalTitle }}</h3>
-                    <div class="text-secondary">{{ $deleteModalMessage }}</div>
-                </div>
-                <div class="modal-footer">
-                    <div class="w-100">
-                        <div class="row">
-                            <div class="col">
-                                <button type="button" class="w-100 btn" wire:click="closeDeleteModal()">
-                                    Batal
-                                </button>
-                            </div>
-                            <div class="col">
-                                <button type="button" class="w-100 btn btn-danger" wire:click="confirmDeleteAction()">
-                                    Hapus
-                                </button>
-                            </div>
-                        </div>
+        </x-slot:body>
+        <x-slot:footer>
+            <div class="w-100">
+                <div class="row">
+                    <div class="col">
+                        <button type="button" class="w-100 btn" data-bs-dismiss="modal">Batal</button>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="w-100 btn btn-danger" wire:click="confirmDeleteAction" data-bs-dismiss="modal">Hapus</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show" wire:click="closeDeleteModal()"></div>
-@endif
+        </x-slot:footer>
+    </x-tabler.modal>
+@endteleport

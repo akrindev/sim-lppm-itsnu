@@ -85,15 +85,11 @@ class MasterData extends Component
     #[Validate('required|min:3|max:255')]
     public string $institutionName = '';
 
-    public bool $showModal = false;
-
     public string $modalTitle = '';
 
     public ?int $editingId = null;
 
     public string $modalFor = '';
-
-    public bool $showDeleteModal = false;
 
     public ?int $deletingId = null;
 
@@ -128,7 +124,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'focus-area';
         $this->modalTitle = 'Tambah Area Fokus';
-        $this->showModal = true;
+
     }
 
     public function saveFocusArea(): void
@@ -151,7 +147,7 @@ class MasterData extends Component
         $this->focusAreaName = $focusArea->name;
         $this->modalFor = 'focus-area';
         $this->modalTitle = 'Edit Area Fokus';
-        $this->showModal = true;
+
     }
 
     public function deleteFocusArea(FocusArea $focusArea): void
@@ -166,7 +162,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'keyword';
         $this->modalTitle = 'Tambah Kata Kunci';
-        $this->showModal = true;
+
     }
 
     public function saveKeyword(): void
@@ -189,7 +185,7 @@ class MasterData extends Component
         $this->keywordName = $keyword->name;
         $this->modalFor = 'keyword';
         $this->modalTitle = 'Edit Kata Kunci';
-        $this->showModal = true;
+
     }
 
     public function deleteKeyword(Keyword $keyword): void
@@ -204,7 +200,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'national-priority';
         $this->modalTitle = 'Tambah Prioritas Nasional';
-        $this->showModal = true;
+
     }
 
     public function saveNationalPriority(): void
@@ -227,7 +223,7 @@ class MasterData extends Component
         $this->nationalPriorityName = $nationalPriority->name;
         $this->modalFor = 'national-priority';
         $this->modalTitle = 'Edit Prioritas Nasional';
-        $this->showModal = true;
+
     }
 
     public function deleteNationalPriority(NationalPriority $nationalPriority): void
@@ -242,7 +238,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'partner';
         $this->modalTitle = 'Tambah Mitra';
-        $this->showModal = true;
+
     }
 
     public function savePartner(): void
@@ -279,7 +275,7 @@ class MasterData extends Component
         $this->partnerAddress = $partner->address ?? '';
         $this->modalFor = 'partner';
         $this->modalTitle = 'Edit Mitra';
-        $this->showModal = true;
+
     }
 
     public function deletePartner(Partner $partner): void
@@ -294,7 +290,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'research-scheme';
         $this->modalTitle = 'Tambah Skema Penelitian';
-        $this->showModal = true;
+
     }
 
     public function saveResearchScheme(): void
@@ -327,7 +323,7 @@ class MasterData extends Component
         $this->researchSchemeStrata = $researchScheme->strata;
         $this->modalFor = 'research-scheme';
         $this->modalTitle = 'Edit Skema Penelitian';
-        $this->showModal = true;
+
     }
 
     public function deleteResearchScheme(ResearchScheme $researchScheme): void
@@ -342,7 +338,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'science-cluster';
         $this->modalTitle = 'Tambah Klaster Sains';
-        $this->showModal = true;
+
     }
 
     public function saveScienceCluster(): void
@@ -375,7 +371,7 @@ class MasterData extends Component
         $this->scienceClusterParentId = $scienceCluster->parent_id;
         $this->modalFor = 'science-cluster';
         $this->modalTitle = 'Edit Klaster Sains';
-        $this->showModal = true;
+
     }
 
     public function deleteScienceCluster(ScienceCluster $scienceCluster): void
@@ -390,7 +386,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'study-program';
         $this->modalTitle = 'Tambah Program Studi';
-        $this->showModal = true;
+
     }
 
     public function saveStudyProgram(): void
@@ -423,7 +419,7 @@ class MasterData extends Component
         $this->institutionId = $studyProgram->institution_id;
         $this->modalFor = 'study-program';
         $this->modalTitle = 'Edit Program Studi';
-        $this->showModal = true;
+
     }
 
     public function deleteStudyProgram(StudyProgram $studyProgram): void
@@ -438,7 +434,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'theme';
         $this->modalTitle = 'Tambah Tema';
-        $this->showModal = true;
+
     }
 
     public function saveTheme(): void
@@ -471,7 +467,7 @@ class MasterData extends Component
         $this->themesFocusAreaId = $theme->focus_area_id;
         $this->modalFor = 'theme';
         $this->modalTitle = 'Edit Tema';
-        $this->showModal = true;
+
     }
 
     public function deleteTheme(Theme $theme): void
@@ -486,7 +482,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'topic';
         $this->modalTitle = 'Tambah Topik';
-        $this->showModal = true;
+
     }
 
     public function saveTopic(): void
@@ -519,7 +515,7 @@ class MasterData extends Component
         $this->topicsThemeId = $topic->theme_id;
         $this->modalFor = 'topic';
         $this->modalTitle = 'Edit Topik';
-        $this->showModal = true;
+
     }
 
     public function deleteTopic(Topic $topic): void
@@ -534,7 +530,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'institution';
         $this->modalTitle = 'Tambah Institusi';
-        $this->showModal = true;
+
     }
 
     public function saveInstitution(): void
@@ -557,7 +553,7 @@ class MasterData extends Component
         $this->institutionName = $institution->name;
         $this->modalFor = 'institution';
         $this->modalTitle = 'Edit Institusi';
-        $this->showModal = true;
+
     }
 
     public function deleteInstitution(Institution $institution): void
@@ -596,8 +592,7 @@ class MasterData extends Component
 
     public function closeModal(): void
     {
-        $this->showModal = false;
-        $this->resetFormFields();
+        $this->dispatch('close-modal', modalId: $this->getModalId());
     }
 
     public function confirmDelete(string $type, int $id, string $name): void
@@ -606,16 +601,19 @@ class MasterData extends Component
         $this->deletingId = $id;
         $this->deleteModalTitle = 'Konfirmasi Penghapusan';
         $this->deleteModalMessage = "Apakah Anda yakin ingin menghapus \"{$name}\"?";
-        $this->showDeleteModal = true;
     }
 
     public function closeDeleteModal(): void
     {
-        $this->showDeleteModal = false;
         $this->deletingId = null;
         $this->deletingType = '';
         $this->deleteModalTitle = '';
         $this->deleteModalMessage = '';
+    }
+
+    private function getModalId(): string
+    {
+        return 'modal-'.$this->modalFor;
     }
 
     public function confirmDeleteAction(): void
