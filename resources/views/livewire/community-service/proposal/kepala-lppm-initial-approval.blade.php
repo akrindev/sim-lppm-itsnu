@@ -6,7 +6,8 @@
                 Persetujuan Awal Kepala LPPM
             </h4>
             <div class="text-secondary">
-                Proposal telah disetujui oleh Dekan. Silakan tinjau dan setujui untuk melanjutkan ke tahap penugasan reviewer.
+                Proposal telah disetujui oleh Dekan. Silakan tinjau dan setujui untuk melanjutkan ke tahap penugasan
+                reviewer.
             </div>
         </div>
 
@@ -17,9 +18,9 @@
             </button>
         </div>
     @else
-        <div class="alert alert-warning" role="alert">
+        {{-- <div class="alert alert-warning" role="alert">
             Proposal belum dapat disetujui. Pastikan Dekan telah menyetujui proposal terlebih dahulu.
-        </div>
+        </div> --}}
     @endif
 
     <!-- Approval Confirmation Modal -->
@@ -33,7 +34,8 @@
                         Dengan menyetujui proposal ini, Admin LPPM akan dapat menugaskan reviewer untuk melakukan penilaian.
                     </div>
                     <div class="mt-3 alert alert-info">
-                        <strong>Catatan:</strong> Setelah reviewer selesai melakukan review, Anda akan diminta untuk memberikan keputusan akhir.
+                        <strong>Catatan:</strong> Setelah reviewer selesai melakukan review, Anda akan diminta untuk
+                        memberikan keputusan akhir.
                     </div>
                 </div>
             </x-slot:body>
@@ -47,7 +49,8 @@
                             </button>
                         </div>
                         <div class="col">
-                            <button type="button" wire:click="approve" class="w-100 btn btn-primary" data-bs-dismiss="modal">
+                            <button type="button" wire:click="approve" class="w-100 btn btn-primary"
+                                data-bs-dismiss="modal">
                                 <x-lucide-check-circle class="icon" />
                                 Ya, Setujui
                             </button>

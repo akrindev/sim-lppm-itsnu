@@ -6,7 +6,7 @@
     </button>
 
     <!-- Assign Reviewer Modal -->
-    <div style="display: none;">
+    @teleport('body')
         <x-tabler.modal id="modal-assign-reviewer" title="Tugaskan Reviewer" on-show="resetReviewerForm">
             <x-slot:body>
                 <form wire:submit.prevent="assignReviewers" id="reviewer-assignment-form">
@@ -35,15 +35,15 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary"
-                    wire:loading.attr="disabled" data-bs-dismiss="modal">
+                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary" wire:loading.attr="disabled"
+                    data-bs-dismiss="modal">
                     <x-lucide-send class="icon" />
                     <span wire:loading.remove>Tugaskan</span>
                     <span wire:loading>Menyimpan...</span>
                 </button>
             </x-slot:footer>
         </x-tabler.modal>
-    </div>
+    @endteleport
 
     @if ($this->currentReviewers->count() > 0)
         <div class="card">

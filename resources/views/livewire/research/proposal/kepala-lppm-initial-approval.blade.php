@@ -1,12 +1,15 @@
 <div>
     @if ($this->canApprove)
         <div class="alert alert-info" role="alert">
-            <h4 class="alert-title">
-                <x-lucide-info class="icon" />
-                Persetujuan Awal Kepala LPPM
-            </h4>
-            <div class="text-secondary">
-                Proposal telah disetujui oleh Dekan. Silakan tinjau dan setujui untuk melanjutkan ke tahap penugasan reviewer.
+            <x-lucide-info class="icon" />
+            <div>
+                <h4 class="alert-heading">
+                    Persetujuan Awal Kepala LPPM
+                </h4>
+                <div class="alert-description">
+                    Proposal telah disetujui oleh Dekan. Silakan tinjau dan setujui untuk melanjutkan ke tahap penugasan
+                    reviewer.
+                </div>
             </div>
         </div>
 
@@ -33,7 +36,12 @@
                         Dengan menyetujui proposal ini, Admin LPPM akan dapat menugaskan reviewer untuk melakukan penilaian.
                     </div>
                     <div class="mt-3 alert alert-info">
-                        <strong>Catatan:</strong> Setelah reviewer selesai melakukan review, Anda akan diminta untuk memberikan keputusan akhir.
+                        <div>
+                            <h4 class="alert-heading">Catatan:</h4>
+                            <div class="alert-description">Setelah reviewer selesai melakukan review, Anda akan diminta
+                                untuk
+                                memberikan keputusan akhir.</div>
+                        </div>
                     </div>
                 </div>
             </x-slot:body>
@@ -47,7 +55,8 @@
                             </button>
                         </div>
                         <div class="col">
-                            <button type="button" wire:click="approve" class="w-100 btn btn-primary" data-bs-dismiss="modal">
+                            <button type="button" wire:click="approve" class="w-100 btn btn-primary"
+                                data-bs-dismiss="modal">
                                 <x-lucide-check-circle class="icon" />
                                 Ya, Setujui
                             </button>

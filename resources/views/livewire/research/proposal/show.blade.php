@@ -375,7 +375,7 @@
         <!-- Section 5: Workflow & Aksi -->
         <div id="section-workflow" x-show="currentStep === 5">
             <!-- Reviewer Assignment (Admin Only) -->
-            @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
+            @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita']) &&
                     $proposal->status->value === 'under_review')
                 <div class="mb-3">
                     <livewire:research.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
@@ -503,37 +503,35 @@
                         <div class="card-header">
                             <h4 class="mb-0 card-title">Review Status</h4>
                         </div>
-                        <div class="card-body">
-                            @php $reviewers = $proposal->reviewers; @endphp
-                            @if ($reviewers->isEmpty())
-                                <p class="text-muted">Belum ada reviewer yang ditugaskan</p>
-                            @else
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead>
+                        @php $reviewers = $proposal->reviewers; @endphp
+                        @if ($reviewers->isEmpty())
+                            <p class="text-muted">Belum ada reviewer yang ditugaskan</p>
+                        @else
+                            <div class="table-responsive">
+                                <table class="card-table table table-bordered table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Reviewer</th>
+                                            <th>Status</th>
+                                            <th>Tanggal Review</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($reviewers as $reviewer)
                                             <tr>
-                                                <th>Reviewer</th>
-                                                <th>Status</th>
-                                                <th>Tanggal Review</th>
+                                                <td>{{ $reviewer->user?->name ?? '-' }}</td>
+                                                <td>
+                                                    <x-tabler.badge :color="$reviewer->status === 'completed' ? 'success' : 'warning'">
+                                                        {{ ucfirst($reviewer->status) }}
+                                                    </x-tabler.badge>
+                                                </td>
+                                                <td>{{ $reviewer->updated_at?->format('d M Y H:i') ?? '-' }}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($reviewers as $reviewer)
-                                                <tr>
-                                                    <td>{{ $reviewer->reviewer?->name ?? '-' }}</td>
-                                                    <td>
-                                                        <x-tabler.badge :color="$reviewer->pivot->status === 'accepted' ? 'success' : 'warning'">
-                                                            {{ ucfirst($reviewer->pivot->status) }}
-                                                        </x-tabler.badge>
-                                                    </td>
-                                                    <td>{{ $reviewer->reviewed_at?->format('d M Y H:i') ?? '-' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
-                        </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
