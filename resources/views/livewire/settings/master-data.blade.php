@@ -213,7 +213,7 @@
             <div class="card" wire:key="partners">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Mitra</h3>
-                    <button wire:click="createPartner" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-partner" wire:click="createPartner">
                         <x-lucide-plus class="icon" />
                         Tambah Mitra
                     </button>
@@ -242,7 +242,7 @@
                                     <td>{{ Str::limit($item->address, 50) ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-partner" wire:click="editpartner({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-partner" wire:click="editPartner({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
@@ -268,7 +268,7 @@
             <div class="card" wire:key="research-schemes">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Skema Penelitian</h3>
-                    <button wire:click="createResearchScheme" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-research-scheme" wire:click="createResearchScheme">
                         <x-lucide-plus class="icon" />
                         Tambah Skema Penelitian
                     </button>
@@ -291,7 +291,7 @@
                                     </td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-researchscheme" wire:click="editresearchscheme({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-research-scheme" wire:click="editResearchScheme({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
@@ -317,7 +317,7 @@
             <div class="card" wire:key="science-clusters">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Klaster Sains</h3>
-                    <button wire:click="createScienceCluster" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-science-cluster" wire:click="createScienceCluster">
                         <x-lucide-plus class="icon" />
                         Tambah Klaster Sains
                     </button>
@@ -336,7 +336,7 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-sciencecluster" wire:click="editsciencecluster({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-science-cluster" wire:click="editScienceCluster({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
@@ -362,7 +362,7 @@
             <div class="card" wire:key="study-programs">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Program Studi</h3>
-                    <button wire:click="createStudyProgram" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-study-program" wire:click="createStudyProgram">
                         <x-lucide-plus class="icon" />
                         Tambah Program Studi
                     </button>
@@ -383,7 +383,7 @@
                                     <td>{{ $item->institution->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-studyprogram" wire:click="editstudyprogram({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-study-program" wire:click="editStudyProgram({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
@@ -409,7 +409,7 @@
             <div class="card" wire:key="themes">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Tema</h3>
-                    <button wire:click="createTheme" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-theme" wire:click="createTheme">
                         <x-lucide-plus class="icon" />
                         Tambah Tema
                     </button>
@@ -430,7 +430,7 @@
                                     <td>{{ $item->focusArea->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-theme" wire:click="edittheme({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-theme" wire:click="editTheme({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
@@ -456,7 +456,7 @@
             <div class="card" wire:key="topics">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Topik</h3>
-                    <button wire:click="createTopic" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-topic" wire:click="createTopic">
                         <x-lucide-plus class="icon" />
                         Tambah Topik
                     </button>
@@ -477,7 +477,7 @@
                                     <td>{{ $item->theme->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-topic" wire:click="edittopic({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-topic" wire:click="editTopic({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
@@ -503,7 +503,7 @@
             <div class="card" wire:key="institutions">
                 <div class="d-flex align-items-center justify-content-between card-header">
                     <h3 class="card-title">Institusi</h3>
-                    <button wire:click="createInstitution" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-institution" wire:click="createInstitution">
                         <x-lucide-plus class="icon" />
                         Tambah Institusi
                     </button>
@@ -522,7 +522,7 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-institution" wire:click="editinstitution({{ $item->id }})"
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-institution" wire:click="editInstitution({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
