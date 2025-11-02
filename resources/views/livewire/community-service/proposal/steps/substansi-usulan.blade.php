@@ -10,15 +10,17 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label" for="macro_research_group">Kelompok Makro Riset</label>
-                    <select id="macro_research_group"
-                        class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
-                        wire:model="form.macro_research_group_id" x-data="tomSelect"
-                        placeholder="Pilih kelompok makro riset">
-                        <option value="">-- Pilih Kelompok Makro Riset --</option>
-                        @foreach ($this->macroResearchGroups as $group)
-                            <option value="{{ $group->id }}">{{ $group->name }}</option>
-                        @endforeach
-                    </select>
+                    <div wire:ignore>
+                        <select id="macro_research_group"
+                            class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
+                            wire:model="form.macro_research_group_id" x-data="tomSelect"
+                            placeholder="Pilih kelompok makro riset">
+                            <option value="">-- Pilih Kelompok Makro Riset --</option>
+                            @foreach ($this->macroResearchGroups as $group)
+                                <option value="{{ $group->id }}">{{ $group->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     @error('form.macro_research_group_id')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror

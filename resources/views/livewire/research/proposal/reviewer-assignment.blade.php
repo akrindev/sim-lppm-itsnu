@@ -13,16 +13,18 @@
                     <div class="mb-3">
                         <label class="form-label" for="selectedReviewer">Pilih Reviewer <span
                                 class="text-danger">*</span></label>
-                        <select wire:model="selectedReviewer" class="form-select tom-select" id="selectedReviewer"
-                            placeholder="Pilih reviewer..." required>
-                            <option value="" selected disabled>Pilih reviewer...</option>
-                            @foreach ($this->availableReviewers as $reviewer)
-                                <option wire:key="reviewer-{{ $reviewer->id }}" value="{{ $reviewer->id }}">
-                                    {{ $reviewer->name }}
-                                    ({{ $reviewer->identity->identity_id }})
-                                </option>
-                            @endforeach
-                        </select>
+                        <div wire:ignore>
+                            <select wire:model="selectedReviewer" class="form-select tom-select" id="selectedReviewer"
+                                x-data="tomSelect" placeholder="Pilih reviewer..." required>
+                                <option value="" selected disabled>Pilih reviewer...</option>
+                                @foreach ($this->availableReviewers as $reviewer)
+                                    <option wire:key="reviewer-{{ $reviewer->id }}" value="{{ $reviewer->id }}">
+                                        {{ $reviewer->name }}
+                                        ({{ $reviewer->identity->identity_id }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         @error('selectedReviewer')
                             <div class="d-block mt-2 text-danger">{{ $message }}</div>
                         @enderror

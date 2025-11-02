@@ -42,8 +42,8 @@
                                         </small>
                                     @endif
                                 </div>
-                                <button type="button" 
-                                    wire:click="$set('form.partner_ids', {{ json_encode(array_values(array_diff($form->partner_ids, [$partnerId]))) }})" 
+                                <button type="button"
+                                    wire:click="$set('form.partner_ids', {{ json_encode(array_values(array_diff($form->partner_ids, [$partnerId]))) }})"
                                     class="btn btn-sm btn-danger">
                                     <x-lucide-x class="icon" />
                                 </button>
@@ -67,13 +67,13 @@
             <div class="modal-body">
                 <ul class="nav nav-tabs mb-3" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-existing-partner" 
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-existing-partner"
                             type="button" role="tab">
                             Pilih Mitra Existing
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-new-partner" 
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-new-partner"
                             type="button" role="tab">
                             Buat Mitra Baru
                         </button>
@@ -85,18 +85,20 @@
                     <div class="tab-pane fade show active" id="tab-existing-partner" role="tabpanel">
                         <div class="mb-3">
                             <label class="form-label">Pilih Mitra</label>
-                            <select class="form-select" x-data="tomSelect" multiple>
-                                <option value="">-- Pilih Mitra --</option>
-                                @foreach ($this->partners as $partner)
-                                    <option value="{{ $partner->id }}" 
-                                        wire:click="$set('form.partner_ids', [...$wire.form.partner_ids, {{ $partner->id }}])">
-                                        {{ $partner->name }} 
-                                        @if ($partner->institution)
-                                            ({{ $partner->institution }})
-                                        @endif
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div wire:ignore>
+                                <select class="form-select" x-data="tomSelect" multiple>
+                                    <option value="">-- Pilih Mitra --</option>
+                                    @foreach ($this->partners as $partner)
+                                        <option value="{{ $partner->id }}"
+                                            wire:click="$set('form.partner_ids', [...$wire.form.partner_ids, {{ $partner->id }}])">
+                                            {{ $partner->name }}
+                                            @if ($partner->institution)
+                                                ({{ $partner->institution }})
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -104,8 +106,8 @@
                     <div class="tab-pane fade" id="tab-new-partner" role="tabpanel">
                         <div class="mb-3">
                             <label class="form-label">Nama Mitra <span class="text-danger">*</span></label>
-                            <input type="text" wire:model="form.new_partner.name" 
-                                class="form-control @error('form.new_partner.name') is-invalid @enderror" 
+                            <input type="text" wire:model="form.new_partner.name"
+                                class="form-control @error('form.new_partner.name') is-invalid @enderror"
                                 placeholder="Nama lengkap mitra">
                             @error('form.new_partner.name')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -114,8 +116,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Alamat Surel</label>
-                            <input type="email" wire:model="form.new_partner.email" 
-                                class="form-control @error('form.new_partner.email') is-invalid @enderror" 
+                            <input type="email" wire:model="form.new_partner.email"
+                                class="form-control @error('form.new_partner.email') is-invalid @enderror"
                                 placeholder="email@example.com">
                             @error('form.new_partner.email')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -124,8 +126,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Institusi</label>
-                            <input type="text" wire:model="form.new_partner.institution" 
-                                class="form-control @error('form.new_partner.institution') is-invalid @enderror" 
+                            <input type="text" wire:model="form.new_partner.institution"
+                                class="form-control @error('form.new_partner.institution') is-invalid @enderror"
                                 placeholder="Nama institusi">
                             @error('form.new_partner.institution')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -134,8 +136,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Negara</label>
-                            <input type="text" wire:model="form.new_partner.country" 
-                                class="form-control @error('form.new_partner.country') is-invalid @enderror" 
+                            <input type="text" wire:model="form.new_partner.country"
+                                class="form-control @error('form.new_partner.country') is-invalid @enderror"
                                 placeholder="Negara">
                             @error('form.new_partner.country')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -144,8 +146,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Alamat</label>
-                            <textarea wire:model="form.new_partner.address" 
-                                class="form-control @error('form.new_partner.address') is-invalid @enderror" 
+                            <textarea wire:model="form.new_partner.address"
+                                class="form-control @error('form.new_partner.address') is-invalid @enderror"
                                 rows="3" placeholder="Alamat lengkap"></textarea>
                             @error('form.new_partner.address')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -154,14 +156,14 @@
 
                         <div class="mb-3">
                             <label class="form-label">File Surat Kesanggupan Mitra (PDF)</label>
-                            <input type="file" wire:model="form.new_partner_commitment_file" 
-                                class="form-control @error('form.new_partner_commitment_file') is-invalid @enderror" 
+                            <input type="file" wire:model="form.new_partner_commitment_file"
+                                class="form-control @error('form.new_partner_commitment_file') is-invalid @enderror"
                                 accept=".pdf">
                             @error('form.new_partner_commitment_file')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <small class="text-muted">Maksimal 5MB, format PDF</small>
-                            
+
                             @if ($form->new_partner_commitment_file)
                                 <div class="mt-2">
                                     <x-lucide-file-check class="icon text-success" />

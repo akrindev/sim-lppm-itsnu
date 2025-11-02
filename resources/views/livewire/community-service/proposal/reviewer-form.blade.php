@@ -53,14 +53,17 @@
                         <div class="mb-3">
                             <label class="form-label" for="recommendation">Rekomendasi <span
                                     class="text-danger">*</span></label>
-                            <select wire:model="recommendation" id="recommendation"
-                                class="form-select @error('recommendation') is-invalid @enderror" required
-                                {{ $this->hasReviewed && $this->myReview->recommendation === 'approved' ? 'disabled' : '' }}>
-                                <option value="">-- Pilih Rekomendasi --</option>
-                                <option value="approved">✓ Disetujui</option>
-                                <option value="revision_needed">↻ Butuh Revisi</option>
-                                <option value="rejected">✗ Ditolak</option>
-                            </select>
+                            <div wire:ignore>
+                                <select wire:model="recommendation" id="recommendation"
+                                    class="form-select @error('recommendation') is-invalid @enderror" required
+                                    x-data="tomSelect" placeholder="Pilih Rekomendasi"
+                                    {{ $this->hasReviewed && $this->myReview->recommendation === 'approved' ? 'disabled' : '' }}>
+                                    <option value="">-- Pilih Rekomendasi --</option>
+                                    <option value="approved">✓ Disetujui</option>
+                                    <option value="revision_needed">↻ Butuh Revisi</option>
+                                    <option value="rejected">✗ Ditolak</option>
+                                </select>
+                            </div>
                             @error('recommendation')
                                 <div class="d-block invalid-feedback">{{ $message }}</div>
                             @enderror
