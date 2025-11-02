@@ -128,11 +128,14 @@ class ProposalForm extends Form
         if ($detailable) {
             if ($detailable instanceof Research) {
                 // Research-specific fields
+                $this->macro_research_group_id = (string) ($detailable->macro_research_group_id ?? '');
                 $this->final_tkt_target = $detailable->final_tkt_target ?? '';
                 $this->background = $detailable->background ?? '';
                 $this->state_of_the_art = $detailable->state_of_the_art ?? '';
                 $this->methodology = $detailable->methodology ?? '';
                 $this->roadmap_data = $detailable->roadmap_data ?? [];
+                // substance_file is a path string, keep as is
+                // $this->substance_file will be null for edit (file uploads handled separately)
 
                 // CommunityService fields should be empty for Research
                 $this->partner_id = '';
@@ -181,6 +184,35 @@ class ProposalForm extends Form
         if ($ketuaMember) {
             $this->author_tasks = $ketuaMember->pivot->tasks ?? '';
         }
+
+        // Load outputs
+        $this->outputs = $proposal->outputs()->get()->map(function ($output) {
+            return [
+                'year' => $output->output_year,
+                'category' => $output->category,
+                'type' => $output->type,
+                'status' => $output->target_status,
+                'description' => '',
+            ];
+        })->toArray();
+
+        // Load budget items
+        $this->budget_items = $proposal->budgetItems()->get()->map(function ($item) {
+            return [
+                'budget_group_id' => $item->budget_group_id,
+                'budget_component_id' => $item->budget_component_id,
+                'group' => $item->group,
+                'component' => $item->component,
+                'item' => $item->item_description,
+                'unit' => '',
+                'volume' => $item->volume,
+                'unit_price' => $item->unit_price,
+                'total' => $item->total_price,
+            ];
+        })->toArray();
+
+        // Load partners
+        $this->partner_ids = $proposal->partners()->pluck('partners.id')->toArray();
     }
 
     /**
@@ -302,11 +334,15 @@ class ProposalForm extends Form
             if ($detailable instanceof Research) {
                 // Update Research-specific fields
                 $detailable->update([
+                    'macro_research_group_id' => $this->macro_research_group_id ?: null,
                     'final_tkt_target' => $this->final_tkt_target ?: null,
                     'background' => $this->background,
                     'state_of_the_art' => $this->state_of_the_art ?: null,
                     'methodology' => $this->methodology,
                     'roadmap_data' => $this->roadmap_data ?: null,
+                    'substance_file' => $this->substance_file && ! is_string($this->substance_file)
+                        ? $this->substance_file->store('substance-files', 'public')
+                        : $detailable->substance_file,
                 ]);
             } elseif ($detailable instanceof CommunityService) {
                 // Update CommunityService-specific fields
@@ -337,6 +373,17 @@ class ProposalForm extends Form
         ]);
 
         $this->attachTeamMembers($this->proposal, $this->proposal->submitter_id);
+        
+        // Update outputs (delete old, create new)
+        $this->proposal->outputs()->delete();
+        $this->attachOutputs($this->proposal);
+        
+        // Update budget items (delete old, create new)
+        $this->proposal->budgetItems()->delete();
+        $this->attachBudgetItems($this->proposal);
+        
+        // Update partners (sync)
+        $this->attachPartners($this->proposal);
     }
 
     /**
@@ -466,6 +513,8 @@ class ProposalForm extends Form
         if (! empty($this->budget_items)) {
             foreach ($this->budget_items as $item) {
                 $proposal->budgetItems()->create([
+                    'budget_group_id' => $item['budget_group_id'] ?? null,
+                    'budget_component_id' => $item['budget_component_id'] ?? null,
                     'group' => $item['group'] ?? '',
                     'component' => $item['component'] ?? '',
                     'item_description' => $item['item'] ?? '',

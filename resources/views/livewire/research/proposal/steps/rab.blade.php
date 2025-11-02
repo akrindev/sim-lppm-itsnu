@@ -34,14 +34,32 @@
                     </thead>
                     <tbody>
                         @foreach ($form->budget_items as $index => $item)
-                            <tr wire:key="budget-{{ $index }}">
+                            <tr wire:key="budget-{{ $index }}" x-data="{
+                                selectedGroup: @entangle('form.budget_items.' + {{ $index }} + '.budget_group_id'),
+                                get filteredComponents() {
+                                    if (!this.selectedGroup) return [];
+                                    return @js($this->budgetComponents->groupBy('budget_group_id')->toArray())[this.selectedGroup] || [];
+                                }
+                            }">
                                 <td>
-                                    <input type="text" wire:model="form.budget_items.{{ $index }}.group"
-                                        class="form-control form-control-sm" placeholder="Kelompok">
+                                    <select wire:model.live="form.budget_items.{{ $index }}.budget_group_id"
+                                        x-model="selectedGroup" class="form-select-sm form-select"
+                                        x-data="tomSelect">
+                                        <option value="">-- Pilih --</option>
+                                        @foreach ($this->budgetGroups as $group)
+                                            <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td>
-                                    <input type="text" wire:model="form.budget_items.{{ $index }}.component"
-                                        class="form-control form-control-sm" placeholder="Komponen">
+                                    <select wire:model="form.budget_items.{{ $index }}.budget_component_id"
+                                        class="form-select-sm form-select" x-data="tomSelect"
+                                        :disabled="!selectedGroup">
+                                        <option value="">-- Pilih --</option>
+                                        <template x-for="comp in filteredComponents" :key="comp.id">
+                                            <option :value="comp.id" x-text="comp.name"></option>
+                                        </template>
+                                    </select>
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.budget_items.{{ $index }}.item"

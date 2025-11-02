@@ -3,6 +3,8 @@
 namespace App\Livewire\Research\Proposal;
 
 use App\Livewire\Forms\ProposalForm;
+use App\Models\BudgetComponent;
+use App\Models\BudgetGroup;
 use App\Models\FocusArea;
 use App\Models\MacroResearchGroup;
 use App\Models\NationalPriority;
@@ -114,6 +116,18 @@ class Create extends Component
         return Partner::all();
     }
 
+    #[Computed]
+    public function budgetGroups()
+    {
+        return BudgetGroup::all();
+    }
+
+    #[Computed]
+    public function budgetComponents()
+    {
+        return BudgetComponent::with('budgetGroup')->get();
+    }
+
     public function nextStep(): void
     {
         $this->validateCurrentStep();
@@ -178,6 +192,8 @@ class Create extends Component
     public function addBudgetItem(): void
     {
         $this->form->budget_items[] = [
+            'budget_group_id' => '',
+            'budget_component_id' => '',
             'group' => '',
             'component' => '',
             'item' => '',
