@@ -173,6 +173,15 @@ class Proposal extends Model
     }
 
     /**
+     * Get all partners for the proposal.
+     */
+    public function partners(): BelongsToMany
+    {
+        return $this->belongsToMany(Partner::class, 'proposal_partner')
+            ->withTimestamps();
+    }
+
+    /**
      * Get all activity schedules for the proposal.
      */
     public function activitySchedules(): HasMany

@@ -74,6 +74,33 @@ class ProposalForm extends Form
     #[Validate('required')]
     public string $author_tasks = '';
 
+    // Step 2: Substansi Usulan
+    #[Validate('nullable|exists:macro_research_groups,id')]
+    public string $macro_research_group_id = '';
+
+    public $substance_file;
+
+    #[Validate('nullable|array')]
+    public array $outputs = [];
+
+    // Step 3: RAB (Budget)
+    #[Validate('nullable|array')]
+    public array $budget_items = [];
+
+    // Step 4: Dokumen Pendukung (Partners)
+    #[Validate('nullable|array')]
+    public array $partner_ids = [];
+
+    public array $new_partner = [
+        'name' => '',
+        'email' => '',
+        'institution' => '',
+        'country' => '',
+        'address' => '',
+    ];
+
+    public $new_partner_commitment_file;
+
     /**
      * Set proposal data for editing
      */
@@ -183,11 +210,13 @@ class ProposalForm extends Form
         // This prevents double-validation and maintains form data integrity
 
         $research = Research::create([
+            'macro_research_group_id' => $this->macro_research_group_id ?: null,
             'final_tkt_target' => $this->final_tkt_target ?: null,
             'background' => $this->background ?: null,
             'state_of_the_art' => $this->state_of_the_art ?: null,
             'methodology' => $this->methodology ?: null,
             'roadmap_data' => $this->roadmap_data ?: null,
+            'substance_file' => $this->substance_file ? $this->substance_file->store('substance-files', 'public') : null,
         ]);
 
         $proposal = Proposal::create([
@@ -210,6 +239,9 @@ class ProposalForm extends Form
         ]);
 
         $this->attachTeamMembers($proposal, $submitterId);
+        $this->attachOutputs($proposal);
+        $this->attachBudgetItems($proposal);
+        $this->attachPartners($proposal);
 
         return $proposal;
     }
@@ -249,6 +281,9 @@ class ProposalForm extends Form
         ]);
 
         $this->attachTeamMembers($proposal, $submitterId);
+        $this->attachOutputs($proposal);
+        $this->attachBudgetItems($proposal);
+        $this->attachPartners($proposal);
 
         return $proposal;
     }
@@ -410,5 +445,42 @@ class ProposalForm extends Form
 
         // Sync all team members at once - this replaces ALL old members with new sync data
         $proposal->teamMembers()->sync($syncData);
+    }
+
+    private function attachOutputs(Proposal $proposal): void
+    {
+        if (! empty($this->outputs)) {
+            foreach ($this->outputs as $output) {
+                $proposal->outputs()->create([
+                    'output_year' => $output['year'] ?? date('Y'),
+                    'category' => $output['category'] ?? '',
+                    'type' => $output['type'] ?? '',
+                    'target_status' => $output['status'] ?? '',
+                ]);
+            }
+        }
+    }
+
+    private function attachBudgetItems(Proposal $proposal): void
+    {
+        if (! empty($this->budget_items)) {
+            foreach ($this->budget_items as $item) {
+                $proposal->budgetItems()->create([
+                    'group' => $item['group'] ?? '',
+                    'component' => $item['component'] ?? '',
+                    'item_description' => $item['item'] ?? '',
+                    'volume' => $item['volume'] ?? 0,
+                    'unit_price' => $item['unit_price'] ?? 0,
+                    'total_price' => $item['total'] ?? 0,
+                ]);
+            }
+        }
+    }
+
+    private function attachPartners(Proposal $proposal): void
+    {
+        if (! empty($this->partner_ids)) {
+            $proposal->partners()->sync($this->partner_ids);
+        }
     }
 }
