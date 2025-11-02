@@ -39,9 +39,14 @@
                                     isset($item['budget_group_id']) && $item['budget_group_id'] !== ''
                                         ? $item['budget_group_id']
                                         : null;
+                                $selectedComponentValue =
+                                    isset($item['budget_component_id']) && $item['budget_component_id'] !== ''
+                                        ? $item['budget_component_id']
+                                        : null;
                             @endphp
                             <tr wire:key="budget-{{ $index }}" x-data="{
                                 selectedGroup: @js($selectedGroupValue),
+                                selectedComponent: @js($selectedComponentValue),
                                 components: @js($this->budgetComponents->groupBy('budget_group_id')->map(fn($items) => $items->map(fn($i) => ['id' => $i->id, 'name' => $i->name])->values())->toArray()),
                                 get filteredComponents() {
                                     if (!this.selectedGroup) return [];
@@ -59,10 +64,12 @@
                                 </td>
                                 <td>
                                     <select wire:model="form.budget_items.{{ $index }}.budget_component_id"
-                                        class="form-select-sm form-select" :disabled="!selectedGroup">
+                                        x-model="selectedComponent" class="form-select-sm form-select"
+                                        :disabled="!selectedGroup">
                                         <option value="">-- Pilih --</option>
                                         <template x-for="comp in filteredComponents" :key="comp.id">
-                                            <option :value="comp.id" x-text="comp.name"></option>
+                                            <option :value="comp.id" x-text="comp.name"
+                                                :selected="comp.id == selectedComponent"></option>
                                         </template>
                                     </select>
                                 </td>
