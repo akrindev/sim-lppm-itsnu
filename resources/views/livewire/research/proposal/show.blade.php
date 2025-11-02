@@ -403,12 +403,12 @@
                                 <x-lucide-check class="icon" />
                                 Setujui Proposal
                             </button>
-                            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                            {{-- <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                 data-bs-target="#approvalModal"
                                 wire:click="$set('approvalDecision', 'need_assignment')">
                                 <x-lucide-alert-triangle class="icon" />
                                 Perlu Perbaikan Anggota
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
                 </div>
@@ -625,6 +625,30 @@
                 </button>
                 <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal">
                     Ya, Tolak
+                </button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
+
+    <!-- Approval Modal (Dekan Decision) -->
+    @teleport('body')
+        <x-tabler.modal id="approvalModal" title="Keputusan Dekan" wire:ignore.self>
+            <x-slot:body>
+                <div class="py-1 text-center">
+                    <x-lucide-check-circle class="mb-2 text-primary icon" style="width: 3rem; height: 3rem;" />
+                    <h3>Konfirmasi Keputusan</h3>
+                    <div class="text-secondary">
+                        Apakah Anda yakin dengan keputusan ini?
+                    </div>
+                </div>
+            </x-slot:body>
+
+            <x-slot:footer>
+                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" wire:click="submitDekanDecision" class="btn btn-primary" data-bs-dismiss="modal">
+                    Ya, Konfirmasi
                 </button>
             </x-slot:footer>
         </x-tabler.modal>

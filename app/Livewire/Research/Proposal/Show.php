@@ -133,4 +133,12 @@ class Show extends Component
         $this->approvalDecision = '';
         $this->approvalNotes = '';
     }
+
+    /**
+     * Submit Dekan decision (alias for processApproval).
+     */
+    public function submitDekanDecision(): void
+    {
+        $this->processApproval();
+    }
 }
