@@ -311,6 +311,13 @@
             </div>
         </div>
 
+        {{-- loop errors --}}
+        <div>
+            @foreach ($errors->all() as $error)
+                <div class="alert alert-danger">{{ $error }}</div>
+            @endforeach
+        </div>
+
         <!-- Form Actions -->
         <div class="d-flex justify-content-end gap-2">
             <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn">

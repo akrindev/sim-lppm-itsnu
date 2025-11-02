@@ -51,6 +51,7 @@ class Create extends Component
         try {
             $this->form->validate();
         } catch (\Exception $e) {
+            dd($e->getMessage());
             // Validation failed, errors will be displayed in the form
             // Do NOT reset the form - keep the data so user can correct errors
             return;

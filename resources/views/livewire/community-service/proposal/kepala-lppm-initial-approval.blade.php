@@ -23,7 +23,7 @@
     @endif
 
     <!-- Approval Confirmation Modal -->
-    <div style="display: none;">
+    @teleport('body')
         <x-tabler.modal id="initialApprovalModal" title="Konfirmasi Persetujuan Awal">
             <x-slot:body>
                 <div class="py-3 text-center">
@@ -56,5 +56,5 @@
                 </div>
             </x-slot:footer>
         </x-tabler.modal>
-    </div>
+    @endteleport
 </div>

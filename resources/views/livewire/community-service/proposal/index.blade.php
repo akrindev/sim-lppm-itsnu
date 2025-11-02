@@ -195,17 +195,19 @@
                                         class="btn btn-icon btn-ghost-primary" wire:navigate title="Lihat">
                                         <x-lucide-eye class="icon" />
                                     </a>
-                                    @if ($proposal->status === 'draft')
+                                    @if ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id())
                                         <a href="{{ route('community-service.proposal.edit', $proposal) }}"
                                             class="btn btn-icon btn-ghost-info" title="Edit" wire:navigate>
                                             <x-lucide-pencil class="icon" />
                                         </a>
                                     @endif
-                                    <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
-                                        wire:click="deleteProposal({{ $proposal->id }})"
-                                        wire:confirm="Yakin ingin menghapus proposal ini?">
-                                        <x-lucide-trash-2 class="icon" />
-                                    </button>
+                                    @if ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id())
+                                        <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
+                                            wire:click="deleteProposal({{ $proposal->id }})"
+                                            wire:confirm="Yakin ingin menghapus proposal ini?">
+                                            <x-lucide-trash-2 class="icon" />
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

@@ -6,8 +6,8 @@
     </button>
 
     <!-- Assign Reviewer Modal -->
-    @teleport('body')
-        <x-tabler.modal id="modal-assign-reviewer" title="Tugaskan Reviewer" on-show="resetReviewerForm" wire:ignore.self>
+    <div style="display: none;">
+        <x-tabler.modal id="modal-assign-reviewer" title="Tugaskan Reviewer" on-show="resetReviewerForm">
             <x-slot:body>
                 <form wire:submit.prevent="assignReviewers" id="reviewer-assignment-form">
                     <div class="mb-3">
@@ -42,7 +42,7 @@
                 </button>
             </x-slot:footer>
         </x-tabler.modal>
-    @endteleport
+    </div>
 
     @if ($this->currentReviewers->count() > 0)
         <div class="card">
@@ -92,8 +92,8 @@
 
 
     <!-- Delete Reviewer Confirmation Modal -->
-    @teleport('body')
-        <x-tabler.modal id="deleteReviewerModal" title="Hapus Reviewer?" wire:ignore.self>
+    <div style="display: none;">
+        <x-tabler.modal id="deleteReviewerModal" title="Hapus Reviewer?">
             <x-slot:body>
                 <div class="py-4 text-center">
                     <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
@@ -114,5 +114,5 @@
                 </button>
             </x-slot:footer>
         </x-tabler.modal>
-    @endteleport
+    </div>
 </div>

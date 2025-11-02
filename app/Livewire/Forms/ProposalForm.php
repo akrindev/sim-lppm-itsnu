@@ -15,8 +15,6 @@ class ProposalForm extends Form
 
     public string $title = '';
 
-    // Research scheme is only required for Research proposals, nullable for CommunityService
-    #[Validate('required|exists:research_schemes,id')]
     public string $research_scheme_id = '';
 
     #[Validate('required|exists:focus_areas,id')]
@@ -329,7 +327,7 @@ class ProposalForm extends Form
 
         $rules = [
             'title' => 'required|string|max:255',
-            'research_scheme_id' => 'required|exists:research_schemes,id',
+            'research_scheme_id' => 'nullable|exists:research_schemes,id',
             'focus_area_id' => 'required|exists:focus_areas,id',
             'theme_id' => 'required|exists:themes,id',
             'topic_id' => 'required|exists:topics,id',
@@ -343,10 +341,14 @@ class ProposalForm extends Form
         ];
 
         if ($isCommunityService) {
+            $rules['research_scheme_id'] = 'nullable|exists:research_schemes,id';
             $rules['partner_id'] = 'nullable|exists:partners,id';
             $rules['partner_issue_summary'] = 'nullable|string|min:50';
             $rules['solution_offered'] = 'nullable|string|min:50';
-            $rules['research_scheme_id'] = 'nullable|exists:research_schemes,id';
+        }
+
+        if ($isResearch) {
+            $rules['research_scheme_id'] = 'required|exists:research_schemes,id';
         }
 
         // Add conditional rules based on proposal type
