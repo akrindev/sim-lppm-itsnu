@@ -114,17 +114,18 @@
                                             </td>
                                             <td>
                                                 @if ($research->status->value === 'approved')
-                                                    <span class="bg-success badge">Disetujui</span>
+                                                    <x-tabler.badge color="success">Disetujui</x-tabler.badge>
                                                 @elseif($research->status->value === 'rejected')
-                                                    <span class="bg-danger badge">Ditolak</span>
+                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
                                                 @elseif($research->status->value === 'submitted')
-                                                    <span class="bg-warning badge">Menunggu Review</span>
+                                                    <x-tabler.badge color="warning">Menunggu Review</x-tabler.badge>
                                                 @elseif($research->status->value === 'reviewed')
-                                                    <span class="bg-info badge">Sudah Direview</span>
+                                                    <x-tabler.badge color="info">Sudah Direview</x-tabler.badge>
                                                 @elseif($research->status->value === 'completed')
-                                                    <span class="bg-success badge">Selesai</span>
+                                                    <x-tabler.badge color="success">Selesai</x-tabler.badge>
                                                 @else
-                                                    <span class="bg-secondary badge">{{ $research->status->label() }}</span>
+                                                    <x-tabler.badge
+                                                        color="secondary">{{ $research->status->label() }}</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td class="text-muted">
@@ -181,17 +182,18 @@
                                             </td>
                                             <td>
                                                 @if ($communityService->status->value === 'approved')
-                                                    <span class="bg-success badge">Disetujui</span>
+                                                    <x-tabler.badge color="success">Disetujui</x-tabler.badge>
                                                 @elseif($communityService->status->value === 'rejected')
-                                                    <span class="bg-danger badge">Ditolak</span>
+                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
                                                 @elseif($communityService->status->value === 'submitted')
-                                                    <span class="bg-warning badge">Menunggu Review</span>
+                                                    <x-tabler.badge color="warning">Menunggu Review</x-tabler.badge>
                                                 @elseif($communityService->status->value === 'reviewed')
-                                                    <span class="bg-info badge">Sudah Direview</span>
+                                                    <x-tabler.badge color="info">Sudah Direview</x-tabler.badge>
                                                 @elseif($communityService->status->value === 'completed')
-                                                    <span class="bg-success badge">Selesai</span>
+                                                    <x-tabler.badge color="success">Selesai</x-tabler.badge>
                                                 @else
-                                                    <span class="bg-secondary badge">{{ $communityService->status->label() }}</span>
+                                                    <x-tabler.badge
+                                                        color="secondary">{{ $communityService->status->label() }}</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td class="text-muted">

@@ -11,8 +11,7 @@
     <x-slot:pageActions>
         <div class="btn-list">
             @foreach ($periods as $availablePeriod)
-                <button type="button"
-                    wire:click="setPeriod('{{ $availablePeriod }}')"
+                <button type="button" wire:click="setPeriod('{{ $availablePeriod }}')"
                     class="btn {{ $period === $availablePeriod ? 'btn-primary' : 'btn-outline-primary' }}">
                     {{ $availablePeriod }}
                 </button>
@@ -21,7 +20,7 @@
     </x-slot:pageActions>
 
     <div class="mb-3 row row-deck">
-            @foreach ($summary as $card)
+        @foreach ($summary as $card)
             <div class="col-sm-6 col-xl-4">
                 <div class="card">
                     <div class="d-flex align-items-center gap-3 card-body">
@@ -52,7 +51,8 @@
                             <div class="mb-1 fw-semibold">{{ $milestone['description'] }}</div>
                             <div class="text-secondary small">
                                 {{ __('Jumlah terkait:') }}
-                                <span class="bg-primary-lt ms-1 text-primary badge">{{ $milestone['value'] }}</span>
+                                <x-tabler.badge color="primary"
+                                    class="ms-1">{{ $milestone['value'] }}</x-tabler.badge>
                             </div>
                         </div>
                     </div>

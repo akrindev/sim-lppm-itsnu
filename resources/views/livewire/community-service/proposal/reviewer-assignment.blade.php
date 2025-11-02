@@ -35,7 +35,8 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary" wire:loading.attr="disabled">
+                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary"
+                    wire:loading.attr="disabled">
                     <x-lucide-send class="icon" />
                     <span wire:loading.remove>Tugaskan</span>
                     <span wire:loading>Menyimpan...</span>
@@ -67,11 +68,11 @@
                                 <td>{{ $reviewer->user->email }}</td>
                                 <td>
                                     @if ($reviewer->status === 'pending')
-                                        <span class="bg-warning badge">Menunggu</span>
+                                        <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
                                     @elseif ($reviewer->status === 'reviewing')
-                                        <span class="bg-info badge">Sedang Review</span>
+                                        <x-tabler.badge color="info">Sedang Review</x-tabler.badge>
                                     @elseif ($reviewer->status === 'completed')
-                                        <span class="bg-success badge">Selesai</span>
+                                        <x-tabler.badge color="success">Selesai</x-tabler.badge>
                                     @endif
                                 </td>
                                 <td>

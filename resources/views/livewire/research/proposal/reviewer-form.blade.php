@@ -29,13 +29,13 @@
                 <form wire:submit="submitReview">
                     <div class="card-body">
                         @if ($this->canEditReview)
-                            <div class="alert alert-info mb-3" role="alert">
+                            <div class="mb-3 alert alert-info" role="alert">
                                 <strong>Note:</strong> Review sudah disubmit sebelumnya dan dapat diedit.
                             </div>
                         @endif
 
                         @if ($this->hasReviewed && $this->myReview->recommendation === 'approved')
-                            <div class="alert alert-warning mb-3" role="alert">
+                            <div class="mb-3 alert alert-warning" role="alert">
                                 <strong>Warning:</strong> Review dengan rekomendasi "Disetujui" tidak dapat diedit lagi.
                             </div>
                         @endif
@@ -106,14 +106,16 @@
                                 <div class="mb-2">
                                     <strong>Rekomendasi:</strong>
                                     @if ($review->recommendation === 'approved')
-                                        <span class="badge-outline text-success badge">✓ Disetujui</span>
+                                        <x-tabler.badge variant="outline" color="success">✓ Disetujui</x-tabler.badge>
                                         @if (auth()->id() === $review->user_id)
-                                            <small class="text-success d-block"><x-lucide-lock class="icon" /> Tidak dapat diedit</small>
+                                            <small class="d-block text-success"><x-lucide-lock class="icon" /> Tidak
+                                                dapat diedit</small>
                                         @endif
                                     @elseif ($review->recommendation === 'rejected')
-                                        <span class="badge-outline text-danger badge">✗ Ditolak</span>
+                                        <x-tabler.badge variant="outline" color="danger">✗ Ditolak</x-tabler.badge>
                                     @else
-                                        <span class="badge-outline text-warning badge">↻ Butuh Revisi</span>
+                                        <x-tabler.badge variant="outline" color="warning">↻ Butuh
+                                            Revisi</x-tabler.badge>
                                     @endif
                                 </div>
                             @endif
@@ -131,7 +133,7 @@
                         </div>
                     @endforeach
                 @else
-                    <div class="text-center py-4 text-secondary">
+                    <div class="py-4 text-secondary text-center">
                         Belum ada review untuk proposal ini.
                     </div>
                 @endif

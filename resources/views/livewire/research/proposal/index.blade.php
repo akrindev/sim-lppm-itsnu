@@ -93,9 +93,9 @@
                                 </div>
                             </td> --}}
                             <td>
-                                <div class="badge-outline badge">
+                                <x-tabler.badge variant="outline">
                                     {{ $proposal->focusArea?->name ?? '—' }}
-                                </div>
+                                </x-tabler.badge>
                             </td>
                             <td>
                                 <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">

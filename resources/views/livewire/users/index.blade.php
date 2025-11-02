@@ -14,7 +14,7 @@
     </x-slot:pageActions>
 
     @if (session('users.status'))
-        <div class="mb-3 alert alert-success alert-important" role="alert">
+        <div class="alert alert-success alert-important mb-3" role="alert">
             {{ session('users.status') }}
         </div>
     @endif
@@ -61,7 +61,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="card-table table table-vcenter">
+            <table class="card-table table-vcenter table">
                 <thead>
                     <tr>
                         <th>{{ __('Nama') }}</th>
@@ -82,17 +82,18 @@
                             <td>{{ $user->email }}</td>
                             <td>
                                 @if ($user->roles->isNotEmpty())
-                                    <span
-                                        class="bg-primary-lt text-primary badge">{{ str($user->roles->first()->name)->title() }}</span>
+                                    <x-tabler.badge color="primary">
+                                        {{ str($user->roles->first()->name)->title() }}
+                                    </x-tabler.badge>
                                 @else
                                     <span class="text-secondary">{{ __('Tidak ada peran') }}</span>
                                 @endif
                             </td>
                             <td class="text-center">
                                 @if ($user->hasVerifiedEmail())
-                                    <span class="bg-green-lt text-green badge">{{ __('Terverifikasi') }}</span>
+                                    <x-tabler.badge color="green">{{ __('Terverifikasi') }}</x-tabler.badge>
                                 @else
-                                    <span class="bg-yellow-lt text-yellow badge">{{ __('Menunggu') }}</span>
+                                    <x-tabler.badge color="yellow">{{ __('Menunggu') }}</x-tabler.badge>
                                 @endif
                             </td>
                             <td class="text-secondary text-end">
@@ -113,7 +114,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-5 text-secondary text-center">
+                            <td colspan="6" class="text-secondary py-5 text-center">
                                 {{ __('Tidak ada pengguna yang cocok dengan filter Anda.') }}
                             </td>
                         </tr>

@@ -1,13 +1,13 @@
 <x-slot:title>Perbaikan Usulan Penelitian</x-slot:title>
 <x-slot:pageTitle>
-    @if(auth()->user()->hasRole('dosen'))
+    @if (auth()->user()->hasRole('dosen'))
         Usulan Penelitian Perlu Diperbaiki
     @else
         Usulan Penelitian yang Sudah Direview
     @endif
 </x-slot:pageTitle>
 <x-slot:pageSubtitle>
-    @if(auth()->user()->hasRole('dosen'))
+    @if (auth()->user()->hasRole('dosen'))
         Daftar usulan penelitian yang perlu diperbaiki sesuai catatan reviewer.
     @elseif(auth()->user()->hasRole('reviewer'))
         Daftar usulan penelitian yang sudah Anda review.
@@ -74,7 +74,7 @@
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
-                                @if($proposal->reviewers->isNotEmpty())
+                                @if ($proposal->reviewers->isNotEmpty())
                                     <small class="text-secondary">
                                         {{ $proposal->reviewers->count() }} reviewer telah menyelesaikan review
                                     </small>
@@ -85,9 +85,9 @@
                                 <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
                             </td>
                             <td>
-                                <div class="badge-outline badge">
+                                <x-tabler.badge variant="outline">
                                     {{ $proposal->focusArea?->name ?? '—' }}
-                                </div>
+                                </x-tabler.badge>
                             </td>
                             <td>
                                 <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
@@ -96,7 +96,7 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-column gap-1">
-                                    @foreach($proposal->reviewers as $reviewer)
+                                    @foreach ($proposal->reviewers as $reviewer)
                                         <div class="d-flex align-items-center gap-2">
                                             <x-tabler.badge color="success" class="fw-normal">
                                                 <x-lucide-check class="icon icon-sm" />
@@ -114,7 +114,8 @@
                             <td>
                                 <div class="flex-nowrap btn-list">
                                     <a href="{{ route('research.proposal.show', $proposal) }}"
-                                        class="btn btn-icon btn-ghost-primary" title="Lihat Detail & Review" wire:navigate>
+                                        class="btn btn-icon btn-ghost-primary" title="Lihat Detail & Review"
+                                        wire:navigate>
                                         <x-lucide-eye class="icon" />
                                     </a>
                                 </div>
@@ -127,7 +128,7 @@
                                     <x-lucide-inbox class="text-secondary icon icon-lg" />
                                 </div>
                                 <p class="text-secondary">
-                                    @if(auth()->user()->hasRole('dosen'))
+                                    @if (auth()->user()->hasRole('dosen'))
                                         Tidak ada usulan penelitian yang perlu diperbaiki.
                                     @else
                                         Tidak ada usulan penelitian yang sudah direview.

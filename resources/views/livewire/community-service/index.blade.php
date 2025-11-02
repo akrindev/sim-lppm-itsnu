@@ -177,9 +177,9 @@
                             </x-tabler.badge>
                         </td>
                         <td>
-                            <div class="badge-outline badge">
+                            <x-tabler.badge variant="outline">
                                 {{ $proposal->focusArea?->name ?? '—' }}
-                            </div>
+                            </x-tabler.badge>
                         </td>
                         <td>
                             <small class="text-secondary">

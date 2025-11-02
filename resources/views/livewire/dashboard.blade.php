@@ -444,24 +444,27 @@
                                             </td>
                                             <td>
                                                 @if ($proposal->detailable_type === 'App\Models\Research')
-                                                    <span class="bg-primary me-1 badge">Penelitian</span>
+                                                    <x-tabler.badge color="primary"
+                                                        class="me-1">Penelitian</x-tabler.badge>
                                                 @else
-                                                    <span class="bg-info me-1 badge">Pengmas</span>
+                                                    <x-tabler.badge color="info"
+                                                        class="me-1">Pengmas</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($proposal->status->value === 'approved')
-                                                    <span class="bg-success badge">Disetujui</span>
+                                                    <x-tabler.badge color="success">Disetujui</x-tabler.badge>
                                                 @elseif($proposal->status->value === 'rejected')
-                                                    <span class="bg-danger badge">Ditolak</span>
+                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
                                                 @elseif($proposal->status->value === 'submitted')
-                                                    <span class="bg-warning badge">Menunggu Review</span>
+                                                    <x-tabler.badge color="warning">Menunggu Review</x-tabler.badge>
                                                 @elseif($proposal->status->value === 'reviewed')
-                                                    <span class="bg-info badge">Sudah Direview</span>
+                                                    <x-tabler.badge color="info">Sudah Direview</x-tabler.badge>
                                                 @elseif($proposal->status->value === 'completed')
-                                                    <span class="bg-success badge">Selesai</span>
+                                                    <x-tabler.badge color="success">Selesai</x-tabler.badge>
                                                 @else
-                                                    <span class="bg-secondary badge">{{ $proposal->status->label() }}</span>
+                                                    <x-tabler.badge
+                                                        color="secondary">{{ $proposal->status->label() }}</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td class="text-muted">

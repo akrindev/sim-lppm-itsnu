@@ -222,13 +222,13 @@
                                         <td>{{ $member->name }}</td>
                                         <td>{{ $member->identity?->identity_id ?? '-' }}</td>
                                         <td>
-                                            <span class="bg-info badge">{{ ucfirst($member->pivot->role) }}</span>
+                                            <x-tabler.badge
+                                                color="info">{{ ucfirst($member->pivot->role) }}</x-tabler.badge>
                                         </td>
                                         <td>
-                                            <span
-                                                class="badge bg-{{ $member->pivot->status === 'accepted' ? 'success' : 'warning' }}">
+                                            <x-tabler.badge :color="$member->pivot->status === 'accepted' ? 'success' : 'warning'">
                                                 {{ ucfirst($member->pivot->status) }}
-                                            </span>
+                                            </x-tabler.badge>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -561,10 +561,9 @@
                                         <tr>
                                             <td>{{ $reviewer->reviewer?->name ?? '-' }}</td>
                                             <td>
-                                                <span
-                                                    class="badge bg-{{ $reviewer->status === 'completed' ? 'success' : 'warning' }}">
-                                                    {{ ucfirst($reviewer->status) }}
-                                                </span>
+                                                <x-tabler.badge :color="$member->pivot->status === 'accepted' ? 'success' : 'warning'">
+                                                    {{ ucfirst($member->pivot->status) }}
+                                                </x-tabler.badge>
                                             </td>
                                             <td>{{ $reviewer->reviewed_at?->format('d M Y H:i') ?? '-' }}</td>
                                         </tr>
