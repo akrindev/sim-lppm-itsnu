@@ -40,7 +40,7 @@
                     <div class="col-md-6">
                         <label class="form-label"><x-lucide-info class="me-2 icon" />Status</label>
                         <p>
-                            @switch($proposal->status)
+                            @switch($proposal->status->value)
                                 @case('draft')
                                     <x-tabler.badge color="warning">Draft</x-tabler.badge>
                                 @break
@@ -263,7 +263,7 @@
 
         <!-- Reviewer Assignment (Admin Only - Submitted Status) -->
         @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
-                $proposal->status === 'submitted')
+                $proposal->status->value === 'submitted')
             <div class="mb-3">
                 <livewire:community-service.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
             </div>
@@ -319,7 +319,7 @@
             </div>
             <div class="text-center card-body">
                 <p class="text-secondary text-sm">
-                    @switch($proposal->status)
+                    @switch($proposal->status->value)
                         @case('draft')
                             Proposal masih dalam tahap penyusunan. Anda dapat mengedit atau mengirimkan proposal ini.
                         @break
@@ -357,11 +357,11 @@
                 <h3 class="card-title">Aksi</h3>
             </div>
             <div class="gap-2 d-grid card-body">
-                @if ($proposal->status === 'draft')
+                @if ($proposal->status->value === 'draft')
                     <livewire:community-service.proposal.submit-button :proposalId="$proposal->id" :key="'submit-button-' . $proposal->id" />
                 @endif
 
-                @if (in_array($proposal->status, ['submitted', 'under_review', 'rejected']))
+                @if (in_array($proposal->status->value, ['submitted', 'under_review', 'rejected']))
                     <a href="#" class="btn btn-info">
                         <x-lucide-eye class="icon" />
                         Lihat Review
@@ -392,7 +392,7 @@
                     </div>
                 @endif
 
-                @if ($proposal->status !== 'completed' && $proposal->submitter_id === auth()->id())
+                @if ($proposal->status->value !== 'completed' && $proposal->submitter_id === auth()->id())
                     <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
                         data-bs-target="#deleteModal">
                         <x-lucide-trash-2 class="icon" />
