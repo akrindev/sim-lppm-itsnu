@@ -1,21 +1,21 @@
 <x-slot:title>{{ $proposal->title }}</x-slot:title>
 <x-slot:pageTitle>{{ $proposal->title }}</x-slot:pageTitle>
-<x-slot:pageSubtitle>Detail Proposal Penelitian</x-slot:pageSubtitle>
+<x-slot:pageSubtitle>Detail Proposal Pengabdian Masyarakat</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
         @if (auth()->user()->hasRole('reviewer'))
-            <a href="{{ route('review.research') }}" class="btn-outline-secondary btn" wire:navigate>
+            <a href="{{ route('review.community-service') }}" class="btn-outline-secondary btn" wire:navigate>
                 <x-lucide-arrow-left class="icon" />
                 Kembali
             </a>
         @else
-            <a href="{{ route('research.proposal.index') }}" class="btn-outline-secondary btn" wire:navigate>
+            <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn" wire:navigate>
                 <x-lucide-arrow-left class="icon" />
                 Kembali
             </a>
         @endif
         @if ($proposal->status->value === 'draft' && $proposal->submitter_id === auth()->id())
-            <a href="{{ route('research.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
+            <a href="{{ route('community-service.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
                 Edit
             </a>
@@ -376,7 +376,7 @@
         <!-- Section 5: Workflow & Aksi -->
         <div id="section-workflow" x-show="currentStep === 5">
             <!-- Reviewer Assignment (Admin Only) -->
-            @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
+            @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita']) &&
                     $proposal->status->value === 'under_review')
                 <div class="mb-3">
                     <livewire:community-service.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
@@ -404,12 +404,6 @@
                                 <x-lucide-check class="icon" />
                                 Setujui Proposal
                             </button>
-                            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                data-bs-target="#approvalModal"
-                                wire:click="$set('approvalDecision', 'need_assignment')">
-                                <x-lucide-alert-triangle class="icon" />
-                                Perlu Perbaikan Anggota
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -431,111 +425,112 @@
                 </div>
             @endif
 
-            <!-- Status & Actions Card -->
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">Status & Aksi</h3>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Status Saat Ini</label>
-                        <p>
-                            <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
-                                {{ $proposal->status->label() }}
-                            </x-tabler.badge>
-                        </p>
-                    </div>
 
-                    @if ($proposal->status->value === 'draft')
-                        <livewire:community-service.proposal.submit-button :proposalId="$proposal->id" :key="'submit-button-' . $proposal->id" />
-                    @endif
-
-                    {{-- Accept/Reject for team members --}}
-                    @php
-                        $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
-                    @endphp
-                    @if ($currentMember && $currentMember->pivot->status === 'pending')
-                        <div class="d-flex gap-2 mb-3">
-                            <button type="button" class="btn btn-success" wire:click="acceptMember">
-                                <x-lucide-check class="icon" />
-                                Terima Undangan
-                            </button>
-                            <button type="button" class="btn btn-danger" wire:click="rejectMember">
-                                <x-lucide-x class="icon" />
-                                Tolak Undangan
-                            </button>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <!-- Status & Actions Card -->
+                    <div class="mb-3 h-100 card">
+                        <div class="card-header">
+                            <h3 class="card-title">Status & Aksi</h3>
                         </div>
-                    @endif
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Status Saat Ini</label>
+                                <p>
+                                    <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
+                                        {{ $proposal->status->label() }}
+                                    </x-tabler.badge>
+                                </p>
+                            </div>
 
-                    @if ($proposal->status->value !== 'completed' && $proposal->submitter_id === auth()->id())
-                        <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
-                            data-bs-target="#deleteModal">
-                            <x-lucide-trash-2 class="icon" />
-                            Hapus
-                        </button>
-                    @endif
-                </div>
-            </div>
+                            @if ($proposal->status->value === 'draft')
+                                <livewire:community-service.proposal.submit-button :proposalId="$proposal->id"
+                                    :key="'submit-button-' . $proposal->id" />
+                            @endif
 
-            <!-- Timeline Card -->
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h4 class="mb-0 card-title">Status Proposal</h4>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Status Saat Ini</label>
-                        <p>
-                            <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
-                                {{ $proposal->status->label() }}
-                            </x-tabler.badge>
-                        </p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Dibuat Pada</label>
-                        <p>{{ $proposal->created_at->format('d M Y H:i') }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Terakhir Diperbarui</label>
-                        <p>{{ $proposal->updated_at->format('d M Y H:i') }}</p>
-                    </div>
-                </div>
-            </div>
+                            {{-- Accept/Reject for team members --}}
+                            @php
+                                $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
+                            @endphp
+                            @if ($currentMember && $currentMember->pivot->status === 'pending')
+                                <div class="d-flex gap-2 mb-3">
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#acceptMemberModal">
+                                        <x-lucide-check class="icon" />
+                                        Terima Undangan
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#rejectMemberModal">
+                                        <x-lucide-x class="icon" />
+                                        Tolak Undangan
+                                    </button>
+                                </div>
+                            @endif
 
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h4 class="mb-0 card-title">Review Status</h4>
+                            @if ($proposal->status->value !== 'completed' && $proposal->submitter_id === auth()->id())
+                                <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+                                    <x-lucide-trash-2 class="icon" />
+                                    Hapus
+                                </button>
+                            @endif
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    @php $reviewers = $proposal->reviewers; @endphp
-                    @if ($reviewers->isEmpty())
-                        <p class="text-muted">Belum ada reviewer yang ditugaskan</p>
-                    @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Reviewer</th>
-                                        <th>Status</th>
-                                        <th>Tanggal Review</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($reviewers as $reviewer)
+                <div class="col-md-4">
+                    <!-- Timeline Card -->
+                    <div class="mb-3 h-100 card">
+                        <div class="card-header">
+                            <h4 class="mb-0 card-title">Status Proposal</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dibuat Pada</label>
+                                <p>{{ $proposal->created_at->format('d M Y H:i') }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Terakhir Diperbarui</label>
+                                <p>{{ $proposal->updated_at->format('d M Y H:i') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <!-- Review Status Card -->
+                    <div class="mb-3 h-100 card">
+                        <div class="card-header">
+                            <h4 class="mb-0 card-title">Review Status</h4>
+                        </div>
+                        @php $reviewers = $proposal->reviewers; @endphp
+                        @if ($reviewers->isEmpty())
+                            <p class="text-muted">Belum ada reviewer yang ditugaskan</p>
+                        @else
+                            <div class="table-responsive">
+                                <table class="card-table table table-bordered table-sm">
+                                    <thead>
                                         <tr>
-                                            <td>{{ $reviewer->reviewer?->name ?? '-' }}</td>
-                                            <td>
-                                                <x-tabler.badge :color="$reviewer->status === 'completed' ? 'success' : 'warning'">
-                                                    {{ ucfirst($reviewer->status) }}
-                                                </x-tabler.badge>
-                                            </td>
-                                            <td>{{ $reviewer->reviewed_at?->format('d M Y H:i') ?? '-' }}</td>
+                                            <th>Reviewer</th>
+                                            <th>Status</th>
+                                            <th>Tanggal Review</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($reviewers as $reviewer)
+                                            <tr>
+                                                <td>{{ $reviewer->user?->name ?? '-' }}</td>
+                                                <td>
+                                                    <x-tabler.badge :color="$reviewer->status === 'completed' ? 'success' : 'warning'">
+                                                        {{ ucfirst($reviewer->status) }}
+                                                    </x-tabler.badge>
+                                                </td>
+                                                <td>{{ $reviewer->updated_at?->format('d M Y H:i') ?? '-' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -582,4 +577,76 @@
             </x-tabler.modal>
         @endteleport
     @endif
+
+    <!-- Accept Member Confirmation Modal -->
+    @teleport('body')
+        <x-tabler.modal id="acceptMemberModal" title="Terima Undangan?" wire:ignore.self>
+            <x-slot:body>
+                <div class="py-1 text-center">
+                    <x-lucide-check-circle class="mb-2 text-success icon" style="width: 3rem; height: 3rem;" />
+                    <h3>Terima Undangan?</h3>
+                    <div class="text-secondary">
+                        Apakah Anda yakin ingin menerima undangan sebagai anggota tim proposal ini?
+                    </div>
+                </div>
+            </x-slot:body>
+
+            <x-slot:footer>
+                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal">
+                    Ya, Terima
+                </button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
+
+    <!-- Reject Member Confirmation Modal -->
+    @teleport('body')
+        <x-tabler.modal id="rejectMemberModal" title="Tolak Undangan?" wire:ignore.self>
+            <x-slot:body>
+                <div class="py-1 text-center">
+                    <x-lucide-x-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                    <h3>Tolak Undangan?</h3>
+                    <div class="text-secondary">
+                        Apakah Anda yakin ingin menolak undangan sebagai anggota tim proposal ini?
+                    </div>
+                </div>
+            </x-slot:body>
+
+            <x-slot:footer>
+                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal">
+                    Ya, Tolak
+                </button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
+
+    <!-- Approval Modal (Dekan Decision) -->
+    @teleport('body')
+        <x-tabler.modal id="approvalModal" title="Keputusan Dekan" wire:ignore.self>
+            <x-slot:body>
+                <div class="py-1 text-center">
+                    <x-lucide-check-circle class="mb-2 text-primary icon" style="width: 3rem; height: 3rem;" />
+                    <h3>Konfirmasi Keputusan</h3>
+                    <div class="text-secondary">
+                        Apakah Anda yakin dengan keputusan ini?
+                    </div>
+                </div>
+            </x-slot:body>
+
+            <x-slot:footer>
+                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" wire:click="submitDekanDecision" class="btn btn-primary" data-bs-dismiss="modal">
+                    Ya, Konfirmasi
+                </button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
 </div>

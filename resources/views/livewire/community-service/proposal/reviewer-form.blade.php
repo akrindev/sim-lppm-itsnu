@@ -3,27 +3,26 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Review Proposal</h3>
+                @if ($this->canReview && $this->canEditReview)
+                    <div class="card-options">
+                        <button type="button"
+                            class="btn {{ $this->showForm ? 'btn-outline-secondary' : 'btn-outline-primary' }}"
+                            wire:click="toggleForm">
+                            <x-lucide-edit-3 class="icon" />
+                            {{ $this->showForm ? 'Tutup Form' : 'Edit Review' }}
+                        </button>
+                    </div>
+                @elseif ($this->canReview && !$this->canEditReview && !$this->hasReviewed)
+                    <div class="card-options">
+                        <button type="button"
+                            class="btn {{ $this->showForm ? 'btn-outline-secondary' : 'btn-outline-primary' }}"
+                            wire:click="toggleForm">
+                            <x-lucide-plus class="icon" />
+                            {{ $this->showForm ? 'Tutup Form' : 'Tambah Review' }}
+                        </button>
+                    </div>
+                @endif
             </div>
-
-            @if ($this->canReview && $this->canEditReview)
-                <div class="card-options">
-                    <button type="button"
-                        class="btn btn-sm {{ $this->showForm ? 'btn-outline-secondary' : 'btn-outline-primary' }}"
-                        wire:click="toggleForm">
-                        <x-lucide-edit-3 class="icon" />
-                        {{ $this->showForm ? 'Tutup Form' : 'Edit Review' }}
-                    </button>
-                </div>
-            @elseif ($this->canReview && !$this->canEditReview && !$this->hasReviewed)
-                <div class="card-options">
-                    <button type="button"
-                        class="btn btn-sm {{ $this->showForm ? 'btn-outline-secondary' : 'btn-outline-primary' }}"
-                        wire:click="toggleForm">
-                        <x-lucide-plus class="icon" />
-                        {{ $this->showForm ? 'Tutup Form' : 'Tambah Review' }}
-                    </button>
-                </div>
-            @endif
 
             @if ($this->canReview && $this->showForm)
                 <form wire:submit="submitReview">
