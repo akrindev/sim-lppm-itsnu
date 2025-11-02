@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Actions;
 
+use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use App\Models\ProposalReviewer;
 use App\Models\User;
@@ -13,10 +14,10 @@ class AssignReviewersAction
      */
     public function execute(Proposal $proposal, int|string $reviewerId): array
     {
-        if ($proposal->status !== 'submitted') {
+        if ($proposal->status !== ProposalStatus::UNDER_REVIEW) {
             return [
                 'success' => false,
-                'message' => 'Proposal harus dalam status submitted untuk menugaskan reviewer.',
+                'message' => 'Proposal harus dalam status under review untuk menugaskan reviewer.',
             ];
         }
 
@@ -47,7 +48,7 @@ class AssignReviewersAction
 
         // Update proposal status to reviewed if first reviewer
         if ($proposal->reviewers()->count() === 1) {
-            $proposal->update(['status' => 'reviewed']);
+            $proposal->update(['status' => ProposalStatus::REVIEWED]);
         }
 
         return [

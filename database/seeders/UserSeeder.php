@@ -20,29 +20,33 @@ class UserSeeder extends Seeder
         $roles = Role::all();
 
         foreach ($roles as $role) {
-            $user = \App\Models\User::factory()->create([
-                'name' => str($role->name)->title() . ' User',
-                'email' => str($role->name)->slug() . '@email.com',
-                'email_verified_at' => now(),
-            ]);
+            $count = $role->name === 'dosen' ? 5 : 1;
 
-            $type = in_array($role->name, ['mahasiswa', 'student']) ? 'mahasiswa' : 'dosen';
+            for ($i = 0; $i < $count; $i++) {
+                $user = \App\Models\User::factory()->create([
+                    'name' => str($role->name)->title() . ' User' . ($count > 1 ? ' ' . ($i + 1) : ''),
+                    'email' => str($role->name)->slug() . ($count > 1 ? $i + 1 : '') . '@email.com',
+                    'email_verified_at' => now(),
+                ]);
 
-            $user->identity()->create([
-                'identity_id' => $type === 'dosen'
-                    ? fake()->numerify('##########') // NIDN 10 digits
-                    : fake()->numerify('################'), // NIM 16 digits
-                'sinta_id' => $type === 'dosen' ? fake()->optional(0.7)->numerify('######') : null,
-                'type' => $type,
-                'institution_id' => $itsnu?->id ?? \App\Models\Institution::first()->id,
-                'study_program_id' => $studyProgram?->id,
-                'address' => 'Jl. Example No. ' . rand(1, 100),
-                'birthdate' => now()->subYears(rand(20, 40))->toDateString(),
-                'birthplace' => fake()->city(),
-                'profile_picture' => null,
-            ]);
+                $type = in_array($role->name, ['mahasiswa', 'student']) ? 'mahasiswa' : 'dosen';
 
-            $user->assignRole($role->name);
+                $user->identity()->create([
+                    'identity_id' => $type === 'dosen'
+                        ? fake()->numerify('##########') // NIDN 10 digits
+                        : fake()->numerify('################'), // NIM 16 digits
+                    'sinta_id' => $type === 'dosen' ? fake()->optional(0.7)->numerify('######') : null,
+                    'type' => $type,
+                    'institution_id' => $itsnu?->id ?? \App\Models\Institution::first()->id,
+                    'study_program_id' => $studyProgram?->id,
+                    'address' => 'Jl. Example No. ' . rand(1, 100),
+                    'birthdate' => now()->subYears(rand(20, 40))->toDateString(),
+                    'birthplace' => fake()->city(),
+                    'profile_picture' => null,
+                ]);
+
+                $user->assignRole($role->name);
+            }
         }
     }
 }

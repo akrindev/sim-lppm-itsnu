@@ -3,10 +3,10 @@
  */
 const THEME_CONFIG = {
 	theme: 'light',
-	'theme-base': 'gray',
+	'theme-base': 'neutral',
 	'theme-font': 'sans-serif',
 	'theme-primary': 'green',
-	'theme-radius': '1',
+	'theme-radius': '2',
 };
 
 /**

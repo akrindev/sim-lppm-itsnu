@@ -98,6 +98,13 @@ class MenuComposer
                 'href' => '/proposals',
                 'roles' => ['kepala lppm'],
             ],
+            // Dekan menu
+            [
+                'title' => 'Persetujuan Dekan',
+                'icon' => 'clipboard-check',
+                'route' => 'dekan.proposals.index',
+                'roles' => ['dekan'],
+            ],
             // Reviewer menu
             [
                 'title' => 'Review Penelitian',

@@ -30,10 +30,13 @@
         // Status mappings
         'draft' => 'secondary',
         'submitted' => 'info',
-        'reviewed' => 'warning',
-        'approved' => 'success',
-        'rejected' => 'danger',
+        'need_assignment' => 'warning',
+        'approved' => 'primary',
+        'under_review' => 'cyan',
+        'reviewed' => 'orange',
+        'revision_needed' => 'yellow',
         'completed' => 'green',
+        'rejected' => 'danger',
     ];
 
     $textColor = $colorMap[$color] ?? 'primary';

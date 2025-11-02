@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
             NationalPrioritySeeder::class,
             KeywordSeeder::class,
             PartnerSeeder::class,
+            MacroResearchGroupSeeder::class,
+            BudgetGroupSeeder::class,
+            BudgetComponentSeeder::class,
 
             // 3. Hierarchical Data (Self-referencing)
             ScienceClusterSeeder::class,

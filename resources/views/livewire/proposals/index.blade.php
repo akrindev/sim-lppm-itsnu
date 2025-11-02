@@ -1,26 +1,21 @@
-<x-layouts.app
-    :title="__('Proposal')"
-    :pageTitle="__('Pengajuan Proposal')"
-    :pageSubtitle="__('Pantau status proposal penelitian dan pengabdian terbaru.')"
->
+<x-layouts.app :title="__('Proposal')" :pageTitle="__('Pengajuan Proposal')" :pageSubtitle="__('Pantau status proposal penelitian dan pengabdian terbaru.')">
     <x-slot:pageActions>
         <div class="btn-list">
             @foreach ($statusOptions as $option)
-                <button type="button"
-                    wire:click="setStatusFilter('{{ $option['key'] }}')"
+                <button type="button" wire:click="setStatusFilter('{{ $option['key'] }}')"
                     class="btn {{ $statusFilter === $option['key'] ? 'btn-primary' : 'btn-outline-primary' }}">
                     {{ $option['label'] }}
-                    <span class="ms-2 badge {{ $statusFilter === $option['key'] ? 'bg-white text-primary' : 'bg-primary-lt text-primary' }}">
+                    <x-tabler.badge :color="$statusFilter === $option['key'] ? 'white' : 'primary'" :variant="$statusFilter === $option['key'] ? 'solid' : 'light'" class="ms-2">
                         {{ $option['count'] }}
-                    </span>
+                    </x-tabler.badge>
                 </button>
             @endforeach
         </div>
     </x-slot:pageActions>
 
     <div class="card">
-            <div class="table-responsive">
-                <table class="card-table table table-vcenter">
+        <div class="table-responsive">
+            <table class="card-table table table-vcenter">
                 <thead>
                     <tr>
                         <th>{{ __('Judul Proposal') }}</th>
@@ -35,11 +30,12 @@
                             <td class="fw-semibold">{{ $proposal['title'] }}</td>
                             <td>{{ $proposal['owner'] }}</td>
                             <td class="text-center">
-                                <span class="{{ $proposal['status_badge'] }}">
+                                <x-tabler.badge :color="$proposal['status_badge']">
                                     {{ $proposal['status_label'] }}
-                                </span>
+                                </x-tabler.badge>
                             </td>
-                            <td class="text-secondary text-end">{{ \Carbon\Carbon::parse($proposal['submitted_at'])->translatedFormat('d F Y') }}</td>
+                            <td class="text-secondary text-end">
+                                {{ \Carbon\Carbon::parse($proposal['submitted_at'])->translatedFormat('d F Y') }}</td>
                         </tr>
                     @empty
                         <tr>

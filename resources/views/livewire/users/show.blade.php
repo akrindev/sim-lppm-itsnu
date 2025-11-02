@@ -18,17 +18,17 @@
                     <p class="text-secondary">{{ $user->email }}</p>
                     <div class="my-3">
                         @if ($user->roles->isNotEmpty())
-                            <span
-                                class="bg-primary-lt text-primary badge badge-lg">{{ str($user->roles->first()->name)->title() }}</span>
+                            <x-tabler.badge color="primary"
+                                size="lg">{{ str($user->roles->first()->name)->title() }}</x-tabler.badge>
                         @else
                             <span class="text-secondary">Tidak ada peran</span>
                         @endif
                     </div>
                     <div class="mt-3">
                         @if ($user->hasVerifiedEmail())
-                            <span class="bg-green-lt text-green badge">Email terverifikasi</span>
+                            <x-tabler.badge color="green">Email terverifikasi</x-tabler.badge>
                         @else
-                            <span class="bg-yellow-lt text-yellow badge">Verifikasi menunggu</span>
+                            <x-tabler.badge color="yellow">Verifikasi menunggu</x-tabler.badge>
                         @endif
                     </div>
                 </div>
@@ -122,9 +122,9 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <span class="text-secondary">Autentikasi dua faktor</span>
                             @if ($user->two_factor_secret)
-                                <span class="bg-green-lt text-green badge">Diaktifkan</span>
+                                <x-tabler.badge color="green">Diaktifkan</x-tabler.badge>
                             @else
-                                <span class="bg-secondary badge">Dinonaktifkan</span>
+                                <x-tabler.badge color="secondary">Dinonaktifkan</x-tabler.badge>
                             @endif
                         </div>
                         <div class="d-flex align-items-center justify-content-between">

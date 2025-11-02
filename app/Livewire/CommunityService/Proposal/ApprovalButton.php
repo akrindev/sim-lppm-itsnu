@@ -2,6 +2,7 @@
 
 namespace App\Livewire\CommunityService\Proposal;
 
+use App\Enums\ProposalStatus;
 use App\Livewire\Actions\ApproveProposalAction;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class ApprovalButton extends Component
         $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
         $proposal = $this->proposal;
 
-        return $isAdmin && $proposal->status === 'reviewed' && $proposal->allReviewsCompleted();
+        return $isAdmin && $proposal->status === ProposalStatus::REVIEWED && $proposal->allReviewsCompleted();
     }
 
     #[Computed]

@@ -3,9 +3,10 @@
         <h3 class="card-title">
             Status Anggota Tim
             @if ($this->allAccepted)
-                <span class="bg-success ms-2 badge">Semua Diterima</span>
+                <x-tabler.badge color="success" class="ms-2">Semua Diterima</x-tabler.badge>
             @else
-                <span class="bg-warning ms-2 badge">{{ $this->pendingInvitations->count() }} Menunggu</span>
+                <x-tabler.badge color="warning" class="ms-2">{{ $this->pendingInvitations->count() }}
+                    Menunggu</x-tabler.badge>
             @endif
         </h3>
     </div>
@@ -20,14 +21,14 @@
                     @foreach ($this->acceptedMembers as $member)
                         <tr>
                             <td class="w-1">
-                                <span class="bg-success badge"></span>
+                                <x-tabler.badge variant="solid" color="success"></x-tabler.badge>
                             </td>
                             <td>
                                 <strong>{{ $member->name }}</strong><br>
                                 <small class="text-muted">{{ $member->email }}</small>
                             </td>
                             <td class="text-end">
-                                <span class="bg-success badge">✓ Diterima</span>
+                                <x-tabler.badge color="success">✓ Diterima</x-tabler.badge>
                             </td>
                         </tr>
                     @endforeach
@@ -46,14 +47,14 @@
                     @foreach ($this->pendingInvitations as $member)
                         <tr>
                             <td class="w-1">
-                                <span class="bg-warning badge"></span>
+                                <x-tabler.badge variant="solid" color="warning"></x-tabler.badge>
                             </td>
                             <td>
                                 <strong>{{ $member->name }}</strong><br>
                                 <small class="text-muted">{{ $member->email }}</small>
                             </td>
                             <td class="text-end">
-                                <span class="bg-warning badge">⏳ Menunggu</span>
+                                <x-tabler.badge color="warning">⏳ Menunggu</x-tabler.badge>
                             </td>
                         </tr>
                     @endforeach
@@ -95,14 +96,14 @@
                     @foreach ($this->rejectedMembers as $member)
                         <tr>
                             <td class="w-1">
-                                <span class="bg-danger badge"></span>
+                                <x-tabler.badge variant="solid" color="danger"></x-tabler.badge>
                             </td>
                             <td>
                                 <strong>{{ $member->name }}</strong><br>
                                 <small class="text-muted">{{ $member->email }}</small>
                             </td>
                             <td class="text-end">
-                                <span class="bg-danger badge">✗ Ditolak</span>
+                                <x-tabler.badge color="danger">✗ Ditolak</x-tabler.badge>
                             </td>
                         </tr>
                     @endforeach

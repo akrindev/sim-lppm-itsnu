@@ -7,22 +7,24 @@
 
     <!-- Assign Reviewer Modal -->
     @teleport('body')
-        <x-tabler.modal id="modal-assign-reviewer" title="Tugaskan Reviewer" on-show="resetReviewerForm" wire:ignore.self>
+        <x-tabler.modal id="modal-assign-reviewer" title="Tugaskan Reviewer" on-show="resetReviewerForm">
             <x-slot:body>
                 <form wire:submit.prevent="assignReviewers" id="reviewer-assignment-form">
                     <div class="mb-3">
                         <label class="form-label" for="selectedReviewer">Pilih Reviewer <span
                                 class="text-danger">*</span></label>
-                        <select wire:model="selectedReviewer" class="form-select tom-select" id="selectedReviewer"
-                            placeholder="Pilih reviewer..." required>
-                            <option value="" selected disabled>Pilih reviewer...</option>
-                            @foreach ($this->availableReviewers as $reviewer)
-                                <option wire:key="reviewer-{{ $reviewer->id }}" value="{{ $reviewer->id }}">
-                                    {{ $reviewer->name }}
-                                    ({{ $reviewer->identity->identity_id }})
-                                </option>
-                            @endforeach
-                        </select>
+                        <div wire:ignore>
+                            <select wire:model="selectedReviewer" class="form-select tom-select" id="selectedReviewer"
+                                x-data="tomSelect" placeholder="Pilih reviewer..." required>
+                                <option value="" selected disabled>Pilih reviewer...</option>
+                                @foreach ($this->availableReviewers as $reviewer)
+                                    <option wire:key="reviewer-{{ $reviewer->id }}" value="{{ $reviewer->id }}">
+                                        {{ $reviewer->name }}
+                                        ({{ $reviewer->identity->identity_id }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         @error('selectedReviewer')
                             <div class="d-block mt-2 text-danger">{{ $message }}</div>
                         @enderror
@@ -35,7 +37,8 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary" wire:loading.attr="disabled">
+                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary" wire:loading.attr="disabled"
+                    data-bs-dismiss="modal">
                     <x-lucide-send class="icon" />
                     <span wire:loading.remove>Tugaskan</span>
                     <span wire:loading>Menyimpan...</span>
@@ -67,11 +70,11 @@
                                 <td>{{ $reviewer->user->email }}</td>
                                 <td>
                                     @if ($reviewer->status === 'pending')
-                                        <span class="bg-warning badge">Menunggu</span>
+                                        <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
                                     @elseif ($reviewer->status === 'reviewing')
-                                        <span class="bg-info badge">Sedang Review</span>
+                                        <x-tabler.badge color="info">Sedang Review</x-tabler.badge>
                                     @elseif ($reviewer->status === 'completed')
-                                        <span class="bg-success badge">Selesai</span>
+                                        <x-tabler.badge color="success">Selesai</x-tabler.badge>
                                     @endif
                                 </td>
                                 <td>
@@ -92,8 +95,8 @@
 
 
     <!-- Delete Reviewer Confirmation Modal -->
-    @teleport('body')
-        <x-tabler.modal id="deleteReviewerModal" title="Hapus Reviewer?" wire:ignore.self>
+    <div style="display: none;">
+        <x-tabler.modal id="deleteReviewerModal" title="Hapus Reviewer?">
             <x-slot:body>
                 <div class="py-4 text-center">
                     <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
@@ -114,5 +117,5 @@
                 </button>
             </x-slot:footer>
         </x-tabler.modal>
-    @endteleport
+    </div>
 </div>

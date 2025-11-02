@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Actions;
 
+use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 
 class ApproveProposalAction
@@ -12,7 +13,7 @@ class ApproveProposalAction
      */
     public function execute(Proposal $proposal, string $decision): array
     {
-        if (! in_array($decision, ['approved', 'rejected'])) {
+        if (! in_array($decision, [ProposalStatus::APPROVED, ProposalStatus::REJECTED])) {
             return [
                 'success' => false,
                 'message' => 'Keputusan harus "approved" atau "rejected".',
