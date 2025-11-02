@@ -93,6 +93,16 @@ class MasterData extends Component
 
     public string $modalFor = '';
 
+    public bool $showDeleteModal = false;
+
+    public ?int $deletingId = null;
+
+    public string $deleteModalTitle = '';
+
+    public string $deleteModalMessage = '';
+
+    public string $deletingType = '';
+
     public function render()
     {
         return view('livewire.settings.master-data', [
@@ -588,5 +598,63 @@ class MasterData extends Component
     {
         $this->showModal = false;
         $this->resetFormFields();
+    }
+
+    public function confirmDelete(string $type, int $id, string $name): void
+    {
+        $this->deletingType = $type;
+        $this->deletingId = $id;
+        $this->deleteModalTitle = 'Konfirmasi Penghapusan';
+        $this->deleteModalMessage = "Apakah Anda yakin ingin menghapus \"{$name}\"?";
+        $this->showDeleteModal = true;
+    }
+
+    public function closeDeleteModal(): void
+    {
+        $this->showDeleteModal = false;
+        $this->deletingId = null;
+        $this->deletingType = '';
+        $this->deleteModalTitle = '';
+        $this->deleteModalMessage = '';
+    }
+
+    public function confirmDeleteAction(): void
+    {
+        if (! $this->deletingId || ! $this->deletingType) {
+            return;
+        }
+
+        match ($this->deletingType) {
+            'focus-area' => $this->deleteFocusArea(FocusArea::findOrFail($this->deletingId)),
+            'keyword' => $this->deleteKeyword(Keyword::findOrFail($this->deletingId)),
+            'national-priority' => $this->deleteNationalPriority(NationalPriority::findOrFail($this->deletingId)),
+            'partner' => $this->deletePartner(Partner::findOrFail($this->deletingId)),
+            'research-scheme' => $this->deleteResearchScheme(ResearchScheme::findOrFail($this->deletingId)),
+            'science-cluster' => $this->deleteScienceCluster(ScienceCluster::findOrFail($this->deletingId)),
+            'study-program' => $this->deleteStudyProgram(StudyProgram::findOrFail($this->deletingId)),
+            'theme' => $this->deleteTheme(Theme::findOrFail($this->deletingId)),
+            'topic' => $this->deleteTopic(Topic::findOrFail($this->deletingId)),
+            'institution' => $this->deleteInstitution(Institution::findOrFail($this->deletingId)),
+            default => null,
+        };
+
+        $this->closeDeleteModal();
+    }
+
+    public function save(): void
+    {
+        match ($this->modalFor) {
+            'focus-area' => $this->saveFocusArea(),
+            'keyword' => $this->saveKeyword(),
+            'national-priority' => $this->saveNationalPriority(),
+            'partner' => $this->savePartner(),
+            'research-scheme' => $this->saveResearchScheme(),
+            'science-cluster' => $this->saveScienceCluster(),
+            'study-program' => $this->saveStudyProgram(),
+            'theme' => $this->saveTheme(),
+            'topic' => $this->saveTopic(),
+            'institution' => $this->saveInstitution(),
+            default => null,
+        };
     }
 }

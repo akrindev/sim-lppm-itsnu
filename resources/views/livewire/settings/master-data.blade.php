@@ -100,9 +100,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteFocusArea({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('focus-area', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -146,9 +145,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteKeyword({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('keyword', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -192,9 +190,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteNationalPriority({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('national-priority', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -248,9 +245,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deletePartner({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('partner', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -298,9 +294,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteResearchScheme({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('research-scheme', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -344,9 +339,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteScienceCluster({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('science-cluster', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -392,9 +386,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteStudyProgram({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('study-program', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -440,9 +433,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteTheme({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('theme', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -488,9 +480,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteTopic({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('topic', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -534,9 +525,8 @@
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button wire:click="deleteInstitution({{ $item->id }})"
-                                                class="btn-outline-danger btn btn-sm"
-                                                onclick="return confirm('Yakin ingin menghapus?')">
+                                            <button wire:click="confirmDelete('institution', {{ $item->id }}, '{{ $item->name }}')"
+                                                class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
                                         </div>
@@ -563,7 +553,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">{{ $modalTitle }}</h5>
                 </div>
-                <form wire:submit="save{{ ucfirst(str_replace('-', '', $modalFor)) }}()">
+                <form wire:submit="save">
                     <div class="modal-body">
                         {{-- Focus Area Form --}}
                         @if ($modalFor === 'focus-area')
@@ -770,5 +760,39 @@
             </div>
         </div>
     </div>
-    <div class="modal-backdrop fade show"></div>
+    <div class="modal-backdrop fade show" wire:click="closeModal()"></div>
+@endif
+
+<!-- Delete Confirmation Modal -->
+@if ($showDeleteModal)
+    <div class="modal modal-blur fade show" id="deleteModal" style="display: block;" role="dialog">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="btn-close" wire:click="closeDeleteModal()" aria-label="Close"></button>
+                <div class="modal-status bg-danger"></div>
+                <div class="modal-body text-center py-4">
+                    <x-lucide-alert-triangle class="mb-2 icon icon-lg text-danger" />
+                    <h3>{{ $deleteModalTitle }}</h3>
+                    <div class="text-secondary">{{ $deleteModalMessage }}</div>
+                </div>
+                <div class="modal-footer">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" class="w-100 btn" wire:click="closeDeleteModal()">
+                                    Batal
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="w-100 btn btn-danger" wire:click="confirmDeleteAction()">
+                                    Hapus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show" wire:click="closeDeleteModal()"></div>
 @endif
