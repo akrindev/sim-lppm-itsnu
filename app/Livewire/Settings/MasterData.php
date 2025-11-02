@@ -624,19 +624,39 @@ class MasterData extends Component
             return;
         }
 
-        match ($this->deletingType) {
-            'focus-area' => $this->deleteFocusArea(FocusArea::findOrFail($this->deletingId)),
-            'keyword' => $this->deleteKeyword(Keyword::findOrFail($this->deletingId)),
-            'national-priority' => $this->deleteNationalPriority(NationalPriority::findOrFail($this->deletingId)),
-            'partner' => $this->deletePartner(Partner::findOrFail($this->deletingId)),
-            'research-scheme' => $this->deleteResearchScheme(ResearchScheme::findOrFail($this->deletingId)),
-            'science-cluster' => $this->deleteScienceCluster(ScienceCluster::findOrFail($this->deletingId)),
-            'study-program' => $this->deleteStudyProgram(StudyProgram::findOrFail($this->deletingId)),
-            'theme' => $this->deleteTheme(Theme::findOrFail($this->deletingId)),
-            'topic' => $this->deleteTopic(Topic::findOrFail($this->deletingId)),
-            'institution' => $this->deleteInstitution(Institution::findOrFail($this->deletingId)),
-            default => null,
-        };
+        try {
+            match ($this->deletingType) {
+                'focus-area' => FocusArea::findOrFail($this->deletingId)->delete(),
+                'keyword' => Keyword::findOrFail($this->deletingId)->delete(),
+                'national-priority' => NationalPriority::findOrFail($this->deletingId)->delete(),
+                'partner' => Partner::findOrFail($this->deletingId)->delete(),
+                'research-scheme' => ResearchScheme::findOrFail($this->deletingId)->delete(),
+                'science-cluster' => ScienceCluster::findOrFail($this->deletingId)->delete(),
+                'study-program' => StudyProgram::findOrFail($this->deletingId)->delete(),
+                'theme' => Theme::findOrFail($this->deletingId)->delete(),
+                'topic' => Topic::findOrFail($this->deletingId)->delete(),
+                'institution' => Institution::findOrFail($this->deletingId)->delete(),
+                default => null,
+            };
+
+            $typeNames = [
+                'focus-area' => 'Area Fokus',
+                'keyword' => 'Kata Kunci',
+                'national-priority' => 'Prioritas Nasional',
+                'partner' => 'Mitra',
+                'research-scheme' => 'Skema Penelitian',
+                'science-cluster' => 'Klaster Sains',
+                'study-program' => 'Program Studi',
+                'theme' => 'Tema',
+                'topic' => 'Topik',
+                'institution' => 'Institusi',
+            ];
+
+            $typeName = $typeNames[$this->deletingType] ?? 'Data';
+            $this->dispatch('notify', message: "{$typeName} berhasil dihapus", type: 'success');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', message: 'Gagal menghapus data', type: 'error');
+        }
 
         $this->closeDeleteModal();
     }
