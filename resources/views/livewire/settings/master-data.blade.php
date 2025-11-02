@@ -2,6 +2,7 @@
 <x-slot:pageTitle>Master Data</x-slot:pageTitle>
 <x-slot:pageSubtitle>Kelola semua data master sistem</x-slot:pageSubtitle>
 
+<div>
 <div class="page-wrapper">
     <div class="container-xl">
         <div class="mb-3 row">
@@ -544,7 +545,6 @@
     </div>
 </div>
 
-<!-- Modals using @teleport -->
 @teleport('body')
     <!-- Focus Area Modal -->
     <x-tabler.modal id="modal-focus-area" :title="$modalTitle" on-hide="resetFormFields">
@@ -844,3 +844,4 @@
         </x-slot:footer>
     </x-tabler.modal>
 @endteleport
+</div>
