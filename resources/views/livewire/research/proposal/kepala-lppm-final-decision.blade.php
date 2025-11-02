@@ -50,11 +50,13 @@
         </div>
 
         <div class="btn-list">
-            <button type="button" class="btn btn-success" wire:click="openDecisionModal('completed')">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#finalDecisionModal"
+                wire:click="$set('decision', 'completed')">
                 <x-lucide-check class="icon" />
                 Setujui Proposal
             </button>
-            <button type="button" class="btn btn-warning" wire:click="openDecisionModal('revision_needed')">
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#finalDecisionModal"
+                wire:click="$set('decision', 'revision_needed')">
                 <x-lucide-file-edit class="icon" />
                 Minta Perbaikan Usulan
             </button>
@@ -70,8 +72,8 @@
     @endif
 
     <!-- Decision Confirmation Modal -->
-    @teleport('body')
-        <x-tabler.modal id="finalDecisionModal" title="Konfirmasi Keputusan Akhir" wire:ignore.self>
+    <div style="display: none;">
+        <x-tabler.modal id="finalDecisionModal" title="Konfirmasi Keputusan Akhir">
             <x-slot:body>
                 <div class="py-3">
                     @if ($decision === 'completed')
@@ -112,8 +114,7 @@
                 <div class="w-100">
                     <div class="row">
                         <div class="col">
-                            <button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal"
-                                wire:click="cancelDecision">
+                            <button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal">
                                 Batal
                             </button>
                         </div>
@@ -134,17 +135,5 @@
                 </div>
             </x-slot:footer>
         </x-tabler.modal>
-    @endteleport>
-
-    @script
-        <script>
-            $wire.on('open-final-decision-modal', () => {
-                new bootstrap.Modal(document.getElementById('finalDecisionModal')).show();
-            });
-
-            $wire.on('close-final-decision-modal', () => {
-                bootstrap.Modal.getInstance(document.getElementById('finalDecisionModal'))?.hide();
-            });
-        </script>
-    @endscript
+    </div>
 </div>

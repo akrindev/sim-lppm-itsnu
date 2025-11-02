@@ -14,10 +14,10 @@ class AssignReviewersAction
      */
     public function execute(Proposal $proposal, int|string $reviewerId): array
     {
-        if ($proposal->status !== ProposalStatus::SUBMITTED) {
+        if ($proposal->status !== ProposalStatus::UNDER_REVIEW) {
             return [
                 'success' => false,
-                'message' => 'Proposal harus dalam status submitted untuk menugaskan reviewer.',
+                'message' => 'Proposal harus dalam status under review untuk menugaskan reviewer.',
             ];
         }
 

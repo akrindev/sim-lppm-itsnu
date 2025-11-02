@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Research\Proposal;
 
+use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -113,14 +114,14 @@ class ReviewerForm extends Component
 
             if ($allCompleted) {
                 // Update proposal status to reviewed
-                $this->proposal->update(['status' => 'reviewed']);
+                $this->proposal->update(['status' => ProposalStatus::COMPLETED]);
             }
 
             $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: ' . $e->getMessage());
         }
     }
 

@@ -11,7 +11,7 @@
         </div>
 
         <div class="btn-list">
-            <button type="button" class="btn btn-primary" wire:click="openApprovalModal">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#initialApprovalModal">
                 <x-lucide-check-circle class="icon" />
                 Setujui & Lanjutkan ke Reviewer
             </button>
@@ -24,7 +24,7 @@
 
     <!-- Approval Confirmation Modal -->
     @teleport('body')
-        <x-tabler.modal id="initialApprovalModal" title="Konfirmasi Persetujuan Awal" wire:ignore.self>
+        <x-tabler.modal id="initialApprovalModal" title="Konfirmasi Persetujuan Awal">
             <x-slot:body>
                 <div class="py-3 text-center">
                     <x-lucide-check-circle class="mb-3 text-primary icon" style="width: 4rem; height: 4rem;" />
@@ -42,14 +42,12 @@
                 <div class="w-100">
                     <div class="row">
                         <div class="col">
-                            <button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal"
-                                wire:click="cancelApproval">
+                            <button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal">
                                 Batal
                             </button>
                         </div>
                         <div class="col">
-                            <button type="button" wire:click="approve" class="w-100 btn btn-primary"
-                                data-bs-dismiss="modal">
+                            <button type="button" wire:click="approve" class="w-100 btn btn-primary" data-bs-dismiss="modal">
                                 <x-lucide-check-circle class="icon" />
                                 Ya, Setujui
                             </button>
@@ -59,16 +57,4 @@
             </x-slot:footer>
         </x-tabler.modal>
     @endteleport
-
-    @script
-        <script>
-            $wire.on('open-initial-approval-modal', () => {
-                new bootstrap.Modal(document.getElementById('initialApprovalModal')).show();
-            });
-
-            $wire.on('close-initial-approval-modal', () => {
-                bootstrap.Modal.getInstance(document.getElementById('initialApprovalModal'))?.hide();
-            });
-        </script>
-    @endscript
 </div>

@@ -31,7 +31,7 @@ class CompleteReviewAction
         // Check if proposal can now be approved
         $proposal = $review->proposal;
         if ($proposal->allReviewersCompleted()) {
-            $proposal->update(['status' => ProposalStatus::REVIEWED]);
+            $proposal->update(['status' => ProposalStatus::COMPLETED]);
         }
 
         return [

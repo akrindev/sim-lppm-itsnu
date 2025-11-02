@@ -163,31 +163,17 @@
                                 <div class="flex-nowrap btn-list">
                                     @if ($proposal->detailable_type === 'App\Models\Research')
                                         <a href="{{ route('research.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-ghost-primary" title="Lihat Detail" wire:navigate>
+                                            class="btn btn-sm btn-primary" wire:navigate>
                                             <x-lucide-eye class="icon" />
-                                            Lihat
+                                            Lihat & Proses
                                         </a>
                                     @else
                                         <a href="{{ route('community-service.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-ghost-primary" title="Lihat Detail" wire:navigate>
+                                            class="btn btn-sm btn-primary" wire:navigate>
                                             <x-lucide-eye class="icon" />
-                                            Lihat
+                                            Lihat & Proses
                                         </a>
                                     @endif
-
-                                    <button type="button" class="btn btn-sm btn-success"
-                                        wire:click="openApprovalModal('{{ $proposal->id }}', 'approved')"
-                                        title="Setujui Proposal">
-                                        <x-lucide-check class="icon" />
-                                        Setujui
-                                    </button>
-
-                                    <button type="button" class="btn btn-sm btn-warning"
-                                        wire:click="openApprovalModal('{{ $proposal->id }}', 'need_assignment')"
-                                        title="Perlu Persetujuan Anggota">
-                                        <x-lucide-user-check class="icon" />
-                                        Perlu Persetujuan
-                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -211,76 +197,4 @@
             </div>
         @endif
     </div>
-
-    <!-- Approval Confirmation Modal -->
-    @teleport('body')
-        <x-tabler.modal id="approvalModal" title="Konfirmasi Persetujuan" wire:ignore.self>
-            <x-slot:body>
-                <div class="py-3">
-                    @if ($approvalDecision === 'approved')
-                        <div class="mb-3 text-center">
-                            <x-lucide-check-circle class="mb-2 text-success icon" style="width: 3rem; height: 3rem;" />
-                            <h3>Setujui Proposal?</h3>
-                            <div class="text-secondary">
-                                Proposal akan diteruskan ke Kepala LPPM untuk persetujuan lebih lanjut.
-                            </div>
-                        </div>
-                    @else
-                        <div class="mb-3 text-center">
-                            <x-lucide-alert-triangle class="mb-2 text-warning icon"
-                                style="width: 3rem; height: 3rem;" />
-                            <h3>Perlu Persetujuan Anggota?</h3>
-                            <div class="text-secondary">
-                                Proposal akan dikembalikan ke pengusul untuk memperbaiki persetujuan anggota tim.
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="mb-3">
-                        <label class="form-label">Catatan (Opsional)</label>
-                        <textarea class="form-control" rows="3" wire:model="approvalNotes"
-                            placeholder="Tambahkan catatan jika diperlukan..."></textarea>
-                    </div>
-                </div>
-            </x-slot:body>
-
-            <x-slot:footer>
-                <div class="w-100">
-                    <div class="row">
-                        <div class="col">
-                            <button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal"
-                                wire:click="cancelApproval">
-                                Batal
-                            </button>
-                        </div>
-                        <div class="col">
-                            <button type="button" wire:click="processApproval"
-                                class="w-100 btn {{ $approvalDecision === 'approved' ? 'btn-success' : 'btn-warning' }}"
-                                data-bs-dismiss="modal">
-                                @if ($approvalDecision === 'approved')
-                                    <x-lucide-check class="icon" />
-                                    Ya, Setujui
-                                @else
-                                    <x-lucide-user-check class="icon" />
-                                    Ya, Kembalikan
-                                @endif
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </x-slot:footer>
-        </x-tabler.modal>
-    @endteleport>
-
-    @script
-        <script>
-            $wire.on('open-approval-modal', () => {
-                new bootstrap.Modal(document.getElementById('approvalModal')).show();
-            });
-
-            $wire.on('close-approval-modal', () => {
-                bootstrap.Modal.getInstance(document.getElementById('approvalModal'))?.hide();
-            });
-        </script>
-    @endscript
 </div>

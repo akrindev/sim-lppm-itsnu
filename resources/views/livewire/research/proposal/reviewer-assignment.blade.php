@@ -35,7 +35,7 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary" wire:loading.attr="disabled">
+                <button type="submit" form="reviewer-assignment-form" class="btn btn-primary" wire:loading.attr="disabled"  data-bs-dismiss="modal">
                     <x-lucide-send class="icon" />
                     <span wire:loading.remove>Tugaskan</span>
                     <span wire:loading>Menyimpan...</span>

@@ -25,7 +25,7 @@ enum ProposalStatus: string
             self::NEED_ASSIGNMENT => 'Perlu Persetujuan Anggota',
             self::APPROVED => 'Disetujui Dekan',
             self::UNDER_REVIEW => 'Sedang Direview',
-            self::REVIEWED => 'Telah Direview',
+            self::REVIEWED => 'Dalam Review',
             self::REVISION_NEEDED => 'Perlu Revisi',
             self::COMPLETED => 'Selesai',
             self::REJECTED => 'Ditolak',

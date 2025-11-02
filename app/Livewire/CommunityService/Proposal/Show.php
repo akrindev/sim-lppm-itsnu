@@ -2,6 +2,7 @@
 
 namespace App\Livewire\CommunityService\Proposal;
 
+use App\Livewire\Actions\DekanApprovalAction;
 use App\Livewire\Forms\ProposalForm;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,10 @@ use Livewire\Component;
 class Show extends Component
 {
     public ProposalForm $form;
+
+    public string $approvalDecision = '';
+
+    public string $approvalNotes = '';
 
     /**
      * Mount the component with proposal.
@@ -83,5 +88,41 @@ class Show extends Component
             $proposal->teamMembers()->updateExistingPivot($user->id, ['status' => 'rejected']);
             $this->dispatch('memberRejected');
         }
+    }
+
+    /**
+     * Process Dekan approval.
+     */
+    public function processApproval(): void
+    {
+        if (! $this->approvalDecision) {
+            session()->flash('error', 'Keputusan approval harus dipilih');
+
+            return;
+        }
+
+        $proposal = $this->form->proposal;
+
+        // Execute approval action
+        $action = new DekanApprovalAction;
+        $result = $action->execute($proposal, $this->approvalDecision, $this->approvalNotes);
+
+        if ($result['success']) {
+            session()->flash('success', $result['message']);
+            $this->dispatch('close-modal', modalId: 'approvalModal');
+            $this->cancelApproval();
+            $this->form->setProposal($proposal->fresh());
+        } else {
+            session()->flash('error', $result['message']);
+        }
+    }
+
+    /**
+     * Cancel approval and reset form.
+     */
+    public function cancelApproval(): void
+    {
+        $this->approvalDecision = '';
+        $this->approvalNotes = '';
     }
 }

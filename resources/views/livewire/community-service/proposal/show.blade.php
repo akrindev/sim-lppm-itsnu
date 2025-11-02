@@ -274,6 +274,90 @@
             <livewire:community-service.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
         </div>
 
+        <!-- Dekan Approval (Status: SUBMITTED) -->
+        @if (auth()->user()->hasRole(['dekan', 'rektor']) && $proposal->status->value === 'submitted')
+            <div class="mb-3 card">
+                <div class="card-header">
+                    <h3 class="card-title">Persetujuan Dekan</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3 text-secondary">
+                        Silakan tinjau proposal ini dan berikan keputusan Anda sebagai Dekan.
+                    </p>
+                    <div class="gap-2 btn-list">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'approved')">
+                            <x-lucide-check class="icon" />
+                            Setujui Proposal
+                        </button>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                            data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'need_assignment')">
+                            <x-lucide-alert-triangle class="icon" />
+                            Perlu Perbaikan Anggota
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dekan Approval Modal -->
+            <div style="display: none;">
+                <x-tabler.modal id="approvalModal" :title="$approvalDecision === 'approved' ? 'Setujui Proposal' : 'Perlu Perbaikan Anggota'"
+                    size="lg" wire:ignore.self :onHide="'cancelApproval'">
+                    <x-slot:body>
+                        <x-tabler.alert />
+
+                        <div class="mb-3">
+                            <label class="form-label">Keputusan</label>
+                            <p class="mb-0 fw-bold">
+                                @if ($approvalDecision === 'approved')
+                                    <span class="text-success">
+                                        <x-lucide-check-circle class="me-1 icon" />
+                                        Menyetujui Proposal
+                                    </span>
+                                @else
+                                    <span class="text-warning">
+                                        <x-lucide-alert-triangle class="me-1 icon" />
+                                        Proposal Perlu Perbaikan Persetujuan Anggota
+                                    </span>
+                                @endif
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Catatan (Opsional)</label>
+                            <textarea wire:model="approvalNotes" class="form-control" rows="4"
+                                placeholder="Tambahkan catatan atau komentar untuk keputusan ini..."></textarea>
+                        </div>
+
+                        @if ($approvalDecision === 'approved')
+                            <div class="alert alert-info">
+                                <x-lucide-info class="me-2 icon" />
+                                Proposal yang disetujui akan diteruskan ke Kepala LPPM untuk proses selanjutnya.
+                            </div>
+                        @else
+                            <div class="alert alert-warning">
+                                <x-lucide-alert-triangle class="me-2 icon" />
+                                Proposal akan dikembalikan ke pengusul untuk memperbaiki persetujuan anggota tim.
+                            </div>
+                        @endif
+                    </x-slot:body>
+
+                    <x-slot:footer>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            wire:click="cancelApproval">
+                            <x-lucide-x class="icon" />
+                            Batal
+                        </button>
+                        <button type="button" class="btn {{ $approvalDecision === 'approved' ? 'btn-success' : 'btn-warning' }}"
+                            wire:click="processApproval">
+                            <x-lucide-check class="icon" />
+                            Konfirmasi Keputusan
+                        </button>
+                    </x-slot:footer>
+                </x-tabler.modal>
+            </div>
+        @endif
+
         <!-- Kepala LPPM Initial Approval (Status: APPROVED from Dekan) -->
         @if (auth()->user()->hasRole(['kepala lppm', 'rektor']) && $proposal->status->value === 'approved')
             <div class="mb-3">
@@ -304,13 +388,12 @@
                     <div class="col-md-6">
                         <label class="form-label"><x-lucide-edit-3 class="me-2 icon" />Diubah</label>
                         <p class="text-reset">{{ $proposal->updated_at?->format('d M Y H:i') }}</p>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Sidebar -->
     <div class="col-lg-4">
         <!-- Status Card -->
         <div class="mb-3 card">
