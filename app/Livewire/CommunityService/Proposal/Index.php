@@ -67,7 +67,12 @@ class Index extends Component
     {
         return Proposal::query()
             ->where('detailable_type', CommunityService::class)
-            ->where('submitter_id', Auth::user()->id)
+            ->where(function ($query) {
+                $query->where('submitter_id', Auth::user()->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) {
+                        $teamQuery->where('user_id', Auth::user()->id);
+                    });
+            })
             ->with(['submitter', 'focusArea'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
@@ -99,12 +104,17 @@ class Index extends Component
         ];
 
         Proposal::where('detailable_type', CommunityService::class)
-            ->where('submitter_id', Auth::user()->id)
+            ->where(function ($query) {
+                $query->where('submitter_id', Auth::user()->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) {
+                        $teamQuery->where('user_id', Auth::user()->id);
+                    });
+            })
             ->get(['status'])
             ->each(function ($proposal) use (&$stats) {
                 $stats['all']++;
-                if (isset($stats[$proposal->status])) {
-                    $stats[$proposal->status]++;
+                if (isset($stats[$proposal->status->value])) {
+                    $stats[$proposal->status->value]++;
                 }
             });
 
@@ -115,7 +125,12 @@ class Index extends Component
     public function typeStats(): array
     {
         $query = Proposal::where('detailable_type', CommunityService::class)
-            ->where('submitter_id', Auth::user()->id);
+            ->where(function ($q) {
+                $q->where('submitter_id', Auth::user()->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) {
+                        $teamQuery->where('user_id', Auth::user()->id);
+                    });
+            });
 
         return [
             'all' => (clone $query)->count(),
@@ -128,7 +143,12 @@ class Index extends Component
     public function availableYears(): array
     {
         $years = Proposal::where('detailable_type', CommunityService::class)
-            ->where('submitter_id', Auth::user()->id)
+            ->where(function ($query) {
+                $query->where('submitter_id', Auth::user()->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) {
+                        $teamQuery->where('user_id', Auth::user()->id);
+                    });
+            })
             ->selectRaw('YEAR(created_at) as year')
             ->distinct()
             ->orderBy('year', 'desc')
@@ -159,7 +179,7 @@ class Index extends Component
             $proposal->delete();
             session()->flash('success', 'Proposal berhasil dihapus');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
         }
     }
 }

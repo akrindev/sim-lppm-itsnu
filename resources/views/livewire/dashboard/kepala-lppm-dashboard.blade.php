@@ -197,17 +197,17 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if ($research->status === 'approved')
-                                                    <span class="bg-success badge">Disetujui</span>
-                                                @elseif($research->status === 'rejected')
-                                                    <span class="bg-danger badge">Ditolak</span>
-                                                @elseif($research->status === 'reviewed')
-                                                    <span class="bg-info badge">Sudah Direview</span>
-                                                @elseif($research->status === 'completed')
-                                                    <span class="bg-success badge">Selesai</span>
+                                                @if ($research->status->value === 'approved')
+                                                    <x-tabler.badge color="success">Disetujui</x-tabler.badge>
+                                                @elseif($research->status->value === 'rejected')
+                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
+                                                @elseif($research->status->value === 'reviewed')
+                                                    <x-tabler.badge color="info">Sudah Direview</x-tabler.badge>
+                                                @elseif($research->status->value === 'completed')
+                                                    <x-tabler.badge color="success">Selesai</x-tabler.badge>
                                                 @else
-                                                    <span
-                                                        class="bg-secondary badge">{{ ucfirst($research->status) }}</span>
+                                                    <x-tabler.badge
+                                                        color="secondary">{{ $research->status->label() }}</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td class="text-muted">
@@ -263,17 +263,17 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if ($communityService->status === 'approved')
-                                                    <span class="bg-success badge">Disetujui</span>
-                                                @elseif($communityService->status === 'rejected')
-                                                    <span class="bg-danger badge">Ditolak</span>
-                                                @elseif($communityService->status === 'reviewed')
-                                                    <span class="bg-info badge">Sudah Direview</span>
-                                                @elseif($communityService->status === 'completed')
-                                                    <span class="bg-success badge">Selesai</span>
+                                                @if ($communityService->status->value === 'approved')
+                                                    <x-tabler.badge color="success">Disetujui</x-tabler.badge>
+                                                @elseif($communityService->status->value === 'rejected')
+                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
+                                                @elseif($communityService->status->value === 'reviewed')
+                                                    <x-tabler.badge color="info">Sudah Direview</x-tabler.badge>
+                                                @elseif($communityService->status->value === 'completed')
+                                                    <x-tabler.badge color="success">Selesai</x-tabler.badge>
                                                 @else
-                                                    <span
-                                                        class="bg-secondary badge">{{ ucfirst($communityService->status) }}</span>
+                                                    <x-tabler.badge
+                                                        color="secondary">{{ $communityService->status->label() }}</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td class="text-muted">

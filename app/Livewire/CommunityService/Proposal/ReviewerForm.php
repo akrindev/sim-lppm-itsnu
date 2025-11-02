@@ -2,6 +2,7 @@
 
 namespace App\Livewire\CommunityService\Proposal;
 
+use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -12,6 +13,7 @@ use Livewire\Component;
 class ReviewerForm extends Component
 {
     public string $proposalId = '';
+
     public bool $showForm = false;
 
     #[Validate('required|min:10')]
@@ -64,6 +66,7 @@ class ReviewerForm extends Component
     public function hasReviewed(): bool
     {
         $review = $this->myReview;
+
         return $review && $review->status === 'completed';
     }
 
@@ -71,7 +74,7 @@ class ReviewerForm extends Component
     public function canEditReview(): bool
     {
         $review = $this->myReview;
-        if (!$review) {
+        if (! $review) {
             return false;
         }
 
@@ -85,7 +88,7 @@ class ReviewerForm extends Component
 
     public function toggleForm(): void
     {
-        $this->showForm = !$this->showForm;
+        $this->showForm = ! $this->showForm;
     }
 
     public function submitReview(): void
@@ -113,7 +116,7 @@ class ReviewerForm extends Component
 
             if ($allCompleted) {
                 // Update proposal status to reviewed
-                $this->proposal->update(['status' => 'reviewed']);
+                $this->proposal->update(['status' => ProposalStatus::REVIEWED]);
             }
 
             $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';

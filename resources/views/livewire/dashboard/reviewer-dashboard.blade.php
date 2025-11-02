@@ -172,11 +172,12 @@
                                                             ->first()?->status ?? 'pending';
                                                 @endphp
                                                 @if ($reviewStatus === 'completed')
-                                                    <span class="bg-success badge">Selesai Review</span>
+                                                    <x-tabler.badge color="success">Selesai Review</x-tabler.badge>
                                                 @elseif($reviewStatus === 'pending')
-                                                    <span class="bg-warning badge">Belum Review</span>
+                                                    <x-tabler.badge color="warning">Belum Review</x-tabler.badge>
                                                 @else
-                                                    <span class="bg-info badge">{{ ucfirst($reviewStatus) }}</span>
+                                                    <x-tabler.badge
+                                                        color="info">{{ ucfirst($reviewStatus) }}</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td class="text-muted">
@@ -239,11 +240,12 @@
                                                             ->first()?->status ?? 'pending';
                                                 @endphp
                                                 @if ($reviewStatus === 'completed')
-                                                    <span class="bg-success badge">Selesai Review</span>
+                                                    <x-tabler.badge color="success">Selesai Review</x-tabler.badge>
                                                 @elseif($reviewStatus === 'pending')
-                                                    <span class="bg-warning badge">Belum Review</span>
+                                                    <x-tabler.badge color="warning">Belum Review</x-tabler.badge>
                                                 @else
-                                                    <span class="bg-info badge">{{ ucfirst($reviewStatus) }}</span>
+                                                    <x-tabler.badge
+                                                        color="info">{{ ucfirst($reviewStatus) }}</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td class="text-muted">

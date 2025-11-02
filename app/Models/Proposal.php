@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProposalStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -54,6 +55,7 @@ class Proposal extends Model
         return [
             'sbk_value' => 'decimal:2',
             'duration_in_years' => 'integer',
+            'status' => ProposalStatus::class,
         ];
     }
 
@@ -168,6 +170,15 @@ class Proposal extends Model
     public function budgetItems(): HasMany
     {
         return $this->hasMany(BudgetItem::class);
+    }
+
+    /**
+     * Get all partners for the proposal.
+     */
+    public function partners(): BelongsToMany
+    {
+        return $this->belongsToMany(Partner::class, 'proposal_partner')
+            ->withTimestamps();
     }
 
     /**

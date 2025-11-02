@@ -137,10 +137,10 @@ class Index extends Component
     protected function statusBadges(): array
     {
         return [
-            'submitted' => 'badge bg-blue-lt text-blue',
-            'revisi' => 'badge bg-yellow-lt text-yellow',
-            'approved' => 'badge bg-green-lt text-green',
-            'rejected' => 'badge bg-red-lt text-red',
+            'submitted' => 'blue',
+            'revisi' => 'yellow',
+            'approved' => 'green',
+            'rejected' => 'red',
         ];
     }
 }

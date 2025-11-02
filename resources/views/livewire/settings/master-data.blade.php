@@ -640,12 +640,14 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Strata</label>
-                                <select wire:model="researchSchemeStrata" class="form-control">
-                                    <option value="">Pilih Strata</option>
-                                    <option value="s1">S1</option>
-                                    <option value="s2">S2</option>
-                                    <option value="s3">S3</option>
-                                </select>
+                                <div wire:ignore>
+                                    <select wire:model="researchSchemeStrata" class="form-control" x-data="tomSelect" placeholder="Pilih Strata">
+                                        <option value="">Pilih Strata</option>
+                                        <option value="s1">S1</option>
+                                        <option value="s2">S2</option>
+                                        <option value="s3">S3</option>
+                                    </select>
+                                </div>
                                 @error('researchSchemeStrata')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -664,12 +666,14 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Parent Klaster (Opsional)</label>
-                                <select wire:model="scienceClusterParentId" class="form-control">
-                                    <option value="">Tidak ada parent</option>
-                                    @foreach ($scienceClusters as $cluster)
-                                        <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div wire:ignore>
+                                    <select wire:model="scienceClusterParentId" class="form-control" x-data="tomSelect" placeholder="Tidak ada parent">
+                                        <option value="">Tidak ada parent</option>
+                                        @foreach ($scienceClusters as $cluster)
+                                            <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 @error('scienceClusterParentId')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -688,13 +692,15 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Institusi</label>
-                                <select wire:model="institutionId" class="form-control">
-                                    <option value="">Pilih Institusi</option>
-                                    @foreach ($allInstitutions as $institution)
-                                        <option value="{{ $institution->id }}">{{ $institution->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div wire:ignore>
+                                    <select wire:model="institutionId" class="form-control" x-data="tomSelect" placeholder="Pilih Institusi">
+                                        <option value="">Pilih Institusi</option>
+                                        @foreach ($allInstitutions as $institution)
+                                            <option value="{{ $institution->id }}">{{ $institution->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 @error('institutionId')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -713,13 +719,15 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Area Fokus</label>
-                                <select wire:model="themesFocusAreaId" class="form-control">
-                                    <option value="">Pilih Area Fokus</option>
-                                    @foreach ($allFocusAreas as $focusArea)
-                                        <option value="{{ $focusArea->id }}">{{ $focusArea->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div wire:ignore>
+                                    <select wire:model="themesFocusAreaId" class="form-control" x-data="tomSelect" placeholder="Pilih Area Fokus">
+                                        <option value="">Pilih Area Fokus</option>
+                                        @foreach ($allFocusAreas as $focusArea)
+                                            <option value="{{ $focusArea->id }}">{{ $focusArea->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 @error('themesFocusAreaId')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -738,12 +746,14 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tema</label>
-                                <select wire:model="topicsThemeId" class="form-control">
-                                    <option value="">Pilih Tema</option>
-                                    @foreach ($allThemes as $theme)
-                                        <option value="{{ $theme->id }}">{{ $theme->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div wire:ignore>
+                                    <select wire:model="topicsThemeId" class="form-control" x-data="tomSelect" placeholder="Pilih Tema">
+                                        <option value="">Pilih Tema</option>
+                                        @foreach ($allThemes as $theme)
+                                            <option value="{{ $theme->id }}">{{ $theme->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 @error('topicsThemeId')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror

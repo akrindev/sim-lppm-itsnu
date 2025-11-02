@@ -88,8 +88,8 @@ class Index extends Component
             ->get(['status'])
             ->each(function ($proposal) use (&$stats) {
                 $stats['all']++;
-                if (isset($stats[$proposal->status])) {
-                    $stats[$proposal->status]++;
+                if (isset($stats[$proposal->status->value])) {
+                    $stats[$proposal->status->value]++;
                 }
             });
 

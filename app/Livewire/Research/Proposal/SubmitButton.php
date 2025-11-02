@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Research\Proposal;
 
+use App\Enums\ProposalStatus;
 use App\Livewire\Actions\SubmitProposalAction;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
@@ -28,8 +29,13 @@ class SubmitButton extends Component
     public function canSubmit(): bool
     {
         $proposal = $this->proposal;
+        $allowedStatuses = [
+            ProposalStatus::DRAFT,
+            ProposalStatus::NEED_ASSIGNMENT,
+            ProposalStatus::REVISION_NEEDED,
+        ];
 
-        return $proposal->status === 'draft'
+        return in_array($proposal->status, $allowedStatuses)
             && $proposal->allTeamMembersAccepted()
             && Auth::id() === $proposal->submitter_id;
     }
@@ -56,10 +62,12 @@ class SubmitButton extends Component
 
         if ($result['success']) {
             $this->dispatch('success', message: $result['message']);
+            session()->flash('success', 'Proposal penelitian berhasil diajukan');
             $this->dispatch('proposal-submitted', proposalId: $proposal->id);
             $this->redirect(route('research.proposal.show', $proposal->id));
         } else {
             $this->dispatch('error', message: $result['message']);
+            session()->flash('error', 'Gagal mengajukan proposal: ' . $result['message']);
         }
     }
 

@@ -6,20 +6,20 @@
     <x-tabler.alert />
 
     <!-- Filters -->
-    <div class="card mb-3">
+    <div class="mb-3 card">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-8">
                     <label class="form-label" for="search">
-                        <x-lucide-search class="icon me-2" />
+                        <x-lucide-search class="me-2 icon" />
                         Cari Proposal
                     </label>
-                    <input type="text" id="search" class="form-control" placeholder="Cari berdasarkan judul atau nama author..."
-                        wire:model.live="search">
+                    <input type="text" id="search" class="form-control"
+                        placeholder="Cari berdasarkan judul atau nama author..." wire:model.live="search">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="year">
-                        <x-lucide-calendar class="icon me-2" />
+                        <x-lucide-calendar class="me-2 icon" />
                         Tahun
                     </label>
                     <select id="year" class="form-select" wire:model.live="selectedYear">
@@ -32,8 +32,8 @@
             </div>
             @if (!empty($search) || !empty($selectedYear))
                 <div class="mt-3">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" wire:click="resetFilters">
-                        <x-lucide-x class="icon me-1" />
+                    <button type="button" class="btn-outline-secondary btn btn-sm" wire:click="resetFilters">
+                        <x-lucide-x class="me-1 icon" />
                         Reset Filter
                     </button>
                 </div>
@@ -70,9 +70,9 @@
                                 <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
                             </td>
                             <td>
-                                <div class="badge-outline badge">
+                                <x-tabler.badge variant="outline">
                                     {{ $proposal->focusArea?->name ?? '—' }}
-                                </div>
+                                </x-tabler.badge>
                             </td>
                             <td>
                                 @if ($review?->isCompleted())
@@ -87,15 +87,13 @@
                             </td>
                             <td>
                                 @if ($review?->isCompleted())
-                                    <span class="badge-outline badge">
-                                        @if ($review->recommendation === 'approved')
-                                            <span class="text-success">✓ Disetujui</span>
-                                        @elseif ($review->recommendation === 'rejected')
-                                            <span class="text-danger">✗ Ditolak</span>
-                                        @else
-                                            <span class="text-warning">↺ Revisi</span>
-                                        @endif
-                                    </span>
+                                    @if ($review->recommendation === 'approved')
+                                        <x-tabler.badge variant="outline" color="success">✓ Disetujui</x-tabler.badge>
+                                    @elseif ($review->recommendation === 'rejected')
+                                        <x-tabler.badge variant="outline" color="danger">✗ Ditolak</x-tabler.badge>
+                                    @else
+                                        <x-tabler.badge variant="outline" color="warning">↺ Revisi</x-tabler.badge>
+                                    @endif
                                 @else
                                     <span class="text-secondary">—</span>
                                 @endif
@@ -108,7 +106,7 @@
                             <td>
                                 <div class="btn-list">
                                     <a href="{{ route('research.proposal.show', $proposal) }}"
-                                        class="btn btn-sm btn-outline-primary" title="Lihat Detail" wire:navigate>
+                                        class="btn-outline-primary btn btn-sm" title="Lihat Detail" wire:navigate>
                                         <x-lucide-eye class="icon" />
                                         Lihat
                                     </a>

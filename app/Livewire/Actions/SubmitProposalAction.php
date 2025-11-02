@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Actions;
 
+use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 
 class SubmitProposalAction
@@ -25,16 +26,22 @@ class SubmitProposalAction
             ];
         }
 
-        // Check if already submitted
-        if (in_array($proposal->status, ['submitted', 'under_review', 'reviewed', 'approved', 'rejected', 'completed'])) {
+        // Check if proposal can be submitted
+        $allowedStatuses = [
+            ProposalStatus::DRAFT,
+            ProposalStatus::NEED_ASSIGNMENT,
+            ProposalStatus::REVISION_NEEDED,
+        ];
+
+        if (! in_array($proposal->status, $allowedStatuses)) {
             return [
                 'success' => false,
-                'message' => 'Proposal sudah diajukan atau dalam tahap review.',
+                'message' => 'Proposal tidak dapat diajukan dari status saat ini.',
             ];
         }
 
-        // Submit proposal
-        $proposal->update(['status' => 'submitted']);
+        // Submit proposal (status changes to SUBMITTED)
+        $proposal->update(['status' => ProposalStatus::SUBMITTED]);
 
         return [
             'success' => true,

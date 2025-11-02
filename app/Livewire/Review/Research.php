@@ -50,9 +50,9 @@ class Research extends Component
             $searchTerm = '%' . $this->search . '%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
-                  ->orWhereHas('submitter', function ($sq) use ($searchTerm) {
-                      $sq->where('name', 'LIKE', $searchTerm);
-                  });
+                    ->orWhereHas('submitter', function ($sq) use ($searchTerm) {
+                        $sq->where('name', 'LIKE', $searchTerm);
+                    });
             });
         }
 

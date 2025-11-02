@@ -13,6 +13,8 @@ class BudgetItem extends Model
 
     protected $fillable = [
         'proposal_id',
+        'budget_group_id',
+        'budget_component_id',
         'group',
         'component',
         'item_description',
@@ -40,5 +42,21 @@ class BudgetItem extends Model
     public function proposal(): BelongsTo
     {
         return $this->belongsTo(Proposal::class);
+    }
+
+    /**
+     * Get the budget group that owns the budget item.
+     */
+    public function budgetGroup(): BelongsTo
+    {
+        return $this->belongsTo(BudgetGroup::class);
+    }
+
+    /**
+     * Get the budget component that owns the budget item.
+     */
+    public function budgetComponent(): BelongsTo
+    {
+        return $this->belongsTo(BudgetComponent::class);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Research extends Model
@@ -25,11 +26,13 @@ class Research extends Model
     protected $table = 'research';
 
     protected $fillable = [
+        'macro_research_group_id',
         'final_tkt_target',
         'background',
         'state_of_the_art',
         'methodology',
         'roadmap_data',
+        'substance_file',
     ];
 
     /**
@@ -50,5 +53,13 @@ class Research extends Model
     public function proposal(): MorphOne
     {
         return $this->morphOne(Proposal::class, 'detailable');
+    }
+
+    /**
+     * Get the macro research group that owns the research.
+     */
+    public function macroResearchGroup(): BelongsTo
+    {
+        return $this->belongsTo(MacroResearchGroup::class);
     }
 }
