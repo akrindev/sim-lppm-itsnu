@@ -97,11 +97,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-focus-area" wire:click="editFocusArea({{ $item->id }})"
+                                            <button type="button" wire:click="editFocusArea({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('focus-area', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('focus-area', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -142,11 +142,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-keyword" wire:click="editKeyword({{ $item->id }})"
+                                            <button type="button" wire:click="editKeyword({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('keyword', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('keyword', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -187,11 +187,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-national-priority" wire:click="editNationalPriority({{ $item->id }})"
+                                            <button type="button" wire:click="editNationalPriority({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('national-priority', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('national-priority', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -242,11 +242,11 @@
                                     <td>{{ Str::limit($item->address, 50) ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-partner" wire:click="editPartner({{ $item->id }})"
+                                            <button type="button" wire:click="editPartner({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('partner', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('partner', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -291,11 +291,11 @@
                                     </td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-research-scheme" wire:click="editResearchScheme({{ $item->id }})"
+                                            <button type="button" wire:click="editResearchScheme({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('research-scheme', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('research-scheme', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -336,11 +336,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-science-cluster" wire:click="editScienceCluster({{ $item->id }})"
+                                            <button type="button" wire:click="editScienceCluster({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('science-cluster', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('science-cluster', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -383,11 +383,11 @@
                                     <td>{{ $item->institution->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-study-program" wire:click="editStudyProgram({{ $item->id }})"
+                                            <button type="button" wire:click="editStudyProgram({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('study-program', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('study-program', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -430,11 +430,11 @@
                                     <td>{{ $item->focusArea->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-theme" wire:click="editTheme({{ $item->id }})"
+                                            <button type="button" wire:click="editTheme({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('theme', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('theme', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -477,11 +477,11 @@
                                     <td>{{ $item->theme->name ?? '-' }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-topic" wire:click="editTopic({{ $item->id }})"
+                                            <button type="button" wire:click="editTopic({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('topic', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('topic', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>
@@ -522,11 +522,11 @@
                                     <td>{{ $item->name }}</td>
                                     <td>
                                         <div class="flex-nowrap btn-list">
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-institution" wire:click="editInstitution({{ $item->id }})"
+                                            <button type="button" wire:click="editInstitution({{ $item->id }})"
                                                 class="btn-outline-warning btn btn-sm">
                                                 Edit
                                             </button>
-                                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-delete-confirm" wire:click="confirmDelete('institution', {{ $item->id }}, '{{ $item->name }}')"
+                                            <button type="button" wire:click="confirmDelete('institution', {{ $item->id }}, '{{ $item->name }}')"
                                                 class="btn-outline-danger btn btn-sm">
                                                 Hapus
                                             </button>

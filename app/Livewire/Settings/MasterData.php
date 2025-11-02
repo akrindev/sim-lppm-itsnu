@@ -124,6 +124,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'focus-area';
         $this->modalTitle = 'Tambah Area Fokus';
+        $this->openModal();
 
     }
 
@@ -147,6 +148,7 @@ class MasterData extends Component
         $this->focusAreaName = $focusArea->name;
         $this->modalFor = 'focus-area';
         $this->modalTitle = 'Edit Area Fokus';
+        $this->openModal();
 
     }
 
@@ -162,6 +164,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'keyword';
         $this->modalTitle = 'Tambah Kata Kunci';
+        $this->openModal();
 
     }
 
@@ -185,6 +188,7 @@ class MasterData extends Component
         $this->keywordName = $keyword->name;
         $this->modalFor = 'keyword';
         $this->modalTitle = 'Edit Kata Kunci';
+        $this->openModal();
 
     }
 
@@ -200,6 +204,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'national-priority';
         $this->modalTitle = 'Tambah Prioritas Nasional';
+        $this->openModal();
 
     }
 
@@ -223,6 +228,7 @@ class MasterData extends Component
         $this->nationalPriorityName = $nationalPriority->name;
         $this->modalFor = 'national-priority';
         $this->modalTitle = 'Edit Prioritas Nasional';
+        $this->openModal();
 
     }
 
@@ -238,6 +244,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'partner';
         $this->modalTitle = 'Tambah Mitra';
+        $this->openModal();
 
     }
 
@@ -275,6 +282,7 @@ class MasterData extends Component
         $this->partnerAddress = $partner->address ?? '';
         $this->modalFor = 'partner';
         $this->modalTitle = 'Edit Mitra';
+        $this->openModal();
 
     }
 
@@ -290,6 +298,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'research-scheme';
         $this->modalTitle = 'Tambah Skema Penelitian';
+        $this->openModal();
 
     }
 
@@ -323,6 +332,7 @@ class MasterData extends Component
         $this->researchSchemeStrata = $researchScheme->strata;
         $this->modalFor = 'research-scheme';
         $this->modalTitle = 'Edit Skema Penelitian';
+        $this->openModal();
 
     }
 
@@ -338,6 +348,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'science-cluster';
         $this->modalTitle = 'Tambah Klaster Sains';
+        $this->openModal();
 
     }
 
@@ -371,6 +382,7 @@ class MasterData extends Component
         $this->scienceClusterParentId = $scienceCluster->parent_id;
         $this->modalFor = 'science-cluster';
         $this->modalTitle = 'Edit Klaster Sains';
+        $this->openModal();
 
     }
 
@@ -386,6 +398,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'study-program';
         $this->modalTitle = 'Tambah Program Studi';
+        $this->openModal();
 
     }
 
@@ -419,6 +432,7 @@ class MasterData extends Component
         $this->institutionId = $studyProgram->institution_id;
         $this->modalFor = 'study-program';
         $this->modalTitle = 'Edit Program Studi';
+        $this->openModal();
 
     }
 
@@ -434,6 +448,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'theme';
         $this->modalTitle = 'Tambah Tema';
+        $this->openModal();
 
     }
 
@@ -467,6 +482,7 @@ class MasterData extends Component
         $this->themesFocusAreaId = $theme->focus_area_id;
         $this->modalFor = 'theme';
         $this->modalTitle = 'Edit Tema';
+        $this->openModal();
 
     }
 
@@ -482,6 +498,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'topic';
         $this->modalTitle = 'Tambah Topik';
+        $this->openModal();
 
     }
 
@@ -515,6 +532,7 @@ class MasterData extends Component
         $this->topicsThemeId = $topic->theme_id;
         $this->modalFor = 'topic';
         $this->modalTitle = 'Edit Topik';
+        $this->openModal();
 
     }
 
@@ -530,6 +548,7 @@ class MasterData extends Component
         $this->resetFormFields();
         $this->modalFor = 'institution';
         $this->modalTitle = 'Tambah Institusi';
+        $this->openModal();
 
     }
 
@@ -553,6 +572,7 @@ class MasterData extends Component
         $this->institutionName = $institution->name;
         $this->modalFor = 'institution';
         $this->modalTitle = 'Edit Institusi';
+        $this->openModal();
 
     }
 
@@ -601,6 +621,7 @@ class MasterData extends Component
         $this->deletingId = $id;
         $this->deleteModalTitle = 'Konfirmasi Penghapusan';
         $this->deleteModalMessage = "Apakah Anda yakin ingin menghapus \"{$name}\"?";
+        $this->dispatch('open-modal', modalId: 'modal-delete-confirm');
     }
 
     public function closeDeleteModal(): void
@@ -614,6 +635,11 @@ class MasterData extends Component
     private function getModalId(): string
     {
         return 'modal-'.$this->modalFor;
+    }
+
+    private function openModal(): void
+    {
+        $this->dispatch('open-modal', modalId: $this->getModalId());
     }
 
     public function confirmDeleteAction(): void

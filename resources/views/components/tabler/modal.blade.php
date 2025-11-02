@@ -186,6 +186,22 @@
                 Livewire.hook('morph.updated', setupTablerModalListeners);
                 Livewire.hook('morph.removed', setupTablerModalListeners);
 
+                // Listen for open-modal dispatch from Livewire
+                window.Livewire?.on('open-modal', (event) => {
+                    const modal = document.getElementById(event.detail.modalId);
+                    console.log('Received open-modal for:', event.detail);
+                    if (modal) {
+                        // Use setTimeout to ensure Bootstrap is loaded
+                        setTimeout(() => {
+                            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                                const bsModal = bootstrap.Modal.getInstance(modal) || new bootstrap
+                                    .Modal(modal);
+                                bsModal.show();
+                            }
+                        }, 0);
+                    }
+                });
+
                 // Listen for close-modal dispatch from Livewire
                 window.Livewire?.on('close-modal', (event) => {
                     const modal = document.getElementById(event.detail.modalId);
