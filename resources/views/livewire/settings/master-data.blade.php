@@ -547,7 +547,7 @@
 
 @teleport('body')
     <!-- Focus Area Modal -->
-    <x-tabler.modal id="modal-focus-area" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-focus-area" :title="$editingId ? 'Edit Area Fokus' : 'Tambah Area Fokus'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-focus-area">
                 <div class="mb-3">
@@ -567,7 +567,7 @@
     </x-tabler.modal>
 
     <!-- Keyword Modal -->
-    <x-tabler.modal id="modal-keyword" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-keyword" :title="$editingId ? 'Edit Kata Kunci' : 'Tambah Kata Kunci'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-keyword">
                 <div class="mb-3">
@@ -587,7 +587,7 @@
     </x-tabler.modal>
 
     <!-- National Priority Modal -->
-    <x-tabler.modal id="modal-national-priority" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-national-priority" :title="$editingId ? 'Edit Prioritas Nasional' : 'Tambah Prioritas Nasional'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-national-priority">
                 <div class="mb-3">
@@ -607,7 +607,7 @@
     </x-tabler.modal>
 
     <!-- Partner Modal -->
-    <x-tabler.modal id="modal-partner" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-partner" :title="$editingId ? 'Edit Mitra' : 'Tambah Mitra'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-partner">
                 <div class="mb-3">
@@ -642,7 +642,7 @@
     </x-tabler.modal>
 
     <!-- Research Scheme Modal -->
-    <x-tabler.modal id="modal-research-scheme" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-research-scheme" :title="$editingId ? 'Edit Skema Penelitian' : 'Tambah Skema Penelitian'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-research-scheme">
                 <div class="mb-3">
@@ -674,7 +674,7 @@
     </x-tabler.modal>
 
     <!-- Science Cluster Modal -->
-    <x-tabler.modal id="modal-science-cluster" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-science-cluster" :title="$editingId ? 'Edit Klaster Sains' : 'Tambah Klaster Sains'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-science-cluster">
                 <div class="mb-3">
@@ -706,7 +706,7 @@
     </x-tabler.modal>
 
     <!-- Study Program Modal -->
-    <x-tabler.modal id="modal-study-program" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-study-program" :title="$editingId ? 'Edit Program Studi' : 'Tambah Program Studi'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-study-program">
                 <div class="mb-3">
@@ -738,7 +738,7 @@
     </x-tabler.modal>
 
     <!-- Theme Modal -->
-    <x-tabler.modal id="modal-theme" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-theme" :title="$editingId ? 'Edit Tema' : 'Tambah Tema'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-theme">
                 <div class="mb-3">
@@ -770,7 +770,7 @@
     </x-tabler.modal>
 
     <!-- Topic Modal -->
-    <x-tabler.modal id="modal-topic" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-topic" :title="$editingId ? 'Edit Topik' : 'Tambah Topik'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-topic">
                 <div class="mb-3">
@@ -802,7 +802,7 @@
     </x-tabler.modal>
 
     <!-- Institution Modal -->
-    <x-tabler.modal id="modal-institution" :title="$modalTitle" on-hide="resetFormFields">
+    <x-tabler.modal id="modal-institution" :title="$editingId ? 'Edit Institusi' : 'Tambah Institusi'" on-hide="resetFormFields">
         <x-slot:body>
             <form wire:submit="save" id="form-institution">
                 <div class="mb-3">
