@@ -1,18 +1,20 @@
 <div>
     @if ($this->canSubmit)
-        <button type="button" class="w-full btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmSubmitModal">
+        <button type="button" class="mb-3 w-full btn btn-success" data-bs-toggle="modal"
+            data-bs-target="#confirmSubmitModal">
             <x-lucide-send class="icon" />
             Submit Proposal
         </button>
 
-        <div style="display: none;">
+        @teleport('body')
             <x-tabler.modal id="confirmSubmitModal" title="Konfirmasi Pengajuan Proposal">
                 <x-slot:body>
                     <div class="py-4 text-center">
-                        <x-lucide-send class="mb-2 text-primary icon" style="width: 3rem; height: 3rem;" />
+                        <x-lucide-send class="mb-2 text-success icon" style="width: 3rem; height: 3rem;" />
                         <h3>Konfirmasi Pengajuan Proposal</h3>
                         <div class="text-secondary">
-                            Apakah Anda yakin ingin mengajukan proposal ini? Setelah diajukan, proposal tidak dapat diubah.
+                            Apakah Anda yakin ingin mengajukan proposal ini? Setelah diajukan, proposal tidak dapat
+                            diubah.
                         </div>
                     </div>
                 </x-slot:body>
@@ -35,7 +37,7 @@
                     </div>
                 </x-slot:footer>
             </x-tabler.modal>
-        </div>
+        @endteleport
     @elseif ($this->pendingMembers->count() > 0)
         <div class="d-inline-block alert alert-warning" role="alert">
             <strong>Menunggu Persetujuan:</strong> {{ $this->pendingMembers->count() }} anggota belum menerima undangan

@@ -74,7 +74,11 @@ class Show extends Component
         $proposal = $this->form->proposal;
         if ($proposal->teamMembers->contains($user)) {
             $proposal->teamMembers()->updateExistingPivot($user->id, ['status' => 'accepted']);
+            session()->flash('success', 'Anda telah menerima undangan sebagai anggota tim proposal ini');
+            $this->dispatch('close-modal', modalId: 'acceptMemberModal');
             $this->dispatch('memberAccepted');
+            $this->dispatch('$refresh');
+            $this->form->setProposal($proposal->fresh());
         }
     }
 
@@ -87,7 +91,10 @@ class Show extends Component
         $proposal = $this->form->proposal;
         if ($proposal->teamMembers->contains($user)) {
             $proposal->teamMembers()->updateExistingPivot($user->id, ['status' => 'rejected']);
+            session()->flash('success', 'Anda telah menolak undangan sebagai anggota tim proposal ini');
+            $this->dispatch('close-modal', modalId: 'rejectMemberModal');
             $this->dispatch('memberRejected');
+            $this->form->setProposal($proposal->fresh());
         }
     }
 

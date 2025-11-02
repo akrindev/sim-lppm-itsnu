@@ -62,10 +62,12 @@ class SubmitButton extends Component
 
         if ($result['success']) {
             $this->dispatch('success', message: $result['message']);
+            session()->flash('success', 'Proposal penelitian berhasil diajukan');
             $this->dispatch('proposal-submitted', proposalId: $proposal->id);
             $this->redirect(route('research.proposal.show', $proposal->id));
         } else {
             $this->dispatch('error', message: $result['message']);
+            session()->flash('error', 'Gagal mengajukan proposal: ' . $result['message']);
         }
     }
 

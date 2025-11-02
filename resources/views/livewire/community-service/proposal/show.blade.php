@@ -199,43 +199,6 @@
             <div class="mb-3">
                 <livewire:community-service.proposal.team-member-form :proposalId="$proposal->id" :key="'team-form-' . $proposal->id" />
             </div>
-
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">1.6 Tim Pelaksana</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Nama</th>
-                                    <th>NIDN</th>
-                                    <th>Peran</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($proposal->teamMembers as $member)
-                                    <tr>
-                                        <td>{{ $member->name }}</td>
-                                        <td>{{ $member->identity?->identity_id ?? '-' }}</td>
-                                        <td>
-                                            <x-tabler.badge
-                                                color="info">{{ ucfirst($member->pivot->role) }}</x-tabler.badge>
-                                        </td>
-                                        <td>
-                                            <x-tabler.badge :color="$member->pivot->status === 'accepted' ? 'success' : 'warning'">
-                                                {{ ucfirst($member->pivot->status) }}
-                                            </x-tabler.badge>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Section 2: Substansi Usulan -->
