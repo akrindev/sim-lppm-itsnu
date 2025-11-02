@@ -34,19 +34,23 @@
             <div class="card-body">
                 <ul class="my-4 steps steps-green steps-counter">
                     <li class="step-item" :class="{ 'active': currentStep === 1 }">
-                        <a href="#" @click.prevent="currentStep = 1" class="text-decoration-none">Identitas Usulan</a>
+                        <a href="#" @click.prevent="currentStep = 1" class="text-decoration-none">Identitas
+                            Usulan</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 2 }">
-                        <a href="#" @click.prevent="currentStep = 2" class="text-decoration-none">Substansi Usulan</a>
+                        <a href="#" @click.prevent="currentStep = 2" class="text-decoration-none">Substansi
+                            Usulan</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 3 }">
                         <a href="#" @click.prevent="currentStep = 3" class="text-decoration-none">RAB</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 4 }">
-                        <a href="#" @click.prevent="currentStep = 4" class="text-decoration-none">Dokumen Pendukung</a>
+                        <a href="#" @click.prevent="currentStep = 4" class="text-decoration-none">Dokumen
+                            Pendukung</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 5 }">
-                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Workflow & Aksi</a>
+                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Workflow &
+                            Aksi</a>
                     </li>
                 </ul>
             </div>
@@ -59,37 +63,102 @@
         <div id="section-identitas" x-show="currentStep === 1">
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Informasi Dasar Proposal</h4>
+                    <h3 class="card-title">1.1 Informasi Dasar</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row g-4">
+                    <div class="mb-3 row">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Judul Proposal</label>
-                            <p>{{ $proposal->title }}</p>
+                            <label class="form-label"><x-lucide-file-text class="me-2 icon" />Judul</label>
+                            <p class="text-reset">{{ $proposal->title }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Skema Penelitian</label>
-                            <p>{{ $proposal->researchScheme?->name ?? '-' }}</p>
+                            <label class="form-label"><x-lucide-info class="me-2 icon" />Status</label>
+                            <p>
+                                <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
+                                    {{ $proposal->status->label() }}
+                                </x-tabler.badge>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label class="form-label"><x-lucide-user class="me-2 icon" />Author</label>
+                            <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Durasi</label>
-                            <p>{{ $proposal->duration_in_years }} Tahun</p>
+                            <label class="form-label"><x-lucide-mail class="me-2 icon" />Email</label>
+                            <p class="text-reset">{{ $proposal->submitter?->email }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label class="form-label"><x-lucide-clipboard-list class="me-2 icon" />Skema
+                                Penelitian</label>
+                            <p class="text-reset">{{ $proposal->researchScheme?->name ?? '—' }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Bidang Fokus</label>
-                            <p>{{ $proposal->focusArea?->name ?? '-' }}</p>
+                            <label class="form-label"><x-lucide-calendar class="me-2 icon" />Durasi (Tahun)</label>
+                            <p class="text-reset">{{ $proposal->duration_in_years ?? '—' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 card">
+                <div class="card-header">
+                    <h3 class="card-title">1.2 Informasi Dasar Proposal</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label class="form-label"><x-lucide-focus class="me-2 icon" />Bidang Fokus</label>
+                            <p class="text-reset">{{ $proposal->focusArea?->name ?? '—' }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Tema</label>
-                            <p>{{ $proposal->theme?->name ?? '-' }}</p>
+                            <label class="form-label"><x-lucide-tag class="me-2 icon" />Tema</label>
+                            <p class="text-reset">{{ $proposal->theme?->name ?? '—' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label class="form-label"><x-lucide-hash class="me-2 icon" />Topik</label>
+                            <p class="text-reset">{{ $proposal->topic?->name ?? '—' }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Topik</label>
-                            <p>{{ $proposal->topic?->name ?? '-' }}</p>
+                            <label class="form-label"><x-lucide-star class="me-2 icon" />Prioritas Nasional</label>
+                            <p class="text-reset">{{ $proposal->nationalPriority?->name ?? '—' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label"><x-lucide-dollar-sign class="me-2 icon" />Nilai SBK</label>
+                            <p class="text-reset">{{ number_format($proposal->sbk_value, 2) ?? '—' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 card">
+                <div class="card-header">
+                    <h3 class="card-title">1.3 Klasifikasi Ilmu</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 row">
+                        <div class="col-md-12">
+                            <label class="form-label">Level 1</label>
+                            <p class="text-reset">{{ $proposal->clusterLevel1?->name ?? '—' }}</p>
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label fw-bold">Ringkasan</label>
-                            <p>{{ $proposal->summary }}</p>
+                            <label class="form-label">Level 2</label>
+                            <p class="text-reset">{{ $proposal->clusterLevel2?->name ?? '—' }}</p>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Level 3</label>
+                            <p class="text-reset">{{ $proposal->clusterLevel3?->name ?? '—' }}</p>
                         </div>
                     </div>
                 </div>
@@ -97,54 +166,44 @@
 
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Klasifikasi Ilmu (Klaster Sains)</h4>
+                    <h3 class="card-title">1.4 Ringkasan</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row g-4">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Level 1</label>
-                            <p>{{ $proposal->clusterLevel1?->name ?? '-' }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Level 2</label>
-                            <p>{{ $proposal->clusterLevel2?->name ?? '-' }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Level 3</label>
-                            <p>{{ $proposal->clusterLevel3?->name ?? '-' }}</p>
-                        </div>
+                    <div class="mb-3">
+                        <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
                     </div>
                 </div>
             </div>
 
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Detail Penelitian</h4>
+                    <h3 class="card-title">1.5 Detail Penelitian</h3>
                 </div>
                 <div class="card-body">
                     @php $research = $proposal->detailable; @endphp
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Target TKT Final</label>
-                        <p>{{ $research?->final_tkt_target ?? '-' }}</p>
+                        <label class="form-label">Target TKT Final</label>
+                        <p class="text-reset">{{ $research?->final_tkt_target ?? '—' }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Latar Belakang</label>
-                        <p>{{ $research?->background ?? '-' }}</p>
+                        <label class="form-label">Latar Belakang</label>
+                        <p class="text-reset">{{ $research?->background ?? '—' }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">State of the Art</label>
-                        <p>{{ $research?->state_of_the_art ?? '-' }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Metodologi</label>
-                        <p>{{ $research?->methodology ?? '-' }}</p>
+                        <label class="form-label">Metodologi</label>
+                        <p class="text-reset">{{ $research?->methodology ?? '—' }}</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Team Members Management -->
+            <div class="mb-3">
+                <livewire:research.proposal.team-member-form :proposalId="$proposal->id" :key="'team-form-' . $proposal->id" />
+            </div>
+
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Tim Peneliti</h4>
+                    <h3 class="card-title">1.6 Tim Peneliti</h3>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -184,16 +243,25 @@
         <div id="section-substansi" x-show="currentStep === 2">
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Substansi Usulan</h4>
+                    <h3 class="card-title">2.1 Kelompok Makro Riset</h3>
                 </div>
                 <div class="card-body">
                     @php $research = $proposal->detailable; @endphp
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Kelompok Makro Riset</label>
-                        <p>{{ $research?->macroResearchGroup?->name ?? '-' }}</p>
+                        <label class="form-label">Kelompok Makro Riset</label>
+                        <p class="text-reset">{{ $research?->macroResearchGroup?->name ?? '—' }}</p>
                     </div>
+                </div>
+            </div>
+
+            <div class="mb-3 card">
+                <div class="card-header">
+                    <h3 class="card-title">2.2 File Substansi</h3>
+                </div>
+                <div class="card-body">
+                    @php $research = $proposal->detailable; @endphp
                     <div class="mb-3">
-                        <label class="form-label fw-bold">File Substansi</label>
+                        <label class="form-label">File Substansi</label>
                         @if ($research?->substance_file)
                             <p>
                                 <a href="{{ Storage::url($research->substance_file) }}" target="_blank"
@@ -203,7 +271,7 @@
                                 </a>
                             </p>
                         @else
-                            <p class="text-muted">Tidak ada file</p>
+                            <p class="text-muted text-reset">Tidak ada file</p>
                         @endif
                     </div>
                 </div>
@@ -211,11 +279,11 @@
 
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Luaran Target Capaian</h4>
+                    <h3 class="card-title">2.3 Luaran Target Capaian</h3>
                 </div>
                 <div class="card-body">
                     @if ($proposal->outputs->isEmpty())
-                        <p class="text-muted">Belum ada luaran target</p>
+                        <p class="text-muted text-reset">Belum ada luaran target</p>
                     @else
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm">
@@ -248,7 +316,7 @@
         <div id="section-rab" x-show="currentStep === 3">
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Rencana Anggaran Biaya (RAB)</h4>
+                    <h3 class="card-title">3.1 Rencana Anggaran Biaya (RAB)</h3>
                 </div>
                 <div class="card-body">
                     @if ($proposal->budgetItems->isEmpty())
@@ -297,7 +365,7 @@
         <div id="section-dokumen" x-show="currentStep === 4">
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h4 class="mb-0 card-title">Mitra Kerjasama</h4>
+                    <h3 class="card-title">4.1 Mitra Kerjasama</h3>
                 </div>
                 <div class="card-body">
                     @if ($proposal->partners->isEmpty())
@@ -345,11 +413,6 @@
 
         <!-- Section 5: Workflow & Aksi -->
         <div id="section-workflow" x-show="currentStep === 5">
-            <!-- Team Members Management -->
-            <div class="mb-3">
-                <livewire:research.proposal.team-member-form :proposalId="$proposal->id" :key="'team-form-' . $proposal->id" />
-            </div>
-
             <!-- Reviewer Assignment (Admin Only) -->
             @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
                     $proposal->status->value === 'under_review')
@@ -511,6 +574,21 @@
                         </div>
                     @endif
                 </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="mt-4">
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn" @click="currentStep--" x-show="currentStep > 1">
+                    <x-lucide-arrow-left class="icon" />
+                    Kembali
+                </button>
+                <div x-show="currentStep === 1"></div>
+                <button type="button" class="btn btn-primary" @click="currentStep++" x-show="currentStep < 5">
+                    Selanjutnya
+                    <x-lucide-arrow-right class="icon" />
+                </button>
             </div>
         </div>
     </div>
