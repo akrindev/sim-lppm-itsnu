@@ -450,19 +450,18 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($proposal->status === 'approved')
+                                                @if ($proposal->status->value === 'approved')
                                                     <span class="bg-success badge">Disetujui</span>
-                                                @elseif($proposal->status === 'rejected')
+                                                @elseif($proposal->status->value === 'rejected')
                                                     <span class="bg-danger badge">Ditolak</span>
-                                                @elseif($proposal->status === 'submitted')
+                                                @elseif($proposal->status->value === 'submitted')
                                                     <span class="bg-warning badge">Menunggu Review</span>
-                                                @elseif($proposal->status === 'reviewed')
+                                                @elseif($proposal->status->value === 'reviewed')
                                                     <span class="bg-info badge">Sudah Direview</span>
-                                                @elseif($proposal->status === 'completed')
+                                                @elseif($proposal->status->value === 'completed')
                                                     <span class="bg-success badge">Selesai</span>
                                                 @else
-                                                    <span
-                                                        class="bg-secondary badge">{{ ucfirst($proposal->status) }}</span>
+                                                    <span class="bg-secondary badge">{{ $proposal->status->label() }}</span>
                                                 @endif
                                             </td>
                                             <td class="text-muted">

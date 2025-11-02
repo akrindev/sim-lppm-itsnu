@@ -274,11 +274,19 @@
             <livewire:community-service.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
         </div>
 
-        <!-- Approval Button (Admin Only - Reviewed Status) -->
-        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
-                in_array($proposal->status, ['reviewed', 'under_review']))
+        <!-- Kepala LPPM Initial Approval (Status: APPROVED from Dekan) -->
+        @if (auth()->user()->hasRole(['kepala lppm', 'rektor']) && $proposal->status->value === 'approved')
             <div class="mb-3">
-                <livewire:community-service.proposal.approval-button :proposalId="$proposal->id" :key="'approval-button-' . $proposal->id" />
+                <livewire:community-service.proposal.kepala-lppm-initial-approval :proposalId="$proposal->id"
+                    :key="'initial-approval-' . $proposal->id" />
+            </div>
+        @endif
+
+        <!-- Kepala LPPM Final Decision (Status: REVIEWED) -->
+        @if (auth()->user()->hasRole(['kepala lppm', 'rektor']) && $proposal->status->value === 'reviewed')
+            <div class="mb-3">
+                <livewire:community-service.proposal.kepala-lppm-final-decision :proposalId="$proposal->id"
+                    :key="'final-decision-' . $proposal->id" />
             </div>
         @endif
 

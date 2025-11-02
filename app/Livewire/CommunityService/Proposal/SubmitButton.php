@@ -2,6 +2,7 @@
 
 namespace App\Livewire\CommunityService\Proposal;
 
+use App\Enums\ProposalStatus;
 use App\Livewire\Actions\SubmitProposalAction;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
@@ -28,8 +29,13 @@ class SubmitButton extends Component
     public function canSubmit(): bool
     {
         $proposal = $this->proposal;
+        $allowedStatuses = [
+            ProposalStatus::DRAFT,
+            ProposalStatus::NEED_ASSIGNMENT,
+            ProposalStatus::REVISION_NEEDED,
+        ];
 
-        return $proposal->status === 'draft'
+        return in_array($proposal->status, $allowedStatuses)
             && $proposal->allTeamMembersAccepted()
             && Auth::id() === $proposal->submitter_id;
     }

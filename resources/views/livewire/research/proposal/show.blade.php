@@ -14,7 +14,7 @@
                 Kembali
             </a>
         @endif
-        @if ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id())
+        @if ($proposal->status->value === 'draft' && $proposal->submitter_id === auth()->id())
             <a href="{{ route('research.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
                 Edit
@@ -44,8 +44,8 @@
                     <div class="col-md-6">
                         <label class="form-label"><x-lucide-info class="me-2 icon" />Status</label>
                         <p>
-                            <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                                {{ ucfirst($proposal->status) }}
+                            <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
+                                {{ $proposal->status->label() }}
                             </x-tabler.badge>
                         </p>
                     </div>
@@ -194,11 +194,17 @@
             <livewire:research.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
         </div>
 
-        <!-- Approval Button (Admin Only - Reviewed Status) -->
-        @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']) &&
-                in_array($proposal->status, ['reviewed', 'under_review']))
+        <!-- Kepala LPPM Initial Approval (Status: APPROVED from Dekan) -->
+        @if (auth()->user()->hasRole(['kepala lppm', 'rektor']) && $proposal->status->value === 'approved')
             <div class="mb-3">
-                <livewire:research.proposal.approval-button :proposalId="$proposal->id" :key="'approval-button-' . $proposal->id" />
+                <livewire:research.proposal.kepala-lppm-initial-approval :proposalId="$proposal->id" :key="'initial-approval-' . $proposal->id" />
+            </div>
+        @endif
+
+        <!-- Kepala LPPM Final Decision (Status: REVIEWED) -->
+        @if (auth()->user()->hasRole(['kepala lppm', 'rektor']) && $proposal->status->value === 'reviewed')
+            <div class="mb-3">
+                <livewire:research.proposal.kepala-lppm-final-decision :proposalId="$proposal->id" :key="'final-decision-' . $proposal->id" />
             </div>
         @endif
 

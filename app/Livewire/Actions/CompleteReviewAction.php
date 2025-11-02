@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Actions;
 
+use App\Enums\ProposalStatus;
 use App\Models\ProposalReviewer;
 
 class CompleteReviewAction
@@ -11,7 +12,7 @@ class CompleteReviewAction
      */
     public function execute(ProposalReviewer $review, string $comments, string $recommendation): array
     {
-        if (! in_array($recommendation, ['approved', 'rejected', 'revision'])) {
+        if (! in_array($recommendation, [ProposalStatus::APPROVED, ProposalStatus::REJECTED, ProposalStatus::REVISION_NEEDED])) {
             return [
                 'success' => false,
                 'message' => 'Rekomendasi harus "approved", "rejected", atau "revision".',
@@ -30,7 +31,7 @@ class CompleteReviewAction
         // Check if proposal can now be approved
         $proposal = $review->proposal;
         if ($proposal->allReviewersCompleted()) {
-            $proposal->update(['status' => 'reviewed']);
+            $proposal->update(['status' => ProposalStatus::REVIEWED]);
         }
 
         return [

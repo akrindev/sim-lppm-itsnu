@@ -9,6 +9,7 @@ use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalInde
 use App\Livewire\CommunityService\Proposal\Show as CommunityServiceProposalShow;
 use App\Livewire\CommunityService\ProposalRevision\Index as CommunityServiceProposalRevisionIndex;
 use App\Livewire\Dashboard;
+use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
 use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
 use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
 use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
@@ -22,7 +23,6 @@ use App\Livewire\Review\Research as ReviewResearch;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\MasterData;
 use App\Livewire\Settings\Password;
-use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\SettingsIndex;
 use App\Livewire\Settings\TwoFactor;
 use App\Livewire\Users\Create as UsersCreate;
@@ -52,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Research Routes
-    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor'])->prefix('research')->name('research.')->group(function () {
+    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('research')->name('research.')->group(function () {
         Route::get('/', ResearchProposalIndex::class)->name('proposal.index');
 
         Route::get('proposal/create', ResearchProposalCreate::class)->name('proposal.create');
@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Community Service Routes
-    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor'])->prefix('community-service')->name('community-service.')->group(function () {
+    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('community-service')->name('community-service.')->group(function () {
         Route::get('/', CommunityServiceProposalIndex::class)->name('proposal.index');
         Route::get('proposal/create', CommunityServiceProposalCreate::class)->name('proposal.create');
         Route::get('proposal/{proposal}', CommunityServiceProposalShow::class)->name('proposal.show');
@@ -74,6 +74,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
         Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
+    });
+
+    // Dekan Routes
+    Route::middleware(['role:dekan'])->prefix('dekan')->name('dekan.')->group(function () {
+        Route::get('proposals', DekanProposalIndex::class)->name('proposals.index');
     });
 
     // Review Routes

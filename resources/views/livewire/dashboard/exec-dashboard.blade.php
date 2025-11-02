@@ -133,13 +133,12 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if ($research->status === 'approved')
+                                                @if ($research->status->value === 'approved')
                                                     <span class="bg-success badge">Disetujui</span>
-                                                @elseif($research->status === 'completed')
+                                                @elseif($research->status->value === 'completed')
                                                     <span class="bg-info badge">Selesai</span>
                                                 @else
-                                                    <span
-                                                        class="bg-secondary badge">{{ ucfirst($research->status) }}</span>
+                                                    <span class="bg-secondary badge">{{ $research->status->label() }}</span>
                                                 @endif
                                             </td>
                                             <td class="text-muted">
@@ -195,13 +194,12 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if ($communityService->status === 'approved')
+                                                @if ($communityService->status->value === 'approved')
                                                     <span class="bg-success badge">Disetujui</span>
-                                                @elseif($communityService->status === 'completed')
+                                                @elseif($communityService->status->value === 'completed')
                                                     <span class="bg-info badge">Selesai</span>
                                                 @else
-                                                    <span
-                                                        class="bg-secondary badge">{{ ucfirst($communityService->status) }}</span>
+                                                    <span class="bg-secondary badge">{{ $communityService->status->label() }}</span>
                                                 @endif
                                             </td>
                                             <td class="text-muted">

@@ -175,8 +175,8 @@
                                 <small class="text-secondary">{{ $proposal->submitter?->email }}</small>
                             </td>
                             <td>
-                                <x-tabler.badge :color="$proposal->status" class="fw-normal">
-                                    {{ ucfirst($proposal->status) }}
+                                <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
+                                    {{ $proposal->status->label() }}
                                 </x-tabler.badge>
                             </td>
                             <td>
