@@ -60,8 +60,13 @@ class Index extends Component
         $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
 
         if (! $isAdmin) {
-            // Regular users only see their own proposals
-            $query->where('submitter_id', $user->id);
+            // Regular users see their own proposals OR proposals where they are team members
+            $query->where(function ($q) use ($user) {
+                $q->where('submitter_id', $user->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) use ($user) {
+                        $teamQuery->where('user_id', $user->id);
+                    });
+            });
         }
 
         return $query
@@ -104,14 +109,19 @@ class Index extends Component
 
         $query = Proposal::where('detailable_type', Research::class);
         if (! $isAdmin) {
-            $query->where('submitter_id', $user->id);
+            $query->where(function ($q) use ($user) {
+                $q->where('submitter_id', $user->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) use ($user) {
+                        $teamQuery->where('user_id', $user->id);
+                    });
+            });
         }
 
         $query->get(['status'])
             ->each(function ($proposal) use (&$stats) {
                 $stats['all']++;
-                if (isset($stats[$proposal->status])) {
-                    $stats[$proposal->status]++;
+                if (isset($stats[$proposal->status->value])) {
+                    $stats[$proposal->status->value]++;
                 }
             });
 
@@ -126,7 +136,12 @@ class Index extends Component
 
         $query = Proposal::where('detailable_type', Research::class);
         if (! $isAdmin) {
-            $query->where('submitter_id', $user->id);
+            $query->where(function ($q) use ($user) {
+                $q->where('submitter_id', $user->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) use ($user) {
+                        $teamQuery->where('user_id', $user->id);
+                    });
+            });
         }
 
         return [
@@ -144,7 +159,12 @@ class Index extends Component
 
         $query = Proposal::where('detailable_type', Research::class);
         if (! $isAdmin) {
-            $query->where('submitter_id', $user->id);
+            $query->where(function ($q) use ($user) {
+                $q->where('submitter_id', $user->id)
+                    ->orWhereHas('teamMembers', function ($teamQuery) use ($user) {
+                        $teamQuery->where('user_id', $user->id);
+                    });
+            });
         }
 
         $years = $query
