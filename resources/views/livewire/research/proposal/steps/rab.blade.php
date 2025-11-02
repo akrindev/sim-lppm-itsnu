@@ -34,7 +34,20 @@
                     </thead>
                     <tbody>
                         @foreach ($form->budget_items as $index => $item)
-                            <tr wire:key="budget-{{ $index }}" x-data="budgetRow({{ $index }})">
+                            @php
+                                $selectedGroupValue =
+                                    isset($item['budget_group_id']) && $item['budget_group_id'] !== ''
+                                        ? $item['budget_group_id']
+                                        : null;
+                            @endphp
+                            <tr wire:key="budget-{{ $index }}" x-data="{
+                                selectedGroup: @js($selectedGroupValue),
+                                components: @js($this->budgetComponents->groupBy('budget_group_id')->map(fn($items) => $items->map(fn($i) => ['id' => $i->id, 'name' => $i->name])->values())->toArray()),
+                                get filteredComponents() {
+                                    if (!this.selectedGroup) return [];
+                                    return this.components[this.selectedGroup] || [];
+                                }
+                            }">
                                 <td>
                                     <select wire:model.live="form.budget_items.{{ $index }}.budget_group_id"
                                         x-model="selectedGroup" class="form-select-sm form-select">
@@ -46,8 +59,7 @@
                                 </td>
                                 <td>
                                     <select wire:model="form.budget_items.{{ $index }}.budget_component_id"
-                                        class="form-select-sm form-select"
-                                        :disabled="!selectedGroup">
+                                        class="form-select-sm form-select" :disabled="!selectedGroup">
                                         <option value="">-- Pilih --</option>
                                         <template x-for="comp in filteredComponents" :key="comp.id">
                                             <option :value="comp.id" x-text="comp.name"></option>
@@ -102,29 +114,3 @@
         @endif
     </div>
 </div>
-
-@push('scripts')
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('budgetRow', (rowIndex) => ({
-        selectedGroup: null,
-        components: @js($this->budgetComponents->groupBy('budget_group_id')->map(fn($items) => $items->map(fn($item) => ['id' => $item->id, 'name' => $item->name])->values())->toArray()),
-
-        init() {
-            // Watch for changes from Livewire
-            this.$watch('$wire.form.budget_items.' + rowIndex + '.budget_group_id', (value) => {
-                this.selectedGroup = value;
-            });
-
-            // Get initial value
-            this.selectedGroup = this.$wire.form.budget_items[rowIndex]?.budget_group_id || null;
-        },
-
-        get filteredComponents() {
-            if (!this.selectedGroup) return [];
-            return this.components[this.selectedGroup] || [];
-        }
-    }));
-});
-</script>
-@endpush
