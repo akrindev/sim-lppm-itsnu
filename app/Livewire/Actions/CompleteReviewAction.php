@@ -6,6 +6,7 @@ use App\Enums\ProposalStatus;
 use App\Models\ProposalReviewer;
 use App\Models\User;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Auth;
 
 class CompleteReviewAction
 {
@@ -63,9 +64,10 @@ class CompleteReviewAction
             ->push(User::role('kepala lppm')->first()) // Kepala LPPM
             ->push(User::role('admin lppm')->first()) // Admin LPPM
             ->merge($proposal->team->pluck('user')) // Team Members
-            ->filter(fn($user) => $user->id !== $reviewer->id) // Exclude reviewer
+            ->filter(fn ($user) => $user->id !== $reviewer->id) // Exclude reviewer
             ->unique('id')
-            ->values();
+            ->values()
+            ->toArray();
 
         $this->notificationService->notifyReviewCompleted(
             $proposal,
@@ -88,11 +90,12 @@ class CompleteReviewAction
             ->merge($proposal->team->pluck('user')) // Team Members
             ->filter()
             ->unique('id')
-            ->values();
+            ->values()
+            ->toArray();
 
         $this->notificationService->notifyReviewCompleted(
             $proposal,
-            auth()->user(),
+            Auth::user(),
             true, // All reviews complete
             $recipients
         );

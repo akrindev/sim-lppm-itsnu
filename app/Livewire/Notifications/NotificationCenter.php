@@ -2,9 +2,7 @@
 
 namespace App\Livewire\Notifications;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -64,24 +62,6 @@ class NotificationCenter extends Component
     public function setFilter(string $filter): void
     {
         $this->filter = $filter;
-    }
-
-    public function deleteNotification(string $notificationId): void
-    {
-        $user = Auth::user();
-        $user->notifications()->where('id', $notificationId)->delete();
-
-        $this->dispatch('notification-updated');
-        session()->flash('success', 'Notifikasi telah dihapus.');
-    }
-
-    public function deleteAll(): void
-    {
-        $user = Auth::user();
-        $user->notifications()->delete();
-
-        $this->dispatch('notification-updated');
-        session()->flash('success', 'Semua notifikasi telah dihapus.');
     }
 
     public function getIconAttribute(string $type): string

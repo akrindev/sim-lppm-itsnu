@@ -16,14 +16,6 @@
                             Tandai Semua Dibaca
                         </button>
                     @endif
-                    <button wire:click="deleteAll" class="btn btn-outline-danger btn-sm" onclick="return confirm('Yakin ingin menghapus semua notifikasi?')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
-                            <path d="M3 6h18"/>
-                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                            <path d="M8 6V4c0-1 1-2 2-2h4c0-1 1-2 2-2v2"/>
-                        </svg>
-                        Hapus Semua
-                    </button>
                 </div>
             </div>
         </div>
@@ -130,32 +122,13 @@
                                 </div>
 
                                 <div class="col-auto">
-                                    <div class="dropdown">
-                                        <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted">
-                                                <circle cx="12" cy="12" r="1"/>
-                                                <circle cx="12" cy="5" r="1"/>
-                                                <circle cx="12" cy="19" r="1"/>
+                                    @if ($isUnread)
+                                        <button wire:click="markAsRead('{{ $notification->id }}')" class="btn btn-sm btn-outline-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20 6L9 17l-5-5"/>
                                             </svg>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            @if ($isUnread)
-                                                <button wire:click="markAsRead('{{ $notification->id }}')" class="dropdown-item">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
-                                                        <path d="M20 6L9 17l-5-5"/>
-                                                    </svg>
-                                                    Tandai Dibaca
-                                                </button>
-                                            @endif
-                                            <button wire:click="deleteNotification('{{ $notification->id }}')" class="dropdown-item text-danger" onclick="return confirm('Yakin ingin menghapus notifikasi ini?')">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
-                                                    <path d="M3 6h18"/>
-                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                                </svg>
-                                                Hapus
-                                            </button>
-                                        </div>
-                                    </div>
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
