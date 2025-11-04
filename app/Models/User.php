@@ -117,7 +117,7 @@ class User extends Authenticatable
     public function profilePicture(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->identity?->profile_picture
+            get: fn ($value) => $this->identity()->profile_picture
                 ?? 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s=128&d=identicon',
         );
     }

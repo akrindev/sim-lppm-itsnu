@@ -26,6 +26,17 @@ class Show extends Component
      */
     public function mount(Proposal $proposal): void
     {
+        // Eager load all required relationships for the show page
+        $proposal->load([
+            'submitter',
+            'focusArea',
+            'researchScheme',
+            'theme',
+            'topic',
+            'nationalPriority',
+            'teamMembers',
+        ]);
+
         $this->form->setProposal($proposal);
     }
 
@@ -46,22 +57,14 @@ class Show extends Component
             session()->flash('success', 'Proposal penelitian berhasil dihapus');
             $this->redirect(route('research.proposal.index'));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
         }
     }
 
     public function render(): View
     {
         return view('livewire.research.proposal.show', [
-            'proposal' => $this->form->proposal->load([
-                'submitter',
-                'focusArea',
-                'researchScheme',
-                'theme',
-                'topic',
-                'nationalPriority',
-                'teamMembers',
-            ]),
+            'proposal' => $this->form->proposal,
         ]);
     }
 

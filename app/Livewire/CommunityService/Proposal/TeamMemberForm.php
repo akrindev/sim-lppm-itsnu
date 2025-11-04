@@ -19,15 +19,17 @@ class TeamMemberForm extends Component
     #[Computed]
     public function proposal()
     {
-        return Proposal::find($this->proposalId);
+        return Proposal::with([
+            'teamMembers.identity',
+        ])->find($this->proposalId);
     }
 
     #[Computed]
     public function teamMembers()
     {
-        return $this->proposal->teamMembers()
-            ->orderByPivot('created_at', 'desc')
-            ->get();
+        return $this->proposal->teamMembers
+            ->sortByDesc('pivot.created_at')
+            ->values();
     }
 
     public function render(): View

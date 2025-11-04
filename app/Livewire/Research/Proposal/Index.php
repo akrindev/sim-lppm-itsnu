@@ -70,7 +70,7 @@ class Index extends Component
         }
 
         return $query
-            ->with(['submitter', 'focusArea', 'researchScheme'])
+            ->with(['submitter.identity', 'focusArea', 'researchScheme'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('title', 'like', "%{$this->search}%")
