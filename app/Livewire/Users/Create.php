@@ -23,7 +23,7 @@ class Create extends Component
 
     public string $password_confirmation = '';
 
-    public ?string $selectedRole = null;
+    public array $selectedRoles = [];
 
     // Identity fields
     public string $identity_id = '';
@@ -67,8 +67,9 @@ class Create extends Component
                 'study_program_id' => $validated['study_program_id'],
             ]);
 
-            if ($validated['selectedRole']) {
-                $user->syncRoles([$validated['selectedRole']]);
+            // Sync multiple roles
+            if (! empty($validated['selectedRoles'])) {
+                $user->syncRoles($validated['selectedRoles']);
             }
         });
 
@@ -101,7 +102,8 @@ class Create extends Component
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)],
             'password' => ['required', 'string', Password::defaults()],
             'password_confirmation' => ['required', 'same:password'],
-            'selectedRole' => ['nullable', 'string', Rule::exists('roles', 'name')],
+            'selectedRoles' => ['nullable', 'array'],
+            'selectedRoles.*' => ['string', Rule::exists('roles', 'name')],
             'identity_id' => ['required', 'string', 'max:255', 'unique:identities,identity_id'],
             'address' => ['nullable', 'string', 'max:500'],
             'birthdate' => ['nullable', 'date', 'before:today'],
@@ -123,7 +125,7 @@ class Create extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Role $role) => [
+            ->map(fn (Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
             ])
@@ -141,7 +143,7 @@ class Create extends Component
         return Institution::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Institution $institution) => [
+            ->map(fn (Institution $institution) => [
                 'value' => $institution->id,
                 'label' => $institution->name,
             ])
@@ -164,7 +166,7 @@ class Create extends Component
             ->where('institution_id', $this->institution_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(\App\Models\StudyProgram $program) => [
+            ->map(fn (\App\Models\StudyProgram $program) => [
                 'value' => $program->id,
                 'label' => $program->name,
             ])

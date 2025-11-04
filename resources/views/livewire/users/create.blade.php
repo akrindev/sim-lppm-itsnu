@@ -73,24 +73,27 @@
                         <label class="form-label">
                             Peran <span class="text-muted">(opsional)</span>
                         </label>
-                        <div class="form-selectgroup @error('selectedRole') is-invalid @enderror">
+                        <div class="row row-cards">
                             @foreach ($roleOptions as $option)
-                                <label class="form-selectgroup-item">
-                                    <input type="radio" name="role" value="{{ $option['value'] }}"
-                                        class="form-selectgroup-input" wire:model="selectedRole">
-                                    <span class="form-selectgroup-label">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="me-1 icon">
-                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
-                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
-                                        </svg>
-                                        {{ $option['label'] }}
-                                    </span>
-                                </label>
+                                <div class="col-sm-6 col-lg-4">
+                                    <label class="form-selectgroup-item">
+                                        <input type="checkbox" name="role" value="{{ $option['value'] }}"
+                                            class="form-selectgroup-input" wire:model="selectedRoles"
+                                            @if (in_array($option['value'], $selectedRoles)) checked @endif>
+                                        <span class="form-selectgroup-label">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" class="me-1 icon">
+                                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                                            </svg>
+                                            {{ $option['label'] }}
+                                        </span>
+                                    </label>
+                                </div>
                             @endforeach
                         </div>
-                        @error('selectedRole')
+                        @error('selectedRoles')
                             <div class="d-block invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

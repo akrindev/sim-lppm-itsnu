@@ -37,13 +37,15 @@ class ReviewerForm extends Component
     #[Computed]
     public function proposal()
     {
-        return Proposal::find($this->proposalId);
+        return Proposal::with([
+            'reviewers.user',
+        ])->find($this->proposalId);
     }
 
     #[Computed]
     public function myReview()
     {
-        return $this->proposal->reviewers()
+        return $this->proposal->reviewers
             ->where('user_id', Auth::id())
             ->first();
     }
@@ -51,9 +53,7 @@ class ReviewerForm extends Component
     #[Computed]
     public function allReviews()
     {
-        return $this->proposal->reviewers()
-            ->with('user')
-            ->get();
+        return $this->proposal->reviewers;
     }
 
     #[Computed]
@@ -123,7 +123,7 @@ class ReviewerForm extends Component
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: ' . $e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }
     }
 

@@ -106,6 +106,16 @@ class ProposalForm extends Form
      */
     public function setProposal(Proposal $proposal): void
     {
+        $proposal->load([
+            'submitter.identity',
+            'detailable',
+            'teamMembers.identity',
+            'outputs',
+            'budgetItems',
+            'partners',
+            'reviewers.user',
+        ]);
+
         $this->proposal = $proposal;
 
         // Load common proposal fields
@@ -157,9 +167,7 @@ class ProposalForm extends Form
         }
 
         // Load team members (excluding ketua/submitter - only load anggota)
-        $this->members = $proposal->teamMembers()
-            ->with('identity')
-            ->get()
+        $this->members = $proposal->teamMembers
             ->filter(function ($member) {
                 // Only include non-ketua members (anggota)
                 return $member->pivot->role !== 'ketua';
@@ -177,16 +185,15 @@ class ProposalForm extends Form
             ->toArray();
 
         // Load author tasks from ketua's pivot data
-        $ketuaMember = $proposal->teamMembers()
-            ->wherePivot('role', 'ketua')
-            ->first();
+        $ketuaMember = $proposal->teamMembers
+            ->firstWhere('pivot.role', 'ketua');
 
         if ($ketuaMember) {
             $this->author_tasks = $ketuaMember->pivot->tasks ?? '';
         }
 
         // Load outputs
-        $this->outputs = $proposal->outputs()->get()->map(function ($output) {
+        $this->outputs = $proposal->outputs->map(function ($output) {
             return [
                 'year' => $output->output_year,
                 'category' => $output->category,
@@ -197,7 +204,7 @@ class ProposalForm extends Form
         })->toArray();
 
         // Load budget items
-        $this->budget_items = $proposal->budgetItems()->get()->map(function ($item) {
+        $this->budget_items = $proposal->budgetItems->map(function ($item) {
             return [
                 'budget_group_id' => $item->budget_group_id,
                 'budget_component_id' => $item->budget_component_id,
@@ -212,7 +219,7 @@ class ProposalForm extends Form
         })->toArray();
 
         // Load partners
-        $this->partner_ids = $proposal->partners()->pluck('partners.id')->toArray();
+        $this->partner_ids = $proposal->partners->pluck('id')->toArray();
     }
 
     /**
@@ -373,15 +380,15 @@ class ProposalForm extends Form
         ]);
 
         $this->attachTeamMembers($this->proposal, $this->proposal->submitter_id);
-        
+
         // Update outputs (delete old, create new)
         $this->proposal->outputs()->delete();
         $this->attachOutputs($this->proposal);
-        
+
         // Update budget items (delete old, create new)
         $this->proposal->budgetItems()->delete();
         $this->attachBudgetItems($this->proposal);
-        
+
         // Update partners (sync)
         $this->attachPartners($this->proposal);
     }

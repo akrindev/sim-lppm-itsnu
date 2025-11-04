@@ -279,46 +279,44 @@
                 <div class="card-header">
                     <h3 class="card-title">3.1 Rencana Anggaran Biaya (RAB)</h3>
                 </div>
-                <div class="card-body">
-                    @if ($proposal->budgetItems->isEmpty())
-                        <p class="text-muted">Belum ada item anggaran</p>
-                    @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead>
+                @if ($proposal->budgetItems->isEmpty())
+                    <p class="text-muted">Belum ada item anggaran</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="card-table table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Kelompok</th>
+                                    <th>Komponen</th>
+                                    <th>Item</th>
+                                    <th>Volume</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($proposal->budgetItems as $item)
                                     <tr>
-                                        <th>Kelompok</th>
-                                        <th>Komponen</th>
-                                        <th>Item</th>
-                                        <th>Volume</th>
-                                        <th>Harga Satuan</th>
-                                        <th>Total</th>
+                                        <td>{{ $item->budgetGroup?->name ?? ($item->group ?? '-') }}</td>
+                                        <td>{{ $item->budgetComponent?->name ?? ($item->component ?? '-') }}</td>
+                                        <td>{{ $item->item_description }}</td>
+                                        <td>{{ $item->volume }}</td>
+                                        <td>Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
+                                        <td>Rp {{ number_format($item->total_price, 2, ',', '.') }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($proposal->budgetItems as $item)
-                                        <tr>
-                                            <td>{{ $item->budgetGroup?->name ?? ($item->group ?? '-') }}</td>
-                                            <td>{{ $item->budgetComponent?->name ?? ($item->component ?? '-') }}</td>
-                                            <td>{{ $item->item_description }}</td>
-                                            <td>{{ $item->volume }}</td>
-                                            <td>Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($item->total_price, 2, ',', '.') }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="5" class="text-end">Total Anggaran:</th>
-                                        <th>Rp
-                                            {{ number_format($proposal->budgetItems->sum('total_price'), 2, ',', '.') }}
-                                        </th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    @endif
-                </div>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="5" class="text-end">Total Anggaran:</th>
+                                    <th>Rp
+                                        {{ number_format($proposal->budgetItems->sum('total_price'), 2, ',', '.') }}
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                @endif
             </div>
         </div>
 

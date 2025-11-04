@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RoleSwitcherController;
 use App\Livewire\CommunityService\DailyNote\Index as CommunityServiceDailyNoteIndex;
 use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalReportIndex;
 use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
@@ -109,6 +110,10 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    // Role Switcher Route
+    Route::post('role/switch', [RoleSwitcherController::class, 'switch'])
+        ->name('role.switch');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

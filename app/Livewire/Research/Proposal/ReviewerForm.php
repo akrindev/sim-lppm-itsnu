@@ -13,6 +13,7 @@ use Livewire\Component;
 class ReviewerForm extends Component
 {
     public string $proposalId = '';
+
     public bool $showForm = false;
 
     #[Validate('required|min:10')]
@@ -36,13 +37,15 @@ class ReviewerForm extends Component
     #[Computed]
     public function proposal()
     {
-        return Proposal::find($this->proposalId);
+        return Proposal::with([
+            'reviewers.user.identity',
+        ])->find($this->proposalId);
     }
 
     #[Computed]
     public function myReview()
     {
-        return $this->proposal->reviewers()
+        return $this->proposal->reviewers
             ->where('user_id', Auth::id())
             ->first();
     }
@@ -50,9 +53,7 @@ class ReviewerForm extends Component
     #[Computed]
     public function allReviews()
     {
-        return $this->proposal->reviewers()
-            ->with('user')
-            ->get();
+        return $this->proposal->reviewers;
     }
 
     #[Computed]
@@ -65,6 +66,7 @@ class ReviewerForm extends Component
     public function hasReviewed(): bool
     {
         $review = $this->myReview;
+
         return $review && $review->status === 'completed';
     }
 
@@ -72,7 +74,7 @@ class ReviewerForm extends Component
     public function canEditReview(): bool
     {
         $review = $this->myReview;
-        if (!$review) {
+        if (! $review) {
             return false;
         }
 
@@ -86,7 +88,7 @@ class ReviewerForm extends Component
 
     public function toggleForm(): void
     {
-        $this->showForm = !$this->showForm;
+        $this->showForm = ! $this->showForm;
     }
 
     public function submitReview(): void
@@ -121,7 +123,7 @@ class ReviewerForm extends Component
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: ' . $e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }
     }
 
