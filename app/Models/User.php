@@ -121,4 +121,83 @@ class User extends Authenticatable
                 ?? 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s=128&d=identicon',
         );
     }
+
+    /**
+     * Get the active role for this user from the session.
+     */
+    public function activeRole(): ?string
+    {
+        return session('active_role');
+    }
+
+    /**
+     * Check if the active role matches the given role.
+     */
+    public function activeHasRole(string $role): bool
+    {
+        return $this->activeRole() === $role;
+    }
+
+    /**
+     * Check if the active role matches any of the given roles.
+     */
+    public function activeHasAnyRole(array $roles): bool
+    {
+        $activeRole = $this->activeRole();
+
+        return in_array($activeRole, $roles, true);
+    }
+
+    /**
+     * Check if the active role matches all of the given roles.
+     */
+    public function activeHasAllRoles(array $roles): bool
+    {
+        $activeRole = $this->activeRole();
+
+        foreach ($roles as $role) {
+            if ($activeRole !== $role) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Override Spatie's hasRole to check only active role.
+     */
+    public function hasRole($role, $guard = null): bool
+    {
+        // Check if it's an array or collection
+        if (is_array($role) || $role instanceof \Illuminate\Support\Collection) {
+            return $this->activeHasAnyRole($role);
+        }
+
+        return $this->activeHasRole($role);
+    }
+
+    /**
+     * Override Spatie's hasAnyRole to check only active role.
+     */
+    public function hasAnyRole($roles, $guard = null): bool
+    {
+        return $this->activeHasAnyRole($roles);
+    }
+
+    /**
+     * Override Spatie's hasAllRoles to check only active role.
+     */
+    public function hasAllRoles($roles, $guard = null): bool
+    {
+        return $this->activeHasAllRoles($roles);
+    }
+
+    /**
+     * Override Spatie's hasExactRoles to check only active role.
+     */
+    public function hasExactRoles($roles, $guard = null): bool
+    {
+        return $this->activeHasAllRoles($roles);
+    }
 }

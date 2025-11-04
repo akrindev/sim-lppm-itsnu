@@ -15,7 +15,7 @@ class DashboardRedirector extends Component
     public function mount()
     {
         $this->user = Auth::user();
-        $this->roleName = $this->user->getRoleNames()->first();
+        $this->roleName = active_role();
 
         $dashboardComponent = match ($this->roleName) {
             'superadmin', 'admin lppm', 'admin lppm saintek', 'admin lppm dekabita' => 'dashboard.admin-dashboard',

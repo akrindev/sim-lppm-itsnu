@@ -39,16 +39,16 @@
                 </div>
 
                 <div class="col-12">
-                    <div class="mb-3">
+                    <div class="">
                         <label class="form-label">
                             Peran <span class="text-muted">(opsional)</span>
                         </label>
-                        <div class="form-selectgroup @error('selectedRole') is-invalid @enderror">
+                        <div class="form-selectgroup @error('selectedRoles') is-invalid @enderror">
                             @foreach ($roleOptions as $option)
                                 <label class="form-selectgroup-item">
-                                    <input type="radio" name="role" value="{{ $option['value'] }}"
-                                        class="form-selectgroup-input" wire:model.defer="selectedRole"
-                                        @if ($selectedRole === $option['value']) checked @endif>
+                                    <input type="checkbox" name="role" value="{{ $option['value'] }}"
+                                        class="form-selectgroup-input" wire:model.defer="selectedRoles"
+                                        @if (in_array($option['value'], $selectedRoles)) checked @endif>
                                     <span class="form-selectgroup-label">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -61,7 +61,7 @@
                                 </label>
                             @endforeach
                         </div>
-                        @error('selectedRole')
+                        @error('selectedRoles')
                             <div class="d-block invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -69,7 +69,7 @@
 
                 <div class="col-12">
                     <hr class="my-4">
-                    <h3 class="mb-4">Informasi Identitas</h3>
+                    <h3>Informasi Identitas</h3>
                 </div>
 
                 <div class="col-md-6">
@@ -162,7 +162,11 @@
                         <label class="form-label" for="institution">
                             Institusi
                         </label>
-                        <select id="institution" class="form-select @error('institution_id') is-invalid @enderror"
+                        <span class="text-muted">
+                            {{ $institution_name ?? 'Tidak ada institusi yang dipilih' }}
+                        </span>
+                        {{-- <select id="institution"
+                            class="form-select disabled form-disabled @error('institution_id') is-invalid @enderror"
                             wire:model.live="institution_id" disabled>
                             <option value="">Pilih institusi...</option>
                             @foreach ($institutionOptions as $option)
@@ -171,7 +175,7 @@
                         </select>
                         @error('institution_id')
                             <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        @enderror --}}
                     </div>
                 </div>
 
