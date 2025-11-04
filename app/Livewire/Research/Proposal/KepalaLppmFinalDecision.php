@@ -4,6 +4,8 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -18,6 +20,12 @@ class KepalaLppmFinalDecision extends Component
     public string $decision = '';
 
     public string $notes = '';
+
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {
+        parent::__construct();
+    }
 
     public function mount(string $proposalId): void
     {
@@ -126,7 +134,8 @@ class KepalaLppmFinalDecision extends Component
                 'notes' => $this->notes,
             ]);
 
-            // TODO: Send notification to submitter
+            // Send notifications
+            $this->sendNotifications($proposal, $this->decision, $user);
 
             $message = $this->decision === 'completed'
                 ? 'Proposal berhasil disetujui dan selesai.'
@@ -144,6 +153,29 @@ class KepalaLppmFinalDecision extends Component
 
             session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Send notifications to stakeholders
+     */
+    protected function sendNotifications(Proposal $proposal, string $decision, User $kepalaLppm): void
+    {
+        // Get recipients
+        $recipients = collect()
+            ->push($proposal->user) // Submitter
+            ->push(User::role('dekan')->first()) // Dekan
+            ->push(User::role('admin lppm')->first()) // Admin LPPM
+            ->merge($proposal->team->pluck('user')) // Team Members
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        $this->notificationService->notifyFinalDecision(
+            $proposal,
+            $decision,
+            $kepalaLppm,
+            $recipients
+        );
     }
 
     public function render(): View

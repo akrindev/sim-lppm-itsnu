@@ -6,13 +6,19 @@ use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use App\Models\ProposalReviewer;
 use App\Models\User;
+use App\Services\NotificationService;
+use Carbon\Carbon;
 
 class AssignReviewersAction
 {
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {}
+
     /**
      * Assign a reviewer to a proposal.
      */
-    public function execute(Proposal $proposal, int|string $reviewerId): array
+    public function execute(Proposal $proposal, int|string $reviewerId, int $daysToReview = 14): array
     {
         if ($proposal->status !== ProposalStatus::UNDER_REVIEW) {
             return [
@@ -46,6 +52,9 @@ class AssignReviewersAction
             'status' => 'pending',
         ]);
 
+        // Send notifications
+        $this->sendNotifications($proposal, $reviewer, $daysToReview);
+
         // Update proposal status to reviewed if first reviewer
         if ($proposal->reviewers()->count() === 1) {
             $proposal->update(['status' => ProposalStatus::REVIEWED]);
@@ -55,5 +64,29 @@ class AssignReviewersAction
             'success' => true,
             'message' => 'Berhasil menugaskan reviewer untuk proposal ini.',
         ];
+    }
+
+    /**
+     * Send notifications to reviewer and stakeholders
+     */
+    protected function sendNotifications(Proposal $proposal, User $reviewer, int $daysToReview): void
+    {
+        $deadline = Carbon::now()->addDays($daysToReview)->format('Y-m-d');
+
+        // Get recipients
+        $recipients = collect()
+            ->push($reviewer) // The reviewer
+            ->push($proposal->user) // Submitter
+            ->push(User::role('kepala lppm')->first()) // Kepala LPPM
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        $this->notificationService->notifyReviewerAssigned(
+            $proposal,
+            $reviewer,
+            $deadline,
+            $recipients
+        );
     }
 }

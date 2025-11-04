@@ -4,9 +4,15 @@ namespace App\Livewire\Actions;
 
 use App\Enums\ProposalStatus;
 use App\Models\ProposalReviewer;
+use App\Models\User;
+use App\Services\NotificationService;
 
 class CompleteReviewAction
 {
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {}
+
     /**
      * Complete a review submission.
      */
@@ -30,13 +36,65 @@ class CompleteReviewAction
 
         // Check if proposal can now be approved
         $proposal = $review->proposal;
+
+        // Send notifications
+        $this->sendNotifications($proposal, $review->user, $review);
+
         if ($proposal->allReviewersCompleted()) {
             $proposal->update(['status' => ProposalStatus::COMPLETED]);
+
+            // Send special notification for all reviews completed
+            $this->sendAllReviewsCompletedNotification($proposal);
         }
 
         return [
             'success' => true,
             'message' => 'Review berhasil diserahkan.',
         ];
+    }
+
+    /**
+     * Send notifications when a review is completed
+     */
+    protected function sendNotifications($proposal, User $reviewer, ProposalReviewer $review): void
+    {
+        $recipients = collect()
+            ->push($proposal->user) // Submitter
+            ->push(User::role('kepala lppm')->first()) // Kepala LPPM
+            ->push(User::role('admin lppm')->first()) // Admin LPPM
+            ->merge($proposal->team->pluck('user')) // Team Members
+            ->filter(fn($user) => $user->id !== $reviewer->id) // Exclude reviewer
+            ->unique('id')
+            ->values();
+
+        $this->notificationService->notifyReviewCompleted(
+            $proposal,
+            $reviewer,
+            false, // Not all reviews complete yet
+            $recipients
+        );
+    }
+
+    /**
+     * Send special notification when all reviews are completed
+     */
+    protected function sendAllReviewsCompletedNotification($proposal): void
+    {
+        $recipients = collect()
+            ->push($proposal->user) // Submitter
+            ->push(User::role('kepala lppm')->first()) // Kepala LPPM
+            ->push(User::role('dekan')->first()) // Dekan
+            ->push(User::role('admin lppm')->first()) // Admin LPPM
+            ->merge($proposal->team->pluck('user')) // Team Members
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        $this->notificationService->notifyReviewCompleted(
+            $proposal,
+            auth()->user(),
+            true, // All reviews complete
+            $recipients
+        );
     }
 }
