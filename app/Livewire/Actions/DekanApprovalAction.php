@@ -6,6 +6,7 @@ use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use App\Models\User;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -67,7 +68,7 @@ class DekanApprovalAction
                 ]);
 
                 // Send notifications based on decision
-                $this->sendNotifications($proposal, $decision, $dekan ?? auth()->user());
+                $this->sendNotifications($proposal, $decision, $dekan ?? Auth::user());
             });
 
             $message = $decision === 'approved'
