@@ -72,7 +72,7 @@
     @endif
 
     <!-- Decision Confirmation Modal -->
-    <div style="display: none;">
+    @teleport('body')
         <x-tabler.modal id="finalDecisionModal" title="Konfirmasi Keputusan Akhir">
             <x-slot:body>
                 <div class="py-3">
@@ -99,8 +99,7 @@
                         <label class="form-label">
                             Catatan {{ $decision === 'revision_needed' ? '(Wajib)' : '(Opsional)' }}
                         </label>
-                        <textarea class="form-control" rows="4" wire:model="notes"
-                            placeholder="Tambahkan catatan atau komentar..."></textarea>
+                        <textarea class="form-control" rows="4" wire:model="notes" placeholder="Tambahkan catatan atau komentar..."></textarea>
                         @if ($decision === 'revision_needed')
                             <small class="form-hint">
                                 Jelaskan perbaikan yang diperlukan agar pengusul dapat melakukan revisi dengan tepat.
@@ -135,5 +134,5 @@
                 </div>
             </x-slot:footer>
         </x-tabler.modal>
-    </div>
+    @endteleport
 </div>
