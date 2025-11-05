@@ -33,6 +33,7 @@ class StudyProgramFactory extends Factory
 
         return [
             'institution_id' => \App\Models\Institution::factory(),
+            'faculty_id' => \App\Models\Faculty::factory(),
             'name' => fake()->randomElement($programs),
         ];
     }

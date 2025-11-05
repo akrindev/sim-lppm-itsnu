@@ -7,19 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class StudyProgram extends Model
+class Faculty extends Model
 {
-    /** @use HasFactory<\Database\Factories\StudyProgramFactory> */
     use HasFactory;
 
     protected $fillable = [
         'institution_id',
-        'faculty_id',
         'name',
+        'code',
     ];
 
     /**
-     * Get the institution that owns the study program.
+     * Get the institution that owns the faculty.
      */
     public function institution(): BelongsTo
     {
@@ -27,15 +26,15 @@ class StudyProgram extends Model
     }
 
     /**
-     * Get the faculty that owns the study program.
+     * Get all study programs for the faculty.
      */
-    public function faculty(): BelongsTo
+    public function studyPrograms(): HasMany
     {
-        return $this->belongsTo(Faculty::class);
+        return $this->hasMany(StudyProgram::class);
     }
 
     /**
-     * Get all identities in this study program.
+     * Get all identities associated with the faculty.
      */
     public function identities(): HasMany
     {

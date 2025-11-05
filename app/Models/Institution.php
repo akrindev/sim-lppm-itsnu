@@ -16,11 +16,19 @@ class Institution extends Model
     ];
 
     /**
-     * Get all study programs for the institution.
+     * Get all faculties for the institution.
+     */
+    public function faculties(): HasMany
+    {
+        return $this->hasMany(Faculty::class);
+    }
+
+    /**
+     * Get all study programs for the institution (through faculties).
      */
     public function studyPrograms(): HasMany
     {
-        return $this->hasMany(StudyProgram::class);
+        return $this->hasManyThrough(StudyProgram::class, Faculty::class);
     }
 
     /**

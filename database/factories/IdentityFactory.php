@@ -25,6 +25,7 @@ class IdentityFactory extends Factory
             'user_id' => User::factory(),
             'institution_id' => \App\Models\Institution::factory(),
             'study_program_id' => \App\Models\StudyProgram::factory(),
+            'faculty_id' => \App\Models\Faculty::factory(),
             'address' => $this->faker->address(),
             'birthdate' => $this->faker->date(),
             'birthplace' => $this->faker->city(),
