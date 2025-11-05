@@ -60,11 +60,11 @@ class CompleteReviewAction
     protected function sendNotifications($proposal, User $reviewer, ProposalReviewer $review): void
     {
         $recipients = collect()
-            ->push($proposal->user) // Submitter
+            ->push($proposal->submitter) // Submitter
             ->push(User::role('kepala lppm')->first()) // Kepala LPPM
             ->push(User::role('admin lppm')->first()) // Admin LPPM
-            ->merge($proposal->team->pluck('user')) // Team Members
-            ->filter(fn ($user) => $user->id !== $reviewer->id) // Exclude reviewer
+            ->merge($proposal->teamMembers) // Team Members
+            ->filter(fn ($user) => $user && $user->id !== $reviewer->id) // Exclude reviewer
             ->unique('id')
             ->values()
             ->toArray();
@@ -83,11 +83,11 @@ class CompleteReviewAction
     protected function sendAllReviewsCompletedNotification($proposal): void
     {
         $recipients = collect()
-            ->push($proposal->user) // Submitter
+            ->push($proposal->submitter) // Submitter
             ->push(User::role('kepala lppm')->first()) // Kepala LPPM
             ->push(User::role('dekan')->first()) // Dekan
             ->push(User::role('admin lppm')->first()) // Admin LPPM
-            ->merge($proposal->team->pluck('user')) // Team Members
+            ->merge($proposal->teamMembers) // Team Members
             ->filter()
             ->unique('id')
             ->values()

@@ -83,7 +83,7 @@ class DekanApprovalAction
 
             return [
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat memproses persetujuan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat memproses persetujuan: '.$e->getMessage(),
             ];
         }
     }
@@ -97,20 +97,20 @@ class DekanApprovalAction
 
         if ($decision === 'approved') {
             // Notify: Submitter, Kepala LPPM, Team Members
-            $recipients->push($proposal->user);
+            $recipients->push($proposal->submitter);
             $recipients->push(User::role('kepala lppm')->first());
-            $recipients->merge($proposal->team->pluck('user'));
+            $recipients = $recipients->merge($proposal->teamMembers);
         } else {
             // Notify: Submitter, Team Members (for approval)
-            $recipients->push($proposal->user);
-            $recipients->merge($proposal->team->pluck('user')->filter(fn($user) => $user->id !== $proposal->user_id));
+            $recipients->push($proposal->submitter);
+            $recipients = $recipients->merge($proposal->teamMembers()->where('user_id', '!=', $proposal->submitter_id)->get());
         }
 
         $this->notificationService->notifyDekanApprovalDecision(
             $proposal,
             $decision,
             $dekan,
-            $recipients->filter()->unique('id')->values()
+            $recipients->filter()->unique('id')->values()->toArray()
         );
     }
 }

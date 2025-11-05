@@ -65,7 +65,7 @@ class SubmitProposalAction
     {
         // Get recipients: Dekan, Team Members, Admin LPPM
         $dekan = User::role('dekan')->first();
-        $teamMembers = $proposal->team->pluck('user')->filter(fn($user) => $user->id !== $proposal->user_id);
+        $teamMembers = $proposal->teamMembers()->where('user_id', '!=', $proposal->submitter_id)->get();
         $adminLppm = User::role('admin lppm')->first();
 
         $recipients = collect()
@@ -74,11 +74,12 @@ class SubmitProposalAction
             ->push($adminLppm)
             ->filter()
             ->unique('id')
-            ->values();
+            ->values()
+            ->toArray();
 
         $this->notificationService->notifyProposalSubmitted(
             $proposal,
-            $proposal->user,
+            $proposal->submitter,
             $recipients
         );
     }

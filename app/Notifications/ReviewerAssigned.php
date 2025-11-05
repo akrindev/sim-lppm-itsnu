@@ -2,7 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Mail\Proposals\ReviewerAssignedMail;
 use App\Models\Proposal;
+use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,7 +27,8 @@ class ReviewerAssigned extends Notification implements ShouldQueue
 
     public function toDatabase(object $notifiable): array
     {
-        $proposalType = $this->proposal->getMorphClass() === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
 
         return [
             'type' => 'reviewer_assigned',
@@ -36,28 +39,19 @@ class ReviewerAssigned extends Notification implements ShouldQueue
             'reviewer_id' => $this->reviewer->id,
             'reviewer_name' => $this->reviewer->name,
             'review_deadline' => $this->reviewDeadline,
-            'proposal_type' => $this->proposal->getMorphClass(),
-            'link' => route($this->proposal->getMorphClass() === 'research' ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal),
+            'proposal_type' => $isResearch ? 'research' : 'community_service',
+            'link' => route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal),
             'icon' => 'user-check',
             'created_at' => now()->toISOString(),
         ];
     }
 
-    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    public function toMail(object $notifiable): ReviewerAssignedMail
     {
-        $proposalType = $this->proposal->getMorphClass() === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat';
-        $mail = \Illuminate\Notifications\Messages\MailMessage::from('noreply@lppm-itsnu.ac.id', 'SIM LPPM ITSNU')
-            ->subject("[SIM LPPM] Ditunjuk sebagai Reviewer - {$this->proposal->title}")
-            ->greeting("Halo {$notifiable->name},")
-            ->line("Anda telah ditugaskan sebagai reviewer untuk proposal {$proposalType} berikut:")
-            ->line('Detail Proposal:')
-            ->line("• Judul: {$this->proposal->title}")
-            ->line("• Batas Waktu Review: {$this->reviewDeadline}")
-            ->line('Silakan lakukan review sesuai dengan panduan reviewer yang tersedia di sistem.')
-            ->action('Lihat Proposal', route($this->proposal->getMorphClass() === 'research' ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal))
-            ->line('Terima kasih atas kontribusi Anda sebagai reviewer.')
-            ->salutation('Salam,<br>Tim SIM LPPM ITSNU');
-
-        return $mail;
+        return (new ReviewerAssignedMail(
+            $this->proposal,
+            $this->reviewer,
+            $this->reviewDeadline
+        ))->to($notifiable->email);
     }
 }

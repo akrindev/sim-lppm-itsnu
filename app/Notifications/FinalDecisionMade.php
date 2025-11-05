@@ -2,7 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Mail\Proposals\FinalDecisionMadeMail;
 use App\Models\Proposal;
+use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,7 +27,8 @@ class FinalDecisionMade extends Notification implements ShouldQueue
 
     public function toDatabase(object $notifiable): array
     {
-        $proposalType = $this->proposal->getMorphClass() === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
 
         $data = match ($this->decision) {
             'approved' => [
@@ -67,61 +70,20 @@ class FinalDecisionMade extends Notification implements ShouldQueue
             'proposal_id' => $this->proposal->id,
             'kepala_lppm_id' => $this->kepalaLppm->id,
             'kepala_lppm_name' => $this->kepalaLppm->name,
-            'proposal_type' => $this->proposal->getMorphClass(),
-            'link' => route($this->proposal->getMorphClass() === 'research' ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal),
+            'proposal_type' => $isResearch ? 'research' : 'community_service',
+            'link' => route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal),
             'icon' => $data['icon'],
             'created_at' => now()->toISOString(),
         ];
     }
 
-    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    public function toMail(object $notifiable): FinalDecisionMadeMail
     {
-        $proposalType = $this->proposal->getMorphClass() === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat';
-
-        $data = match ($this->decision) {
-            'approved' => [
-                'title' => 'Proposal Disetujui',
-                'subject' => "[SIM LPPM] Keputusan Akhir: {$this->proposal->title} - Disetujui",
-                'line1' => "Kepala LPPM telah menyetujui proposal {$proposalType} berikut:",
-                'line2' => 'Selamat! Proposal Anda telah melalui semua tahap review dan mendapat persetujuan final.',
-                'icon' => 'award',
-            ],
-            'rejected' => [
-                'title' => 'Proposal Ditolak',
-                'subject' => "[SIM LPPM] Keputusan Akhir: {$this->proposal->title} - Ditolak",
-                'line1' => "Kepala LPPM meninjau proposal {$proposalType} berikut dan mengambil keputusan untuk menolaknya:",
-                'line2' => 'Mohon jangan menyerah dan silakan memperbaiki proposal Anda berdasarkan feedback yang diberikan.',
-                'icon' => 'x-circle',
-            ],
-            'revision_needed' => [
-                'title' => 'Proposal Memerlukan Revisi',
-                'subject' => "[SIM LPPM] Keputusan Akhir: {$this->proposal->title} - Memerlukan Revisi",
-                'line1' => "Kepala LPPM meninjau proposal {$proposalType} berikut dan meminta perbaikan/revisi:",
-                'line2' => 'Mohon untuk segera memperbaiki proposal sesuai dengan catatan dan rekomendasi yang diberikan.',
-                'icon' => 'edit',
-            ],
-            default => [
-                'title' => 'Keputusan Final',
-                'subject' => "[SIM LPPM] Keputusan Akhir: {$this->proposal->title}",
-                'line1' => "Kepala LPPM telah mengambil keputusan final terhadap proposal {$proposalType} berikut:",
-                'line2' => 'Mohon melihat detail keputusan dan catatan yang diberikan melalui sistem.',
-                'icon' => 'alert-circle',
-            ],
-        };
-
-        $mail = \Illuminate\Notifications\Messages\MailMessage::from('noreply@lppm-itsnu.ac.id', 'SIM LPPM ITSNU')
-            ->subject($data['subject'])
-            ->greeting("Halo {$notifiable->name},")
-            ->line($data['line1'])
-            ->line('Detail Proposal:')
-            ->line("• Judul: {$this->proposal->title}")
-            ->line("• Kepala LPPM: {$this->kepalaLppm->name}")
-            ->line('• Tanggal Keputusan: '.now()->format('d/m/Y H:i'))
-            ->line($data['line2'])
-            ->action('Lihat Proposal', route($this->proposal->getMorphClass() === 'research' ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal))
-            ->line('Terima kasih atas perhatian Anda.')
-            ->salutation('Salam,<br>Tim SIM LPPM ITSNU');
-
-        return $mail;
+        return (new FinalDecisionMadeMail(
+            $this->proposal,
+            $this->decision,
+            $this->kepalaLppm,
+            $notifiable
+        ))->to($notifiable->email);
     }
 }

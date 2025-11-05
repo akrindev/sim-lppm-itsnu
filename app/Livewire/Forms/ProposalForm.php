@@ -477,6 +477,9 @@ class ProposalForm extends Form
             'status' => 'accepted', // Submitter/ketua is always accepted
         ];
 
+        // Get the submitter user for notifications
+        $submitter = \App\Models\User::find($submitterId);
+
         // Add other team members (anggota) - filter out ketua if it exists in members array
         if (! empty($this->members)) {
             foreach ($this->members as $member) {
@@ -493,6 +496,11 @@ class ProposalForm extends Form
                         'role' => 'anggota',
                         'status' => 'pending', // Other team members start as pending
                     ];
+
+                    // Send invitation notification
+                    $invitee = $identity->user;
+                    $notificationService = app(\App\Services\NotificationService::class);
+                    $notificationService->notifyTeamInvitationSent($proposal, $submitter, $invitee);
                 }
             }
         }

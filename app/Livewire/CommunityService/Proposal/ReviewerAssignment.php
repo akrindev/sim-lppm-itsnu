@@ -53,7 +53,7 @@ class ReviewerAssignment extends Component
         $this->validate();
 
         $proposal = $this->proposal;
-        $action = new AssignReviewersAction;
+        $action = app(AssignReviewersAction::class);
         $result = $action->execute($proposal, $this->selectedReviewer);
 
         if ($result['success']) {

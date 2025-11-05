@@ -2,7 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Mail\Proposals\ProposalSubmittedMail;
 use App\Models\Proposal;
+use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,8 +26,9 @@ class ProposalSubmitted extends Notification implements ShouldQueue
 
     public function toDatabase(object $notifiable): array
     {
-        $proposalType = $this->proposal->getMorphClass() === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat';
-        $routeName = $this->proposal->getMorphClass() === 'research'
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $routeName = $isResearch
             ? 'research.proposal.show'
             : 'community-service.proposal.show';
 
@@ -33,37 +36,23 @@ class ProposalSubmitted extends Notification implements ShouldQueue
             'type' => 'proposal_submitted',
             'title' => 'Proposal Baru Disubmit',
             'message' => "Proposal '{$this->proposal->title}' telah disubmit oleh {$this->submitter->name}",
-            'body' => "Proposal {$proposalType} dengan judul '{$this->proposal->title}' telah berhasil disubmit oleh {$this->submitter->name} pada tanggal ".now()->format('d/m/Y H:i').'. Proposal ini sedang menunggu review dan persetujuan dari Dekan. Tim reviewer akan ditentukan kemudian oleh Kepala LPPM. Mohon menunggu informasi selanjutnya melalui sistem notifikasi.',
+            'body' => "Proposal {$proposalType} dengan judul '{$this->proposal->title}' telah berhasil disubmit oleh {$this->submitter->name} pada tanggal " . now()->format('d/m/Y H:i') . '. Proposal ini sedang menunggu review dan persetujuan dari Dekan. Tim reviewer akan ditentukan kemudian oleh Kepala LPPM. Mohon menunggu informasi selanjutnya melalui sistem notifikasi.',
             'proposal_id' => $this->proposal->id,
             'submitter_id' => $this->submitter->id,
             'submitter_name' => $this->submitter->name,
-            'proposal_type' => $this->proposal->getMorphClass(),
+            'proposal_type' => $isResearch ? 'research' : 'community_service',
             'link' => route($routeName, $this->proposal),
             'icon' => 'file-text',
             'created_at' => now()->toISOString(),
         ];
     }
 
-    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    public function toMail(object $notifiable): ProposalSubmittedMail
     {
-        $proposalType = $this->proposal->getMorphClass() === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat';
-        $routeName = $this->proposal->getMorphClass() === 'research'
-            ? 'research.proposal.show'
-            : 'community-service.proposal.show';
-
-        $mail = \Illuminate\Notifications\Messages\MailMessage::from('noreply@lppm-itsnu.ac.id', 'SIM LPPM ITSNU')
-            ->subject("[SIM LPPM] Proposal Baru: {$this->proposal->title} - Menunggu Persetujuan")
-            ->greeting("Halo {$notifiable->name},")
-            ->line("Proposal {$proposalType} baru telah disubmit dan menunggu persetujuan.")
-            ->line('Detail Proposal:')
-            ->line("• Judul: {$this->proposal->title}")
-            ->line("• Diajukan oleh: {$this->submitter->name}")
-            ->line('• Tanggal Submit: '.now()->format('d/m/Y H:i'))
-            ->line('Proposal ini sedang menunggu review dan persetujuan dari Dekan. Tim reviewer akan ditentukan kemudian.')
-            ->action('Lihat Proposal', route($routeName, $this->proposal))
-            ->line('Terima kasih atas perhatian Anda.')
-            ->salutation('Salam,<br>Tim SIM LPPM ITSNU');
-
-        return $mail;
+        return (new ProposalSubmittedMail(
+            $this->proposal,
+            $this->submitter,
+            $notifiable
+        ))->to($notifiable->email);
     }
 }

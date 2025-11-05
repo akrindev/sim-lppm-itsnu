@@ -53,6 +53,11 @@ class TeamMemberInvitation extends Component
 
         if ($teamMember) {
             $teamMember->pivot->update(['status' => 'accepted']);
+
+            // Send notification
+            $notificationService = app(\App\Services\NotificationService::class);
+            $notificationService->notifyTeamInvitationAccepted($this->proposal, $user, $user);
+
             $this->dispatch('team-member-accepted', proposalId: $this->proposal->id);
             session()->flash('success', 'Anda telah menerima undangan menjadi anggota proposal ini.');
         }
@@ -68,6 +73,11 @@ class TeamMemberInvitation extends Component
 
         if ($teamMember) {
             $teamMember->pivot->update(['status' => 'rejected']);
+
+            // Send notification
+            $notificationService = app(\App\Services\NotificationService::class);
+            $notificationService->notifyTeamInvitationRejected($this->proposal, $user, $user);
+
             $this->dispatch('team-member-rejected', proposalId: $this->proposal->id);
             session()->flash('warning', 'Anda telah menolak undangan untuk proposal ini.');
         }

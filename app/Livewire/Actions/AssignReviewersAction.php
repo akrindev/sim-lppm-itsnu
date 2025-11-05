@@ -76,11 +76,12 @@ class AssignReviewersAction
         // Get recipients
         $recipients = collect()
             ->push($reviewer) // The reviewer
-            ->push($proposal->user) // Submitter
+            ->push($proposal->submitter) // Submitter
             ->push(User::role('kepala lppm')->first()) // Kepala LPPM
             ->filter()
             ->unique('id')
-            ->values();
+            ->values()
+            ->toArray();
 
         $this->notificationService->notifyReviewerAssigned(
             $proposal,

@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Mail\Proposals;
+
+use App\Models\Proposal;
+use App\Models\Research;
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class ReviewOverdueMail extends Mailable implements ShouldQueue
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(
+        public Proposal $proposal,
+        public User $reviewer,
+        public string $daysOverdue
+    ) {}
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: "[SIM LPPM] 🚨 URGENT: Review Overdue - {$this->proposal->title}",
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $routeName = $isResearch ? 'research.proposal.show' : 'community-service.proposal.show';
+
+        return new Content(
+            markdown: 'mail.proposals.review-overdue',
+            with: [
+                'reviewerName' => $this->reviewer->name,
+                'proposalType' => $proposalType,
+                'proposalTitle' => $this->proposal->title,
+                'daysOverdue' => $this->daysOverdue,
+                'url' => route($routeName, $this->proposal),
+            ],
+        );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
+    }
+}

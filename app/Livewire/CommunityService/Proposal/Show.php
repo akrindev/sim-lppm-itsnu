@@ -114,7 +114,7 @@ class Show extends Component
         $proposal = $this->form->proposal;
 
         // Execute approval action
-        $action = new DekanApprovalAction;
+        $action = app(DekanApprovalAction::class);
         $result = $action->execute($proposal, $this->approvalDecision, $this->approvalNotes);
 
         if ($result['success']) {
