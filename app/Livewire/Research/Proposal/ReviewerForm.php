@@ -5,6 +5,7 @@ namespace App\Livewire\Research\Proposal;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -104,26 +105,37 @@ class ReviewerForm extends Component
         }
 
         try {
-            // Allow updating review even after submission
-            $review->update([
-                'status' => 'completed',
-                'review_notes' => $this->reviewNotes,
-                'recommendation' => $this->recommendation,
-            ]);
+            $isNew = ! $review->exists;
 
-            // Check if all reviews are completed
-            $allCompleted = $this->proposal->allReviewsCompleted();
+            DB::transaction(function (): void {
+                $review = $this->myReview;
 
-            if ($allCompleted) {
-                // Update proposal status to reviewed
-                $this->proposal->update(['status' => ProposalStatus::COMPLETED]);
-            }
+                // Allow updating review even after submission
+                $review->update([
+                    'status' => 'completed',
+                    'review_notes' => $this->reviewNotes,
+                    'recommendation' => $this->recommendation,
+                ]);
 
-            $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
+                // Refresh the proposal and review from DB to get updated data
+                $proposal = $this->proposal->fresh(['reviewers']);
+                $review = $proposal->reviewers->where('user_id', Auth::id())->first();
+
+                // Check if all reviews are completed using fresh data
+                $allCompleted = $proposal->allReviewsCompleted();
+
+                if ($allCompleted) {
+                    // Update proposal status to reviewed
+                    $proposal->update(['status' => ProposalStatus::REVIEWED]);
+                }
+            });
+
+            $review = $this->myReview;
+            $message = $isNew ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: ' . $e->getMessage());
         }
     }
 

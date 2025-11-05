@@ -56,7 +56,7 @@
 
     <!-- Add Member Modal -->
     @teleport('body')
-        <x-tabler.modal id="modal-add-member" :title="$modalTitle" :component-id="$this->getId()" on-show="resetMemberForm">
+        <x-tabler.modal id="modal-add-member" :title="$modalTitle" on-show="resetMemberForm">
             <x-slot:body>
                 <div class="mb-3">
                     <label class="form-label" for="member_nidn">NIDN / NIP <span class="text-danger">*</span></label>
@@ -146,7 +146,7 @@
     @if (!empty($members))
         @foreach ($members as $index => $member)
             @teleport('body')
-                <x-tabler.modal id="modal-confirm-delete-{{ $index }}" title="Konfirmasi Hapus" :component-id="$this->getId()">
+                <x-tabler.modal id="modal-confirm-delete-{{ $index }}" title="Konfirmasi Hapus">
                     <x-slot:body>
                         <div class="text-center">
                             <div class="mb-3">

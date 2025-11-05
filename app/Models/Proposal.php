@@ -68,6 +68,14 @@ class Proposal extends Model
     }
 
     /**
+     * Alias for submitter relationship.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->submitter();
+    }
+
+    /**
      * Get the detailable model (Research or CommunityService).
      */
     public function detailable(): MorphTo

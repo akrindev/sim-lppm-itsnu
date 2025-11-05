@@ -4,17 +4,25 @@ namespace App\Livewire\Actions;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use App\Models\User;
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class DekanApprovalAction
 {
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {}
+
     /**
      * Execute the Dekan approval action
      *
      * @param  string  $decision  'approved' or 'need_assignment'
      * @return array{success: bool, message: string}
      */
-    public function execute(Proposal $proposal, string $decision, ?string $notes = null): array
+    public function execute(Proposal $proposal, string $decision, ?string $notes = null, ?User $dekan = null): array
     {
         // Validate proposal status
         if ($proposal->status !== ProposalStatus::SUBMITTED) {
@@ -45,22 +53,23 @@ class DekanApprovalAction
                 ];
             }
 
-            // Update proposal status
-            $proposal->update([
-                'status' => $newStatus,
-            ]);
+            DB::transaction(function () use ($proposal, $newStatus, $decision, $notes, $dekan): void {
+                // Update proposal status
+                $proposal->update([
+                    'status' => $newStatus,
+                ]);
 
-            // Log the activity
-            Log::info('Dekan approval action', [
-                'proposal_id' => $proposal->id,
-                'decision' => $decision,
-                'new_status' => $newStatus->value,
-                'notes' => $notes,
-            ]);
+                // Log the activity
+                Log::info('Dekan approval action', [
+                    'proposal_id' => $proposal->id,
+                    'decision' => $decision,
+                    'new_status' => $newStatus->value,
+                    'notes' => $notes,
+                ]);
 
-            // TODO: Send notification based on decision
-            // If approved: notify Kepala LPPM
-            // If need_assignment: notify submitter (dosen)
+                // Send notifications based on decision
+                $this->sendNotifications($proposal, $decision, $dekan ?? Auth::user());
+            });
 
             $message = $decision === 'approved'
                 ? 'Proposal berhasil disetujui dan diteruskan ke Kepala LPPM.'
@@ -81,5 +90,31 @@ class DekanApprovalAction
                 'message' => 'Terjadi kesalahan saat memproses persetujuan: ' . $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Send notifications based on decision
+     */
+    protected function sendNotifications(Proposal $proposal, string $decision, User $dekan): void
+    {
+        $recipients = collect();
+
+        if ($decision === 'approved') {
+            // Notify: Submitter, Kepala LPPM, Team Members
+            $recipients->push($proposal->submitter);
+            $recipients->push(User::role('kepala lppm')->first());
+            $recipients = $recipients->merge($proposal->teamMembers);
+        } else {
+            // Notify: Submitter, Team Members (for approval)
+            $recipients->push($proposal->submitter);
+            $recipients = $recipients->merge($proposal->teamMembers()->where('user_id', '!=', $proposal->submitter_id)->get());
+        }
+
+        $this->notificationService->notifyDekanApprovalDecision(
+            $proposal,
+            $decision,
+            $dekan,
+            $recipients->filter()->unique('id')->values()
+        );
     }
 }

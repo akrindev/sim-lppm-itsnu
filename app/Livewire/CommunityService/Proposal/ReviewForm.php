@@ -37,7 +37,7 @@ class ReviewForm extends Component
             return;
         }
 
-        $action = new CompleteReviewAction;
+        $action = app(CompleteReviewAction::class);
         $result = $action->execute($this->review, $this->comments, $this->recommendation);
 
         if ($result['success']) {

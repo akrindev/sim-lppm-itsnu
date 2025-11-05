@@ -334,63 +334,65 @@ class ProposalForm extends Form
     {
         $this->validate();
 
-        // Update detailable based on type
-        $detailable = $this->proposal->detailable;
+        DB::transaction(function (): void {
+            // Update detailable based on type
+            $detailable = $this->proposal->detailable;
 
-        if ($detailable) {
-            if ($detailable instanceof Research) {
-                // Update Research-specific fields
-                $detailable->update([
-                    'macro_research_group_id' => $this->macro_research_group_id ?: null,
-                    'final_tkt_target' => $this->final_tkt_target ?: null,
-                    'background' => $this->background,
-                    'state_of_the_art' => $this->state_of_the_art ?: null,
-                    'methodology' => $this->methodology,
-                    'roadmap_data' => $this->roadmap_data ?: null,
-                    'substance_file' => $this->substance_file && ! is_string($this->substance_file)
-                        ? $this->substance_file->store('substance-files', 'public')
-                        : $detailable->substance_file,
-                ]);
-            } elseif ($detailable instanceof CommunityService) {
-                // Update CommunityService-specific fields
-                $detailable->update([
-                    'partner_id' => $this->partner_id ?: null,
-                    'partner_issue_summary' => $this->partner_issue_summary ?: null,
-                    'solution_offered' => $this->solution_offered ?: null,
-                    'background' => $this->background,
-                    'methodology' => $this->methodology,
-                ]);
+            if ($detailable) {
+                if ($detailable instanceof Research) {
+                    // Update Research-specific fields
+                    $detailable->update([
+                        'macro_research_group_id' => $this->macro_research_group_id ?: null,
+                        'final_tkt_target' => $this->final_tkt_target ?: null,
+                        'background' => $this->background,
+                        'state_of_the_art' => $this->state_of_the_art ?: null,
+                        'methodology' => $this->methodology,
+                        'roadmap_data' => $this->roadmap_data ?: null,
+                        'substance_file' => $this->substance_file && ! is_string($this->substance_file)
+                            ? $this->substance_file->store('substance-files', 'public')
+                            : $detailable->substance_file,
+                    ]);
+                } elseif ($detailable instanceof CommunityService) {
+                    // Update CommunityService-specific fields
+                    $detailable->update([
+                        'partner_id' => $this->partner_id ?: null,
+                        'partner_issue_summary' => $this->partner_issue_summary ?: null,
+                        'solution_offered' => $this->solution_offered ?: null,
+                        'background' => $this->background,
+                        'methodology' => $this->methodology,
+                    ]);
+                }
             }
-        }
 
-        // Update proposal fields
-        $this->proposal->update([
-            'title' => $this->title,
-            'research_scheme_id' => $this->research_scheme_id ?: null,
-            'focus_area_id' => $this->focus_area_id,
-            'theme_id' => $this->theme_id,
-            'topic_id' => $this->topic_id,
-            'national_priority_id' => $this->national_priority_id ?: null,
-            'cluster_level1_id' => $this->cluster_level1_id,
-            'cluster_level2_id' => $this->cluster_level2_id ?: null,
-            'cluster_level3_id' => $this->cluster_level3_id ?: null,
-            'sbk_value' => $this->sbk_value ?: null,
-            'duration_in_years' => (int) $this->duration_in_years,
-            'summary' => $this->summary,
-        ]);
+            // Update proposal fields
+            $this->proposal->update([
+                'title' => $this->title,
+                'research_scheme_id' => $this->research_scheme_id ?: null,
+                'focus_area_id' => $this->focus_area_id,
+                'theme_id' => $this->theme_id,
+                'topic_id' => $this->topic_id,
+                'national_priority_id' => $this->national_priority_id ?: null,
+                'cluster_level1_id' => $this->cluster_level1_id,
+                'cluster_level2_id' => $this->cluster_level2_id ?: null,
+                'cluster_level3_id' => $this->cluster_level3_id ?: null,
+                'sbk_value' => $this->sbk_value ?: null,
+                'duration_in_years' => (int) $this->duration_in_years,
+                'summary' => $this->summary,
+            ]);
 
-        $this->attachTeamMembers($this->proposal, $this->proposal->submitter_id);
+            $this->attachTeamMembers($this->proposal, $this->proposal->submitter_id);
 
-        // Update outputs (delete old, create new)
-        $this->proposal->outputs()->delete();
-        $this->attachOutputs($this->proposal);
+            // Update outputs (delete old, create new)
+            $this->proposal->outputs()->delete();
+            $this->attachOutputs($this->proposal);
 
-        // Update budget items (delete old, create new)
-        $this->proposal->budgetItems()->delete();
-        $this->attachBudgetItems($this->proposal);
+            // Update budget items (delete old, create new)
+            $this->proposal->budgetItems()->delete();
+            $this->attachBudgetItems($this->proposal);
 
-        // Update partners (sync)
-        $this->attachPartners($this->proposal);
+            // Update partners (sync)
+            $this->attachPartners($this->proposal);
+        });
     }
 
     /**
@@ -399,9 +401,11 @@ class ProposalForm extends Form
     public function delete(): void
     {
         if ($this->proposal) {
-            $this->proposal->teamMembers()->detach();
-            $this->proposal->detailable?->delete();
-            $this->proposal->delete();
+            DB::transaction(function (): void {
+                $this->proposal->teamMembers()->detach();
+                $this->proposal->detailable?->delete();
+                $this->proposal->delete();
+            });
         }
     }
 
@@ -477,6 +481,9 @@ class ProposalForm extends Form
             'status' => 'accepted', // Submitter/ketua is always accepted
         ];
 
+        // Get the submitter user for notifications
+        $submitter = \App\Models\User::find($submitterId);
+
         // Add other team members (anggota) - filter out ketua if it exists in members array
         if (! empty($this->members)) {
             foreach ($this->members as $member) {
@@ -493,6 +500,11 @@ class ProposalForm extends Form
                         'role' => 'anggota',
                         'status' => 'pending', // Other team members start as pending
                     ];
+
+                    // Send invitation notification
+                    $invitee = $identity->user;
+                    $notificationService = app(\App\Services\NotificationService::class);
+                    $notificationService->notifyTeamInvitationSent($proposal, $submitter, $invitee);
                 }
             }
         }

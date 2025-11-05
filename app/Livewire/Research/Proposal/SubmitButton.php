@@ -57,7 +57,7 @@ class SubmitButton extends Component
     public function submit(): void
     {
         $proposal = $this->proposal;
-        $action = new SubmitProposalAction;
+        $action = app(SubmitProposalAction::class);
         $result = $action->execute($proposal);
 
         if ($result['success']) {
@@ -67,7 +67,7 @@ class SubmitButton extends Component
             $this->redirect(route('research.proposal.show', $proposal->id));
         } else {
             $this->dispatch('error', message: $result['message']);
-            session()->flash('error', 'Gagal mengajukan proposal: ' . $result['message']);
+            session()->flash('error', 'Gagal mengajukan proposal: '.$result['message']);
         }
     }
 
