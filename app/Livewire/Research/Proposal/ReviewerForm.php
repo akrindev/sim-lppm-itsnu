@@ -105,6 +105,8 @@ class ReviewerForm extends Component
         }
 
         try {
+            $isNew = ! $review->exists;
+
             DB::transaction(function (): void {
                 $review = $this->myReview;
 
@@ -115,17 +117,21 @@ class ReviewerForm extends Component
                     'recommendation' => $this->recommendation,
                 ]);
 
-                // Check if all reviews are completed
-                $allCompleted = $this->proposal->allReviewsCompleted();
+                // Refresh the proposal and review from DB to get updated data
+                $proposal = $this->proposal->fresh(['reviewers']);
+                $review = $proposal->reviewers->where('user_id', Auth::id())->first();
+
+                // Check if all reviews are completed using fresh data
+                $allCompleted = $proposal->allReviewsCompleted();
 
                 if ($allCompleted) {
                     // Update proposal status to reviewed
-                    $this->proposal->update(['status' => ProposalStatus::COMPLETED]);
+                    $proposal->update(['status' => ProposalStatus::REVIEWED]);
                 }
             });
 
             $review = $this->myReview;
-            $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
+            $message = $isNew ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {

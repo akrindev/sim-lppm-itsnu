@@ -56,7 +56,7 @@
 
     <!-- Add Member Modal -->
     @teleport('body')
-        <x-tabler.modal id="modal-add-member" :title="$modalTitle">
+        <x-tabler.modal id="modal-add-member" :title="$modalTitle" on-show="resetMemberForm">
             <x-slot:body>
                 <div class="mb-3">
                     <label class="form-label" for="member_nidn">NIDN / NIP <span class="text-danger">*</span></label>
@@ -133,7 +133,7 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="button" wire:click="addMember" data-bs-dismiss="modal" class="btn btn-primary"
+                <button type="button" wire:click="addMember" class="btn btn-primary"
                     {{ !$memberFound ? 'disabled' : '' }}>
                     <x-lucide-plus class="icon" />
                     Tambah

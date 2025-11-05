@@ -21,12 +21,6 @@ class KepalaLppmFinalDecision extends Component
 
     public string $notes = '';
 
-    public function __construct(
-        protected NotificationService $notificationService
-    ) {
-        parent::__construct();
-    }
-
     public function mount(string $proposalId): void
     {
         $this->proposalId = $proposalId;
@@ -151,7 +145,7 @@ class KepalaLppmFinalDecision extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: '.$e->getMessage());
         }
     }
 
@@ -160,6 +154,8 @@ class KepalaLppmFinalDecision extends Component
      */
     protected function sendNotifications(Proposal $proposal, string $decision, User $kepalaLppm): void
     {
+        $notificationService = app(NotificationService::class);
+
         // Get recipients
         $recipients = collect()
             ->push($proposal->user) // Submitter
@@ -170,7 +166,7 @@ class KepalaLppmFinalDecision extends Component
             ->unique('id')
             ->values();
 
-        $this->notificationService->notifyFinalDecision(
+        $notificationService->notifyFinalDecision(
             $proposal,
             $decision,
             $kepalaLppm,

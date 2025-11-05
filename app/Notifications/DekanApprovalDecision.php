@@ -91,7 +91,7 @@ class DekanApprovalDecision extends Notification implements ShouldQueue
         }
 
         return $message->line("**Jenis Proposal:** {$proposalType}")
-            ->line("**Diputuskan oleh:** {$this->dekan->name}")
+            ->line("**Diajukan oleh:** {$this->proposal->user->name}")
             ->action('Lihat Detail Proposal', $url)
             ->line('Terima kasih atas partisipasi Anda dalam sistem LPPM ITSNU.');
     }

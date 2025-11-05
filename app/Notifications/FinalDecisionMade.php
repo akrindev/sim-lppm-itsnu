@@ -84,18 +84,18 @@ class FinalDecisionMade extends Notification implements ShouldQueue
         $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
 
         $subject = match ($this->decision) {
-            'completed' => 'Proposal Disetujui - Selesai',
+            'approved' => 'Proposal Disetujui - Selesai',
             'rejected' => 'Proposal Ditolak',
             'revision_needed' => 'Proposal Perlu Revisi',
             default => 'Keputusan Final untuk Proposal',
         };
 
         $message = (new MailMessage)
-            ->subject('[SIM LPPM] '.$subject)
-            ->greeting('Halo, '.$notifiable->name.'!')
+            ->subject('[SIM LPPM] ' . $subject)
+            ->greeting('Halo, ' . $notifiable->name . '!')
             ->line("Keputusan final telah dibuat untuk proposal **{$this->proposal->title}**.");
 
-        if ($this->decision === 'completed') {
+        if ($this->decision === 'approved') {
             $message->line('🎉 **Status:** Disetujui dan Selesai')
                 ->line('Selamat! Proposal Anda telah disetujui dan dapat dilanjutkan ke tahap implementasi.');
         } elseif ($this->decision === 'rejected') {
