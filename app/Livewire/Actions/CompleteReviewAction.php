@@ -64,10 +64,9 @@ class CompleteReviewAction
             ->push(User::role('kepala lppm')->first()) // Kepala LPPM
             ->push(User::role('admin lppm')->first()) // Admin LPPM
             ->merge($proposal->teamMembers) // Team Members
-            ->filter(fn ($user) => $user && $user->id !== $reviewer->id) // Exclude reviewer
+            ->filter(fn($user) => $user && $user->id !== $reviewer->id) // Exclude reviewer
             ->unique('id')
-            ->values()
-            ->toArray();
+            ->values();
 
         $this->notificationService->notifyReviewCompleted(
             $proposal,
@@ -90,8 +89,7 @@ class CompleteReviewAction
             ->merge($proposal->teamMembers) // Team Members
             ->filter()
             ->unique('id')
-            ->values()
-            ->toArray();
+            ->values();
 
         $this->notificationService->notifyReviewCompleted(
             $proposal,

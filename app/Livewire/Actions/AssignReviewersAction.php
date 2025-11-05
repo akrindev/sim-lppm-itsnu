@@ -80,8 +80,7 @@ class AssignReviewersAction
             ->push(User::role('kepala lppm')->first()) // Kepala LPPM
             ->filter()
             ->unique('id')
-            ->values()
-            ->toArray();
+            ->values();
 
         $this->notificationService->notifyReviewerAssigned(
             $proposal,

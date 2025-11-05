@@ -83,7 +83,7 @@ class DekanApprovalAction
 
             return [
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat memproses persetujuan: '.$e->getMessage(),
+                'message' => 'Terjadi kesalahan saat memproses persetujuan: ' . $e->getMessage(),
             ];
         }
     }
@@ -110,7 +110,7 @@ class DekanApprovalAction
             $proposal,
             $decision,
             $dekan,
-            $recipients->filter()->unique('id')->values()->toArray()
+            $recipients->filter()->unique('id')->values()
         );
     }
 }

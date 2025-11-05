@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Proposals\ReviewReminderMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class ReviewReminder extends Notification implements ShouldQueue
@@ -47,12 +47,20 @@ class ReviewReminder extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): ReviewReminderMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new ReviewReminderMail(
-            $this->proposal,
-            $this->reviewer,
-            $this->daysRemaining
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Pengingat Review Proposal')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("Ini adalah pengingat untuk review proposal **{$this->proposal->title}**.")
+            ->line("⏰ **Sisa waktu:** {$this->daysRemaining} hari")
+            ->line("**Jenis Proposal:** {$proposalType}")
+            ->line('Mohon segera menyelesaikan review Anda sebelum batas waktu yang ditentukan.')
+            ->action('Lanjutkan Review', $url)
+            ->line('Jika Anda mengalami kesulitan, silakan hubungi admin LPPM.');
     }
 }

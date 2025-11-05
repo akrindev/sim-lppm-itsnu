@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Proposals\ReviewerAssignedMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class ReviewerAssigned extends Notification implements ShouldQueue
@@ -46,12 +46,20 @@ class ReviewerAssigned extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): ReviewerAssignedMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new ReviewerAssignedMail(
-            $this->proposal,
-            $this->reviewer,
-            $this->reviewDeadline
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Penugasan Reviewer')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("Anda telah ditugaskan sebagai reviewer untuk proposal **{$this->proposal->title}**.")
+            ->line("**Jenis Proposal:** {$proposalType}")
+            ->line("**Batas Waktu Review:** {$this->reviewDeadline}")
+            ->line('Mohon melakukan review sesuai dengan panduan reviewer yang tersedia di sistem.')
+            ->action('Mulai Review', $url)
+            ->line('Pastikan untuk memberikan evaluasi yang objektif dan konstruktif sesuai dengan kriteria yang telah ditetapkan.');
     }
 }

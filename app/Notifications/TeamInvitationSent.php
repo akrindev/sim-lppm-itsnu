@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Team\InvitationSentMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class TeamInvitationSent extends Notification implements ShouldQueue
@@ -46,12 +46,21 @@ class TeamInvitationSent extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): InvitationSentMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new InvitationSentMail(
-            $this->proposal,
-            $this->inviter,
-            $notifiable
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Undangan Menjadi Anggota Tim')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("{$this->inviter->name} mengundang Anda untuk bergabung sebagai anggota tim.")
+            ->line("**Judul Proposal:** {$this->proposal->title}")
+            ->line("**Jenis:** {$proposalType}")
+            ->line("**Pengundang:** {$this->inviter->name}")
+            ->line('Silakan terima atau tolak undangan ini melalui sistem.')
+            ->action('Lihat Undangan', $url)
+            ->line('Proposal ini membutuhkan persetujuan dari semua anggota tim sebelum dapat diajukan.');
     }
 }

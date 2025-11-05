@@ -2,9 +2,9 @@
 
 namespace App\Notifications\System;
 
-use App\Mail\System\TwoFactorAuthenticationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class TwoFactorAuthentication extends Notification implements ShouldQueue
@@ -34,12 +34,17 @@ class TwoFactorAuthentication extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): TwoFactorAuthenticationMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new TwoFactorAuthenticationMail(
-            $this->code,
-            $notifiable->name,
-            $this->expiresIn
-        ))->to($notifiable->email);
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Kode Verifikasi 2FA')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line('Berikut adalah kode verifikasi Anda untuk autentikasi dua faktor:')
+            ->line('')
+            ->line("🔒 **Kode: {$this->code}**")
+            ->line('')
+            ->line("Kode ini akan berlaku selama **{$this->expiresIn} menit**.")
+            ->line('Jangan bagikan kode ini kepada siapa pun.')
+            ->line('Jika Anda tidak mencoba login, abaikan email ini dan segera hubungi admin.');
     }
 }

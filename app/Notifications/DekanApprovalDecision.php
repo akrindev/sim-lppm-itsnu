@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Proposals\DekanApprovalDecisionMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class DekanApprovalDecision extends Notification implements ShouldQueue
@@ -61,13 +61,38 @@ class DekanApprovalDecision extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): DekanApprovalDecisionMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new DekanApprovalDecisionMail(
-            $this->proposal,
-            $this->decision,
-            $this->dekan,
-            $notifiable
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        $subject = match ($this->decision) {
+            'approved' => 'Proposal Disetujui oleh Dekan',
+            'need_assignment' => 'Proposal Perlu Penugasan Reviewer',
+            'rejected' => 'Proposal Ditolak oleh Dekan',
+            default => 'Keputusan Dekan untuk Proposal',
+        };
+
+        $message = (new MailMessage)
+            ->subject('[SIM LPPM] '.$subject)
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("Dekan telah membuat keputusan untuk proposal **{$this->proposal->title}**.");
+
+        if ($this->decision === 'approved') {
+            $message->line('✅ **Status:** Disetujui')
+                ->line('Proposal Anda telah disetujui oleh Dekan dan akan dilanjutkan ke proses berikutnya.');
+        } elseif ($this->decision === 'need_assignment') {
+            $message->line('📋 **Status:** Perlu Penugasan Reviewer')
+                ->line('Proposal akan ditugaskan kepada reviewer untuk evaluasi lebih lanjut.');
+        } elseif ($this->decision === 'rejected') {
+            $message->line('❌ **Status:** Ditolak')
+                ->line('Proposal Anda ditolak oleh Dekan. Silakan hubungi admin untuk informasi lebih lanjut.');
+        }
+
+        return $message->line("**Jenis Proposal:** {$proposalType}")
+            ->line("**Diputuskan oleh:** {$this->dekan->name}")
+            ->action('Lihat Detail Proposal', $url)
+            ->line('Terima kasih atas partisipasi Anda dalam sistem LPPM ITSNU.');
     }
 }

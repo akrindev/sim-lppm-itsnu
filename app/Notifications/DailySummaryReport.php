@@ -2,9 +2,9 @@
 
 namespace App\Notifications;
 
-use App\Mail\Reports\DailySummaryMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class DailySummaryReport extends Notification implements ShouldQueue
@@ -36,13 +36,32 @@ class DailySummaryReport extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): DailySummaryMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new DailySummaryMail(
-            $this->role,
-            $this->data,
-            $notifiable->name
-        ))->to($notifiable->email);
+        $message = (new MailMessage)
+            ->subject('[SIM LPPM] Laporan Ringkas Harian')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("Berikut adalah laporan ringkas harian Anda untuk tanggal **{$this->data['date']}**.");
+
+        if ($this->role === 'dosen') {
+            $message->line('📊 **Statistik Anda:**')
+                ->line("- Proposal Aktif: {$this->data['active_proposals']}")
+                ->line("- Proposal Pending: {$this->data['pending_proposals']}")
+                ->line("- Review Selesai: {$this->data['completed_reviews']}");
+        } elseif ($this->role === 'reviewer') {
+            $message->line('📊 **Statistik Review:**')
+                ->line("- Review Pending: {$this->data['pending_reviews']}")
+                ->line("- Review Selesai: {$this->data['completed_reviews']}")
+                ->line("- Review Mendekati Deadline: {$this->data['near_deadline']}");
+        } elseif (in_array($this->role, ['dekan', 'kepala lppm', 'rektor'])) {
+            $message->line('📊 **Statistik Sistem:**')
+                ->line("- Total Proposal: {$this->data['total_proposals']}")
+                ->line("- Menunggu Persetujuan: {$this->data['pending_approval']}")
+                ->line("- Selesai: {$this->data['completed']}");
+        }
+
+        return $message->action('Lihat Dashboard', route('dashboard'))
+            ->line('Silakan login ke sistem untuk melihat detail lengkap.');
     }
 
     private function generateBody(): string

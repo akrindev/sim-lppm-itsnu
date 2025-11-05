@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Proposals\ProposalSubmittedMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class ProposalSubmitted extends Notification implements ShouldQueue
@@ -36,7 +36,7 @@ class ProposalSubmitted extends Notification implements ShouldQueue
             'type' => 'proposal_submitted',
             'title' => 'Proposal Baru Disubmit',
             'message' => "Proposal '{$this->proposal->title}' telah disubmit oleh {$this->submitter->name}",
-            'body' => "Proposal {$proposalType} dengan judul '{$this->proposal->title}' telah berhasil disubmit oleh {$this->submitter->name} pada tanggal " . now()->format('d/m/Y H:i') . '. Proposal ini sedang menunggu review dan persetujuan dari Dekan. Tim reviewer akan ditentukan kemudian oleh Kepala LPPM. Mohon menunggu informasi selanjutnya melalui sistem notifikasi.',
+            'body' => "Proposal {$proposalType} dengan judul '{$this->proposal->title}' telah berhasil disubmit oleh {$this->submitter->name} pada tanggal ".now()->format('d/m/Y H:i').'. Proposal ini sedang menunggu review dan persetujuan dari Dekan. Tim reviewer akan ditentukan kemudian oleh Kepala LPPM. Mohon menunggu informasi selanjutnya melalui sistem notifikasi.',
             'proposal_id' => $this->proposal->id,
             'submitter_id' => $this->submitter->id,
             'submitter_name' => $this->submitter->name,
@@ -47,12 +47,23 @@ class ProposalSubmitted extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): ProposalSubmittedMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new ProposalSubmittedMail(
-            $this->proposal,
-            $this->submitter,
-            $notifiable
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $routeName = $isResearch
+            ? 'research.proposal.show'
+            : 'community-service.proposal.show';
+        $url = route($routeName, $this->proposal);
+
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Proposal Baru Diajukan')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("Proposal baru dengan judul **{$this->proposal->title}** telah diajukan oleh {$this->submitter->name}.")
+            ->line("**Jenis Proposal:** {$proposalType}")
+            ->line("**Diajukan oleh:** {$this->submitter->name}")
+            ->line('Proposal ini perlu ditinjau dan disetujui sesuai dengan prosedur yang berlaku.')
+            ->action('Lihat Detail Proposal', $url)
+            ->line('Silakan akses proposal untuk melihat detail lengkap dan melakukan tindakan yang diperlukan.');
     }
 }

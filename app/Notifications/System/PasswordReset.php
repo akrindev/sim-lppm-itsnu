@@ -2,9 +2,9 @@
 
 namespace App\Notifications\System;
 
-use App\Mail\System\PasswordResetMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class PasswordReset extends Notification implements ShouldQueue
@@ -32,16 +32,19 @@ class PasswordReset extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): PasswordResetMail
+    public function toMail(object $notifiable): MailMessage
     {
         $resetUrl = url(route('password.reset', [
             'token' => $this->resetToken,
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
-        return (new PasswordResetMail(
-            $resetUrl,
-            $notifiable->name
-        ))->to($notifiable->email);
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Reset Password')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line('Anda menerima email ini karena kami menerima permintaan reset password untuk akun Anda.')
+            ->action('Reset Password', $resetUrl)
+            ->line('Link reset password ini akan berlaku selama 60 menit.')
+            ->line('Jika Anda tidak meminta reset password, abaikan email ini.');
     }
 }

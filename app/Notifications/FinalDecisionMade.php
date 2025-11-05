@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Proposals\FinalDecisionMadeMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class FinalDecisionMade extends Notification implements ShouldQueue
@@ -77,13 +77,38 @@ class FinalDecisionMade extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): FinalDecisionMadeMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new FinalDecisionMadeMail(
-            $this->proposal,
-            $this->decision,
-            $this->kepalaLppm,
-            $notifiable
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        $subject = match ($this->decision) {
+            'completed' => 'Proposal Disetujui - Selesai',
+            'rejected' => 'Proposal Ditolak',
+            'revision_needed' => 'Proposal Perlu Revisi',
+            default => 'Keputusan Final untuk Proposal',
+        };
+
+        $message = (new MailMessage)
+            ->subject('[SIM LPPM] '.$subject)
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("Keputusan final telah dibuat untuk proposal **{$this->proposal->title}**.");
+
+        if ($this->decision === 'completed') {
+            $message->line('🎉 **Status:** Disetujui dan Selesai')
+                ->line('Selamat! Proposal Anda telah disetujui dan dapat dilanjutkan ke tahap implementasi.');
+        } elseif ($this->decision === 'rejected') {
+            $message->line('❌ **Status:** Ditolak')
+                ->line('Proposal Anda ditolak. Silakan hubungi admin untuk informasi lebih lanjut.');
+        } elseif ($this->decision === 'revision_needed') {
+            $message->line('📝 **Status:** Perlu Revisi')
+                ->line('Proposal Anda memerlukan revisi. Silakan perbaiki sesuai dengan catatan reviewer.');
+        }
+
+        return $message->line("**Jenis Proposal:** {$proposalType}")
+            ->line("**Diputuskan oleh:** {$this->kepalaLppm->name}")
+            ->action('Lihat Detail Proposal', $url)
+            ->line('Terima kasih atas partisipasi Anda dalam sistem LPPM ITSNU.');
     }
 }

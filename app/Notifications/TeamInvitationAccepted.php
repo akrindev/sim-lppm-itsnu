@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Team\InvitationAcceptedMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class TeamInvitationAccepted extends Notification implements ShouldQueue
@@ -45,12 +45,20 @@ class TeamInvitationAccepted extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): InvitationAcceptedMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new InvitationAcceptedMail(
-            $this->proposal,
-            $this->acceptedMember,
-            $notifiable
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Anggota Tim Menerima Undangan')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("✅ **{$this->acceptedMember->name}** telah menerima undangan untuk bergabung sebagai anggota tim.")
+            ->line("**Judul Proposal:** {$this->proposal->title}")
+            ->line("**Jenis:** {$proposalType}")
+            ->line('Tim proposal ini semakin lengkap!')
+            ->action('Lihat Detail Proposal', $url)
+            ->line('Pastikan semua anggota tim telah memberikan persetujuan sebelum proposal dapat diajukan.');
     }
 }

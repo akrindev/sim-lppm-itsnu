@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Team\InvitationRejectedMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class TeamInvitationRejected extends Notification implements ShouldQueue
@@ -45,12 +45,20 @@ class TeamInvitationRejected extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): InvitationRejectedMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new InvitationRejectedMail(
-            $this->proposal,
-            $this->rejectedMember,
-            $notifiable
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Anggota Tim Menolak Undangan')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("❌ **{$this->rejectedMember->name}** telah menolak undangan untuk bergabung sebagai anggota tim.")
+            ->line("**Judul Proposal:** {$this->proposal->title}")
+            ->line("**Jenis:** {$proposalType}")
+            ->line('Silakan cari pengganti atau hubungi anggota tim yang menolak untuk mengetahui alasannya.')
+            ->action('Lihat Detail Proposal', $url)
+            ->line('Anda dapat menambahkan anggota tim yang lain melalui sistem.');
     }
 }

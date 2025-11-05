@@ -74,8 +74,7 @@ class SubmitProposalAction
             ->push($adminLppm)
             ->filter()
             ->unique('id')
-            ->values()
-            ->toArray();
+            ->values();
 
         $this->notificationService->notifyProposalSubmitted(
             $proposal,

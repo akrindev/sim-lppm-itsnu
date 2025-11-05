@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Proposals\ReviewCompletedMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class ReviewCompleted extends Notification implements ShouldQueue
@@ -59,13 +59,28 @@ class ReviewCompleted extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): ReviewCompletedMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new ReviewCompletedMail(
-            $this->proposal,
-            $this->reviewer,
-            $notifiable,
-            $this->allReviewsComplete
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        $message = (new MailMessage)
+            ->subject('[SIM LPPM] Review Proposal Selesai')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("Review untuk proposal **{$this->proposal->title}** telah diselesaikan oleh {$this->reviewer->name}.");
+
+        if ($this->allReviewsComplete) {
+            $message->line('✅ **Semua review telah selesai!**')
+                ->line('Proposal ini siap untuk keputusan final dari Kepala LPPM.');
+        } else {
+            $message->line('⏳ **Menunggu review lainnya...**')
+                ->line('Masih ada reviewer lain yang sedang melakukan evaluasi.');
+        }
+
+        return $message->line("**Jenis Proposal:** {$proposalType}")
+            ->line("**Reviewer:** {$this->reviewer->name}")
+            ->action('Lihat Detail Review', $url)
+            ->line('Terima kasih atas perhatian Anda.');
     }
 }

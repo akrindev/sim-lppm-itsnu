@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Mail\Proposals\ReviewOverdueMail;
 use App\Models\Proposal;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class ReviewOverdue extends Notification implements ShouldQueue
@@ -47,12 +47,21 @@ class ReviewOverdue extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): ReviewOverdueMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new ReviewOverdueMail(
-            $this->proposal,
-            $this->reviewer,
-            $this->daysOverdue
-        ))->to($notifiable->email);
+        $isResearch = $this->proposal->detailable instanceof Research;
+        $proposalType = $isResearch ? 'Penelitian' : 'Pengabdian Masyarakat';
+        $url = route($isResearch ? 'research.proposal.show' : 'community-service.proposal.show', $this->proposal);
+
+        return (new MailMessage)
+            ->subject('[SIM LPPM] ⚠️ Review Terlambat')
+            ->error()
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line("⚠️ Review Anda untuk proposal **{$this->proposal->title}** sudah melewati batas waktu.")
+            ->line("**Terlambat:** {$this->daysOverdue} hari")
+            ->line("**Jenis Proposal:** {$proposalType}")
+            ->line('Mohon segera menyelesaikan review Anda. Keterlambatan dapat menghambat proses evaluasi proposal.')
+            ->action('Selesaikan Review Sekarang', $url)
+            ->line('Jika ada kendala, segera hubungi admin LPPM.');
     }
 }

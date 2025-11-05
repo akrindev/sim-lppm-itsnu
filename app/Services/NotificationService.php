@@ -46,7 +46,7 @@ class NotificationService
     /**
      * Send Proposal Submitted notification
      */
-    public function notifyProposalSubmitted($proposal, $submitter, array $recipients): void
+    public function notifyProposalSubmitted($proposal, $submitter, Collection|array $recipients): void
     {
         $notification = new ProposalSubmitted($proposal, $submitter);
         $this->sendToMany($recipients, $notification);
@@ -55,7 +55,7 @@ class NotificationService
     /**
      * Send Dekan Approval Decision notification
      */
-    public function notifyDekanApprovalDecision($proposal, string $decision, $dekan, array $recipients): void
+    public function notifyDekanApprovalDecision($proposal, string $decision, $dekan, Collection|array $recipients): void
     {
         $notification = new DekanApprovalDecision($proposal, $decision, $dekan);
         $this->sendToMany($recipients, $notification);
@@ -64,7 +64,7 @@ class NotificationService
     /**
      * Send Reviewer Assignment notification
      */
-    public function notifyReviewerAssigned($proposal, $reviewer, string $deadline, array $recipients): void
+    public function notifyReviewerAssigned($proposal, $reviewer, string $deadline, Collection|array $recipients): void
     {
         $notification = new ReviewerAssigned($proposal, $reviewer, $deadline);
         $this->sendToMany($recipients, $notification);
@@ -73,7 +73,7 @@ class NotificationService
     /**
      * Send Review Completion notification
      */
-    public function notifyReviewCompleted($proposal, $reviewer, bool $allComplete = false, array $recipients = []): void
+    public function notifyReviewCompleted($proposal, $reviewer, bool $allComplete = false, Collection|array $recipients = []): void
     {
         $notification = new ReviewCompleted($proposal, $reviewer, $allComplete);
 
@@ -89,7 +89,7 @@ class NotificationService
     /**
      * Send Final Decision Made notification
      */
-    public function notifyFinalDecision($proposal, string $decision, $kepalaLppm, array $recipients): void
+    public function notifyFinalDecision($proposal, string $decision, $kepalaLppm, Collection|array $recipients): void
     {
         $notification = new FinalDecisionMade($proposal, $decision, $kepalaLppm);
         $this->sendToMany($recipients, $notification);
@@ -173,10 +173,11 @@ class NotificationService
      */
     public function notifyTeamInvitationAccepted($proposal, $acceptedMember, $acceptedBy): void
     {
-        $recipients = [
+        $recipients = collect([
             $proposal->submitter,
-            ...$this->getUsersByRole(['admin lppm'])->toArray(),
-        ];
+        ])->merge(
+            $this->getUsersByRole(['admin lppm'])
+        )->unique('id')->values();
 
         $notification = new TeamInvitationAccepted($proposal, $acceptedMember, $acceptedBy);
         $this->sendToMany($recipients, $notification);
@@ -187,10 +188,11 @@ class NotificationService
      */
     public function notifyTeamInvitationRejected($proposal, $rejectedMember, $rejectedBy): void
     {
-        $recipients = [
+        $recipients = collect([
             $proposal->submitter,
-            ...$this->getUsersByRole(['admin lppm'])->toArray(),
-        ];
+        ])->merge(
+            $this->getUsersByRole(['admin lppm'])
+        )->unique('id')->values();
 
         $notification = new TeamInvitationRejected($proposal, $rejectedMember, $rejectedBy);
         $this->sendToMany($recipients, $notification);
@@ -210,8 +212,11 @@ class NotificationService
      */
     public function notifyReviewOverdue($proposal, $reviewer, int $daysOverdue): void
     {
-        $adminRecipients = $this->getUsersByRole(['admin lppm', 'kepala lppm'])->toArray();
-        $recipients = array_merge([$reviewer], $adminRecipients);
+        $recipients = collect([
+            $reviewer,
+        ])->merge(
+            $this->getUsersByRole(['admin lppm', 'kepala lppm'])
+        )->unique('id')->values();
 
         $notification = new ReviewOverdue($proposal, $reviewer, $daysOverdue);
         $this->sendToMany($recipients, $notification);
@@ -222,7 +227,7 @@ class NotificationService
      */
     public function notifyDailySummaryReport(string $role, array $data): void
     {
-        $recipients = $this->getUsersByRole($role)->toArray();
+        $recipients = $this->getUsersByRole($role);
         $notification = new DailySummaryReport($role, $data);
         $this->sendToMany($recipients, $notification);
     }
@@ -232,7 +237,7 @@ class NotificationService
      */
     public function notifyWeeklySummaryReport(string $role, array $data): void
     {
-        $recipients = $this->getUsersByRole($role)->toArray();
+        $recipients = $this->getUsersByRole($role);
         $notification = new WeeklySummaryReport($role, $data);
         $this->sendToMany($recipients, $notification);
     }

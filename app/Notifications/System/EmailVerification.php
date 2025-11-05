@@ -2,9 +2,9 @@
 
 namespace App\Notifications\System;
 
-use App\Mail\System\EmailVerificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class EmailVerification extends Notification implements ShouldQueue
@@ -32,11 +32,15 @@ class EmailVerification extends Notification implements ShouldQueue
         ];
     }
 
-    public function toMail(object $notifiable): EmailVerificationMail
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new EmailVerificationMail(
-            $this->verificationUrl,
-            $notifiable->name
-        ))->to($notifiable->email);
+        return (new MailMessage)
+            ->subject('[SIM LPPM] Verifikasi Email Anda')
+            ->greeting('Halo, '.$notifiable->name.'!')
+            ->line('Terima kasih telah mendaftar di SIM LPPM ITSNU.')
+            ->line('Kami perlu memverifikasi email Anda sebelum Anda dapat menggunakan semua fitur aplikasi.')
+            ->action('Verifikasi Email', $this->verificationUrl)
+            ->line('Link verifikasi ini akan berlaku selama 60 menit.')
+            ->line('Jika Anda tidak mendaftar di sistem kami, abaikan email ini.');
     }
 }
