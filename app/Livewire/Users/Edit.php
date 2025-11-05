@@ -20,7 +20,7 @@ class Edit extends Component
 
     public string $email = '';
 
-    public ?string $selectedRole = null;
+    public array $selectedRoles = [];
 
     public bool $emailVerified = false;
 
@@ -39,6 +39,8 @@ class Edit extends Component
 
     public ?string $institution_id = null;
 
+    public ?string $institution_name = null;
+
     public ?string $study_program_id = null;
 
     /**
@@ -49,7 +51,7 @@ class Edit extends Component
         $this->userId = $user->getKey();
         $this->name = $user->name;
         $this->email = $user->email;
-        $this->selectedRole = $user->roles()->first()?->name;
+        $this->selectedRoles = $user->getRoleNames()->toArray();
         $this->emailVerified = $user->hasVerifiedEmail();
 
         // Load identity data
@@ -61,6 +63,7 @@ class Edit extends Component
             $this->sinta_id = $user->identity->sinta_id ?? '';
             $this->type = $user->identity->type ?? '';
             $this->institution_id = $user->identity->institution_id ?? '';
+            $this->institution_name = $user->identity->institution->name ?? '';
             $this->study_program_id = $user->identity->study_program_id ?? '';
         }
     }
@@ -75,7 +78,8 @@ class Edit extends Component
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->userId)],
-            'selectedRole' => ['nullable', 'string', Rule::exists('roles', 'name')],
+            'selectedRoles' => ['nullable', 'array'],
+            'selectedRoles.*' => ['string', Rule::exists('roles', 'name')],
             'emailVerified' => ['boolean'],
             'identity_id' => ['required', 'string', 'max:255', Rule::unique('identities', 'identity_id')->ignore($this->user->identity?->id)],
             'address' => ['nullable', 'string', 'max:255'],
@@ -130,14 +134,11 @@ class Edit extends Component
                 ]
             );
 
-            if ($validated['selectedRole']) {
-                $user->syncRoles([$validated['selectedRole']]);
-            } else {
-                $user->syncRoles([]);
-            }
+            // Sync multiple roles
+            $user->syncRoles($validated['selectedRoles']);
         });
 
-        $this->selectedRole = $this->user->roles()->first()?->name;
+        $this->selectedRoles = $this->user->getRoleNames()->toArray();
         $this->emailVerified = $this->user->hasVerifiedEmail();
 
         session()->flash('success', 'Pengguna telah diperbarui.');

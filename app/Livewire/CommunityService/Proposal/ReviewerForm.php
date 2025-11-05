@@ -5,6 +5,7 @@ namespace App\Livewire\CommunityService\Proposal;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -37,13 +38,15 @@ class ReviewerForm extends Component
     #[Computed]
     public function proposal()
     {
-        return Proposal::find($this->proposalId);
+        return Proposal::with([
+            'reviewers.user',
+        ])->find($this->proposalId);
     }
 
     #[Computed]
     public function myReview()
     {
-        return $this->proposal->reviewers()
+        return $this->proposal->reviewers
             ->where('user_id', Auth::id())
             ->first();
     }
@@ -51,9 +54,7 @@ class ReviewerForm extends Component
     #[Computed]
     public function allReviews()
     {
-        return $this->proposal->reviewers()
-            ->with('user')
-            ->get();
+        return $this->proposal->reviewers;
     }
 
     #[Computed]
@@ -104,21 +105,26 @@ class ReviewerForm extends Component
         }
 
         try {
-            // Allow updating review even after submission
-            $review->update([
-                'status' => 'completed',
-                'review_notes' => $this->reviewNotes,
-                'recommendation' => $this->recommendation,
-            ]);
+            DB::transaction(function (): void {
+                $review = $this->myReview;
 
-            // Check if all reviews are completed
-            $allCompleted = $this->proposal->allReviewsCompleted();
+                // Allow updating review even after submission
+                $review->update([
+                    'status' => 'completed',
+                    'review_notes' => $this->reviewNotes,
+                    'recommendation' => $this->recommendation,
+                ]);
 
-            if ($allCompleted) {
-                // Update proposal status to reviewed
-                $this->proposal->update(['status' => ProposalStatus::REVIEWED]);
-            }
+                // Check if all reviews are completed
+                $allCompleted = $this->proposal->allReviewsCompleted();
 
+                if ($allCompleted) {
+                    // Update proposal status to reviewed
+                    $this->proposal->update(['status' => ProposalStatus::REVIEWED]);
+                }
+            });
+
+            $review = $this->myReview;
             $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);

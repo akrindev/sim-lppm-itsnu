@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RoleSwitcherController;
 use App\Livewire\CommunityService\DailyNote\Index as CommunityServiceDailyNoteIndex;
 use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalReportIndex;
 use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
@@ -10,6 +11,7 @@ use App\Livewire\CommunityService\Proposal\Show as CommunityServiceProposalShow;
 use App\Livewire\CommunityService\ProposalRevision\Index as CommunityServiceProposalRevisionIndex;
 use App\Livewire\Dashboard;
 use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
+use App\Livewire\Notifications\NotificationCenter;
 use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
 use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
 use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
@@ -109,6 +111,15 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    // Notification Routes
+    Route::get('notifications', NotificationCenter::class)
+        ->middleware(['auth', 'verified'])
+        ->name('notifications');
+
+    // Role Switcher Route
+    Route::post('role/switch', [RoleSwitcherController::class, 'switch'])
+        ->name('role.switch');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

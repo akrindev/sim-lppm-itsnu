@@ -4,9 +4,15 @@ namespace App\Livewire\Actions;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use App\Models\User;
+use App\Services\NotificationService;
 
 class SubmitProposalAction
 {
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {}
+
     /**
      * Submit a proposal for review.
      * Only possible if all team members have accepted.
@@ -43,9 +49,37 @@ class SubmitProposalAction
         // Submit proposal (status changes to SUBMITTED)
         $proposal->update(['status' => ProposalStatus::SUBMITTED]);
 
+        // Send notifications
+        $this->sendNotifications($proposal);
+
         return [
             'success' => true,
             'message' => 'Proposal berhasil diajukan untuk review.',
         ];
+    }
+
+    /**
+     * Send notifications to relevant stakeholders
+     */
+    protected function sendNotifications(Proposal $proposal): void
+    {
+        // Get recipients: Dekan, Team Members, Admin LPPM
+        $dekan = User::role('dekan')->first();
+        $teamMembers = $proposal->teamMembers()->where('user_id', '!=', $proposal->submitter_id)->get();
+        $adminLppm = User::role('admin lppm')->first();
+
+        $recipients = collect()
+            ->push($dekan)
+            ->merge($teamMembers)
+            ->push($adminLppm)
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        $this->notificationService->notifyProposalSubmitted(
+            $proposal,
+            $proposal->submitter,
+            $recipients
+        );
     }
 }

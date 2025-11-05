@@ -5,6 +5,7 @@ namespace App\Livewire\Research\Proposal;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -13,6 +14,7 @@ use Livewire\Component;
 class ReviewerForm extends Component
 {
     public string $proposalId = '';
+
     public bool $showForm = false;
 
     #[Validate('required|min:10')]
@@ -36,13 +38,15 @@ class ReviewerForm extends Component
     #[Computed]
     public function proposal()
     {
-        return Proposal::find($this->proposalId);
+        return Proposal::with([
+            'reviewers.user.identity',
+        ])->find($this->proposalId);
     }
 
     #[Computed]
     public function myReview()
     {
-        return $this->proposal->reviewers()
+        return $this->proposal->reviewers
             ->where('user_id', Auth::id())
             ->first();
     }
@@ -50,9 +54,7 @@ class ReviewerForm extends Component
     #[Computed]
     public function allReviews()
     {
-        return $this->proposal->reviewers()
-            ->with('user')
-            ->get();
+        return $this->proposal->reviewers;
     }
 
     #[Computed]
@@ -65,6 +67,7 @@ class ReviewerForm extends Component
     public function hasReviewed(): bool
     {
         $review = $this->myReview;
+
         return $review && $review->status === 'completed';
     }
 
@@ -72,7 +75,7 @@ class ReviewerForm extends Component
     public function canEditReview(): bool
     {
         $review = $this->myReview;
-        if (!$review) {
+        if (! $review) {
             return false;
         }
 
@@ -86,7 +89,7 @@ class ReviewerForm extends Component
 
     public function toggleForm(): void
     {
-        $this->showForm = !$this->showForm;
+        $this->showForm = ! $this->showForm;
     }
 
     public function submitReview(): void
@@ -102,22 +105,33 @@ class ReviewerForm extends Component
         }
 
         try {
-            // Allow updating review even after submission
-            $review->update([
-                'status' => 'completed',
-                'review_notes' => $this->reviewNotes,
-                'recommendation' => $this->recommendation,
-            ]);
+            $isNew = ! $review->exists;
 
-            // Check if all reviews are completed
-            $allCompleted = $this->proposal->allReviewsCompleted();
+            DB::transaction(function (): void {
+                $review = $this->myReview;
 
-            if ($allCompleted) {
-                // Update proposal status to reviewed
-                $this->proposal->update(['status' => ProposalStatus::COMPLETED]);
-            }
+                // Allow updating review even after submission
+                $review->update([
+                    'status' => 'completed',
+                    'review_notes' => $this->reviewNotes,
+                    'recommendation' => $this->recommendation,
+                ]);
 
-            $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
+                // Refresh the proposal and review from DB to get updated data
+                $proposal = $this->proposal->fresh(['reviewers']);
+                $review = $proposal->reviewers->where('user_id', Auth::id())->first();
+
+                // Check if all reviews are completed using fresh data
+                $allCompleted = $proposal->allReviewsCompleted();
+
+                if ($allCompleted) {
+                    // Update proposal status to reviewed
+                    $proposal->update(['status' => ProposalStatus::REVIEWED]);
+                }
+            });
+
+            $review = $this->myReview;
+            $message = $isNew ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {

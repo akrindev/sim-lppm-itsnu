@@ -26,7 +26,7 @@ class DefaultDashboard extends Component
     public function mount()
     {
         $this->user = Auth::user();
-        $this->roleName = $this->user->getRoleNames()->first();
+        $this->roleName = active_role();
         $this->selectedYear = date('Y');
         $this->availableYears = $this->getAvailableYears();
 

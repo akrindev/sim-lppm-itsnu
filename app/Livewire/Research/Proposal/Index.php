@@ -57,7 +57,7 @@ class Index extends Component
 
         // Show all proposals for admin, kepala lppm, and rektor roles
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
 
         if (! $isAdmin) {
             // Regular users see their own proposals OR proposals where they are team members
@@ -70,7 +70,7 @@ class Index extends Component
         }
 
         return $query
-            ->with(['submitter', 'focusArea', 'researchScheme'])
+            ->with(['submitter.identity', 'focusArea', 'researchScheme'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('title', 'like', "%{$this->search}%")
@@ -105,7 +105,7 @@ class Index extends Component
         ];
 
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
 
         $query = Proposal::where('detailable_type', Research::class);
         if (! $isAdmin) {
@@ -132,7 +132,7 @@ class Index extends Component
     public function typeStats(): array
     {
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
 
         $query = Proposal::where('detailable_type', Research::class);
         if (! $isAdmin) {
@@ -155,7 +155,7 @@ class Index extends Component
     public function availableYears(): array
     {
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
 
         $query = Proposal::where('detailable_type', Research::class);
         if (! $isAdmin) {
@@ -206,7 +206,7 @@ class Index extends Component
             $proposal->delete();
             session()->flash('success', 'Proposal berhasil dihapus');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
         }
     }
 }

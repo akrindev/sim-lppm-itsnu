@@ -59,6 +59,7 @@ class TeamMembersForm extends Component
             $this->memberFound = false;
             $this->foundMember = null;
             $this->addError('member_nidn', 'Anda tidak dapat menambahkan diri sendiri sebagai anggota');
+
             return;
         }
 
@@ -89,8 +90,9 @@ class TeamMembersForm extends Component
             'member_tugas' => 'required|string|max:500',
         ]);
 
-        if (!$this->memberFound || !$this->foundMember) {
+        if (! $this->memberFound || ! $this->foundMember) {
             $this->addError('member_nidn', 'Silakan cek anggota terlebih dahulu');
+
             return;
         }
 
@@ -101,6 +103,7 @@ class TeamMembersForm extends Component
 
         if ($alreadyAdded) {
             $this->addError('member_nidn', 'Anggota ini sudah ditambahkan');
+
             return;
         }
 
@@ -116,7 +119,7 @@ class TeamMembersForm extends Component
         $this->dispatch('members-updated', members: $this->members);
 
         // Dispatch event to close modal
-        $this->dispatch('close-modal', 'modal-add-member')->to('research.proposal.create');
+        $this->dispatch('close-modal', modalId: 'modal-add-member');
     }
 
     /**
@@ -130,6 +133,7 @@ class TeamMembersForm extends Component
         // Dispatch to parent component
         $this->dispatch('members-updated', members: $this->members);
     }
+
     /**
      * Reset member form
      */
