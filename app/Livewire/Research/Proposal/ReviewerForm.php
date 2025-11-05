@@ -5,6 +5,7 @@ namespace App\Livewire\Research\Proposal;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -104,26 +105,31 @@ class ReviewerForm extends Component
         }
 
         try {
-            // Allow updating review even after submission
-            $review->update([
-                'status' => 'completed',
-                'review_notes' => $this->reviewNotes,
-                'recommendation' => $this->recommendation,
-            ]);
+            DB::transaction(function (): void {
+                $review = $this->myReview;
 
-            // Check if all reviews are completed
-            $allCompleted = $this->proposal->allReviewsCompleted();
+                // Allow updating review even after submission
+                $review->update([
+                    'status' => 'completed',
+                    'review_notes' => $this->reviewNotes,
+                    'recommendation' => $this->recommendation,
+                ]);
 
-            if ($allCompleted) {
-                // Update proposal status to reviewed
-                $this->proposal->update(['status' => ProposalStatus::COMPLETED]);
-            }
+                // Check if all reviews are completed
+                $allCompleted = $this->proposal->allReviewsCompleted();
 
+                if ($allCompleted) {
+                    // Update proposal status to reviewed
+                    $this->proposal->update(['status' => ProposalStatus::COMPLETED]);
+                }
+            });
+
+            $review = $this->myReview;
             $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: ' . $e->getMessage());
         }
     }
 

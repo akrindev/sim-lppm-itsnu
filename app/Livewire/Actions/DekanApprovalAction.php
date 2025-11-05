@@ -6,6 +6,7 @@ use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use App\Models\User;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class DekanApprovalAction
@@ -51,21 +52,23 @@ class DekanApprovalAction
                 ];
             }
 
-            // Update proposal status
-            $proposal->update([
-                'status' => $newStatus,
-            ]);
+            DB::transaction(function () use ($proposal, $newStatus, $decision, $notes, $dekan): void {
+                // Update proposal status
+                $proposal->update([
+                    'status' => $newStatus,
+                ]);
 
-            // Log the activity
-            Log::info('Dekan approval action', [
-                'proposal_id' => $proposal->id,
-                'decision' => $decision,
-                'new_status' => $newStatus->value,
-                'notes' => $notes,
-            ]);
+                // Log the activity
+                Log::info('Dekan approval action', [
+                    'proposal_id' => $proposal->id,
+                    'decision' => $decision,
+                    'new_status' => $newStatus->value,
+                    'notes' => $notes,
+                ]);
 
-            // Send notifications based on decision
-            $this->sendNotifications($proposal, $decision, $dekan ?? auth()->user());
+                // Send notifications based on decision
+                $this->sendNotifications($proposal, $decision, $dekan ?? auth()->user());
+            });
 
             $message = $decision === 'approved'
                 ? 'Proposal berhasil disetujui dan diteruskan ke Kepala LPPM.'

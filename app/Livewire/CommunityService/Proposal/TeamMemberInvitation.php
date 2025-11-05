@@ -4,6 +4,7 @@ namespace App\Livewire\CommunityService\Proposal;
 
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -52,11 +53,13 @@ class TeamMemberInvitation extends Component
             ->first();
 
         if ($teamMember) {
-            $teamMember->pivot->update(['status' => 'accepted']);
+            DB::transaction(function () use ($teamMember, $user): void {
+                $teamMember->pivot->update(['status' => 'accepted']);
 
-            // Send notification
-            $notificationService = app(\App\Services\NotificationService::class);
-            $notificationService->notifyTeamInvitationAccepted($this->proposal, $user, $user);
+                // Send notification
+                $notificationService = app(\App\Services\NotificationService::class);
+                $notificationService->notifyTeamInvitationAccepted($this->proposal, $user, $user);
+            });
 
             $this->dispatch('team-member-accepted', proposalId: $this->proposal->id);
             session()->flash('success', 'Anda telah menerima undangan menjadi anggota proposal ini.');
@@ -72,11 +75,13 @@ class TeamMemberInvitation extends Component
             ->first();
 
         if ($teamMember) {
-            $teamMember->pivot->update(['status' => 'rejected']);
+            DB::transaction(function () use ($teamMember, $user): void {
+                $teamMember->pivot->update(['status' => 'rejected']);
 
-            // Send notification
-            $notificationService = app(\App\Services\NotificationService::class);
-            $notificationService->notifyTeamInvitationRejected($this->proposal, $user, $user);
+                // Send notification
+                $notificationService = app(\App\Services\NotificationService::class);
+                $notificationService->notifyTeamInvitationRejected($this->proposal, $user, $user);
+            });
 
             $this->dispatch('team-member-rejected', proposalId: $this->proposal->id);
             session()->flash('warning', 'Anda telah menolak undangan untuk proposal ini.');

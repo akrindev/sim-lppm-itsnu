@@ -8,6 +8,7 @@ use App\Models\ProposalReviewer;
 use App\Models\User;
 use App\Services\NotificationService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AssignReviewersAction
 {
@@ -45,25 +46,35 @@ class AssignReviewersAction
             ];
         }
 
-        // Assign reviewer
-        ProposalReviewer::create([
-            'proposal_id' => $proposal->id,
-            'user_id' => $reviewerId,
-            'status' => 'pending',
-        ]);
+        try {
+            DB::transaction(function () use ($proposal, $reviewerId, $reviewer, $daysToReview): void {
+                // Assign reviewer
+                ProposalReviewer::create([
+                    'proposal_id' => $proposal->id,
+                    'user_id' => $reviewerId,
+                    'status' => 'pending',
+                ]);
 
-        // Send notifications
-        $this->sendNotifications($proposal, $reviewer, $daysToReview);
+                // Send notifications
+                $this->sendNotifications($proposal, $reviewer, $daysToReview);
 
-        // Update proposal status to reviewed if first reviewer
-        if ($proposal->reviewers()->count() === 1) {
-            $proposal->update(['status' => ProposalStatus::REVIEWED]);
+                // Update proposal status to reviewed if this is first reviewer
+                $reviewerCount = $proposal->reviewers()->count();
+                if ($reviewerCount === 1) {
+                    $proposal->update(['status' => ProposalStatus::REVIEWED]);
+                }
+            });
+
+            return [
+                'success' => true,
+                'message' => 'Berhasil menugaskan reviewer untuk proposal ini.',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Gagal menugaskan reviewer: ' . $e->getMessage(),
+            ];
         }
-
-        return [
-            'success' => true,
-            'message' => 'Berhasil menugaskan reviewer untuk proposal ini.',
-        ];
     }
 
     /**

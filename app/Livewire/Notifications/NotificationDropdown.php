@@ -3,6 +3,7 @@
 namespace App\Livewire\Notifications;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class NotificationDropdown extends Component
@@ -27,9 +28,11 @@ class NotificationDropdown extends Component
     public function markAsRead(string $notificationId): void
     {
         $user = Auth::user();
-        $user->notifications()->where('id', $notificationId)->update([
-            'read_at' => now(),
-        ]);
+        DB::transaction(function () use ($user, $notificationId): void {
+            $user->notifications()->where('id', $notificationId)->update([
+                'read_at' => now(),
+            ]);
+        });
 
         $this->dispatch('notification-updated');
     }
@@ -37,9 +40,11 @@ class NotificationDropdown extends Component
     public function markAllAsRead(): void
     {
         $user = Auth::user();
-        $user->unreadNotifications()->update([
-            'read_at' => now(),
-        ]);
+        DB::transaction(function () use ($user): void {
+            $user->unreadNotifications()->update([
+                'read_at' => now(),
+            ]);
+        });
 
         $this->dispatch('notification-updated');
     }
