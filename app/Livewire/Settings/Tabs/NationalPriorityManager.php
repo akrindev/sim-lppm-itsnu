@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\NationalPriority;
 use Livewire\Attributes\On;
@@ -25,7 +25,7 @@ class NationalPriorityManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.national-priority-manager', [
+        return view('livewire.settings.tabs.national-priority-manager', [
             'nationalPriorities' => NationalPriority::paginate(10),
         ]);
     }

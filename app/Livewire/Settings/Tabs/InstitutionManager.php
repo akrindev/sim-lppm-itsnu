@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Institution;
 use Livewire\Attributes\On;
@@ -25,7 +25,7 @@ class InstitutionManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.institution-manager', [
+        return view('livewire.settings.tabs.institution-manager', [
             'institutions' => Institution::paginate(10),
         ]);
     }

@@ -3,189 +3,124 @@
 <x-slot:pageSubtitle>Kelola semua data master sistem</x-slot:pageSubtitle>
 
 <div>
-    <div class="page-wrapper">
-        <div class="container-xl">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Kelola Data Master</h3>
-                        </div>
-                        <div class="card-body">
-                            <!-- Research & Academic Content -->
-                            <div class="mb-4">
-                                <h4 class="mb-3">
-                                    <x-lucide-book-open class="me-2 icon" />
-                                    Konten Penelitian & Akademik
-                                </h4>
-                                <div class="row">
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-target class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Area Fokus</h5>
-                                                <p class="text-muted card-text">Kelola area fokus penelitian</p>
-                                                <a href="{{ route('settings.tabs.focus-areas') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-hash class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Kata Kunci</h5>
-                                                <p class="text-muted card-text">Kelola kata kunci penelitian</p>
-                                                <a href="{{ route('settings.tabs.keywords') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-palette class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Tema</h5>
-                                                <p class="text-muted card-text">Kelola tema penelitian</p>
-                                                <a href="{{ route('settings.tabs.themes') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-message-square class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Topik</h5>
-                                                <p class="text-muted card-text">Kelola topik penelitian</p>
-                                                <a href="{{ route('settings.tabs.topics') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-file-text class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Skema Penelitian</h5>
-                                                <p class="text-muted card-text">Kelola skema penelitian</p>
-                                                <a href="{{ route('settings.tabs.research-schemes') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-atom class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Klaster Sains</h5>
-                                                <p class="text-muted card-text">Kelola klaster sains</p>
-                                                <a href="{{ route('settings.tabs.science-clusters') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Academic Structure -->
-                            <div class="mb-4">
-                                <h4 class="mb-3">
-                                    <x-lucide-school class="me-2 icon" />
-                                    Struktur Akademik
-                                </h4>
-                                <div class="row">
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-graduation-cap class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Program Studi</h5>
-                                                <p class="text-muted card-text">Kelola program studi</p>
-                                                <a href="{{ route('settings.tabs.study-programs') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-building class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Fakultas</h5>
-                                                <p class="text-muted card-text">Kelola data fakultas</p>
-                                                <a href="{{ route('settings.tabs.faculties') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-building-2 class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Institusi</h5>
-                                                <p class="text-muted card-text">Kelola data institusi</p>
-                                                <a href="{{ route('settings.tabs.institutions') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- External Partnerships -->
-                            <div class="mb-4">
-                                <h4 class="mb-3">
-                                    <x-lucide-handshake class="me-2 icon" />
-                                    Kemitraan & Prioritas
-                                </h4>
-                                <div class="row">
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-users class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Mitra</h5>
-                                                <p class="text-muted card-text">Kelola data mitra</p>
-                                                <a href="{{ route('settings.tabs.partners') }}" wire:navigate
-                                                    class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 col-md-6 col-lg-4">
-                                        <div class="h-100 card">
-                                            <div class="text-center card-body">
-                                                <x-lucide-star class="mb-2 text-primary icon" />
-                                                <h5 class="card-title">Prioritas Nasional</h5>
-                                                <p class="text-muted card-text">Kelola prioritas nasional</p>
-                                                <a href="{{ route('settings.tabs.national-priorities') }}"
-                                                    wire:navigate class="btn btn-primary">
-                                                    Kelola
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="card">
+        <div class="row g-0">
+            <div class="border-end col-12 col-md-3">
+                <div class="card-body">
+                    <h4 class="subheader">Konten Penelitian & Akademik</h4>
+                    <div class="list-group list-group-transparent">
+                        <button wire:click="setActiveTab('focus-areas')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'focus-areas' ? 'active' : '' }}">
+                            <x-lucide-target class="me-2 icon" />
+                            Area Fokus
+                        </button>
+                        <button wire:click="setActiveTab('keywords')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'keywords' ? 'active' : '' }}">
+                            <x-lucide-hash class="me-2 icon" />
+                            Kata Kunci
+                        </button>
+                        <button wire:click="setActiveTab('themes')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'themes' ? 'active' : '' }}">
+                            <x-lucide-palette class="me-2 icon" />
+                            Tema
+                        </button>
+                        <button wire:click="setActiveTab('topics')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'topics' ? 'active' : '' }}">
+                            <x-lucide-message-square class="me-2 icon" />
+                            Topik
+                        </button>
+                        <button wire:click="setActiveTab('research-schemes')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'research-schemes' ? 'active' : '' }}">
+                            <x-lucide-file-text class="me-2 icon" />
+                            Skema Penelitian
+                        </button>
+                        <button wire:click="setActiveTab('science-clusters')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'science-clusters' ? 'active' : '' }}">
+                            <x-lucide-atom class="me-2 icon" />
+                            Klaster Sains
+                        </button>
                     </div>
+                    <h4 class="mt-4 subheader">Struktur Akademik</h4>
+                    <div class="list-group list-group-transparent">
+                        <button wire:click="setActiveTab('study-programs')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'study-programs' ? 'active' : '' }}">
+                            <x-lucide-graduation-cap class="me-2 icon" />
+                            Program Studi
+                        </button>
+                        <button wire:click="setActiveTab('faculties')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'faculties' ? 'active' : '' }}">
+                            <x-lucide-building class="me-2 icon" />
+                            Fakultas
+                        </button>
+                        <button wire:click="setActiveTab('institutions')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'institutions' ? 'active' : '' }}">
+                            <x-lucide-building-2 class="me-2 icon" />
+                            Institusi
+                        </button>
+                    </div>
+                    <h4 class="mt-4 subheader">Kemitraan & Prioritas</h4>
+                    <div class="list-group list-group-transparent">
+                        <button wire:click="setActiveTab('partners')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'partners' ? 'active' : '' }}">
+                            <x-lucide-users class="me-2 icon" />
+                            Mitra
+                        </button>
+                        <button wire:click="setActiveTab('national-priorities')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'national-priorities' ? 'active' : '' }}">
+                            <x-lucide-star class="me-2 icon" />
+                            Prioritas Nasional
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column col-12 col-md-9">
+                <div class="card-body">
+                    @if ($activeTab === 'focus-areas')
+                        <div>
+                            <livewire:settings.tabs.focus-area-manager />
+                        </div>
+                    @elseif ($activeTab === 'keywords')
+                        <div>
+                            <livewire:settings.tabs.keyword-manager />
+                        </div>
+                    @elseif ($activeTab === 'themes')
+                        <div>
+                            <livewire:settings.tabs.theme-manager />
+                        </div>
+                    @elseif ($activeTab === 'topics')
+                        <div>
+                            <livewire:settings.tabs.topic-manager />
+                        </div>
+                    @elseif ($activeTab === 'research-schemes')
+                        <div>
+                            <livewire:settings.tabs.research-scheme-manager />
+                        </div>
+                    @elseif ($activeTab === 'science-clusters')
+                        <div>
+                            <livewire:settings.tabs.science-cluster-manager />
+                        </div>
+                    @elseif ($activeTab === 'study-programs')
+                        <div>
+                            <livewire:settings.tabs.study-program-manager />
+                        </div>
+                    @elseif ($activeTab === 'faculties')
+                        <div>
+                            <livewire:settings.tabs.faculty-manager />
+                        </div>
+                    @elseif ($activeTab === 'institutions')
+                        <div>
+                            <livewire:settings.tabs.institution-manager />
+                        </div>
+                    @elseif ($activeTab === 'partners')
+                        <div>
+                            <livewire:settings.tabs.partner-manager />
+                        </div>
+                    @elseif ($activeTab === 'national-priorities')
+                        <div>
+                            <livewire:settings.tabs.national-priority-manager />
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Institution;
 use App\Models\StudyProgram;
@@ -29,7 +29,7 @@ class StudyProgramManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.study-program-manager', [
+        return view('livewire.settings.tabs.study-program-manager', [
             'studyPrograms' => StudyProgram::with(['institution'])->paginate(10),
             'institutions' => Institution::all(),
         ]);

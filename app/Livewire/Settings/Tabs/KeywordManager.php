@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Keyword;
 use Livewire\Attributes\On;
@@ -25,7 +25,7 @@ class KeywordManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.keyword-manager', [
+        return view('livewire.settings.tabs.keyword-manager', [
             'keywords' => Keyword::paginate(10),
         ]);
     }

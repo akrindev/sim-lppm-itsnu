@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\FocusArea;
 use Livewire\Attributes\On;
@@ -25,7 +25,7 @@ class FocusAreaManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.focus-area-manager', [
+        return view('livewire.settings.tabs.focus-area-manager', [
             'focusAreas' => FocusArea::paginate(10),
         ]);
     }

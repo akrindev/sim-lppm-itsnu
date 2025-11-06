@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\ScienceCluster;
 use Livewire\Attributes\On;
@@ -27,7 +27,7 @@ class ScienceClusterManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.science-cluster-manager', [
+        return view('livewire.settings.tabs.science-cluster-manager', [
             'scienceClusters' => ScienceCluster::with(['parent'])->paginate(10),
             'parentClusters' => ScienceCluster::whereNull('parent_id')->get(),
         ]);

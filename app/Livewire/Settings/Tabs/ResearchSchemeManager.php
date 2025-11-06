@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\ResearchScheme;
 use Livewire\Attributes\On;
@@ -28,7 +28,7 @@ class ResearchSchemeManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.research-scheme-manager', [
+        return view('livewire.settings.tabs.research-scheme-manager', [
             'researchSchemes' => ResearchScheme::paginate(10),
         ]);
     }

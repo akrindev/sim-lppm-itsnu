@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Faculty;
 use App\Models\Institution;
@@ -32,7 +32,7 @@ class FacultyManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.faculty-manager', [
+        return view('livewire.settings.tabs.faculty-manager', [
             'faculties' => Faculty::with(['institution'])->paginate(10),
             'institutions' => Institution::all(),
         ]);

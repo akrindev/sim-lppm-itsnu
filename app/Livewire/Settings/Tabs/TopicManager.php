@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Theme;
 use App\Models\Topic;
@@ -29,7 +29,7 @@ class TopicManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.topic-manager', [
+        return view('livewire.settings.tabs.topic-manager', [
             'topics' => Topic::with(['theme'])->paginate(10),
             'themes' => Theme::all(),
         ]);

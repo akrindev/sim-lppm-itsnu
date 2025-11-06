@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\FocusArea;
 use App\Models\Theme;
@@ -29,7 +29,7 @@ class ThemeManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.theme-manager', [
+        return view('livewire.settings.tabs.theme-manager', [
             'themes' => Theme::with(['focusArea'])->paginate(10),
             'focusAreas' => FocusArea::all(),
         ]);

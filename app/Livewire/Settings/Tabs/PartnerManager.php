@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Settings;
+namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Partner;
 use Livewire\Attributes\On;
@@ -31,7 +31,7 @@ class PartnerManager extends Component
 
     public function render()
     {
-        return view('livewire.settings.partner-manager', [
+        return view('livewire.settings.tabs.partner-manager', [
             'partners' => Partner::paginate(10),
         ]);
     }
