@@ -17,7 +17,7 @@ class FocusAreaManager extends Component
 
     public ?int $editingId = null;
 
-    public string $modalTitle = '';
+    public string $modalTitle = 'Area Fokus';
 
     public ?int $deleteItemId = null;
 
@@ -47,6 +47,9 @@ class FocusAreaManager extends Component
         }
 
         $this->dispatch('notify', message: $this->editingId ? 'Area Fokus berhasil diubah' : 'Area Fokus berhasil ditambahkan', type: 'success');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-focus-area']);
         $this->reset(['name', 'editingId']);
     }
 
