@@ -2,7 +2,8 @@
     <div class="card">
         <div class="d-flex align-items-center justify-content-between card-header">
             <h3 class="card-title">Program Studi</h3>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-study-program">
+            <button type="button" class="btn btn-primary" wire:click='create' data-bs-toggle="modal"
+                data-bs-target="#modal-study-program">
                 <x-lucide-plus class="icon" />
                 Tambah Program Studi
             </button>
@@ -29,7 +30,7 @@
                                     </button>
                                     <button type="button" class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#modal-confirm-delete"
-                                        wire:click="$set('deleteItemId', {{ $item->id }}); $set('deleteItemName', '{{ $item->name }}')">
+                                        wire:click="confirmDelete({{ $item->id }}, '{{ $item->name }}')">
                                         Hapus
                                     </button>
                                 </div>
@@ -43,58 +44,55 @@
             {{ $studyPrograms->links() }}
         </div>
     </div>
+    <x-tabler.modal id="modal-study-program" :title="$modalTitle">
+        <x-slot:body>
+            <form wire:submit="save" id="form-study-program">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
+                    @error('name')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Institusi</label>
+                    <select wire:model="institutionId" class="form-control">
+                        <option value="">Select institution</option>
+                        @foreach ($institutions as $institution)
+                            <option value="{{ $institution->id }}">{{ $institution->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('institutionId')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-study-program" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-    @teleport('body')
-        <x-tabler.modal id="modal-study-program" :title="$modalTitle">
-            <x-slot:body>
-                <form wire:submit="save" id="form-study-program">
-                    <div class="mb-3">
-                        <label class="form-label">Nama</label>
-                        <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
-                        @error('name')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Institusi</label>
-                        <select wire:model="institutionId" class="form-control">
-                            <option value="">Select institution</option>
-                            @foreach ($institutions as $institution)
-                                <option value="{{ $institution->id }}">{{ $institution->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('institutionId')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </form>
-            </x-slot:body>
-            <x-slot:footer>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" form="form-study-program" class="btn btn-primary">Simpan</button>
-            </x-slot:footer>
-        </x-tabler.modal>
+    <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
+        <x-slot:body>
+            <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
+                data-bs-dismiss="modal">Ya, Hapus</button>
+        </x-slot:footer>
+    </x-tabler.modal>
 
-        <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus" on-hide="resetConfirmDelete">
-            <x-slot:body>
-                <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
-            </x-slot:body>
-            <x-slot:footer>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
-                    data-bs-dismiss="modal">Ya, Hapus</button>
-            </x-slot:footer>
-        </x-tabler.modal>
-
+    @script
         <script>
-            document.addEventListener('livewire:init', () => {
-                const modal = document.getElementById('modal-study-program');
-                if (modal) {
-                    modal.addEventListener('hidden.bs.modal', () => {
-                        $wire.call('resetForm');
-                    });
-                }
-            });
+            const modal = document.getElementById('modal-study-program');
+            if (modal) {
+                modal.addEventListener('hidden.bs.modal', () => {
+                    @this.call('resetForm');
+                });
+            }
         </script>
-    @endteleport
+    @endscript
 </div>
