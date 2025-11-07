@@ -21,6 +21,7 @@ use App\Livewire\Research\Proposal\Edit as ResearchProposalEdit;
 use App\Livewire\Research\Proposal\Index as ResearchProposalIndex;
 use App\Livewire\Research\Proposal\Show as ResearchProposalShow;
 use App\Livewire\Research\ProposalRevision\Index as ResearchProposalRevisionIndex;
+use App\Livewire\Research\ProposalRevision\Show as ResearchProposalRevisionShow;
 use App\Livewire\Review\CommunityService as ReviewCommunityService;
 use App\Livewire\Review\Research as ReviewResearch;
 use App\Livewire\Settings\Appearance;
@@ -62,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proposal/{proposal}', ResearchProposalShow::class)->name('proposal.show');
         Route::get('proposal/{proposal}/edit', ResearchProposalEdit::class)->name('proposal.edit');
         Route::get('proposal-revision', ResearchProposalRevisionIndex::class)->name('proposal-revision.index');
+        Route::get('proposal-revision/{proposal}', ResearchProposalRevisionShow::class)->name('proposal-revision.show');
         Route::get('progress-report', ResearchProgressReportIndex::class)->name('progress-report.index');
         Route::get('progress-report/{proposal}', ResearchProgressReportShow::class)->name('progress-report.show');
         Route::get('final-report', ResearchFinalReportIndex::class)->name('final-report.index');
