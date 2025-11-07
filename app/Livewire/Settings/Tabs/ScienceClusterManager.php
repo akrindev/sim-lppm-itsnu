@@ -54,7 +54,10 @@ class ScienceClusterManager extends Component
             ScienceCluster::create($data);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-science-cluster']);
         $this->reset(['name', 'parentId', 'editingId']);
     }
 
@@ -69,7 +72,9 @@ class ScienceClusterManager extends Component
     public function delete(ScienceCluster $scienceCluster): void
     {
         $scienceCluster->delete();
-        $this->dispatch('notify', message: 'Klaster Sains berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Klaster Sains berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -82,7 +87,8 @@ class ScienceClusterManager extends Component
     {
         if ($this->deleteItemId) {
             ScienceCluster::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Klaster Sains berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Klaster Sains berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -90,5 +96,11 @@ class ScienceClusterManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

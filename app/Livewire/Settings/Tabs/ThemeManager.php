@@ -56,7 +56,10 @@ class ThemeManager extends Component
             Theme::create($data);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Tema berhasil diubah' : 'Tema berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Tema berhasil diubah' : 'Tema berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-theme']);
         $this->reset(['name', 'focusAreaId', 'editingId']);
     }
 
@@ -71,7 +74,9 @@ class ThemeManager extends Component
     public function delete(Theme $theme): void
     {
         $theme->delete();
-        $this->dispatch('notify', message: 'Tema berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Tema berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -84,7 +89,8 @@ class ThemeManager extends Component
     {
         if ($this->deleteItemId) {
             Theme::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Tema berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Tema berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -92,5 +98,11 @@ class ThemeManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

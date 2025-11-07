@@ -17,7 +17,7 @@ class InstitutionManager extends Component
 
     public ?int $editingId = null;
 
-    public string $modalTitle = '';
+    public string $modalTitle = 'Institusi';
 
     public ?int $deleteItemId = null;
 
@@ -46,7 +46,10 @@ class InstitutionManager extends Component
             Institution::create(['name' => $this->name]);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-institution']);
         $this->reset(['name', 'editingId']);
     }
 
@@ -60,7 +63,9 @@ class InstitutionManager extends Component
     public function delete(Institution $institution): void
     {
         $institution->delete();
-        $this->dispatch('notify', message: 'Institusi berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Institusi berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -68,12 +73,12 @@ class InstitutionManager extends Component
         $this->reset(['name', 'editingId']);
     }
 
-
     public function handleConfirmDeleteAction(): void
     {
         if ($this->deleteItemId) {
             Institution::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Institusi berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Institusi berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -81,5 +86,11 @@ class InstitutionManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

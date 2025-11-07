@@ -24,7 +24,7 @@ class FacultyManager extends Component
 
     public ?int $editingId = null;
 
-    public string $modalTitle = '';
+    public string $modalTitle = 'Fakultas';
 
     public ?int $deleteItemId = null;
 
@@ -60,7 +60,10 @@ class FacultyManager extends Component
             Faculty::create($data);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Fakultas berhasil diubah' : 'Fakultas berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Fakultas berhasil diubah' : 'Fakultas berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-faculty']);
         $this->reset(['name', 'code', 'institutionId', 'editingId']);
     }
 
@@ -76,7 +79,9 @@ class FacultyManager extends Component
     public function delete(Faculty $faculty): void
     {
         $faculty->delete();
-        $this->dispatch('notify', message: 'Fakultas berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Fakultas berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -89,7 +94,8 @@ class FacultyManager extends Component
     {
         if ($this->deleteItemId) {
             Faculty::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Fakultas berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Fakultas berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -97,5 +103,11 @@ class FacultyManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

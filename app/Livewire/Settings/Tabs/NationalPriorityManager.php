@@ -17,7 +17,7 @@ class NationalPriorityManager extends Component
 
     public ?int $editingId = null;
 
-    public string $modalTitle = '';
+    public string $modalTitle = 'Prioritas Nasional';
 
     public ?int $deleteItemId = null;
 
@@ -46,7 +46,10 @@ class NationalPriorityManager extends Component
             NationalPriority::create(['name' => $this->name]);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Prioritas Nasional berhasil diubah' : 'Prioritas Nasional berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Prioritas Nasional berhasil diubah' : 'Prioritas Nasional berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-national-priority']);
         $this->reset(['name', 'editingId']);
     }
 
@@ -60,7 +63,9 @@ class NationalPriorityManager extends Component
     public function delete(NationalPriority $nationalPriority): void
     {
         $nationalPriority->delete();
-        $this->dispatch('notify', message: 'Prioritas Nasional berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Prioritas Nasional berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -68,12 +73,12 @@ class NationalPriorityManager extends Component
         $this->reset(['name', 'editingId']);
     }
 
-
     public function handleConfirmDeleteAction(): void
     {
         if ($this->deleteItemId) {
             NationalPriority::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Prioritas Nasional berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Prioritas Nasional berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -81,5 +86,11 @@ class NationalPriorityManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

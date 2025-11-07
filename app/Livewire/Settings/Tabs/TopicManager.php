@@ -56,7 +56,10 @@ class TopicManager extends Component
             Topic::create($data);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Topik berhasil diubah' : 'Topik berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Topik berhasil diubah' : 'Topik berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-topic']);
         $this->reset(['name', 'themeId', 'editingId']);
     }
 
@@ -71,7 +74,9 @@ class TopicManager extends Component
     public function delete(Topic $topic): void
     {
         $topic->delete();
-        $this->dispatch('notify', message: 'Topik berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Topik berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -84,7 +89,8 @@ class TopicManager extends Component
     {
         if ($this->deleteItemId) {
             Topic::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Topik berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Topik berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -92,5 +98,11 @@ class TopicManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

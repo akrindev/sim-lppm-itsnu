@@ -56,7 +56,10 @@ class StudyProgramManager extends Component
             StudyProgram::create($data);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Program Studi berhasil diubah' : 'Program Studi berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Program Studi berhasil diubah' : 'Program Studi berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-study-program']);
         $this->reset(['name', 'institutionId', 'editingId']);
     }
 
@@ -71,7 +74,9 @@ class StudyProgramManager extends Component
     public function delete(StudyProgram $studyProgram): void
     {
         $studyProgram->delete();
-        $this->dispatch('notify', message: 'Program Studi berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Program Studi berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -84,7 +89,8 @@ class StudyProgramManager extends Component
     {
         if ($this->deleteItemId) {
             StudyProgram::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Program Studi berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Program Studi berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -92,5 +98,11 @@ class StudyProgramManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

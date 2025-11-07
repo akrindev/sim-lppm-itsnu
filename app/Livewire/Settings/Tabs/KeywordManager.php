@@ -17,7 +17,7 @@ class KeywordManager extends Component
 
     public ?int $editingId = null;
 
-    public string $modalTitle = '';
+    public string $modalTitle = 'Kata Kunci';
 
     public ?int $deleteItemId = null;
 
@@ -46,7 +46,10 @@ class KeywordManager extends Component
             Keyword::create(['name' => $this->name]);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Kata Kunci berhasil diubah' : 'Kata Kunci berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Kata Kunci berhasil diubah' : 'Kata Kunci berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-keyword']);
         $this->reset(['name', 'editingId']);
     }
 
@@ -60,7 +63,9 @@ class KeywordManager extends Component
     public function delete(Keyword $keyword): void
     {
         $keyword->delete();
-        $this->dispatch('notify', message: 'Kata Kunci berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Kata Kunci berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -68,12 +73,12 @@ class KeywordManager extends Component
         $this->reset(['name', 'editingId']);
     }
 
-
     public function handleConfirmDeleteAction(): void
     {
         if ($this->deleteItemId) {
             Keyword::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Kata Kunci berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Kata Kunci berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -81,5 +86,11 @@ class KeywordManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

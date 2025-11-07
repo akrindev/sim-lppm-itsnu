@@ -23,7 +23,7 @@ class PartnerManager extends Component
 
     public ?int $editingId = null;
 
-    public string $modalTitle = '';
+    public string $modalTitle = 'Mitra';
 
     public ?int $deleteItemId = null;
 
@@ -58,7 +58,10 @@ class PartnerManager extends Component
             Partner::create($data);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Mitra berhasil diubah' : 'Mitra berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Mitra berhasil diubah' : 'Mitra berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-partner']);
         $this->reset(['name', 'type', 'address', 'editingId']);
     }
 
@@ -74,7 +77,9 @@ class PartnerManager extends Component
     public function delete(Partner $partner): void
     {
         $partner->delete();
-        $this->dispatch('notify', message: 'Mitra berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Mitra berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -82,12 +87,12 @@ class PartnerManager extends Component
         $this->reset(['name', 'type', 'address', 'editingId']);
     }
 
-
     public function handleConfirmDeleteAction(): void
     {
         if ($this->deleteItemId) {
             Partner::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Mitra berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Mitra berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -95,5 +100,11 @@ class PartnerManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

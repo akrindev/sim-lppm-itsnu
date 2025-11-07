@@ -59,6 +59,19 @@
                             Institusi
                         </button>
                     </div>
+                    <h4 class="mt-4 subheader">Anggaran & RAB</h4>
+                    <div class="list-group list-group-transparent">
+                        <button wire:click="setActiveTab('budget-groups')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-groups' ? 'active' : '' }}">
+                            <x-lucide-archive class="me-2 icon" />
+                            Kelompok Anggaran
+                        </button>
+                        <button wire:click="setActiveTab('budget-components')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-components' ? 'active' : '' }}">
+                            <x-lucide-package class="me-2 icon" />
+                            Komponen Anggaran
+                        </button>
+                    </div>
                     <h4 class="mt-4 subheader">Kemitraan & Prioritas</h4>
                     <div class="list-group list-group-transparent">
                         <button wire:click="setActiveTab('partners')"
@@ -135,6 +148,14 @@
                     @elseif ($activeTab === 'national-priorities')
                         <div>
                             <livewire:settings.tabs.national-priority-manager />
+                        </div>
+                    @elseif ($activeTab === 'budget-groups')
+                        <div>
+                            <livewire:settings.tabs.budget-group-manager />
+                        </div>
+                    @elseif ($activeTab === 'budget-components')
+                        <div>
+                            <livewire:settings.tabs.budget-component-manager />
                         </div>
                     @endif
                 </div>

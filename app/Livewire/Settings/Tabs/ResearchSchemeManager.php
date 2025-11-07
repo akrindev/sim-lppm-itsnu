@@ -20,7 +20,7 @@ class ResearchSchemeManager extends Component
 
     public ?int $editingId = null;
 
-    public string $modalTitle = '';
+    public string $modalTitle = 'Skema Penelitian';
 
     public ?int $deleteItemId = null;
 
@@ -54,7 +54,10 @@ class ResearchSchemeManager extends Component
             ResearchScheme::create($data);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan');
+
+        // close modal
+        $this->dispatch('close-modal', detail: ['modalId' => 'modal-research-scheme']);
         $this->reset(['name', 'strata', 'editingId']);
     }
 
@@ -69,7 +72,9 @@ class ResearchSchemeManager extends Component
     public function delete(ResearchScheme $researchScheme): void
     {
         $researchScheme->delete();
-        $this->dispatch('notify', message: 'Skema Penelitian berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Skema Penelitian berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -77,12 +82,12 @@ class ResearchSchemeManager extends Component
         $this->reset(['name', 'strata', 'editingId']);
     }
 
-
     public function handleConfirmDeleteAction(): void
     {
         if ($this->deleteItemId) {
             ResearchScheme::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Skema Penelitian berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Skema Penelitian berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -90,5 +95,11 @@ class ResearchSchemeManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }
