@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Livewire\Settings;
 
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -15,6 +14,12 @@ class MasterData extends Component
     public function setActiveTab(string $tab): void
     {
         $this->activeTab = $tab;
+    }
+
+    #[On('close-modal')]
+    public function refresh(): void
+    {
+        // Just to trigger re-render
     }
 
     public function render()

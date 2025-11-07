@@ -3,6 +3,7 @@
 <x-slot:pageSubtitle>Kelola semua data master sistem</x-slot:pageSubtitle>
 
 <div>
+    <x-tabler.alert />
     <div class="card">
         <div class="row g-0">
             <div class="border-end col-12 col-md-3">
@@ -75,6 +76,21 @@
             </div>
 
             <div class="d-flex flex-column col-12 col-md-9">
+                <div class="m-3 alert alert-info" role="alert">
+                    <div class="alert-icon">
+
+                        <!-- Download SVG icon from http://tabler.io/icons/icon/info-circle -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="icon alert-icon icon-2">
+                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                            <path d="M12 9h.01"></path>
+                            <path d="M11 12h1v4h1"></path>
+                        </svg>
+                    </div>
+                    Tidak Disarankan menghapus data master yang sudah digunakan pada entitas lain untuk menghindari
+                    inkonsistensi data.
+                </div>
                 <div class="card-body">
                     @if ($activeTab === 'focus-areas')
                         <div>

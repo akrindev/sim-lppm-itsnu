@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Settings\MasterData;
 use App\Models\FocusArea;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
@@ -46,7 +47,7 @@ class FocusAreaManager extends Component
             FocusArea::create(['name' => $this->name]);
         }
 
-        $this->dispatch('notify', message: $this->editingId ? 'Area Fokus berhasil diubah' : 'Area Fokus berhasil ditambahkan', type: 'success');
+        session()->flash('success', $this->editingId ? 'Area Fokus berhasil diubah' : 'Area Fokus berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-focus-area']);
@@ -63,7 +64,9 @@ class FocusAreaManager extends Component
     public function delete(FocusArea $focusArea): void
     {
         $focusArea->delete();
-        $this->dispatch('notify', message: 'Area Fokus berhasil dihapus', type: 'success');
+
+        $this->resetForm();
+        session()->flash('success', 'Area Fokus berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -76,7 +79,8 @@ class FocusAreaManager extends Component
     {
         if ($this->deleteItemId) {
             FocusArea::findOrFail($this->deleteItemId)->delete();
-            $this->dispatch('notify', message: 'Area Fokus berhasil dihapus', type: 'success');
+
+            session()->flash('success', 'Area Fokus berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -84,5 +88,11 @@ class FocusAreaManager extends Component
     public function resetConfirmDelete(): void
     {
         $this->reset(['deleteItemId', 'deleteItemName']);
+    }
+
+    public function confirmDelete(int $id, string $name): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = $name;
     }
 }

@@ -129,87 +129,104 @@
     </div>
 </div>
 
-@push('scripts')
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            const setupTablerModalListeners = () => {
-                document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
-                    if (modalEl.dataset.livewireModalBound === 'true') {
-                        return;
-                    }
+@once
+    @push('scripts')
+        <script>
+            document.addEventListener('livewire:initialized', () => {
+                const setupTablerModalListeners = () => {
+                    document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
+                        if (modalEl.dataset.livewireModalBound === 'true') {
+                            return;
+                        }
 
-                    modalEl.dataset.livewireModalBound = 'true';
+                        modalEl.dataset.livewireModalBound = 'true';
 
-                    const componentId = modalEl.dataset.livewireComponent;
-                    const onShow = modalEl.dataset.livewireOnShow;
-                    const onHide = modalEl.dataset.livewireOnHide;
+                        const componentId = modalEl.dataset.livewireComponent;
+                        const onShow = modalEl.dataset.livewireOnShow;
+                        const onHide = modalEl.dataset.livewireOnHide;
 
-                    if (onShow && componentId) {
-                        modalEl.addEventListener('show.bs.modal', () => {
-                            console.log('Modal show event:', modalEl.id, 'calling:', onShow);
-                            try {
-                                const livewireComponent = window.Livewire?.find(componentId);
-                                if (livewireComponent) {
-                                    livewireComponent.call(onShow);
-                                } else {
-                                    console.warn('Livewire component not found:', componentId);
+                        if (onShow && componentId) {
+                            modalEl.addEventListener('show.bs.modal', () => {
+                                console.log('Modal show event:', modalEl.id, 'calling:', onShow);
+                                try {
+                                    const livewireComponent = window.Livewire?.find(componentId);
+                                    if (livewireComponent) {
+                                        livewireComponent.call(onShow);
+                                    } else {
+                                        console.warn('Livewire component not found:', componentId);
+                                    }
+                                } catch (error) {
+                                    console.error('Error calling onShow:', error);
                                 }
-                            } catch (error) {
-                                console.error('Error calling onShow:', error);
-                            }
-                        });
-                    }
+                            });
+                        }
 
-                    if (onHide && componentId) {
-                        modalEl.addEventListener('hidden.bs.modal', () => {
-                            console.log('Modal hide event:', modalEl.id, 'calling:', onHide);
-                            try {
-                                const livewireComponent = window.Livewire?.find(componentId);
-                                if (livewireComponent) {
-                                    livewireComponent.call(onHide);
-                                } else {
-                                    console.warn('Livewire component not found:', componentId);
+                        if (onHide && componentId) {
+                            modalEl.addEventListener('hidden.bs.modal', () => {
+                                console.log('Modal hide event:', modalEl.id, 'calling:', onHide);
+                                try {
+                                    const livewireComponent = window.Livewire?.find(componentId);
+                                    if (livewireComponent) {
+                                        livewireComponent.call(onHide);
+                                    } else {
+                                        console.warn('Livewire component not found:', componentId);
+                                    }
+                                } catch (error) {
+                                    console.error('Error calling onHide:', error);
                                 }
-                            } catch (error) {
-                                console.error('Error calling onHide:', error);
-                            }
-                        });
+                            });
+                        }
+                    });
+                };
+
+                // Set up listeners on initial load
+                setupTablerModalListeners();
+
+                // Re-setup listeners when Livewire updates the DOM using v3 hooks
+                Livewire.hook('morph.updated', setupTablerModalListeners);
+                Livewire.hook('morph.removed', setupTablerModalListeners);
+
+                // Manage aria-hidden attribute based on modal visibility
+                const manageAriaHidden = () => {
+                    document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
+                        const isVisible = modalEl.classList.contains('show');
+                        modalEl.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+                    });
+                };
+
+                // Listen for modal visibility changes
+                document.addEventListener('show.bs.modal', manageAriaHidden);
+                document.addEventListener('hidden.bs.modal', manageAriaHidden);
+
+                // Set initial state
+                manageAriaHidden();
+
+                // Listen for open-modal dispatch from Livewire
+                window.Livewire.on('open-modal', (event) => {
+                    const modal = document.getElementById(event.detail.modalId);
+                    console.log('Received open-modal for:', event.detail);
+                    if (modal) {
+                        if (typeof tabler !== 'undefined' && tabler.Modal) {
+                            const bsModal = tabler.Modal.getInstance(modal) || new tabler
+                                .Modal(modal);
+                            bsModal.show();
+                        }
                     }
                 });
-            };
 
-            // Set up listeners on initial load
-            setupTablerModalListeners();
-
-            // Re-setup listeners when Livewire updates the DOM using v3 hooks
-            Livewire.hook('morph.updated', setupTablerModalListeners);
-            Livewire.hook('morph.removed', setupTablerModalListeners);
-
-            // Listen for open-modal dispatch from Livewire
-            window.Livewire.on('open-modal', (event) => {
-                const modal = document.getElementById(event.detail.modalId);
-                console.log('Received open-modal for:', event.detail);
-                if (modal) {
-                    if (typeof tabler !== 'undefined' && tabler.Modal) {
-                        const bsModal = tabler.Modal.getInstance(modal) || new tabler
-                            .Modal(modal);
-                        bsModal.show();
+                // Listen for close-modal dispatch from Livewire
+                window.Livewire.on('close-modal', (event) => {
+                    const modal = document.getElementById(event.detail.modalId);
+                    console.log('Received close-modal for:', event.detail);
+                    if (modal) {
+                        if (typeof tabler !== 'undefined' && tabler.Modal) {
+                            const bsModal = tabler.Modal.getInstance(modal) || new tabler
+                                .Modal(modal);
+                            bsModal.hide();
+                        }
                     }
-                }
+                });
             });
-
-            // Listen for close-modal dispatch from Livewire
-            window.Livewire.on('close-modal', (event) => {
-                const modal = document.getElementById(event.detail.modalId);
-                console.log('Received close-modal for:', event.detail);
-                if (modal) {
-                    if (typeof tabler !== 'undefined' && tabler.Modal) {
-                        const bsModal = tabler.Modal.getInstance(modal) || new tabler
-                            .Modal(modal);
-                        bsModal.hide();
-                    }
-                }
-            });
-        });
-    </script>
-@endpush
+        </script>
+    @endpush
+@endonce
