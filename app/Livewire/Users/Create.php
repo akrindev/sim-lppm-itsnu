@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,8 @@ class Create extends Component
 
     public ?string $institution_id = '1';
 
+    public ?string $faculty_id = null;
+
     public ?string $study_program_id = null;
 
     /**
@@ -64,6 +67,8 @@ class Create extends Component
                 'birthplace' => $validated['birthplace'],
                 'sinta_id' => $validated['sinta_id'],
                 'type' => $validated['type'],
+                'institution_id' => $validated['institution_id'],
+                'faculty_id' => $validated['faculty_id'] ?? null,
                 'study_program_id' => $validated['study_program_id'],
             ]);
 
@@ -86,6 +91,7 @@ class Create extends Component
         return view('livewire.users.create', [
             'roleOptions' => $this->roleOptions(),
             'institutionOptions' => $this->institutionOptions(),
+            'facultyOptions' => $this->facultyOptions(),
             'studyProgramOptions' => $this->studyProgramOptions(),
         ]);
     }
@@ -111,6 +117,7 @@ class Create extends Component
             'sinta_id' => ['nullable', 'string', 'max:255'],
             'type' => ['required', Rule::in('dosen', 'mahasiswa')],
             'institution_id' => ['required', 'exists:institutions,id'],
+            'faculty_id' => ['nullable', 'exists:faculties,id'],
             'study_program_id' => ['required', 'exists:study_programs,id'],
         ];
     }
@@ -152,18 +159,41 @@ class Create extends Component
     }
 
     /**
-     * Retrieve study program options for the current institution.
+     * Retrieve faculty options for the current institution.
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function studyProgramOptions(): array
+    protected function facultyOptions(): array
     {
         if (! $this->institution_id) {
             return [];
         }
 
-        return \App\Models\StudyProgram::query()
+        return Faculty::query()
             ->where('institution_id', $this->institution_id)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Faculty $faculty) => [
+                'value' => $faculty->id,
+                'label' => $faculty->name,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Retrieve study program options for the current faculty.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function studyProgramOptions(): array
+    {
+        if (! $this->faculty_id) {
+            return [];
+        }
+
+        return \App\Models\StudyProgram::query()
+            ->where('faculty_id', $this->faculty_id)
             ->orderBy('name')
             ->get()
             ->map(fn (\App\Models\StudyProgram $program) => [
@@ -172,5 +202,22 @@ class Create extends Component
             ])
             ->values()
             ->all();
+    }
+
+    /**
+     * Updated institution.
+     */
+    public function updatedInstitutionId(): void
+    {
+        $this->faculty_id = null;
+        $this->study_program_id = null;
+    }
+
+    /**
+     * Updated faculty.
+     */
+    public function updatedFacultyId(): void
+    {
+        $this->study_program_id = null;
     }
 }

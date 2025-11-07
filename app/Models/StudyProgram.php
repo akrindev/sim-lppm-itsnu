@@ -14,6 +14,7 @@ class StudyProgram extends Model
 
     protected $fillable = [
         'institution_id',
+        'faculty_id',
         'name',
     ];
 
@@ -23,6 +24,14 @@ class StudyProgram extends Model
     public function institution(): BelongsTo
     {
         return $this->belongsTo(Institution::class);
+    }
+
+    /**
+     * Get the faculty that owns the study program.
+     */
+    public function faculty(): BelongsTo
+    {
+        return $this->belongsTo(Faculty::class);
     }
 
     /**

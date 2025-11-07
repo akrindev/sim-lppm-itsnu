@@ -210,6 +210,24 @@
 
                 <div class="col-md-6">
                     <div class="mb-3">
+                        <label class="form-label" for="faculty">
+                            Fakultas
+                        </label>
+                        <select id="faculty" class="form-select @error('faculty_id') is-invalid @enderror"
+                            wire:model.live="faculty_id" @disabled(empty($facultyOptions))>
+                            <option value="">Pilih fakultas...</option>
+                            @foreach ($facultyOptions as $option)
+                                <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
+                            @endforeach
+                        </select>
+                        @error('faculty_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
                         <label class="form-label" for="study-program">
                             Program Studi <span class="text-danger">*</span>
                         </label>

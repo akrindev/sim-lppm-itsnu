@@ -211,7 +211,7 @@ class ProposalForm extends Form
                 'group' => $item->group,
                 'component' => $item->component,
                 'item' => $item->item_description,
-                'unit' => '',
+                'unit' => $item->budgetComponent?->unit ?? '',
                 'volume' => $item->volume,
                 'unit_price' => $item->unit_price,
                 'total' => $item->total_price,

@@ -20,6 +20,7 @@ class Identity extends Model
         'birthplace',
         'institution_id',
         'study_program_id',
+        'faculty_id',
         'profile_picture',
     ];
 
@@ -57,5 +58,13 @@ class Identity extends Model
     public function studyProgram(): BelongsTo
     {
         return $this->belongsTo(StudyProgram::class);
+    }
+
+    /**
+     * Get the faculty that the identity belongs to.
+     */
+    public function faculty(): BelongsTo
+    {
+        return $this->belongsTo(Faculty::class);
     }
 }

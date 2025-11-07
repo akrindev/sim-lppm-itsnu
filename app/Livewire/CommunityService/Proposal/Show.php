@@ -26,6 +26,11 @@ class Show extends Component
      */
     public function mount(Proposal $proposal): void
     {
+        // if is research proposal, redirect to research show page
+        if ($proposal->detailable instanceof \App\Models\Research) {
+            $this->redirect(route('research.proposal.show', $proposal->id), navigate: true);
+        }
+
         // Eager load all required relationships for the show page
         $proposal->load([
             'submitter',
@@ -56,7 +61,7 @@ class Show extends Component
             session()->flash('success', 'Proposal pengabdian masyarakat berhasil dihapus');
             $this->redirect(route('community-service.proposal.index'));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
         }
     }
 

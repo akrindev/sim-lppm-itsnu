@@ -47,10 +47,18 @@
                             <tr wire:key="budget-{{ $index }}" x-data="{
                                 selectedGroup: @js($selectedGroupValue),
                                 selectedComponent: @js($selectedComponentValue),
-                                components: @js($this->budgetComponents->groupBy('budget_group_id')->map(fn($items) => $items->map(fn($i) => ['id' => $i->id, 'name' => $i->name])->values())->toArray()),
+                                components: @js($this->budgetComponents->groupBy('budget_group_id')->map(fn($items) => $items->map(fn($i) => ['id' => $i->id, 'name' => $i->name, 'unit' => $i->unit])->values())->toArray()),
                                 get filteredComponents() {
                                     if (!this.selectedGroup) return [];
                                     return this.components[this.selectedGroup] || [];
+                                },
+                                autoFillUnit() {
+                                    if (this.selectedComponent) {
+                                        const comp = this.filteredComponents.find(c => c.id == this.selectedComponent);
+                                        if (comp) {
+                                            @this.set('form.budget_items.{{ $index }}.unit', comp.unit);
+                                        }
+                                    }
                                 }
                             }">
                                 <td>
@@ -64,8 +72,8 @@
                                 </td>
                                 <td>
                                     <select wire:model="form.budget_items.{{ $index }}.budget_component_id"
-                                        x-model="selectedComponent" class="form-select-sm form-select"
-                                        :disabled="!selectedGroup">
+                                        x-model="selectedComponent" x-on:change="autoFillUnit()"
+                                        class="form-select-sm form-select" :disabled="!selectedGroup">
                                         <option value="">-- Pilih --</option>
                                         <template x-for="comp in filteredComponents" :key="comp.id">
                                             <option :value="comp.id" x-text="comp.name"
@@ -79,7 +87,8 @@
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.budget_items.{{ $index }}.unit"
-                                        class="form-control form-control-sm" placeholder="Satuan">
+                                        class="bg-light form-control form-control-sm disabled" placeholder="Satuan"
+                                        readonly disabled>
                                 </td>
                                 <td>
                                     <input type="number" wire:model.live="form.budget_items.{{ $index }}.volume"

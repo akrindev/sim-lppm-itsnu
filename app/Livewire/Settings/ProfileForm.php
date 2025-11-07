@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\StudyProgram;
 use App\Models\User;
@@ -31,9 +32,13 @@ class ProfileForm extends Component
 
     public ?int $institution_id = null;
 
+    public ?int $faculty_id = null;
+
     public ?int $study_program_id = null;
 
     public array $institutions = [];
+
+    public array $faculties = [];
 
     public array $studyPrograms = [];
 
@@ -57,14 +62,28 @@ class ProfileForm extends Component
             $this->birthdate = $user->identity->birthdate?->format('Y-m-d') ?? '';
             $this->birthplace = $user->identity->birthplace ?? '';
             $this->institution_id = $user->identity->institution_id;
+            $this->faculty_id = $user->identity->faculty_id;
             $this->study_program_id = $user->identity->study_program_id;
         }
 
         // Load institutions for dropdown
         $this->institutions = Institution::orderBy('name')->get()->toArray();
 
-        // Load study programs based on selected institution
+        // Load faculties based on selected institution
         if ($this->institution_id) {
+            $this->faculties = Faculty::where('institution_id', $this->institution_id)
+                ->orderBy('name')
+                ->get()
+                ->toArray();
+        }
+
+        // Load study programs based on selected faculty
+        if ($this->faculty_id) {
+            $this->studyPrograms = StudyProgram::where('faculty_id', $this->faculty_id)
+                ->orderBy('name')
+                ->get()
+                ->toArray();
+        } elseif ($this->institution_id) {
             $this->studyPrograms = StudyProgram::where('institution_id', $this->institution_id)
                 ->orderBy('name')
                 ->get()
@@ -77,8 +96,22 @@ class ProfileForm extends Component
      */
     public function updatedInstitutionId(): void
     {
+        $this->faculty_id = null;
         $this->study_program_id = null;
-        $this->studyPrograms = StudyProgram::where('institution_id', $this->institution_id)
+        $this->faculties = Faculty::where('institution_id', $this->institution_id)
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+        $this->studyPrograms = [];
+    }
+
+    /**
+     * Updated faculty.
+     */
+    public function updatedFacultyId(): void
+    {
+        $this->study_program_id = null;
+        $this->studyPrograms = StudyProgram::where('faculty_id', $this->faculty_id)
             ->orderBy('name')
             ->get()
             ->toArray();
@@ -108,6 +141,7 @@ class ProfileForm extends Component
             'birthdate' => ['nullable', 'date'],
             'birthplace' => ['nullable', 'string', 'max:255'],
             'institution_id' => ['nullable', 'exists:institutions,id'],
+            'faculty_id' => ['nullable', 'exists:faculties,id'],
             'study_program_id' => ['nullable', 'exists:study_programs,id'],
         ]);
 
@@ -132,6 +166,7 @@ class ProfileForm extends Component
             'birthdate' => $validated['birthdate'] ?? null,
             'birthplace' => $validated['birthplace'] ?? null,
             'institution_id' => $validated['institution_id'] ?? null,
+            'faculty_id' => $validated['faculty_id'] ?? null,
             'study_program_id' => $validated['study_program_id'] ?? null,
         ];
 
@@ -180,10 +215,24 @@ class ProfileForm extends Component
             $this->birthdate = $user->identity->birthdate?->format('Y-m-d') ?? '';
             $this->birthplace = $user->identity->birthplace ?? '';
             $this->institution_id = $user->identity->institution_id;
+            $this->faculty_id = $user->identity->faculty_id;
             $this->study_program_id = $user->identity->study_program_id;
 
-            // Reload study programs based on institution
+            // Reload faculties based on institution
             if ($this->institution_id) {
+                $this->faculties = Faculty::where('institution_id', $this->institution_id)
+                    ->orderBy('name')
+                    ->get()
+                    ->toArray();
+            }
+
+            // Reload study programs based on faculty
+            if ($this->faculty_id) {
+                $this->studyPrograms = StudyProgram::where('faculty_id', $this->faculty_id)
+                    ->orderBy('name')
+                    ->get()
+                    ->toArray();
+            } elseif ($this->institution_id) {
                 $this->studyPrograms = StudyProgram::where('institution_id', $this->institution_id)
                     ->orderBy('name')
                     ->get()

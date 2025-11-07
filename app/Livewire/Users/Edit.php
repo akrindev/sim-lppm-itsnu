@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +42,8 @@ class Edit extends Component
 
     public ?string $institution_name = null;
 
+    public ?string $faculty_id = null;
+
     public ?string $study_program_id = null;
 
     /**
@@ -64,6 +67,7 @@ class Edit extends Component
             $this->type = $user->identity->type ?? '';
             $this->institution_id = $user->identity->institution_id ?? '';
             $this->institution_name = $user->identity->institution->name ?? '';
+            $this->faculty_id = $user->identity->faculty_id ?? '';
             $this->study_program_id = $user->identity->study_program_id ?? '';
         }
     }
@@ -88,6 +92,7 @@ class Edit extends Component
             'sinta_id' => ['nullable', 'string', 'max:255'],
             'type' => ['required', Rule::in('dosen', 'mahasiswa')],
             'institution_id' => ['nullable', 'exists:institutions,id'],
+            'faculty_id' => ['nullable', 'exists:faculties,id'],
             'study_program_id' => ['nullable', 'exists:study_programs,id'],
         ];
     }
@@ -129,7 +134,8 @@ class Edit extends Component
                     'birthplace' => $validated['birthplace'],
                     'sinta_id' => $validated['sinta_id'],
                     'type' => $validated['type'],
-                    // 'institution_id' => $validated['institution_id'],
+                    'institution_id' => $validated['institution_id'],
+                    'faculty_id' => $validated['faculty_id'] ?? null,
                     'study_program_id' => $validated['study_program_id'],
                 ]
             );
@@ -157,6 +163,7 @@ class Edit extends Component
             'user' => $user,
             'roleOptions' => $this->roleOptions(),
             'institutionOptions' => $this->institutionOptions(),
+            'facultyOptions' => $this->facultyOptions(),
             'studyProgramOptions' => $this->studyProgramOptions(),
         ]);
     }
@@ -181,7 +188,7 @@ class Edit extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Role $role) => [
+            ->map(fn (Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
             ])
@@ -199,7 +206,7 @@ class Edit extends Component
         return Institution::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Institution $institution) => [
+            ->map(fn (Institution $institution) => [
                 'value' => $institution->id,
                 'label' => $institution->name,
             ])
@@ -208,25 +215,65 @@ class Edit extends Component
     }
 
     /**
-     * Retrieve study program options for the current institution.
+     * Retrieve faculty options for the current institution.
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function studyProgramOptions(): array
+    protected function facultyOptions(): array
     {
         if (! $this->institution_id) {
             return [];
         }
 
-        return \App\Models\StudyProgram::query()
+        return Faculty::query()
             ->where('institution_id', $this->institution_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(\App\Models\StudyProgram $program) => [
+            ->map(fn (Faculty $faculty) => [
+                'value' => $faculty->id,
+                'label' => $faculty->name,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Retrieve study program options for the current faculty.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function studyProgramOptions(): array
+    {
+        if (! $this->faculty_id) {
+            return [];
+        }
+
+        return \App\Models\StudyProgram::query()
+            ->where('faculty_id', $this->faculty_id)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (\App\Models\StudyProgram $program) => [
                 'value' => $program->id,
                 'label' => $program->name,
             ])
             ->values()
             ->all();
+    }
+
+    /**
+     * Updated institution.
+     */
+    public function updatedInstitutionId(): void
+    {
+        $this->faculty_id = null;
+        $this->study_program_id = null;
+    }
+
+    /**
+     * Updated faculty.
+     */
+    public function updatedFacultyId(): void
+    {
+        $this->study_program_id = null;
     }
 }

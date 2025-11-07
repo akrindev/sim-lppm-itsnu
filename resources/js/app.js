@@ -1,8 +1,10 @@
 import "@tabler/core/dist/libs/nouislider/dist/nouislider.min.js";
 import TomSelect from "@tabler/core/dist/libs/tom-select/dist/js/tom-select.base.js";
-import "@tabler/core/js/tabler";
+import * as Tabler from "@tabler/core/js/tabler";
 import "./theme-config";
 
+window.tabler = Tabler;
+window.bootstrap = Tabler.bootstrap;
 // Make TomSelect available globally
 window.TomSelect = TomSelect;
 
