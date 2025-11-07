@@ -11,28 +11,16 @@
 
         <div class="card-body">
             <x-tabler.nav-segmented count="3">
-                <button
-                    class="nav-link {{ $selectedLevel === 1 ? 'active' : '' }}"
-                    role="tab"
-                    wire:click="setSelectedLevel(1)"
-                    aria-selected="{{ $selectedLevel === 1 ? 'true' : 'false' }}"
-                >
+                <button class="nav-link {{ $selectedLevel === 1 ? 'active' : '' }}" role="tab"
+                    wire:click="setSelectedLevel(1)" aria-selected="{{ $selectedLevel === 1 ? 'true' : 'false' }}">
                     Level 1
                 </button>
-                <button
-                    class="nav-link {{ $selectedLevel === 2 ? 'active' : '' }}"
-                    role="tab"
-                    wire:click="setSelectedLevel(2)"
-                    aria-selected="{{ $selectedLevel === 2 ? 'true' : 'false' }}"
-                >
+                <button class="nav-link {{ $selectedLevel === 2 ? 'active' : '' }}" role="tab"
+                    wire:click="setSelectedLevel(2)" aria-selected="{{ $selectedLevel === 2 ? 'true' : 'false' }}">
                     Level 2
                 </button>
-                <button
-                    class="nav-link {{ $selectedLevel === 3 ? 'active' : '' }}"
-                    role="tab"
-                    wire:click="setSelectedLevel(3)"
-                    aria-selected="{{ $selectedLevel === 3 ? 'true' : 'false' }}"
-                >
+                <button class="nav-link {{ $selectedLevel === 3 ? 'active' : '' }}" role="tab"
+                    wire:click="setSelectedLevel(3)" aria-selected="{{ $selectedLevel === 3 ? 'true' : 'false' }}">
                     Level 3
                 </button>
             </x-tabler.nav-segmented>
@@ -43,7 +31,7 @@
                 <thead>
                     <tr>
                         <th>Nama Cluster</th>
-                        @if($selectedLevel === 2)
+                        @if ($selectedLevel === 2)
                             <th>Parent (Level 1)</th>
                         @elseif($selectedLevel === 3)
                             <th>Parent (Level 2)</th>
@@ -52,23 +40,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if($selectedLevel === 1)
+                    @if ($selectedLevel === 1)
                         @foreach ($level1Clusters as $cluster)
                             <tr wire:key="cluster-{{ $cluster->id }}">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <x-lucide-folder class="icon me-2 text-primary" />
+                                        <x-lucide-folder class="me-2 text-primary icon" />
                                         <strong>{{ $cluster->name }}</strong>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="btn-list">
-                                        <button type="button" class="btn-outline-warning btn btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-science-cluster" wire:click="edit({{ $cluster->id }})">
+                                        <button type="button" class="btn-outline-warning btn btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#modal-science-cluster"
+                                            wire:click="edit({{ $cluster->id }})">
                                             Edit
                                         </button>
-                                        <button type="button" class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-confirm-delete"
+                                        <button type="button" class="btn-outline-danger btn btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#modal-confirm-delete"
                                             wire:click="confirmDelete({{ $cluster->id }}, '{{ $cluster->name }}')">
                                             Hapus
                                         </button>
@@ -81,21 +70,23 @@
                             <tr wire:key="cluster-{{ $cluster->id }}">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <x-lucide-folder-open class="icon me-2 text-success" />
+                                        <x-lucide-folder-open class="me-2 text-success icon" />
                                         <span>{{ $cluster->name }}</span>
                                     </div>
                                 </td>
                                 <td>
-                                    <x-tabler.badge color="primary">{{ $cluster->parent?->name ?? 'N/A' }}</x-tabler.badge>
+                                    <x-tabler.badge
+                                        color="primary">{{ $cluster->parent?->name ?? 'N/A' }}</x-tabler.badge>
                                 </td>
                                 <td>
                                     <div class="btn-list">
-                                        <button type="button" class="btn-outline-warning btn btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-science-cluster" wire:click="edit({{ $cluster->id }})">
+                                        <button type="button" class="btn-outline-warning btn btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#modal-science-cluster"
+                                            wire:click="edit({{ $cluster->id }})">
                                             Edit
                                         </button>
-                                        <button type="button" class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-confirm-delete"
+                                        <button type="button" class="btn-outline-danger btn btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#modal-confirm-delete"
                                             wire:click="confirmDelete({{ $cluster->id }}, '{{ $cluster->name }}')">
                                             Hapus
                                         </button>
@@ -108,21 +99,23 @@
                             <tr wire:key="cluster-{{ $cluster->id }}">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <x-lucide-file-text class="icon me-2 text-warning" />
+                                        <x-lucide-file-text class="me-2 text-warning icon" />
                                         <span>{{ $cluster->name }}</span>
                                     </div>
                                 </td>
                                 <td>
-                                    <x-tabler.badge color="success">{{ $cluster->parent?->name ?? 'N/A' }}</x-tabler.badge>
+                                    <x-tabler.badge
+                                        color="success">{{ $cluster->parent?->name ?? 'N/A' }}</x-tabler.badge>
                                 </td>
                                 <td>
                                     <div class="btn-list">
-                                        <button type="button" class="btn-outline-warning btn btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-science-cluster" wire:click="edit({{ $cluster->id }})">
+                                        <button type="button" class="btn-outline-warning btn btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#modal-science-cluster"
+                                            wire:click="edit({{ $cluster->id }})">
                                             Edit
                                         </button>
-                                        <button type="button" class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-confirm-delete"
+                                        <button type="button" class="btn-outline-danger btn btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#modal-confirm-delete"
                                             wire:click="confirmDelete({{ $cluster->id }}, '{{ $cluster->name }}')">
                                             Hapus
                                         </button>
@@ -149,12 +142,12 @@
                     <label class="form-label">Parent</label>
                     <select wire:model="parentId" class="form-control">
                         <option value="">Select parent</option>
-                        @if($level1Clusters->count() > 0)
+                        @if ($level1Clusters->count() > 0)
                             @foreach ($level1Clusters as $cluster)
                                 <option value="{{ $cluster->id }}">{{ $cluster->name }} (Level 1)</option>
                             @endforeach
                         @endif
-                        @if($level2Clusters->count() > 0)
+                        @if ($level2Clusters->count() > 0)
                             @foreach ($level2Clusters as $cluster)
                                 <option value="{{ $cluster->id }}">{{ $cluster->name }} (Level 2)</option>
                             @endforeach
