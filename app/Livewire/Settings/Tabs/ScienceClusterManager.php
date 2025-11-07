@@ -3,7 +3,6 @@
 namespace App\Livewire\Settings\Tabs;
 
 use App\Models\ScienceCluster;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -19,6 +18,8 @@ class ScienceClusterManager extends Component
 
     public ?int $editingId = null;
 
+    public int $selectedLevel = 1;
+
     public string $modalTitle = '';
 
     public ?int $deleteItemId = null;
@@ -27,9 +28,17 @@ class ScienceClusterManager extends Component
 
     public function render()
     {
+        $allClusters = ScienceCluster::with(['parent', 'children'])->get();
+
+        $level1Clusters = $allClusters->where('level', 1)->values();
+        $level2Clusters = $allClusters->where('level', 2)->values();
+        $level3Clusters = $allClusters->where('level', 3)->values();
+
         return view('livewire.settings.tabs.science-cluster-manager', [
-            'scienceClusters' => ScienceCluster::with(['parent'])->paginate(10),
-            'parentClusters' => ScienceCluster::whereNull('parent_id')->get(),
+            'level1Clusters' => $level1Clusters,
+            'level2Clusters' => $level2Clusters,
+            'level3Clusters' => $level3Clusters,
+            'allClusters' => $allClusters,
         ]);
     }
 
@@ -37,6 +46,11 @@ class ScienceClusterManager extends Component
     {
         $this->reset(['name', 'parentId', 'editingId']);
         $this->modalTitle = 'Tambah Klaster Sains';
+    }
+
+    public function setSelectedLevel(int $level): void
+    {
+        $this->selectedLevel = $level;
     }
 
     public function save(): void
@@ -51,6 +65,12 @@ class ScienceClusterManager extends Component
         if ($this->editingId) {
             ScienceCluster::findOrFail($this->editingId)->update($data);
         } else {
+            if ($this->parentId) {
+                $parent = ScienceCluster::findOrFail($this->parentId);
+                $data['level'] = $parent->level + 1;
+            } else {
+                $data['level'] = 1;
+            }
             ScienceCluster::create($data);
         }
 
@@ -81,7 +101,6 @@ class ScienceClusterManager extends Component
     {
         $this->reset(['name', 'parentId', 'editingId']);
     }
-
 
     public function handleConfirmDeleteAction(): void
     {
