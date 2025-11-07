@@ -32,7 +32,8 @@ class DatabaseSeeder extends Seeder
             ScienceClusterSeeder::class,
 
             // 4. Dependent Master Data
-            StudyProgramSeeder::class, // depends on institutions
+            FacultySeeder::class,      // depends on institutions
+            StudyProgramSeeder::class, // depends on institutions and faculties
             ThemeSeeder::class,        // depends on focus_areas
             TopicSeeder::class,        // depends on themes
 
