@@ -41,7 +41,10 @@ class BudgetGroupSeeder extends Seeder
         ];
 
         foreach ($groups as $group) {
-            BudgetGroup::create($group);
+            BudgetGroup::updateOrCreate(
+                ['code' => $group['code']],
+                $group
+            );
         }
     }
 }

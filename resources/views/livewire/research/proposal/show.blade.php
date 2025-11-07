@@ -288,8 +288,9 @@
                                 <tr>
                                     <th>Kelompok</th>
                                     <th>Komponen</th>
-                                    <th>Item</th>
+                                    {{-- <th>Item</th> --}}
                                     <th>Volume</th>
+                                    <th>Unit</th>
                                     <th>Harga Satuan</th>
                                     <th>Total</th>
                                 </tr>
@@ -299,8 +300,10 @@
                                     <tr>
                                         <td>{{ $item->budgetGroup?->name ?? ($item->group ?? '-') }}</td>
                                         <td>{{ $item->budgetComponent?->name ?? ($item->component ?? '-') }}</td>
-                                        <td>{{ $item->item_description }}</td>
+                                        {{-- <td>{{ $item->item_description }}</td> --}}
                                         <td>{{ $item->volume }}</td>
+                                        <td><x-tabler.badge>{{ $item->budgetComponent?->unit ?? '-' }}</x-tabler.badge>
+                                        </td>
                                         <td>Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
                                         <td>Rp {{ number_format($item->total_price, 2, ',', '.') }}</td>
                                     </tr>
@@ -308,7 +311,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="5" class="text-end">Total Anggaran:</th>
+                                    <th colspan="6" class="text-end">Total Anggaran:</th>
                                     <th>Rp
                                         {{ number_format($proposal->budgetItems->sum('total_price'), 2, ',', '.') }}
                                     </th>

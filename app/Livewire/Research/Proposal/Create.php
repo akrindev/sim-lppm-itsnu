@@ -218,6 +218,19 @@ class Create extends Component
         $item['total'] = $volume * $unitPrice;
     }
 
+    public function updatedFormBudgetItems(int $index, string $field): void
+    {
+        // Auto-fill unit when budget_component_id is selected
+        if ($field === 'budget_component_id' && !empty($this->form->budget_items[$index]['budget_component_id'])) {
+            $componentId = $this->form->budget_items[$index]['budget_component_id'];
+            $component = BudgetComponent::find($componentId);
+
+            if ($component) {
+                $this->form->budget_items[$index]['unit'] = $component->unit;
+            }
+        }
+    }
+
     public function saveNewPartner(): void
     {
         $this->validate([

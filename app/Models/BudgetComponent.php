@@ -16,6 +16,7 @@ class BudgetComponent extends Model
         'budget_group_id',
         'code',
         'name',
+        'unit',
         'description',
     ];
 
