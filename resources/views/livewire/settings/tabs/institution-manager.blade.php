@@ -1,4 +1,5 @@
 <div>
+    <x-tabler.alert />
     <div class="card">
         <div class="d-flex align-items-center justify-content-between card-header">
             <h3 class="card-title">Institusi</h3>
