@@ -28,7 +28,7 @@ class ScienceClusterManager extends Component
 
     public function render()
     {
-        $allClusters = ScienceCluster::with(['parent', 'children'])->get();
+        $allClusters = ScienceCluster::with(['parent', 'children'])->latest()->get();
 
         $level1Clusters = $allClusters->where('level', 1)->values();
         $level2Clusters = $allClusters->where('level', 2)->values();

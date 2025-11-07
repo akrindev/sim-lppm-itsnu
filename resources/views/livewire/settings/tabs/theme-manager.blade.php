@@ -45,7 +45,7 @@
             {{ $themes->links() }}
         </div>
     </div>
-    <x-tabler.modal id="modal-theme" :title="$modalTitle">
+    <x-tabler.modal id="modal-theme" :title="$modalTitle" onHide="resetForm">
         <x-slot:body>
             <form wire:submit="save" id="form-theme">
                 <div class="mb-3">
@@ -86,14 +86,4 @@
         </x-slot:footer>
     </x-tabler.modal>
 
-    @script
-        <script>
-            const modal = document.getElementById('modal-theme');
-            if (modal) {
-                modal.addEventListener('hidden.bs.modal', () => {
-                    @this.call('resetForm');
-                });
-            }
-        </script>
-    @endscript
 </div>

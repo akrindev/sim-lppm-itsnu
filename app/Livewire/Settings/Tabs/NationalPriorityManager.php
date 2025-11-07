@@ -26,7 +26,7 @@ class NationalPriorityManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.national-priority-manager', [
-            'nationalPriorities' => NationalPriority::paginate(10),
+            'nationalPriorities' => NationalPriority::latest()->paginate(10),
         ]);
     }
 

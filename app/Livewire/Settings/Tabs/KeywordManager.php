@@ -26,7 +26,7 @@ class KeywordManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.keyword-manager', [
-            'keywords' => Keyword::paginate(10),
+            'keywords' => Keyword::latest()->paginate(10),
         ]);
     }
 

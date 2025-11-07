@@ -30,7 +30,7 @@ class ThemeManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.theme-manager', [
-            'themes' => Theme::with(['focusArea'])->paginate(10),
+            'themes' => Theme::with(['focusArea'])->latest()->paginate(10),
             'focusAreas' => FocusArea::all(),
         ]);
     }

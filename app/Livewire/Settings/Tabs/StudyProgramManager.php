@@ -30,7 +30,7 @@ class StudyProgramManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.study-program-manager', [
-            'studyPrograms' => StudyProgram::with(['institution'])->paginate(10),
+            'studyPrograms' => StudyProgram::with(['institution'])->latest()->paginate(10),
             'institutions' => Institution::all(),
         ]);
     }

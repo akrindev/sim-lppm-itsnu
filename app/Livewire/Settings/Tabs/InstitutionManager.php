@@ -26,7 +26,7 @@ class InstitutionManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.institution-manager', [
-            'institutions' => Institution::paginate(10),
+            'institutions' => Institution::latest()->paginate(10),
         ]);
     }
 

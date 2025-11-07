@@ -33,7 +33,7 @@ class FacultyManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.faculty-manager', [
-            'faculties' => Faculty::with(['institution'])->paginate(10),
+            'faculties' => Faculty::with(['institution'])->latest()->paginate(10),
             'institutions' => Institution::all(),
         ]);
     }

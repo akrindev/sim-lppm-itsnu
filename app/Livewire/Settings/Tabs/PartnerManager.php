@@ -32,7 +32,7 @@ class PartnerManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.partner-manager', [
-            'partners' => Partner::paginate(10),
+            'partners' => Partner::latest()->paginate(10),
         ]);
     }
 

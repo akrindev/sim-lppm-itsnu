@@ -38,7 +38,7 @@ class BudgetComponentManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.budget-component-manager', [
-            'budgetComponents' => BudgetComponent::with(['budgetGroup'])->paginate(10),
+            'budgetComponents' => BudgetComponent::with(['budgetGroup'])->latest()->paginate(10),
             'budgetGroups' => BudgetGroup::all(),
         ]);
     }

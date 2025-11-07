@@ -129,7 +129,7 @@
             </table>
         </div>
     </div>
-    <x-tabler.modal id="modal-science-cluster" :title="$modalTitle">
+    <x-tabler.modal id="modal-science-cluster" :title="$modalTitle" onHide="resetForm">
         <x-slot:body>
             <form wire:submit="save" id="form-science-cluster">
                 <div class="mb-3">
@@ -177,14 +177,4 @@
         </x-slot:footer>
     </x-tabler.modal>
 
-    @script
-        <script>
-            const modal = document.getElementById('modal-science-cluster');
-            if (modal) {
-                modal.addEventListener('hidden.bs.modal', () => {
-                    @this.call('resetForm');
-                });
-            }
-        </script>
-    @endscript
 </div>

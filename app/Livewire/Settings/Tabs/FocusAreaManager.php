@@ -27,7 +27,7 @@ class FocusAreaManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.focus-area-manager', [
-            'focusAreas' => FocusArea::paginate(10),
+            'focusAreas' => FocusArea::latest()->paginate(10),
         ]);
     }
 

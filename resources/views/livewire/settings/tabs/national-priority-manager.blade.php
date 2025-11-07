@@ -44,7 +44,7 @@
             {{ $nationalPriorities->links() }}
         </div>
     </div>
-    <x-tabler.modal id="modal-national-priority" :title="$modalTitle">
+    <x-tabler.modal id="modal-national-priority" :title="$modalTitle" onHide="resetForm">
         <x-slot:body>
             <form wire:submit="save" id="form-national-priority">
                 <div class="mb-3">
@@ -73,14 +73,4 @@
         </x-slot:footer>
     </x-tabler.modal>
 
-    @script
-        <script>
-            const modal = document.getElementById('modal-national-priority');
-            if (modal) {
-                modal.addEventListener('hidden.bs.modal', () => {
-                    @this.call('resetForm');
-                });
-            }
-        </script>
-    @endscript
 </div>

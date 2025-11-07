@@ -29,7 +29,7 @@ class ResearchSchemeManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.research-scheme-manager', [
-            'researchSchemes' => ResearchScheme::paginate(10),
+            'researchSchemes' => ResearchScheme::latest()->paginate(10),
         ]);
     }
 
