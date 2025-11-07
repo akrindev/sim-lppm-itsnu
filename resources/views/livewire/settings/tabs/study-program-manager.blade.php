@@ -15,6 +15,7 @@
                     <tr>
                         <th>Nama</th>
                         <th>Institusi</th>
+                        <th>Fakultas</th>
                         <th class="w-25">Aksi</th>
                     </tr>
                 </thead>
@@ -23,6 +24,7 @@
                         <tr wire:key="program-{{ $item->id }}">
                             <td>{{ $item->name }}</td>
                             <td>{{ $item->institution?->name ?? 'N/A' }}</td>
+                            <td>{{ $item->faculty?->name ?? 'N/A' }}</td>
                             <td>
                                 <div class="btn-list">
                                     <button type="button" class="btn-outline-warning btn btn-sm" data-bs-toggle="modal"
@@ -57,13 +59,25 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Institusi</label>
-                    <select wire:model="institutionId" class="form-control">
+                    <select wire:model.live="institutionId" class="form-control">
                         <option value="">Select institution</option>
                         @foreach ($institutions as $institution)
                             <option value="{{ $institution->id }}">{{ $institution->name }}</option>
                         @endforeach
                     </select>
                     @error('institutionId')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Fakultas</label>
+                    <select wire:model="facultyId" class="form-control" wire:key="faculty-select-{{ $institutionId }}">
+                        <option value="">Select faculty</option>
+                        @foreach ($faculties as $faculty)
+                            <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('facultyId')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

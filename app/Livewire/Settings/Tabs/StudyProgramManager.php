@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\StudyProgram;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -19,6 +19,9 @@ class StudyProgramManager extends Component
     #[Validate('required|exists:institutions,id')]
     public ?int $institutionId = null;
 
+    #[Validate('nullable|exists:faculties,id')]
+    public ?int $facultyId = null;
+
     public ?int $editingId = null;
 
     public string $modalTitle = '';
@@ -30,14 +33,15 @@ class StudyProgramManager extends Component
     public function render()
     {
         return view('livewire.settings.tabs.study-program-manager', [
-            'studyPrograms' => StudyProgram::with(['institution'])->latest()->paginate(10),
+            'studyPrograms' => StudyProgram::with(['institution', 'faculty'])->latest()->paginate(10),
             'institutions' => Institution::all(),
+            'faculties' => $this->institutionId ? Faculty::where('institution_id', $this->institutionId)->orderBy('name')->get() : [],
         ]);
     }
 
     public function create(): void
     {
-        $this->reset(['name', 'institutionId', 'editingId']);
+        $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
         $this->modalTitle = 'Tambah Program Studi';
     }
 
@@ -48,6 +52,7 @@ class StudyProgramManager extends Component
         $data = [
             'name' => $this->name,
             'institution_id' => $this->institutionId,
+            'faculty_id' => $this->facultyId,
         ];
 
         if ($this->editingId) {
@@ -60,7 +65,7 @@ class StudyProgramManager extends Component
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-study-program']);
-        $this->reset(['name', 'institutionId', 'editingId']);
+        $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
     }
 
     public function edit(StudyProgram $studyProgram): void
@@ -68,6 +73,7 @@ class StudyProgramManager extends Component
         $this->editingId = $studyProgram->id;
         $this->name = $studyProgram->name;
         $this->institutionId = $studyProgram->institution_id;
+        $this->facultyId = $studyProgram->faculty_id;
         $this->modalTitle = 'Edit Program Studi';
     }
 
@@ -81,9 +87,8 @@ class StudyProgramManager extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['name', 'institutionId', 'editingId']);
+        $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
     }
-
 
     public function handleConfirmDeleteAction(): void
     {

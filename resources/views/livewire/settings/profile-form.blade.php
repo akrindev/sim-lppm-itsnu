@@ -97,6 +97,21 @@
             @enderror
         </div>
         <div class="col-md">
+            <div class="form-label">Fakultas</div>
+            <div wire:ignore>
+                <select class="form-select @error('faculty_id') is-invalid @enderror" wire:model.live="faculty_id"
+                    disabled x-data="tomSelect" placeholder="Pilih Fakultas">
+                    <option value="">Pilih Fakultas</option>
+                    @foreach ($faculties as $faculty)
+                        <option value="{{ $faculty['id'] }}">{{ $faculty['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @error('faculty_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="col-md">
             <div class="form-label">Program Studi</div>
             <div wire:ignore>
                 <select class="form-select @error('study_program_id') is-invalid @enderror" wire:model="study_program_id"
