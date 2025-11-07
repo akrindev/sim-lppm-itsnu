@@ -15,6 +15,7 @@ use App\Livewire\Notifications\NotificationCenter;
 use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
 use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
 use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
+use App\Livewire\Research\ProgressReport\Show as ResearchProgressReportShow;
 use App\Livewire\Research\Proposal\Create as ResearchProposalCreate;
 use App\Livewire\Research\Proposal\Edit as ResearchProposalEdit;
 use App\Livewire\Research\Proposal\Index as ResearchProposalIndex;
@@ -62,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proposal/{proposal}/edit', ResearchProposalEdit::class)->name('proposal.edit');
         Route::get('proposal-revision', ResearchProposalRevisionIndex::class)->name('proposal-revision.index');
         Route::get('progress-report', ResearchProgressReportIndex::class)->name('progress-report.index');
+        Route::get('progress-report/{proposal}', ResearchProgressReportShow::class)->name('progress-report.show');
         Route::get('final-report', ResearchFinalReportIndex::class)->name('final-report.index');
         Route::get('daily-note', ResearchDailyNoteIndex::class)->name('daily-note.index');
     });
