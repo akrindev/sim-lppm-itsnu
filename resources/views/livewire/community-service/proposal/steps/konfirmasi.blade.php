@@ -142,8 +142,20 @@
                             <tbody>
                                 @foreach ($form->budget_items as $item)
                                     <tr>
-                                        <td>{{ $item['group'] ?? '-' }}</td>
-                                        <td>{{ $item['component'] ?? '-' }}</td>
+                                        <td>
+                                            @if (!empty($item['budget_group_id']))
+                                                {{ $this->budgetGroups->find($item['budget_group_id'])?->name ?? $item['group'] ?? '-' }}
+                                            @else
+                                                {{ $item['group'] ?? '-' }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if (!empty($item['budget_component_id']))
+                                                {{ $this->budgetComponents->find($item['budget_component_id'])?->name ?? $item['component'] ?? '-' }}
+                                            @else
+                                                {{ $item['component'] ?? '-' }}
+                                            @endif
+                                        </td>
                                         <td>{{ $item['item'] ?? '-' }}</td>
                                         <td>{{ $item['volume'] ?? 0 }} {{ $item['unit'] ?? '' }}</td>
                                         <td>Rp {{ number_format($item['unit_price'] ?? 0, 2, ',', '.') }}</td>

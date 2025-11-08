@@ -376,40 +376,91 @@
                     @if ($proposal->partners->isEmpty())
                         <p class="text-muted">Belum ada mitra yang ditambahkan</p>
                     @else
-                        <div class="list-group">
-                            @foreach ($proposal->partners as $partner)
-                                <div class="list-group-item">
-                                    <div class="d-flex align-items-start justify-content-between">
-                                        <div>
-                                            <h5 class="mb-1">{{ $partner->name }}</h5>
-                                            <p class="mb-1 text-muted">
+                        <div class="table-responsive">
+                            <table class="table table-vcenter">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Mitra</th>
+                                        <th>Institusi</th>
+                                        <th>Email</th>
+                                        <th>Negara</th>
+                                        <th>Alamat</th>
+                                        <th>Tipe</th>
+                                        <th>Surat Kesanggupan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($proposal->partners as $partner)
+                                        <tr>
+                                            <td>
+                                                <div class="font-weight-medium">{{ $partner->name }}</div>
+                                            </td>
+                                            <td>
                                                 @if ($partner->institution)
-                                                    <x-lucide-building class="icon-inline icon" />
-                                                    {{ $partner->institution }}
+                                                    <div class="d-flex align-items-center">
+                                                        <x-lucide-building class="icon me-1 text-muted" />
+                                                        {{ $partner->institution }}
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">-</span>
                                                 @endif
-                                                @if ($partner->country)
-                                                    <x-lucide-map-pin class="icon-inline ms-2 icon" />
-                                                    {{ $partner->country }}
-                                                @endif
-                                            </p>
-                                            @if ($partner->email)
-                                                <small class="text-muted">
-                                                    <x-lucide-mail class="icon-inline icon" /> {{ $partner->email }}
-                                                </small>
-                                            @endif
-                                            @if ($partner->commitment_letter_file)
-                                                <div class="mt-2">
-                                                    <a href="{{ Storage::url($partner->commitment_letter_file) }}"
-                                                        target="_blank" class="btn-outline-primary btn btn-sm">
-                                                        <x-lucide-download class="icon" />
-                                                        Surat Kesanggupan
+                                            </td>
+                                            <td>
+                                                @if ($partner->email)
+                                                    <a href="mailto:{{ $partner->email }}" class="text-reset">
+                                                        <div class="d-flex align-items-center">
+                                                            <x-lucide-mail class="icon me-1 text-muted" />
+                                                            {{ $partner->email }}
+                                                        </div>
                                                     </a>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($partner->country)
+                                                    <div class="d-flex align-items-center">
+                                                        <x-lucide-map-pin class="icon me-1 text-muted" />
+                                                        {{ $partner->country }}
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($partner->address)
+                                                    <div class="text-truncate" style="max-width: 200px;" title="{{ $partner->address }}">
+                                                        {{ $partner->address }}
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-blue-lt">
+                                                    {{ $partner->type ?? 'External' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if ($partner->commitment_letter_file)
+                                                    <a href="{{ Storage::url($partner->commitment_letter_file) }}" 
+                                                       target="_blank" 
+                                                       onclick="setTimeout(() => window.location.reload(), 100)"
+                                                       class="btn btn-sm btn-primary">
+                                                        <x-lucide-download class="icon" />
+                                                        Unduh
+                                                    </a>
+                                                @else
+                                                    <span class="badge bg-yellow-lt text-yellow-fg">
+                                                        <x-lucide-file-x class="icon me-1" />
+                                                        Tidak Ada
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     @endif
                 </div>
@@ -638,7 +689,7 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal">
+                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal" onclick="setTimeout(() => window.location.reload(), 3000)">
                     Ya, Terima
                 </button>
             </x-slot:footer>
@@ -662,7 +713,7 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal">
+                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal" onclick="setTimeout(() => window.location.reload(), 3000)">
                     Ya, Tolak
                 </button>
             </x-slot:footer>

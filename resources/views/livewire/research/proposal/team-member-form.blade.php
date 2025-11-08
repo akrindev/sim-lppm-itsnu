@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">1.6 Anggota Pelaksana - Dosen</h3>
+        <h3 class="card-title">1.6 Identitas Anggota - Dosen</h3>
     </div>
 
     @if ($this->teamMembers->count() > 0)
@@ -34,7 +34,7 @@
                             </td>
                             <td>
                                 @if ($member->pivot->status === 'accepted')
-                                    <x-tabler.badge color="success">Diterima</x-tabler.badge>
+                                    <x-tabler.badge color="success">Menyetujui</x-tabler.badge>
                                 @elseif ($member->pivot->status === 'pending')
                                     <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
                                 @else
