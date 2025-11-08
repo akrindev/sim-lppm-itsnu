@@ -57,7 +57,7 @@ class SubmitButton extends Component
     public function submit(): void
     {
         $proposal = $this->proposal;
-        $action = new SubmitProposalAction;
+        $action = app(SubmitProposalAction::class);
         $result = $action->execute($proposal);
 
         if ($result['success']) {

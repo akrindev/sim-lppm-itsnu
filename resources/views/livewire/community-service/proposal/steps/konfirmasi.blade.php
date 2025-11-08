@@ -23,10 +23,6 @@
                         <td>{{ $form->title }}</td>
                     </tr>
                     <tr>
-                        <td><strong>Skema Penelitian</strong></td>
-                        <td>{{ $this->schemes->find($form->research_scheme_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
                         <td><strong>Durasi</strong></td>
                         <td>{{ $form->duration_in_years }} Tahun</td>
                     </tr>

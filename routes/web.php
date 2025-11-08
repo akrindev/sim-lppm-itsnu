@@ -9,6 +9,7 @@ use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
 use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalIndex;
 use App\Livewire\CommunityService\Proposal\Show as CommunityServiceProposalShow;
 use App\Livewire\CommunityService\ProposalRevision\Index as CommunityServiceProposalRevisionIndex;
+use App\Livewire\CommunityService\ProposalRevision\Show as CommunityServiceProposalRevisionShow;
 use App\Livewire\Dashboard;
 use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
 use App\Livewire\Notifications\NotificationCenter;
@@ -77,6 +78,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proposal/{proposal}', CommunityServiceProposalShow::class)->name('proposal.show');
         Route::get('proposal/{proposal}/edit', CommunityServiceProposalEdit::class)->name('proposal.edit');
         Route::get('proposal-revision', CommunityServiceProposalRevisionIndex::class)->name('proposal-revision.index');
+        Route::get('proposal-revision/{proposal}', CommunityServiceProposalRevisionShow::class)->name('proposal-revision.show');
         Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
         Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
