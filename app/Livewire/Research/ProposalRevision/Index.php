@@ -45,6 +45,21 @@ class Index extends Component
             }
         ]);
 
+        // where submitter is current user
+        if ($user->hasRole('dosen')) {
+            $query->where('submitter_id', $user->id)
+                ->where('status', ProposalStatus::REVISION_NEEDED);
+        } elseif ($user->hasRole('reviewer')) {
+            $query->whereHas('reviewers', function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                    ->whereIn('status', ['completed', 'pending']);
+            });
+        } elseif ($user->hasAnyRole(['kepala lppm', 'admin lppm', 'rektor'])) {
+            $query->whereHas('reviewers', function ($q) {
+                $q->whereIn('status', ['completed', 'pending']);
+            });
+        }
+
         $query->whereHas('reviewers', function ($q) use ($user) {
             $q->whereIn('status', ['completed', 'pending']);
         });
