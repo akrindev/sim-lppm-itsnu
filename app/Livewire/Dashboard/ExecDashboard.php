@@ -67,7 +67,7 @@ class ExecDashboard extends Component
             ->where('detailable_type', Research::class)
             ->where('status', 'approved')->count();
 
-        // Statistik Pengmas
+        // Statistik PKM
         $totalCommunityService = Proposal::whereYear('created_at', $yearFilter)
             ->where('detailable_type', CommunityService::class)->count();
 
@@ -91,7 +91,7 @@ class ExecDashboard extends Component
             ->limit(10)
             ->get();
 
-        // Data pengmas terbaru
+        // Data PKM terbaru
         $this->recentCommunityService = Proposal::with(['submitter'])
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', CommunityService::class)
