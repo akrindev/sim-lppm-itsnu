@@ -4,6 +4,7 @@ use App\Http\Controllers\RoleSwitcherController;
 use App\Livewire\CommunityService\DailyNote\Index as CommunityServiceDailyNoteIndex;
 use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalReportIndex;
 use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
+use App\Livewire\CommunityService\ProgressReport\Show as CommunityServiceProgressReportShow;
 use App\Livewire\CommunityService\Proposal\Create as CommunityServiceProposalCreate;
 use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
 use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalIndex;
@@ -80,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proposal-revision', CommunityServiceProposalRevisionIndex::class)->name('proposal-revision.index');
         Route::get('proposal-revision/{proposal}', CommunityServiceProposalRevisionShow::class)->name('proposal-revision.show');
         Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
+        Route::get('progress-report/{proposal}', CommunityServiceProgressReportShow::class)->name('progress-report.show');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
         Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
     });
