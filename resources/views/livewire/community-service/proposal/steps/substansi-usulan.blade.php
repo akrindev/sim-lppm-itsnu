@@ -74,7 +74,8 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th width="20%">Tahun</th>
+                            {{-- <th width="20%">Tahun</th> --}}
+                            <th width="20%">Jenis</th>
                             <th width="20%">Kategori Luaran</th>
                             <th width="20%">Luaran</th>
                             <th width="15%">Status</th>
@@ -88,15 +89,25 @@
                                 <td>
                                     <input type="number" wire:model="form.outputs.{{ $index }}.year"
                                         class="form-control form-control-sm" placeholder="2025" min="2020"
-                                        max="2030">
+                                        max="2040">
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.category"
                                         class="form-select-sm form-select">
+                                        <option value="Wajib">Wajib</option>
+                                        <option value="Tambahan">Tambahan</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <select wire:model="form.outputs.{{ $index }}.group"
+                                        class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
-                                        <option value="buku_cetak">Buku Cetak</option>
-                                        <option value="buku_elektronik">Buku Elektronik</option>
+                                        <option value="buku_cetak">Buku Cetak Hasil Penelitian</option>
+                                        <option value="buku_elektronik">Buku Elektronik Hasil Penelitian</option>
                                         <option value="artikel_jurnal">Artikel di Jurnal</option>
+                                        <option value="naskah_akademik">Naskah Akademik</option>
+                                        <option value="hak_cipta">Hak Cipta</option>
                                     </select>
                                 </td>
                                 <td>

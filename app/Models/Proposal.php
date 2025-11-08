@@ -214,6 +214,14 @@ class Proposal extends Model
     }
 
     /**
+     * Get all progress reports for the proposal.
+     */
+    public function progressReports(): HasMany
+    {
+        return $this->hasMany(ProgressReport::class);
+    }
+
+    /**
      * Check if all team members have accepted the invitation.
      */
     public function allTeamMembersAccepted(): bool

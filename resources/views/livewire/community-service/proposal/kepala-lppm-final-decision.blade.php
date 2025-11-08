@@ -1,51 +1,15 @@
 <div>
     @if ($this->canDecide)
-        @if ($this->reviewSummary->isNotEmpty())
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">Ringkasan Review</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        @if ($this->reviewSummary->get('approved'))
-                            <div class="col-md-4">
-                                <div class="stat">
-                                    <div class="stat-title">Disetujui</div>
-                                    <div class="text-success stat-value">{{ $this->reviewSummary->get('approved', 0) }}
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                        @if ($this->reviewSummary->get('revision_needed'))
-                            <div class="col-md-4">
-                                <div class="stat">
-                                    <div class="stat-title">Butuh Revisi</div>
-                                    <div class="text-warning stat-value">
-                                        {{ $this->reviewSummary->get('revision_needed', 0) }}</div>
-                                </div>
-                            </div>
-                        @endif
-                        @if ($this->reviewSummary->get('rejected'))
-                            <div class="col-md-4">
-                                <div class="stat">
-                                    <div class="stat-title">Ditolak</div>
-                                    <div class="text-danger stat-value">{{ $this->reviewSummary->get('rejected', 0) }}
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        @endif
-
         <div class="alert alert-info" role="alert">
-            <h4 class="alert-title">
-                <x-lucide-clipboard-check class="icon" />
-                Keputusan Akhir Kepala LPPM
-            </h4>
-            <div class="text-secondary">
-                Semua reviewer telah menyelesaikan review. Silakan berikan keputusan akhir untuk proposal ini.
+            <x-lucide-clipboard-check class="icon" />
+            <div>
+
+                <h4 class="alert-heading">
+                    Keputusan Akhir Kepala LPPM
+                </h4>
+                <div class="alert-description">
+                    Semua reviewer telah menyelesaikan review. Silakan berikan keputusan akhir untuk proposal ini.
+                </div>
             </div>
         </div>
 
@@ -55,24 +19,24 @@
                 <x-lucide-check class="icon" />
                 Setujui Proposal
             </button>
-            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#finalDecisionModal"
+            {{-- <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#finalDecisionModal"
                 wire:click="$set('decision', 'revision_needed')">
                 <x-lucide-file-edit class="icon" />
                 Minta Perbaikan Usulan
-            </button>
+            </button> --}}
         </div>
     @elseif ($this->pendingReviewers->count() > 0)
         <div class="alert alert-warning" role="alert">
             <strong>Menunggu Review:</strong> {{ $this->pendingReviewers->count() }} reviewer belum menyelesaikan review
         </div>
     @else
-        <div class="alert alert-info" role="alert">
+        {{-- <div class="alert alert-info" role="alert">
             Proposal tidak dapat diputuskan saat ini
-        </div>
+        </div> --}}
     @endif
 
     <!-- Decision Confirmation Modal -->
-    <div style="display: none;">
+    @teleport('body')
         <x-tabler.modal id="finalDecisionModal" title="Konfirmasi Keputusan Akhir">
             <x-slot:body>
                 <div class="py-3">
@@ -99,8 +63,7 @@
                         <label class="form-label">
                             Catatan {{ $decision === 'revision_needed' ? '(Wajib)' : '(Opsional)' }}
                         </label>
-                        <textarea class="form-control" rows="4" wire:model="notes"
-                            placeholder="Tambahkan catatan atau komentar..."></textarea>
+                        <textarea class="form-control" rows="4" wire:model="notes" placeholder="Tambahkan catatan atau komentar..."></textarea>
                         @if ($decision === 'revision_needed')
                             <small class="form-hint">
                                 Jelaskan perbaikan yang diperlukan agar pengusul dapat melakukan revisi dengan tepat.
@@ -135,5 +98,5 @@
                 </div>
             </x-slot:footer>
         </x-tabler.modal>
-    </div>
+    @endteleport
 </div>

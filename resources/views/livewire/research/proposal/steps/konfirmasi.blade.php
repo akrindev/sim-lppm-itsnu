@@ -97,7 +97,8 @@
                             <thead>
                                 <tr>
                                     <th>Tahun</th>
-                                    <th>Kategori</th>
+                                    <th>Jenis</th>
+                                    <th>Kategori Luaran</th>
                                     <th>Luaran</th>
                                     <th>Status</th>
                                     <th>Keterangan</th>
@@ -106,8 +107,9 @@
                             <tbody>
                                 @foreach ($form->outputs as $output)
                                     <tr>
-                                        <td>{{ $output['year'] ?? date('Y') }}</td>
+                                        <td>{{ $output['year'] ?? 1 }}</td>
                                         <td>{{ ucfirst(str_replace('_', ' ', $output['category'] ?? '-')) }}</td>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $output['group'] ?? '-')) }}</td>
                                         <td>{{ ucfirst(str_replace('_', ' ', $output['type'] ?? '-')) }}</td>
                                         <td>{{ $output['status'] ?? '-' }}</td>
                                         <td>{{ $output['description'] ?? '-' }}</td>

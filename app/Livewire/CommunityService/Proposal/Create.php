@@ -175,8 +175,9 @@ class Create extends Component
     public function addOutput(): void
     {
         $this->form->outputs[] = [
-            'year' => date('Y'),
-            'category' => '',
+            'year' => 1,
+            'category' => 'Wajib',
+            'group' => '',
             'type' => '',
             'status' => '',
             'description' => '',

@@ -240,30 +240,78 @@
                 </div>
             </div>
 
+            {{-- Section 2.3.1: Luaran Wajib --}}
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h3 class="card-title">2.3 Luaran Target Capaian</h3>
+                    <h3 class="card-title">2.3.1 Luaran Wajib</h3>
                 </div>
-                @if ($proposal->outputs->isEmpty())
-                    <p class="text-muted text-reset">Belum ada luaran target</p>
+                @php
+                    $requiredOutputs = $proposal->outputs->where('category', 'Wajib');
+                @endphp
+                @if ($requiredOutputs->isEmpty())
+                    <div class="card-body">
+                        <p class="text-muted">Belum ada luaran wajib</p>
+                    </div>
                 @else
                     <div class="table-responsive">
                         <table class="card-table table table-bordered table-sm">
                             <thead>
                                 <tr>
                                     <th>Tahun</th>
-                                    <th>Kategori</th>
+                                    <th>Kelompok</th>
                                     <th>Luaran</th>
                                     <th>Status</th>
+                                    <th>Keterangan</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($proposal->outputs as $output)
+                                @foreach ($requiredOutputs as $output)
                                     <tr>
                                         <td>{{ $output->output_year }}</td>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $output->category)) }}</td>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
                                         <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
                                         <td>{{ $output->target_status }}</td>
+                                        <td>{{ $output->description ?? '—' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Section 2.3.2: Luaran Tambahan --}}
+            <div class="mb-3 card">
+                <div class="card-header">
+                    <h3 class="card-title">2.3.2 Luaran Tambahan</h3>
+                </div>
+                @php
+                    $additionalOutputs = $proposal->outputs->where('category', 'Tambahan');
+                @endphp
+                @if ($additionalOutputs->isEmpty())
+                    <div class="card-body">
+                        <p class="text-muted">Belum ada luaran tambahan</p>
+                    </div>
+                @else
+                    <div class="table-responsive">
+                        <table class="card-table table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Tahun</th>
+                                    <th>Kelompok</th>
+                                    <th>Luaran</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($additionalOutputs as $output)
+                                    <tr>
+                                        <td>{{ $output->output_year }}</td>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
+                                        <td>{{ $output->target_status }}</td>
+                                        <td>{{ $output->description ?? '—' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

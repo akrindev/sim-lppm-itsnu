@@ -197,9 +197,10 @@ class ProposalForm extends Form
             return [
                 'year' => $output->output_year,
                 'category' => $output->category,
+                'group' => $output->group ?? '',
                 'type' => $output->type,
                 'status' => $output->target_status,
-                'description' => '',
+                'description' => $output->description ?? '',
             ];
         })->toArray();
 
@@ -271,7 +272,7 @@ class ProposalForm extends Form
             'cluster_level1_id' => $this->cluster_level1_id,
             'cluster_level2_id' => $this->cluster_level2_id ?: null,
             'cluster_level3_id' => $this->cluster_level3_id ?: null,
-            'sbk_value' => $this->sbk_value ?: null,
+            'sbk_value' => ! empty($this->sbk_value) ? $this->sbk_value : null,
             'duration_in_years' => (int) $this->duration_in_years,
             'summary' => $this->summary,
             'status' => 'draft',
@@ -313,7 +314,7 @@ class ProposalForm extends Form
             'cluster_level1_id' => $this->cluster_level1_id,
             'cluster_level2_id' => $this->cluster_level2_id ?: null,
             'cluster_level3_id' => $this->cluster_level3_id ?: null,
-            'sbk_value' => $this->sbk_value,
+            'sbk_value' => ! empty($this->sbk_value) ? $this->sbk_value : null,
             'duration_in_years' => (int) $this->duration_in_years,
             'summary' => $this->summary,
             'status' => 'draft',
@@ -375,7 +376,7 @@ class ProposalForm extends Form
                 'cluster_level1_id' => $this->cluster_level1_id,
                 'cluster_level2_id' => $this->cluster_level2_id ?: null,
                 'cluster_level3_id' => $this->cluster_level3_id ?: null,
-                'sbk_value' => $this->sbk_value ?: null,
+                'sbk_value' => ! empty($this->sbk_value) ? $this->sbk_value : null,
                 'duration_in_years' => (int) $this->duration_in_years,
                 'summary' => $this->summary,
             ]);
@@ -518,8 +519,9 @@ class ProposalForm extends Form
         if (! empty($this->outputs)) {
             foreach ($this->outputs as $output) {
                 $proposal->outputs()->create([
-                    'output_year' => $output['year'] ?? date('Y'),
-                    'category' => $output['category'] ?? '',
+                    'output_year' => $output['year'] ?? 1, //date('Y'),
+                    'category' => $output['category'] ?? 'Wajib',
+                    'group' => $output['group'] ?? '',
                     'type' => $output['type'] ?? '',
                     'target_status' => $output['status'] ?? '',
                 ]);

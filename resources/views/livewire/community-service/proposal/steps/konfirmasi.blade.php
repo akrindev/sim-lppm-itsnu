@@ -23,10 +23,6 @@
                         <td>{{ $form->title }}</td>
                     </tr>
                     <tr>
-                        <td><strong>Skema Penelitian</strong></td>
-                        <td>{{ $this->schemes->find($form->research_scheme_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
                         <td><strong>Durasi</strong></td>
                         <td>{{ $form->duration_in_years }} Tahun</td>
                     </tr>
@@ -97,7 +93,8 @@
                             <thead>
                                 <tr>
                                     <th>Tahun</th>
-                                    <th>Kategori</th>
+                                    <th>Jenis</th>
+                                    <th>Kategori Luaran</th>
                                     <th>Luaran</th>
                                     <th>Status</th>
                                     <th>Keterangan</th>
@@ -106,8 +103,9 @@
                             <tbody>
                                 @foreach ($form->outputs as $output)
                                     <tr>
-                                        <td>{{ $output['year'] ?? date('Y') }}</td>
+                                        <td>{{ $output['year'] ?? 1 }}</td>
                                         <td>{{ ucfirst(str_replace('_', ' ', $output['category'] ?? '-')) }}</td>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $output['group'] ?? '-')) }}</td>
                                         <td>{{ ucfirst(str_replace('_', ' ', $output['type'] ?? '-')) }}</td>
                                         <td>{{ $output['status'] ?? '-' }}</td>
                                         <td>{{ $output['description'] ?? '-' }}</td>
