@@ -14,7 +14,7 @@
     <!-- Ringkasan & Kata Kunci -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📝 Ringkasan & Kata Kunci</h3>
+            <h3 class="card-title"><x-lucide-file-text class="icon me-2" />Ringkasan & Kata Kunci</h3>
         </div>
         <div class="card-body">
             <div class="mb-3">
@@ -64,7 +64,7 @@
     <!-- Luaran Wajib -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📚 Luaran Wajib</h3>
+            <h3 class="card-title"><x-lucide-book-open class="icon me-2" />Luaran Wajib</h3>
         </div>
         <div class="card-body">
             @php
@@ -138,7 +138,7 @@
     <!-- Luaran Tambahan -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📖 Luaran Tambahan</h3>
+            <h3 class="card-title"><x-lucide-book class="icon me-2" />Luaran Tambahan</h3>
         </div>
         <div class="card-body">
             @php
@@ -373,7 +373,7 @@
             </x-slot:body>
 
             <x-slot:footer>
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" wire:click="closeMandatoryModal">
                     Tutup
                 </button>
                 <button type="button" wire:click="saveMandatoryOutput" class="btn btn-primary"
@@ -512,7 +512,7 @@
             </x-slot:body>
 
             <x-slot:footer>
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" wire:click="closeAdditionalModal">
                     Tutup
                 </button>
                 <button type="button" wire:click="saveAdditionalOutput" class="btn btn-primary"

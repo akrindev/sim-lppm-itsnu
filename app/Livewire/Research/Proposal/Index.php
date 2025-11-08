@@ -26,6 +26,14 @@ class Index extends Component
 
     public string $confirmingDeleteProposalId = '';
 
+    public function mount(): void
+    {
+        $role = active_role();
+        if (in_array($role, ['dekan', 'dekan saintek', 'dekan dekabita'])) {
+            $this->statusFilter = 'approved';
+        }
+    }
+
     public function resetFilters(): void
     {
         $this->search = '';

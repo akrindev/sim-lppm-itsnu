@@ -85,6 +85,7 @@ class Show extends Component
     {
         if (! $this->canEdit()) {
             session()->flash('error', 'Anda tidak memiliki akses untuk mengedit proposal ini');
+            $this->dispatch('show-alert', type: 'error', message: 'Anda tidak memiliki akses untuk mengedit proposal ini');
 
             return;
         }
@@ -97,6 +98,15 @@ class Show extends Component
             // Update macro research group
             $research->macro_research_group_id = $this->macroResearchGroupId;
 
+            $hasChanges = false;
+            $changedFields = [];
+
+            // Check if macro research group changed
+            if ($research->wasChanged('macro_research_group_id') || $research->isDirty('macro_research_group_id')) {
+                $hasChanges = true;
+                $changedFields[] = 'Kelompok Makro Riset';
+            }
+
             // Handle file upload
             if ($this->substanceFile) {
                 // Delete old file if exists
@@ -107,20 +117,30 @@ class Show extends Component
                 // Store new file
                 $path = $this->substanceFile->store('proposals/substance-files', 'public');
                 $research->substance_file = $path;
+                $hasChanges = true;
+                $changedFields[] = 'File Substansi';
             }
 
             $research->save();
-
-            session()->flash('success', 'Perubahan berhasil disimpan');
 
             // Refresh proposal data
             $this->form->setProposal($this->form->proposal->fresh());
             $this->macroResearchGroupId = (string) ($research->macro_research_group_id ?? '');
 
+            // Flash message
+            session()->flash('success', 'Perubahan berhasil disimpan');
+
+            // Dispatch update events for UI refresh
+            $this->dispatch('content-updated', fields: $changedFields);
+            $this->dispatch('show-update-notification', message: 'Perubahan berhasil disimpan: '.implode(', ', $changedFields));
+            $this->dispatch('proposal-refreshed');
+
             // Reset file input
             $this->substanceFile = null;
+
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menyimpan perubahan: '.$e->getMessage());
+            $this->dispatch('show-alert', type: 'error', message: 'Gagal menyimpan perubahan: '.$e->getMessage());
         }
     }
 

@@ -397,7 +397,7 @@
                                             <td>
                                                 @if ($partner->institution)
                                                     <div class="d-flex align-items-center">
-                                                        <x-lucide-building class="icon me-1 text-muted" />
+                                                        <x-lucide-building class="me-1 text-muted icon" />
                                                         {{ $partner->institution }}
                                                     </div>
                                                 @else
@@ -408,7 +408,7 @@
                                                 @if ($partner->email)
                                                     <a href="mailto:{{ $partner->email }}" class="text-reset">
                                                         <div class="d-flex align-items-center">
-                                                            <x-lucide-mail class="icon me-1 text-muted" />
+                                                            <x-lucide-mail class="me-1 text-muted icon" />
                                                             {{ $partner->email }}
                                                         </div>
                                                     </a>
@@ -419,7 +419,7 @@
                                             <td>
                                                 @if ($partner->country)
                                                     <div class="d-flex align-items-center">
-                                                        <x-lucide-map-pin class="icon me-1 text-muted" />
+                                                        <x-lucide-map-pin class="me-1 text-muted icon" />
                                                         {{ $partner->country }}
                                                     </div>
                                                 @else
@@ -428,7 +428,8 @@
                                             </td>
                                             <td>
                                                 @if ($partner->address)
-                                                    <div class="text-truncate" style="max-width: 200px;" title="{{ $partner->address }}">
+                                                    <div class="text-truncate" style="max-width: 200px;"
+                                                        title="{{ $partner->address }}">
                                                         {{ $partner->address }}
                                                     </div>
                                                 @else
@@ -436,22 +437,22 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge bg-blue-lt">
+                                                <span class="bg-blue-lt badge">
                                                     {{ $partner->type ?? 'External' }}
                                                 </span>
                                             </td>
                                             <td>
                                                 @if ($partner->commitment_letter_file)
-                                                    <a href="{{ Storage::url($partner->commitment_letter_file) }}" 
-                                                       target="_blank" 
-                                                       onclick="setTimeout(() => window.location.reload(), 100)"
-                                                       class="btn btn-sm btn-primary">
+                                                    <a href="{{ Storage::url($partner->commitment_letter_file) }}"
+                                                        target="_blank"
+                                                        onclick="setTimeout(() => window.location.reload(), 100)"
+                                                        class="btn btn-sm btn-primary">
                                                         <x-lucide-download class="icon" />
                                                         Unduh
                                                     </a>
                                                 @else
-                                                    <span class="badge bg-yellow-lt text-yellow-fg">
-                                                        <x-lucide-file-x class="icon me-1" />
+                                                    <span class="bg-yellow-lt text-yellow-fg badge">
+                                                        <x-lucide-file-x class="me-1 icon" />
                                                         Tidak Ada
                                                     </span>
                                                 @endif
@@ -482,7 +483,7 @@
             </div>
 
             <!-- Dekan Approval (Status: SUBMITTED) -->
-            @if (auth()->user()->hasRole(['dekan', 'rektor']) && $proposal->status->value === 'submitted')
+            @if (auth()->user()->hasRole(['dekan', 'dekan saintek', 'dekan dekabita']) && $proposal->status->value === 'submitted')
                 <div class="mb-3 card">
                     <div class="card-header">
                         <h3 class="card-title">Persetujuan Dekan</h3>
@@ -691,7 +692,8 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal" onclick="setTimeout(() => window.location.reload(), 3000)">
+                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal"
+                    onclick="setTimeout(() => window.location.reload(), 3000)">
                     Ya, Terima
                 </button>
             </x-slot:footer>
@@ -715,7 +717,8 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal" onclick="setTimeout(() => window.location.reload(), 3000)">
+                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal"
+                    onclick="setTimeout(() => window.location.reload(), 3000)">
                     Ya, Tolak
                 </button>
             </x-slot:footer>

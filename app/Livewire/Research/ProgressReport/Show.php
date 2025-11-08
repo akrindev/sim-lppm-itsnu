@@ -94,6 +94,11 @@ class Show extends Component
 
         // Load existing mandatory outputs
         foreach ($this->progressReport->mandatoryOutputs as $output) {
+            // Skip if proposal_output_id is null or empty
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
+
             $this->mandatoryOutputs[$output->proposal_output_id] = [
                 'id' => $output->id,
                 'status_type' => $output->status_type,
@@ -117,6 +122,11 @@ class Show extends Component
 
         // Load existing additional outputs
         foreach ($this->progressReport->additionalOutputs as $output) {
+            // Skip if proposal_output_id is null or empty
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
+
             $this->additionalOutputs[$output->proposal_output_id] = [
                 'id' => $output->id,
                 'status' => $output->status,
@@ -140,11 +150,11 @@ class Show extends Component
         $this->selectedKeywords = $this->proposal->keywords()->pluck('keywords.id')->toArray();
 
         // Initialize empty arrays for planned outputs
-        foreach ($this->proposal->outputs->where('category', 'wajib') as $output) {
+        foreach ($this->proposal->outputs->where('category', 'Wajib') as $output) {
             $this->mandatoryOutputs[$output->id] = $this->getEmptyMandatoryOutput();
         }
 
-        foreach ($this->proposal->outputs->where('category', 'tambahan') as $output) {
+        foreach ($this->proposal->outputs->where('category', 'Tambahan') as $output) {
             $this->additionalOutputs[$output->id] = $this->getEmptyAdditionalOutput();
         }
     }
@@ -232,6 +242,11 @@ class Show extends Component
     protected function saveMandatoryOutputs(): void
     {
         foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
+            // Skip if invalid proposal_output_id (empty string, null, or not valid)
+            if (empty($proposalOutputId) || ! is_string($proposalOutputId) && ! is_numeric($proposalOutputId)) {
+                continue;
+            }
+
             // Skip if no data entered
             if (empty($data['status_type']) && empty($data['journal_title'])) {
                 continue;
@@ -240,7 +255,7 @@ class Show extends Component
             // Handle file upload
             $filePath = $data['document_file'] ?? null;
             if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
-                $filePath = $this->tempMandatoryFiles[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/mandatory', 'public');
+                $filePath = $this->tempMandatoryFiles[$proposalOutputId]->store('progress-reports/'.$this->proposal->id.'/mandatory', 'public');
             }
 
             $outputData = [
@@ -275,6 +290,11 @@ class Show extends Component
     protected function saveAdditionalOutputs(): void
     {
         foreach ($this->additionalOutputs as $proposalOutputId => $data) {
+            // Skip if invalid proposal_output_id (empty string, null, or not valid)
+            if (empty($proposalOutputId) || ! is_string($proposalOutputId) && ! is_numeric($proposalOutputId)) {
+                continue;
+            }
+
             // Skip if no data entered
             if (empty($data['status']) && empty($data['book_title'])) {
                 continue;
@@ -283,12 +303,12 @@ class Show extends Component
             // Handle file uploads
             $documentPath = $data['document_file'] ?? null;
             if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
-                $documentPath = $this->tempAdditionalFiles[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/additional', 'public');
+                $documentPath = $this->tempAdditionalFiles[$proposalOutputId]->store('progress-reports/'.$this->proposal->id.'/additional', 'public');
             }
 
             $certPath = $data['publication_certificate'] ?? null;
             if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
-                $certPath = $this->tempAdditionalCerts[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/certificates', 'public');
+                $certPath = $this->tempAdditionalCerts[$proposalOutputId]->store('progress-reports/'.$this->proposal->id.'/certificates', 'public');
             }
 
             $outputData = [
@@ -348,6 +368,11 @@ class Show extends Component
         if (! isset($this->mandatoryOutputs[$proposalOutputId])) {
             $this->mandatoryOutputs[$proposalOutputId] = $this->getEmptyMandatoryOutput();
         }
+
+        // Ensure the data structure is properly initialized to prevent reset issues
+        if (empty($this->mandatoryOutputs[$proposalOutputId])) {
+            $this->mandatoryOutputs[$proposalOutputId] = $this->getEmptyMandatoryOutput();
+        }
     }
 
     public function saveMandatoryOutput(): void
@@ -363,7 +388,8 @@ class Show extends Component
             "mandatoryOutputs.{$this->editingMandatoryId}.publication_year" => 'nullable|integer|between:2000,2030',
         ]);
 
-        $this->reset('editingMandatoryId');
+        // Don't reset editing state immediately to prevent form reset
+        // $this->reset('editingMandatoryId'); // REMOVED - this was causing the reset issue
 
         // Save is handled by main save() method
         $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
@@ -377,6 +403,11 @@ class Show extends Component
         $this->editingAdditionalId = $proposalOutputId;
 
         if (! isset($this->additionalOutputs[$proposalOutputId])) {
+            $this->additionalOutputs[$proposalOutputId] = $this->getEmptyAdditionalOutput();
+        }
+
+        // Ensure the data structure is properly initialized to prevent reset issues
+        if (empty($this->additionalOutputs[$proposalOutputId])) {
             $this->additionalOutputs[$proposalOutputId] = $this->getEmptyAdditionalOutput();
         }
     }
@@ -394,7 +425,8 @@ class Show extends Component
             "additionalOutputs.{$this->editingAdditionalId}.publication_year" => 'nullable|integer|between:2000,2030',
         ]);
 
-        $this->reset('editingAdditionalId');
+        // Don't reset editing state immediately to prevent form reset
+        // $this->reset('editingAdditionalId'); // REMOVED - this was causing the reset issue
 
         $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
         // $this->dispatch('alert', type: 'success', message: 'Data luaran tambahan berhasil disimpan.');
@@ -403,6 +435,18 @@ class Show extends Component
         session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
 
         // $this->editingAdditionalId = null;
+    }
+
+    public function closeMandatoryModal(): void
+    {
+        // Clear editing state when modal is actually closed
+        $this->reset('editingMandatoryId');
+    }
+
+    public function closeAdditionalModal(): void
+    {
+        // Clear editing state when modal is actually closed
+        $this->reset('editingAdditionalId');
     }
 
     public function render()

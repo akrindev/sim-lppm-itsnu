@@ -91,19 +91,19 @@ class MenuComposer
                 ],
             ],
             // Kepala LPPM menu
-            [
-                'title' => 'Persetujuan Usulan',
-                'icon' => 'checkbox',
-                'route' => 'proposals.index',
-                'href' => '/proposals',
-                'roles' => ['kepala lppm'],
-            ],
+            // [
+            //     'title' => 'Persetujuan Usulan',
+            //     'icon' => 'checkbox',
+            //     'route' => 'proposals.index',
+            //     'href' => '/proposals',
+            //     'roles' => ['kepala lppm'],
+            // ],
             // Dekan menu
             [
                 'title' => 'Persetujuan Dekan',
                 'icon' => 'clipboard-check',
                 'route' => 'dekan.proposals.index',
-                'roles' => ['dekan'],
+                'roles' => ['dekan', 'dekan saintek', 'dekan dekabita'],
             ],
             // Reviewer menu
             [
@@ -153,7 +153,7 @@ class MenuComposer
         ];
 
         return array_values(array_filter(array_map(
-            fn(array $item) => $this->formatItem($item, $user),
+            fn (array $item) => $this->formatItem($item, $user),
             $items,
         )));
     }
@@ -172,7 +172,7 @@ class MenuComposer
         $children = null;
         if (isset($item['children']) && is_array($item['children'])) {
             $children = array_values(array_filter(array_map(
-                fn(array $child) => $this->formatDropdownItem($child, $user),
+                fn (array $child) => $this->formatDropdownItem($child, $user),
                 $item['children'],
             )));
         }

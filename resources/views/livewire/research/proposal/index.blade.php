@@ -30,13 +30,9 @@
                         <!-- Status Filter -->
                         <div class="col-md-3">
                             <select class="form-select" wire:model.live="statusFilter">
-                                <option value="all">Semua Status</option>
-                                <option value="draft">Draft</option>
-                                <option value="submitted">Diajukan</option>
-                                <option value="reviewed">Ditinjau</option>
-                                <option value="approved">Disetujui</option>
-                                <option value="rejected">Ditolak</option>
-                                <option value="completed">Selesai</option>
+                                @foreach (\App\Enums\ProposalStatus::filterOptions() as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
                             </select>
                         </div>
 
