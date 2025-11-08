@@ -15,6 +15,7 @@ class ProposalOutput extends Model
         'proposal_id',
         'output_year',
         'category',
+        'group',
         'type',
         'target_status',
     ];

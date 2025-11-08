@@ -197,9 +197,10 @@ class ProposalForm extends Form
             return [
                 'year' => $output->output_year,
                 'category' => $output->category,
+                'group' => $output->group ?? '',
                 'type' => $output->type,
                 'status' => $output->target_status,
-                'description' => '',
+                'description' => $output->description ?? '',
             ];
         })->toArray();
 
@@ -518,8 +519,9 @@ class ProposalForm extends Form
         if (! empty($this->outputs)) {
             foreach ($this->outputs as $output) {
                 $proposal->outputs()->create([
-                    'output_year' => $output['year'] ?? date('Y'),
-                    'category' => $output['category'] ?? '',
+                    'output_year' => $output['year'] ?? 1, //date('Y'),
+                    'category' => $output['category'] ?? 'Wajib',
+                    'group' => $output['group'] ?? '',
                     'type' => $output['type'] ?? '',
                     'target_status' => $output['status'] ?? '',
                 ]);

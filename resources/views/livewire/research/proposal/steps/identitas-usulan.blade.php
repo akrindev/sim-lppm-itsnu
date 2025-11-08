@@ -110,12 +110,12 @@
     </div>
 </div>
 
-<!-- Section: Klasifikasi Ilmu -->
+<!-- Section: Rumpun Ilmu -->
 <div class="mb-3 card">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
             <x-lucide-dna class="me-3 icon" />
-            <h3 class="mb-0 card-title">1.2 Klasifikasi Ilmu (Klaster Sains)</h3>
+            <h3 class="mb-0 card-title">1.2 Rumpun Ilmu</h3>
         </div>
 
         <div class="row g-4">

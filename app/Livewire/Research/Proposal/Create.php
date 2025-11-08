@@ -40,7 +40,7 @@ class Create extends Component
      */
     public function mount(): void
     {
-        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
+        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
     }
 
     /**
@@ -64,7 +64,7 @@ class Create extends Component
             session()->flash('success', 'Proposal penelitian berhasil dibuat');
             $this->redirect(route('research.proposal.show', $proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal membuat proposal: ' . $e->getMessage());
         }
     }
 
@@ -175,8 +175,9 @@ class Create extends Component
     public function addOutput(): void
     {
         $this->form->outputs[] = [
-            'year' => date('Y'),
-            'category' => '',
+            'year' => 1, //date('Y'),
+            'category' => 'Wajib',
+            'group' => '',
             'type' => '',
             'status' => '',
             'description' => '',
