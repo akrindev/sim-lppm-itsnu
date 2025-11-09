@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use App\Models\ProposalStatusLog;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -70,15 +71,22 @@ class ResearchSeeder extends Seeder
         ];
 
         // Flatten titles array
-        $flatTitles = array_reduce($researchTitles, fn($carry, $category) => array_merge($carry, $category), []);
+        $flatTitles = array_reduce($researchTitles, fn ($carry, $category) => array_merge($carry, $category), []);
 
-        // All 9 workflow statuses
-        $allStatuses = ProposalStatus::cases();
+        // Valid initial statuses (exclude REJECTED, REVISION_NEEDED, NEED_ASSIGNMENT)
+        $validStatuses = [
+            ProposalStatus::DRAFT,
+            ProposalStatus::SUBMITTED,
+            ProposalStatus::APPROVED,
+            ProposalStatus::UNDER_REVIEW,
+            ProposalStatus::REVIEWED,
+            ProposalStatus::COMPLETED,
+        ];
         $titleIndex = 0;
 
-        // For each dosen, create proposals covering all statuses
+        // For each dosen, create proposals covering valid statuses
         foreach ($dosenUsers as $dosenIndex => $submitter) {
-            foreach ($allStatuses as $statusEnum) {
+            foreach ($validStatuses as $statusEnum) {
                 // Create 2 proposals for each status
                 for ($proposalCount = 0; $proposalCount < 2; $proposalCount++) {
                     // Select focus area and related data
@@ -111,6 +119,15 @@ class ResearchSeeder extends Seeder
                         'summary' => fake()->paragraph(3),
                     ]);
 
+                    // Create ProposalStatusLog entry for initial status
+                    ProposalStatusLog::create([
+                        'proposal_id' => $proposal->id,
+                        'user_id' => $submitter->id,
+                        'status_before' => ProposalStatus::DRAFT,
+                        'status_after' => $statusEnum,
+                        'at' => $proposal->created_at,
+                    ]);
+
                     // Attach keywords (3-5 per proposal)
                     if ($keywords->isNotEmpty()) {
                         $proposal->keywords()->attach(
@@ -119,7 +136,7 @@ class ResearchSeeder extends Seeder
                     }
 
                     // Attach team members (anggota are also dosen, 2-4 per proposal)
-                    $teamMemberStatus = in_array($statusEnum->value, ['draft', 'need_assignment'])
+                    $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED])
                         ? 'pending'
                         : 'accepted';
 
@@ -162,7 +179,7 @@ class ResearchSeeder extends Seeder
                     }
 
                     // Create reviewers for UNDER_REVIEW and REVIEWED statuses
-                    if (in_array($statusEnum->value, ['under_review', 'reviewed'])) {
+                    if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED])) {
                         $excludedIds = $availableMembers->pluck('id')->push($submitter->id)->toArray();
                         $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
 
@@ -173,9 +190,9 @@ class ResearchSeeder extends Seeder
                                 \App\Models\ProposalReviewer::create([
                                     'proposal_id' => $proposal->id,
                                     'user_id' => $reviewer->id,
-                                    'status' => $statusEnum->value === 'reviewed' ? 'completed' : 'reviewing',
-                                    'review_notes' => $statusEnum->value === 'reviewed' ? fake()->paragraph() : null,
-                                    'recommendation' => $statusEnum->value === 'reviewed'
+                                    'status' => $statusEnum === ProposalStatus::REVIEWED ? 'completed' : 'reviewing',
+                                    'review_notes' => $statusEnum === ProposalStatus::REVIEWED ? fake()->paragraph() : null,
+                                    'recommendation' => $statusEnum === ProposalStatus::REVIEWED
                                         ? fake()->randomElement(['approved', 'revision_needed'])
                                         : null,
                                 ]);
