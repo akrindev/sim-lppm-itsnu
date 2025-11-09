@@ -215,8 +215,11 @@ class Show extends Component
                 ]);
             }
 
+            // Handle keywords: create new ones if they don't exist
+            $keywordIds = $this->processKeywords($this->selectedKeywords);
+
             // Sync keywords
-            $this->progressReport->keywords()->sync($this->selectedKeywords);
+            $this->progressReport->keywords()->sync($keywordIds);
 
             // Save mandatory outputs
             $this->saveMandatoryOutputs();
@@ -227,6 +230,33 @@ class Show extends Component
 
         session()->flash('success', 'Laporan kemajuan berhasil disimpan sebagai draft.');
         $this->dispatch('alert', type: 'success', message: 'Laporan kemajuan berhasil disimpan sebagai draft.');
+    }
+
+    /**
+     * Process keywords array, creating new keywords if they don't exist.
+     *
+     * @param  array  $selectedKeywords  Array of keyword IDs or new keyword names
+     * @return array Array of keyword IDs
+     */
+    protected function processKeywords(array $selectedKeywords): array
+    {
+        $keywordIds = [];
+
+        foreach ($selectedKeywords as $keyword) {
+            // If it's already a numeric ID (existing keyword)
+            if (is_numeric($keyword)) {
+                $keywordIds[] = (int) $keyword;
+            } elseif (is_string($keyword) && ! empty(trim($keyword))) {
+                // Create new keyword if it doesn't exist
+                $newKeyword = Keyword::firstOrCreate(
+                    ['name' => trim($keyword)],
+                    ['name' => trim($keyword)]
+                );
+                $keywordIds[] = $newKeyword->id;
+            }
+        }
+
+        return array_unique($keywordIds);
     }
 
     protected function saveMandatoryOutputs(): void

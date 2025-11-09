@@ -28,13 +28,13 @@
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
-                <select wire:model="selectedKeywords" multiple class="form-select tom-select" x-data="tomSelect"
+                <select wire:model="selectedKeywords" multiple class="form-select tom-select" x-data="tomSelectWithCreate"
                     size="6">
                     @foreach ($allKeywords as $keyword)
                         <option value="{{ $keyword->id }}">{{ $keyword->name }}</option>
                     @endforeach
                 </select>
-                <small class="form-hint">Tekan Ctrl/Cmd untuk memilih lebih dari satu</small>
+                <small class="form-hint">Tekan Ctrl/Cmd untuk memilih lebih dari satu. Ketik untuk membuat kata kunci baru.</small>
             </div>
 
             <div class="row">

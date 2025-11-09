@@ -165,14 +165,6 @@ tests/
 • **Queue:** Laravel Queue system (database driver default)
 • **Database:** MySQL (UUID primary keys throughout)
 
-## Git Workflow Essentials
-
-1. Branch from `main` with descriptive name: `feature/<slug>` or `bugfix/<slug>`
-2. Run `vendor/bin/pint --dirty` AND `php artisan test` before committing
-3. Keep commits atomic with clear messages
-4. Follow existing commit message style (check `git log --oneline -5`)
-5. **NEVER** commit sensitive data (`.env`, keys, secrets)
-6. Force pushes allowed ONLY on feature branches using `--force-with-lease`
 
 ## Evidence Required for Changes
 
@@ -293,6 +285,15 @@ php artisan view:clear
 • Laravel 12 docs: Use Laravel Boost MCP `search-docs` tool
 • Livewire v3: Use `search-docs` tool with livewire filter
 • Spatie Permission: Check existing authorization patterns in codebase
+
+
+**MCP**: 
+• Use `Serena` agent for code search, navigation, and documentation lookup. always use initial prompt for context.
+• Use `Laravel Boost` agent for Laravel documentation search, and other Laravel-related queries.
+• Use `Sequential Thinking` agent for complex reasoning tasks that require step-by-step analysis.
+
+and other agents as needed.
+
 
 ## Summary
 

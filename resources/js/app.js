@@ -226,6 +226,47 @@ document.addEventListener("alpine:init", () => {
             }
         },
     }));
+
+    /**
+     * Alpine.js component for Tom Select with create functionality
+     * Allows users to create new options on the fly
+     */
+    Alpine.data("tomSelectWithCreate", () => ({
+        instance: null,
+
+        init() {
+            const select = this.$el;
+
+            this.instance = new TomSelect(select, {
+                ...TOM_SELECT_CONFIG,
+                create: true,
+                createOnBlur: true,
+                placeholder:
+                    select.getAttribute("placeholder") ||
+                    TOM_SELECT_CONFIG.placeholder,
+                onChange: (value) => {
+                    select.value = value;
+                    select.dispatchEvent(
+                        new Event("change", { bubbles: true }),
+                    );
+                    select.dispatchEvent(new Event("input", { bubbles: true }));
+                },
+            });
+
+            this.$watch("$el.value", (value) => {
+                if (this.instance && this.instance.getValue() !== value) {
+                    this.instance.setValue(value, true);
+                }
+            });
+        },
+
+        destroy() {
+            if (this.instance) {
+                this.instance.destroy();
+                this.instance = null;
+            }
+        },
+    }));
 });
 
 // Fallback: Initialize on page navigation (e.g., wire:navigate)
