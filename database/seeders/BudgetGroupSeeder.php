@@ -9,34 +9,44 @@ class BudgetGroupSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * Based on BIMA Kemdikbud RAB Components 2024-2025
+     * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2025
+     * 
+     * Budget Percentage Limits:
+     * - Honor/Upah: Max 10%
+     * - Teknologi & Inovasi (Bahan/Peralatan): Min 50%
+     * - Pelatihan: Max 20%
+     * - Perjalanan: Max 15%
+     * - Lainnya: Max 5%
      */
     public function run(): void
     {
         $groups = [
             [
-                'code' => 'HON',
-                'name' => 'Honorarium',
-                'description' => 'Biaya honorarium pelaksana penelitian dan narasumber',
+                'code' => 'HONOR',
+                'name' => 'Upah dan Jasa (Honor)',
+                'description' => 'Honorarium peneliti, asisten, operator, tenaga ahli, dan jasa pihak ketiga (Maksimal 10% dari total anggaran)',
             ],
             [
-                'code' => 'PER',
-                'name' => 'Peralatan Penunjang',
-                'description' => 'Biaya pengadaan peralatan penelitian yang menunjang kegiatan',
+                'code' => 'TEKNOLOGI',
+                'name' => 'Teknologi dan Inovasi',
+                'description' => 'Bahan habis pakai, bahan penelitian, alat laboratorium, peralatan pendukung, dan pengembangan teknologi (Minimal 50% dari total anggaran)',
             ],
             [
-                'code' => 'BHP',
-                'name' => 'Bahan Habis Pakai',
-                'description' => 'Biaya bahan dan material yang habis terpakai dalam penelitian',
+                'code' => 'PELATIHAN',
+                'name' => 'Biaya Pelatihan',
+                'description' => 'Pelatihan, workshop, penyuluhan, atau capacity building dalam rangka program penelitian/pengabdian (Maksimal 20%)',
             ],
             [
-                'code' => 'PRJ',
-                'name' => 'Perjalanan',
-                'description' => 'Biaya perjalanan untuk survei, pengumpulan data, dan kegiatan lapangan',
+                'code' => 'PERJALANAN',
+                'name' => 'Biaya Perjalanan',
+                'description' => 'Transportasi, akomodasi, dan konsumsi untuk pelaksanaan kegiatan di lokasi penelitian/pengabdian dan koordinasi dengan mitra (Maksimal 15%)',
             ],
             [
-                'code' => 'LAN',
-                'name' => 'Lain-lain',
-                'description' => 'Biaya publikasi, seminar, pelaporan, dan kegiatan penunjang lainnya',
+                'code' => 'LAINNYA',
+                'name' => 'Biaya Lainnya',
+                'description' => 'Publikasi hasil, seminar, pelaporan, dokumentasi, dan kebutuhan administrasi penunjang lainnya (Maksimal 5%)',
             ],
         ];
 
