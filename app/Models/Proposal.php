@@ -222,6 +222,14 @@ class Proposal extends Model
     }
 
     /**
+     * Get all status change logs for the proposal.
+     */
+    public function statusLogs(): HasMany
+    {
+        return $this->hasMany(ProposalStatusLog::class);
+    }
+
+    /**
      * Check if all team members have accepted the invitation.
      */
     public function allTeamMembersAccepted(): bool

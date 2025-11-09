@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Proposal;
+use App\Observers\ProposalObserver;
 use App\View\Composers\MenuComposer;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -26,5 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('components.layouts.header', MenuComposer::class);
+
+        Proposal::observe(ProposalObserver::class);
     }
 }

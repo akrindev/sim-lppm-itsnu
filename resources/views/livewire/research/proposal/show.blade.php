@@ -630,6 +630,43 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Status History Section -->
+            <div class="mt-4 mb-3 card">
+                <div class="card-header">
+                    <h3 class="card-title">Riwayat Status</h3>
+                </div>
+                <div class="card-body">
+                    @if ($proposal->statusLogs->isEmpty())
+                        <p class="text-muted">Belum ada riwayat perubahan status</p>
+                    @else
+                        <div class="timeline">
+                            @foreach ($proposal->statusLogs as $log)
+                                <div class="timeline-item">
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <strong>{{ $log->status_before?->label() ?? '—' }}</strong>
+                                                <x-lucide-arrow-right class="mx-2 icon" style="width: 1rem; height: 1rem;" />
+                                                <strong>{{ $log->status_after->label() }}</strong>
+                                            </div>
+                                            <small class="text-muted">{{ $log->at->format('d M Y H:i') }}</small>
+                                        </div>
+                                        <p class="text-secondary mb-1">
+                                            Oleh: <strong>{{ $log->user?->name ?? '—' }}</strong>
+                                        </p>
+                                        @if ($log->notes)
+                                            <p class="text-secondary mb-0">
+                                                Catatan: {{ $log->notes }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <!-- Navigation Buttons -->

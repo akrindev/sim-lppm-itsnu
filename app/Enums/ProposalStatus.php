@@ -104,4 +104,12 @@ enum ProposalStatus: string
             self::REJECTED->value => self::REJECTED->label(),
         ];
     }
+
+    /**
+     * Mendapatkan array dari semua nilai enum
+     */
+    public static function values(): array
+    {
+        return array_map(fn ($status) => $status->value, self::cases());
+    }
 }
