@@ -105,12 +105,6 @@ tests/
 • Own-proposal access for Dosen
 • Assigned-proposal access for Reviewers
 
-**Testing (Pest v4):**
-• Use `php artisan test --filter=name` to run specific tests
-• Model factories for test data
-• No browser tests currently (could use Pest v4 browser testing)
-• Run tests BEFORE completing any task
-
 **Code Style:**
 • Run `vendor/bin/pint --dirty` before committing
 • Follow existing patterns in sibling files
@@ -247,10 +241,6 @@ tests/
 # Format code
 vendor/bin/pint --dirty
 
-# Run all tests (or filtered)
-# php artisan test
-# php artisan test --filter=ProposalWorkflowTest
-
 # Check no errors
 php artisan config:clear
 php artisan route:clear
@@ -297,4 +287,4 @@ and other agents as needed.
 
 ## Summary
 
-**This is a Laravel 12 application for managing research grants at ITSNU.** It has a complex multi-role approval workflow (Dosen → Dekan → Kepala LPPM → Reviewers → Kepala LPPM final). Uses Livewire 3 for full-stack reactivity, Spatie permissions for RBAC, and UUID primary keys throughout. Always run tests and formatter before committing. Check workflow rules and status transitions carefully - they are business-critical.
+**This is a Laravel 12 application for managing research grants at ITSNU.** It has a complex multi-role approval workflow (Dosen → Dekan → Kepala LPPM → Reviewers → Kepala LPPM final). Uses Livewire 3 for full-stack reactivity, Spatie permissions for RBAC, and UUID primary keys throughout. Always run the formatter. Check workflow rules and status transitions carefully - they are business-critical.

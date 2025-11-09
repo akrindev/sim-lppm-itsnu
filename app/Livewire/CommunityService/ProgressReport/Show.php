@@ -25,7 +25,7 @@ class Show extends Component
     // Form fields
     public string $summaryUpdate = '';
 
-    public array $selectedKeywords = [];
+    public string $keywordsInput = '';
 
     public int $reportingYear;
 
@@ -90,7 +90,7 @@ class Show extends Component
         $this->summaryUpdate = $this->progressReport->summary_update ?? '';
         $this->reportingYear = $this->progressReport->reporting_year;
         $this->reportingPeriod = $this->progressReport->reporting_period;
-        $this->selectedKeywords = $this->progressReport->keywords()->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+        $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
 
         // Load existing mandatory outputs
         foreach ($this->progressReport->mandatoryOutputs as $output) {
@@ -137,7 +137,7 @@ class Show extends Component
     {
         $this->summaryUpdate = $this->proposal->summary ?? '';
         $this->reportingYear = (int) date('Y');
-        $this->selectedKeywords = $this->proposal->keywords()->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+        $this->keywordsInput = $this->proposal->keywords()->pluck('name')->join('; ');
 
         // Initialize empty arrays for planned outputs
         foreach ($this->proposal->outputs->where('category', 'wajib') as $output) {
@@ -215,11 +215,15 @@ class Show extends Component
                 ]);
             }
 
-            // Handle keywords: create new ones if they don't exist
-            $keywordIds = $this->processKeywords($this->selectedKeywords);
+            // Handle keywords: parse from semicolon-separated input
+            $keywordNames = $this->parseKeywordsInput($this->keywordsInput);
+            $keywordIds = $this->processKeywords($keywordNames);
 
             // Sync keywords
             $this->progressReport->keywords()->sync($keywordIds);
+
+            // Update input with cleaned keywords from database
+            $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
 
             // Save mandatory outputs
             $this->saveMandatoryOutputs();
@@ -233,30 +237,61 @@ class Show extends Component
     }
 
     /**
-     * Process keywords array, creating new keywords if they don't exist.
+     * Parse keywords from semicolon-separated string.
      *
-     * @param  array  $selectedKeywords  Array of keyword IDs or new keyword names
-     * @return array Array of keyword IDs
+     * @param  string  $input  Semicolon-separated keywords
+     * @return array Array of keyword names (trimmed, non-empty, unique)
      */
-    protected function processKeywords(array $selectedKeywords): array
+    protected function parseKeywordsInput(string $input): array
     {
-        $keywordIds = [];
+        if (empty(trim($input))) {
+            return [];
+        }
 
-        foreach ($selectedKeywords as $keyword) {
-            // If it's already a numeric ID (existing keyword)
-            if (is_numeric($keyword)) {
-                $keywordIds[] = (int) $keyword;
-            } elseif (is_string($keyword) && ! empty(trim($keyword))) {
-                // Create new keyword if it doesn't exist
-                $newKeyword = Keyword::firstOrCreate(
-                    ['name' => trim($keyword)],
-                    ['name' => trim($keyword)]
-                );
-                $keywordIds[] = $newKeyword->id;
+        // Split by semicolon
+        $keywords = explode(';', $input);
+
+        // Trim whitespace and filter empty
+        $keywords = array_map('trim', $keywords);
+        $keywords = array_filter($keywords, fn ($k) => ! empty($k));
+
+        // Remove duplicates (case-insensitive)
+        $uniqueKeywords = [];
+        $seen = [];
+
+        foreach ($keywords as $keyword) {
+            $lowerKeyword = strtolower($keyword);
+            if (! in_array($lowerKeyword, $seen)) {
+                $uniqueKeywords[] = $keyword;
+                $seen[] = $lowerKeyword;
             }
         }
 
-        return array_unique($keywordIds);
+        return $uniqueKeywords;
+    }
+
+    /**
+     * Process keywords array, creating new keywords if they don't exist.
+     *
+     * @param  array  $keywordNames  Array of keyword names (strings)
+     * @return array Array of keyword IDs
+     */
+    protected function processKeywords(array $keywordNames): array
+    {
+        $keywordIds = [];
+
+        foreach ($keywordNames as $name) {
+            if (! empty(trim($name))) {
+                // Create new keyword if it doesn't exist
+                $keyword = Keyword::firstOrCreate(
+                    ['name' => trim($name)],
+                    ['name' => trim($name)]
+                );
+                $keywordIds[] = $keyword->id;
+            }
+        }
+
+        return $keywordIds;
     }
 
     protected function saveMandatoryOutputs(): void

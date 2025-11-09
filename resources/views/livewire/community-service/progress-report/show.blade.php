@@ -28,13 +28,13 @@
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
-                <select wire:model="selectedKeywords" multiple class="form-select tom-select" x-data="tomSelectWithCreate"
-                    size="6">
-                    @foreach ($allKeywords as $keyword)
-                        <option value="{{ $keyword->id }}">{{ $keyword->name }}</option>
-                    @endforeach
-                </select>
-                <small class="form-hint">Tekan Ctrl/Cmd untuk memilih lebih dari satu. Ketik untuk membuat kata kunci baru.</small>
+                <input type="text" wire:model="keywordsInput" class="form-control"
+                    placeholder="Contoh: AI; Machine Learning; IoT" />
+                <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
+                    Learning</small>
+                @error('keywordsInput')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class="row">
