@@ -24,12 +24,15 @@ class Index extends Component
     #[Url]
     public string $yearFilter = '';
 
+    #[Url]
+    public string $roleFilter = 'ketua';
+
     public string $confirmingDeleteProposalId = '';
 
     public function mount(): void
     {
         $role = active_role();
-        if (in_array($role, ['dekan', 'dekan saintek', 'dekan dekabita'])) {
+        if (in_array($role, ['dekan'])) {
             $this->statusFilter = 'approved';
         }
     }
@@ -39,6 +42,7 @@ class Index extends Component
         $this->search = '';
         $this->statusFilter = 'all';
         $this->yearFilter = '';
+        $this->roleFilter = 'ketua';
         $this->resetPage();
     }
 
@@ -65,16 +69,20 @@ class Index extends Component
 
         // Show all proposals for admin, kepala lppm, and rektor roles
         $user = Auth::user();
-        $isAdmin = $user->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->activeHasAnyRole(['admin lppm', 'kepala lppm']);
 
         if (! $isAdmin) {
-            // Regular users see their own proposals OR proposals where they are team members
-            $query->where(function ($q) use ($user) {
-                $q->where('submitter_id', $user->id)
-                    ->orWhereHas('teamMembers', function ($teamQuery) use ($user) {
-                        $teamQuery->where('user_id', $user->id);
-                    });
-            });
+            // Apply role filter for regular users
+            if ($this->roleFilter === 'ketua') {
+                // User is the submitter (leader)
+                $query->where('submitter_id', $user->id);
+            } else {
+                // roleFilter = 'anggota': User is a team member with anggota role
+                $query->whereHas('teamMembers', function ($teamQuery) use ($user) {
+                    $teamQuery->where('user_id', $user->id)
+                        ->where('role', 'anggota');
+                });
+            }
         }
 
         return $query
