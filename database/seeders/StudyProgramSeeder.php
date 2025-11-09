@@ -11,35 +11,52 @@ class StudyProgramSeeder extends Seeder
      */
     public function run(): void
     {
-        $itsnu = \App\Models\Institution::where('name', 'like', '%ITSNU%')->first();
+        // based on FacultySeeder
+        $saintek = \App\Models\Faculty::where('code', 'SAINTEK')->first();
+        $dekabita = \App\Models\Faculty::where('code', 'DEKABITA')->first();
 
-        if ($itsnu) {
-            $programs = [
-                'Teknik Informatika',
-                'Sistem Informasi',
-                'Teknik Elektro',
-                'Teknik Mesin',
-                'Teknik Industri',
-                'Farmasi',
-                'Kesehatan Masyarakat',
+        // saintek study programs
+        // - Informatika
+        // - Teknologi Informasi
+        // - Fisika
+        // - Teknik Industri
+
+        // dekabita study programs
+        //- Kriya Batik
+        // - Administrasi Perkantoran
+        // - Akuntansi
+
+        if ($saintek) {
+            $saintekPrograms = [
+                ['name' => 'Informatika', 'code' => 'IF'],
+                ['name' => 'Teknologi Informasi', 'code' => 'TI'],
+                ['name' => 'Fisika', 'code' => 'FIS'],
+                ['name' => 'Teknik Industri', 'code' => 'TIU'],
             ];
 
-            foreach ($programs as $program) {
+            foreach ($saintekPrograms as $program) {
                 \App\Models\StudyProgram::create([
-                    'institution_id' => $itsnu->id,
-                    'name' => $program,
+                    'faculty_id' => $saintek->id,
+                    'name' => $program['name'],
+                    'code' => $program['code'],
                 ]);
             }
         }
 
-        // Add programs for other institutions
-        $otherInstitutions = \App\Models\Institution::where('name', 'not like', '%ITSNU%')->take(3)->get();
+        if ($dekabita) {
+            $dekabitaPrograms = [
+                ['name' => 'Kriya Batik', 'code' => 'KB'],
+                ['name' => 'Administrasi Perkantoran', 'code' => 'AP'],
+                ['name' => 'Akuntansi', 'code' => 'AK'],
+            ];
 
-        foreach ($otherInstitutions as $institution) {
-            \App\Models\StudyProgram::create([
-                'institution_id' => $institution->id,
-                'name' => fake()->randomElement(['Manajemen', 'Akuntansi', 'Hukum', 'Pendidikan Agama Islam']),
-            ]);
+            foreach ($dekabitaPrograms as $program) {
+                \App\Models\StudyProgram::create([
+                    'faculty_id' => $dekabita->id,
+                    'name' => $program['name'],
+                    'code' => $program['code'],
+                ]);
+            }
         }
     }
 }
