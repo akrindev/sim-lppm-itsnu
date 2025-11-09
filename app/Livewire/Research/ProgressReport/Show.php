@@ -90,7 +90,7 @@ class Show extends Component
         $this->summaryUpdate = $this->progressReport->summary_update ?? '';
         $this->reportingYear = $this->progressReport->reporting_year;
         $this->reportingPeriod = $this->progressReport->reporting_period;
-        $this->selectedKeywords = $this->progressReport->keywords()->pluck('keywords.id')->toArray();
+        $this->selectedKeywords = $this->progressReport->keywords()->pluck('id')->map(fn ($id) => (string) $id)->toArray();
 
         // Load existing mandatory outputs
         foreach ($this->progressReport->mandatoryOutputs as $output) {
@@ -147,7 +147,7 @@ class Show extends Component
     {
         $this->summaryUpdate = $this->proposal->summary ?? '';
         $this->reportingYear = (int) date('Y');
-        $this->selectedKeywords = $this->proposal->keywords()->pluck('keywords.id')->toArray();
+        $this->selectedKeywords = $this->proposal->keywords()->pluck('id')->map(fn ($id) => (string) $id)->toArray();
 
         // Initialize empty arrays for planned outputs
         foreach ($this->proposal->outputs->where('category', 'Wajib') as $output) {
