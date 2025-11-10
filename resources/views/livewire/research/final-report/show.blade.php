@@ -599,7 +599,7 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveMandatoryOutput" class="btn btn-primary"
+                <button type="button" wire:click="saveMandatoryOutput({{ $editingMandatoryId }})" class="btn btn-primary"
                     wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="saveMandatoryOutput">
                         <x-lucide-save class="icon" /> Simpan
@@ -762,7 +762,7 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveAdditionalOutput" class="btn btn-primary"
+                <button type="button" wire:click="saveAdditionalOutput({{ $editingAdditionalId }})" class="btn btn-primary"
                     wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="saveAdditionalOutput">
                         <x-lucide-save class="icon" /> Simpan

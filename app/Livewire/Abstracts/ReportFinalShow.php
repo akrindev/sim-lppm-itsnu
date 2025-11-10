@@ -29,8 +29,10 @@ abstract class ReportFinalShow extends ReportShow
     public $realizationFile;
     public $presentationFile;
 
-    // Temporary file arrays for output documents (from HasFileUploads trait)
-    // Note: These are defined in the trait, not duplicated here
+    // Output document file uploads
+    public array $tempMandatoryFiles = [];
+    public array $tempAdditionalFiles = [];
+    public array $tempAdditionalCerts = [];
 
     /**
      * Get the Form class name - to be implemented by child classes
@@ -235,6 +237,7 @@ abstract class ReportFinalShow extends ReportShow
                     'page_end' => $output->page_end,
                     'article_url' => $output->article_url,
                     'doi' => $output->doi,
+                    'document_file' => $output->getFirstMedia('journal_article') ? true : false,
                 ];
             }
 
@@ -253,6 +256,8 @@ abstract class ReportFinalShow extends ReportShow
                     'total_pages' => $output->total_pages,
                     'publisher_url' => $output->publisher_url,
                     'book_url' => $output->book_url,
+                    'document_file' => $output->getFirstMedia('book_document') ? true : false,
+                    'publication_certificate' => $output->getFirstMedia('publication_certificate') ? true : false,
                 ];
             }
         }
@@ -505,6 +510,60 @@ abstract class ReportFinalShow extends ReportShow
     }
 
     /**
+     * Handle mandatory output file upload
+     */
+    public function updatedTempMandatoryFiles(): void
+    {
+        if (!$this->canEdit) {
+            return;
+        }
+
+        try {
+            // Auto-save the file
+            $this->validateMandatoryFile($this->editingMandatoryId);
+            session()->flash('success', 'File dokumen artikel berhasil diunggah.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle additional output file upload
+     */
+    public function updatedTempAdditionalFiles(): void
+    {
+        if (!$this->canEdit) {
+            return;
+        }
+
+        try {
+            // Auto-save the file
+            $this->validateAdditionalFile($this->editingAdditionalId);
+            session()->flash('success', 'File dokumen buku berhasil diunggah.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle additional output certificate upload
+     */
+    public function updatedTempAdditionalCerts(): void
+    {
+        if (!$this->canEdit) {
+            return;
+        }
+
+        try {
+            // Auto-save the file
+            $this->validateAdditionalCert($this->editingAdditionalId);
+            session()->flash('success', 'File surat keterangan berhasil diunggah.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Remove substance file
      */
     public function removeSubstanceFile(): void
@@ -547,6 +606,203 @@ abstract class ReportFinalShow extends ReportShow
             $this->progressReport->clearMediaCollection('presentation_file');
             session()->flash('success', 'File presentasi berhasil dihapus.');
         }
+    }
+
+    /**
+     * Save mandatory output (journal article)
+     */
+    public function saveMandatoryOutput(int $proposalOutputId): void
+    {
+        if (!$this->canEdit) {
+            abort(403);
+        }
+
+        if (!isset($this->mandatoryOutputs[$proposalOutputId])) {
+            session()->flash('error', 'Data luaran wajib tidak ditemukan.');
+            return;
+        }
+
+        $data = $this->mandatoryOutputs[$proposalOutputId];
+
+        // Ensure progress report exists
+        if (!$this->progressReport) {
+            session()->flash('error', 'Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
+            return;
+        }
+
+        DB::transaction(function () use ($proposalOutputId, $data) {
+            // Find or create mandatory output
+            $output = \App\Models\MandatoryOutput::where('progress_report_id', $this->progressReport->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            if (!$output) {
+                $output = \App\Models\MandatoryOutput::create([
+                    'progress_report_id' => $this->progressReport->id,
+                    'proposal_output_id' => $proposalOutputId,
+                    'status_type' => $data['status_type'] ?? '',
+                    'author_status' => $data['author_status'] ?? '',
+                    'journal_title' => $data['journal_title'] ?? '',
+                    'issn' => $data['issn'] ?? '',
+                    'eissn' => $data['eissn'] ?? '',
+                    'indexing_body' => $data['indexing_body'] ?? '',
+                    'journal_url' => $data['journal_url'] ?? '',
+                    'article_title' => $data['article_title'] ?? '',
+                    'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
+                    'volume' => $data['volume'] ?? '',
+                    'issue_number' => $data['issue_number'] ?? '',
+                    'page_start' => $data['page_start'] ?? '',
+                    'page_end' => $data['page_end'] ?? '',
+                    'article_url' => $data['article_url'] ?? '',
+                    'doi' => $data['doi'] ?? '',
+                ]);
+            } else {
+                $output->update([
+                    'status_type' => $data['status_type'] ?? '',
+                    'author_status' => $data['author_status'] ?? '',
+                    'journal_title' => $data['journal_title'] ?? '',
+                    'issn' => $data['issn'] ?? '',
+                    'eissn' => $data['eissn'] ?? '',
+                    'indexing_body' => $data['indexing_body'] ?? '',
+                    'journal_url' => $data['journal_url'] ?? '',
+                    'article_title' => $data['article_title'] ?? '',
+                    'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
+                    'volume' => $data['volume'] ?? '',
+                    'issue_number' => $data['issue_number'] ?? '',
+                    'page_start' => $data['page_start'] ?? '',
+                    'page_end' => $data['page_end'] ?? '',
+                    'article_url' => $data['article_url'] ?? '',
+                    'doi' => $data['doi'] ?? '',
+                ]);
+            }
+
+            // Save file if uploaded
+            if (isset($this->tempMandatoryFiles[$proposalOutputId]) &&
+                $this->tempMandatoryFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $this->tempMandatoryFiles[$proposalOutputId];
+
+                $output->clearMediaCollection('journal_article');
+                $output
+                    ->addMedia($file->getRealPath())
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName($file->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => Auth::id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('journal_article');
+
+                // Update the output array to reflect file exists
+                $this->mandatoryOutputs[$proposalOutputId]['document_file'] = true;
+                // Clear the temp file
+                unset($this->tempMandatoryFiles[$proposalOutputId]);
+            }
+        });
+
+        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+        $this->closeMandatoryModal();
+    }
+
+    /**
+     * Save additional output (book)
+     */
+    public function saveAdditionalOutput(int $proposalOutputId): void
+    {
+        if (!$this->canEdit) {
+            abort(403);
+        }
+
+        if (!isset($this->additionalOutputs[$proposalOutputId])) {
+            session()->flash('error', 'Data luaran tambahan tidak ditemukan.');
+            return;
+        }
+
+        $data = $this->additionalOutputs[$proposalOutputId];
+
+        // Ensure progress report exists
+        if (!$this->progressReport) {
+            session()->flash('error', 'Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
+            return;
+        }
+
+        DB::transaction(function () use ($proposalOutputId, $data) {
+            // Find or create additional output
+            $output = \App\Models\AdditionalOutput::where('progress_report_id', $this->progressReport->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            if (!$output) {
+                $output = \App\Models\AdditionalOutput::create([
+                    'progress_report_id' => $this->progressReport->id,
+                    'proposal_output_id' => $proposalOutputId,
+                    'status' => $data['status'] ?? '',
+                    'book_title' => $data['book_title'] ?? '',
+                    'publisher_name' => $data['publisher_name'] ?? '',
+                    'isbn' => $data['isbn'] ?? '',
+                    'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
+                    'total_pages' => $data['total_pages'] ? (int) $data['total_pages'] : null,
+                    'publisher_url' => $data['publisher_url'] ?? '',
+                    'book_url' => $data['book_url'] ?? '',
+                ]);
+            } else {
+                $output->update([
+                    'status' => $data['status'] ?? '',
+                    'book_title' => $data['book_title'] ?? '',
+                    'publisher_name' => $data['publisher_name'] ?? '',
+                    'isbn' => $data['isbn'] ?? '',
+                    'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
+                    'total_pages' => $data['total_pages'] ? (int) $data['total_pages'] : null,
+                    'publisher_url' => $data['publisher_url'] ?? '',
+                    'book_url' => $data['book_url'] ?? '',
+                ]);
+            }
+
+            // Save document file if uploaded
+            if (isset($this->tempAdditionalFiles[$proposalOutputId]) &&
+                $this->tempAdditionalFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $this->tempAdditionalFiles[$proposalOutputId];
+
+                $output->clearMediaCollection('book_document');
+                $output
+                    ->addMedia($file->getRealPath())
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName($file->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => Auth::id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('book_document');
+
+                $this->additionalOutputs[$proposalOutputId]['document_file'] = true;
+                unset($this->tempAdditionalFiles[$proposalOutputId]);
+            }
+
+            // Save certificate file if uploaded
+            if (isset($this->tempAdditionalCerts[$proposalOutputId]) &&
+                $this->tempAdditionalCerts[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $this->tempAdditionalCerts[$proposalOutputId];
+
+                $output->clearMediaCollection('publication_certificate');
+                $output
+                    ->addMedia($file->getRealPath())
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName($file->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => Auth::id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('publication_certificate');
+
+                $this->additionalOutputs[$proposalOutputId]['publication_certificate'] = true;
+                unset($this->tempAdditionalCerts[$proposalOutputId]);
+            }
+        });
+
+        session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+        $this->closeAdditionalModal();
     }
 
     /**
@@ -603,6 +859,7 @@ abstract class ReportFinalShow extends ReportShow
             'page_end' => '',
             'article_url' => '',
             'doi' => '',
+            'document_file' => false,
         ];
     }
 
@@ -621,6 +878,8 @@ abstract class ReportFinalShow extends ReportShow
             'total_pages' => '',
             'publisher_url' => '',
             'book_url' => '',
+            'document_file' => false,
+            'publication_certificate' => false,
         ];
     }
 
