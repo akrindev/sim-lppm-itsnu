@@ -224,14 +224,24 @@
                     @php $communityService = $proposal->detailable; @endphp
                     <div class="mb-3">
                         <label class="form-label">File Substansi</label>
-                        @if ($communityService?->substance_file)
-                            <p>
-                                <a href="{{ Storage::url($communityService->substance_file) }}" target="_blank"
-                                    class="btn-outline-primary btn btn-sm">
-                                    <x-lucide-download class="icon" />
-                                    Download File
-                                </a>
-                            </p>
+                        @if ($communityService && $communityService->hasMedia('substance_file'))
+                            @php
+                                $media = $communityService->getFirstMedia('substance_file');
+                            @endphp
+                            <div class="alert alert-info mb-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <x-lucide-file-text class="icon text-primary me-2" />
+                                        <strong>{{ $media->name }}</strong>
+                                        <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                                    </div>
+                                    <a href="{{ $media->getUrl() }}" target="_blank"
+                                        class="btn-outline-primary btn btn-sm">
+                                        <x-lucide-download class="icon" />
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
                         @else
                             <p class="text-muted text-reset">Tidak ada file</p>
                         @endif

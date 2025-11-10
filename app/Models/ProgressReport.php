@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class ProgressReport extends Model
+class ProgressReport extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ProgressReportFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, InteractsWithMedia;
 
     /**
      * The type of the auto-incrementing ID's primary key.
@@ -109,5 +111,26 @@ class ProgressReport extends Model
     public function scopeProgressReports($query)
     {
         return $query->whereIn('reporting_period', ['semester_1', 'semester_2', 'annual']);
+    }
+
+    /**
+     * Register media collections for this model.
+     */
+    public function registerMediaCollections(): void
+    {
+        // Substance file untuk Progress & Final Report
+        $this->addMediaCollection('substance_file')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf']);
+
+        // File realisasi keterlibatan (Final Report only)
+        $this->addMediaCollection('realization_file')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']);
+
+        // File presentasi hasil penelitian (Final Report only)
+        $this->addMediaCollection('presentation_file')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf', 'application/vnd.openxmlformats-officedocument.presentationml.presentation']);
     }
 }

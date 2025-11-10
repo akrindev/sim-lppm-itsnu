@@ -49,6 +49,13 @@ class Show extends Component
 
     public array $tempAdditionalCerts = [];
 
+    // Final Report document files
+    public $substanceFile;
+
+    public $realizationFile;
+
+    public $presentationFile;
+
     public function mount(Proposal $proposal): void
     {
         $this->proposal = $proposal;
@@ -223,6 +230,9 @@ class Show extends Component
             'summaryUpdate' => 'required|min:100',
             'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
+            'substanceFile' => 'nullable|file|mimes:pdf|max:10240',
+            'realizationFile' => 'nullable|file|mimes:pdf,docx|max:10240',
+            'presentationFile' => 'nullable|file|mimes:pdf,pptx|max:51200',
         ]);
 
         DB::transaction(function () {
@@ -252,6 +262,51 @@ class Show extends Component
                     'reporting_period' => 'final',
                     'status' => 'draft',
                 ]);
+            }
+
+            // Upload substance file using Media Library
+            if ($this->substanceFile) {
+                $this->finalReport->clearMediaCollection('substance_file');
+                $this->finalReport
+                    ->addMedia($this->substanceFile->getRealPath())
+                    ->usingName($this->substanceFile->getClientOriginalName())
+                    ->usingFileName($this->substanceFile->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => auth()->id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('substance_file');
+            }
+
+            // Upload realization file using Media Library
+            if ($this->realizationFile) {
+                $this->finalReport->clearMediaCollection('realization_file');
+                $this->finalReport
+                    ->addMedia($this->realizationFile->getRealPath())
+                    ->usingName($this->realizationFile->getClientOriginalName())
+                    ->usingFileName($this->realizationFile->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => auth()->id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('realization_file');
+            }
+
+            // Upload presentation file using Media Library
+            if ($this->presentationFile) {
+                $this->finalReport->clearMediaCollection('presentation_file');
+                $this->finalReport
+                    ->addMedia($this->presentationFile->getRealPath())
+                    ->usingName($this->presentationFile->getClientOriginalName())
+                    ->usingFileName($this->presentationFile->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => auth()->id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('presentation_file');
             }
 
             // Handle keywords: parse from semicolon-separated input
@@ -346,12 +401,6 @@ class Show extends Component
                 continue;
             }
 
-            // Handle file upload
-            $filePath = $data['document_file'] ?? null;
-            if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
-                $filePath = $this->tempMandatoryFiles[$proposalOutputId]->store('final-reports/'.$this->proposal->id.'/mandatory', 'public');
-            }
-
             $outputData = [
                 'progress_report_id' => $this->finalReport->id,
                 'proposal_output_id' => $proposalOutputId,
@@ -370,13 +419,28 @@ class Show extends Component
                 'page_end' => ! empty($data['page_end']) ? (int) $data['page_end'] : null,
                 'article_url' => $data['article_url'] ?? null,
                 'doi' => $data['doi'] ?? null,
-                'document_file' => $filePath,
             ];
 
             if (isset($data['id']) && $data['id']) {
-                MandatoryOutput::where('id', $data['id'])->update($outputData);
+                $mandatoryOutput = MandatoryOutput::find($data['id']);
+                $mandatoryOutput->update($outputData);
             } else {
-                MandatoryOutput::create($outputData);
+                $mandatoryOutput = MandatoryOutput::create($outputData);
+            }
+
+            // Handle file upload using Media Library
+            if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
+                $mandatoryOutput->clearMediaCollection('journal_article');
+                $mandatoryOutput
+                    ->addMedia($this->tempMandatoryFiles[$proposalOutputId]->getRealPath())
+                    ->usingName($this->tempMandatoryFiles[$proposalOutputId]->getClientOriginalName())
+                    ->usingFileName($this->tempMandatoryFiles[$proposalOutputId]->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => auth()->id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('journal_article');
             }
         }
     }
@@ -394,17 +458,6 @@ class Show extends Component
                 continue;
             }
 
-            // Handle file uploads
-            $documentPath = $data['document_file'] ?? null;
-            if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
-                $documentPath = $this->tempAdditionalFiles[$proposalOutputId]->store('final-reports/'.$this->proposal->id.'/additional', 'public');
-            }
-
-            $certPath = $data['publication_certificate'] ?? null;
-            if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
-                $certPath = $this->tempAdditionalCerts[$proposalOutputId]->store('final-reports/'.$this->proposal->id.'/certificates', 'public');
-            }
-
             $outputData = [
                 'progress_report_id' => $this->finalReport->id,
                 'proposal_output_id' => $proposalOutputId,
@@ -416,14 +469,43 @@ class Show extends Component
                 'total_pages' => ! empty($data['total_pages']) ? (int) $data['total_pages'] : null,
                 'publisher_url' => $data['publisher_url'] ?? null,
                 'book_url' => $data['book_url'] ?? null,
-                'document_file' => $documentPath,
-                'publication_certificate' => $certPath,
             ];
 
             if (isset($data['id']) && $data['id']) {
-                AdditionalOutput::where('id', $data['id'])->update($outputData);
+                $additionalOutput = AdditionalOutput::find($data['id']);
+                $additionalOutput->update($outputData);
             } else {
-                AdditionalOutput::create($outputData);
+                $additionalOutput = AdditionalOutput::create($outputData);
+            }
+
+            // Handle book document upload using Media Library
+            if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
+                $additionalOutput->clearMediaCollection('book_document');
+                $additionalOutput
+                    ->addMedia($this->tempAdditionalFiles[$proposalOutputId]->getRealPath())
+                    ->usingName($this->tempAdditionalFiles[$proposalOutputId]->getClientOriginalName())
+                    ->usingFileName($this->tempAdditionalFiles[$proposalOutputId]->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => auth()->id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('book_document');
+            }
+
+            // Handle publication certificate upload using Media Library
+            if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
+                $additionalOutput->clearMediaCollection('publication_certificate');
+                $additionalOutput
+                    ->addMedia($this->tempAdditionalCerts[$proposalOutputId]->getRealPath())
+                    ->usingName($this->tempAdditionalCerts[$proposalOutputId]->getClientOriginalName())
+                    ->usingFileName($this->tempAdditionalCerts[$proposalOutputId]->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => auth()->id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => 'final',
+                    ])
+                    ->toMediaCollection('publication_certificate');
             }
         }
     }

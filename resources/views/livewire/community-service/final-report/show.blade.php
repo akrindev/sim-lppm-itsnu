@@ -48,6 +48,119 @@
         </div>
     </div>
 
+    <!-- Dokumen Laporan Akhir -->
+    <div class="mb-3 card">
+        <div class="card-header">
+            <h3 class="card-title"><x-lucide-file-text class="me-2 icon" />Dokumen Laporan Akhir</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">File Substansi Laporan (PDF)</label>
+                <input type="file" wire:model="substanceFile" class="form-control @error('substanceFile') is-invalid @enderror"
+                    accept=".pdf" @disabled(!$canEdit) />
+                @error('substanceFile')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-hint">Maksimal 10MB, format PDF</small>
+
+                <div wire:loading wire:target="substanceFile">
+                    <small class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Uploading...
+                    </small>
+                </div>
+
+                @if ($finalReport && $finalReport->hasMedia('substance_file'))
+                    @php
+                        $media = $finalReport->getFirstMedia('substance_file');
+                    @endphp
+                    <div class="alert alert-success mt-2 mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <x-lucide-file-check class="icon text-success me-2" />
+                                <strong>{{ $media->name }}</strong>
+                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                            </div>
+                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                <x-lucide-eye class="icon" /> Lihat
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">File Realisasi Keterlibatan (PDF/DOCX)</label>
+                <input type="file" wire:model="realizationFile" class="form-control @error('realizationFile') is-invalid @enderror"
+                    accept=".pdf,.docx" @disabled(!$canEdit) />
+                @error('realizationFile')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-hint">Maksimal 10MB, format PDF atau DOCX</small>
+
+                <div wire:loading wire:target="realizationFile">
+                    <small class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Uploading...
+                    </small>
+                </div>
+
+                @if ($finalReport && $finalReport->hasMedia('realization_file'))
+                    @php
+                        $media = $finalReport->getFirstMedia('realization_file');
+                    @endphp
+                    <div class="alert alert-success mt-2 mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <x-lucide-file-check class="icon text-success me-2" />
+                                <strong>{{ $media->name }}</strong>
+                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                            </div>
+                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                <x-lucide-eye class="icon" /> Lihat
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">File Presentasi Hasil (PDF/PPTX)</label>
+                <input type="file" wire:model="presentationFile" class="form-control @error('presentationFile') is-invalid @enderror"
+                    accept=".pdf,.pptx" @disabled(!$canEdit) />
+                @error('presentationFile')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-hint">Maksimal 50MB, format PDF atau PPTX</small>
+
+                <div wire:loading wire:target="presentationFile">
+                    <small class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Uploading...
+                    </small>
+                </div>
+
+                @if ($finalReport && $finalReport->hasMedia('presentation_file'))
+                    @php
+                        $media = $finalReport->getFirstMedia('presentation_file');
+                    @endphp
+                    <div class="alert alert-success mt-2 mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <x-lucide-file-check class="icon text-success me-2" />
+                                <strong>{{ $media->name }}</strong>
+                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                            </div>
+                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                <x-lucide-eye class="icon" /> Lihat
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <!-- Luaran Wajib -->
     <div class="mb-3 card">
         <div class="card-header">

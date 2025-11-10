@@ -262,10 +262,17 @@ class Create extends Component
             'country' => $this->form->new_partner['country'],
             'address' => $this->form->new_partner['address'],
             'type' => 'External', // Default value for partner type
-            'commitment_letter_file' => $this->form->new_partner_commitment_file
-                ? $this->form->new_partner_commitment_file->store('partner-commitments', 'public')
-                : null,
         ]);
+
+        // Upload commitment letter using Media Library
+        if ($this->form->new_partner_commitment_file) {
+            $partner
+                ->addMedia($this->form->new_partner_commitment_file->getRealPath())
+                ->usingName($this->form->new_partner_commitment_file->getClientOriginalName())
+                ->usingFileName($this->form->new_partner_commitment_file->hashName())
+                ->withCustomProperties(['uploaded_by' => auth()->id()])
+                ->toMediaCollection('commitment_letter');
+        }
 
         $this->form->partner_ids[] = $partner->id;
 

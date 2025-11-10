@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class MandatoryOutput extends Model
+class MandatoryOutput extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\MandatoryOutputFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, InteractsWithMedia;
 
     /**
      * The type of the auto-incrementing ID's primary key.
@@ -57,5 +59,15 @@ class MandatoryOutput extends Model
     public function proposalOutput(): BelongsTo
     {
         return $this->belongsTo(ProposalOutput::class);
+    }
+
+    /**
+     * Register media collections for this model.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('journal_article')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf']);
     }
 }

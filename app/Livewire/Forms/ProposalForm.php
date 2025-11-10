@@ -256,8 +256,17 @@ class ProposalForm extends Form
             'state_of_the_art' => $this->state_of_the_art ?: null,
             'methodology' => $this->methodology ?: null,
             'roadmap_data' => $this->roadmap_data ?: null,
-            'substance_file' => $this->substance_file ? $this->substance_file->store('substance-files', 'public') : null,
         ]);
+
+        // Upload substance file using Media Library
+        if ($this->substance_file) {
+            $research
+                ->addMedia($this->substance_file->getRealPath())
+                ->usingName($this->substance_file->getClientOriginalName())
+                ->usingFileName($this->substance_file->hashName())
+                ->withCustomProperties(['uploaded_by' => $submitterId])
+                ->toMediaCollection('substance_file');
+        }
 
         $proposal = Proposal::create([
             'title' => $this->title,
@@ -301,6 +310,16 @@ class ProposalForm extends Form
             'background' => $this->background,
             'methodology' => $this->methodology,
         ]);
+
+        // Upload substance file using Media Library
+        if ($this->substance_file) {
+            $communityService
+                ->addMedia($this->substance_file->getRealPath())
+                ->usingName($this->substance_file->getClientOriginalName())
+                ->usingFileName($this->substance_file->hashName())
+                ->withCustomProperties(['uploaded_by' => $submitterId])
+                ->toMediaCollection('substance_file');
+        }
 
         $proposal = Proposal::create([
             'title' => $this->title,
@@ -349,10 +368,18 @@ class ProposalForm extends Form
                         'state_of_the_art' => $this->state_of_the_art ?: null,
                         'methodology' => $this->methodology,
                         'roadmap_data' => $this->roadmap_data ?: null,
-                        'substance_file' => $this->substance_file && ! is_string($this->substance_file)
-                            ? $this->substance_file->store('substance-files', 'public')
-                            : $detailable->substance_file,
                     ]);
+
+                    // Update substance file using Media Library
+                    if ($this->substance_file && ! is_string($this->substance_file)) {
+                        $detailable->clearMediaCollection('substance_file');
+                        $detailable
+                            ->addMedia($this->substance_file->getRealPath())
+                            ->usingName($this->substance_file->getClientOriginalName())
+                            ->usingFileName($this->substance_file->hashName())
+                            ->withCustomProperties(['uploaded_by' => auth()->id()])
+                            ->toMediaCollection('substance_file');
+                    }
                 } elseif ($detailable instanceof CommunityService) {
                     // Update CommunityService-specific fields
                     $detailable->update([
@@ -362,6 +389,17 @@ class ProposalForm extends Form
                         'background' => $this->background,
                         'methodology' => $this->methodology,
                     ]);
+
+                    // Update substance file using Media Library
+                    if ($this->substance_file && ! is_string($this->substance_file)) {
+                        $detailable->clearMediaCollection('substance_file');
+                        $detailable
+                            ->addMedia($this->substance_file->getRealPath())
+                            ->usingName($this->substance_file->getClientOriginalName())
+                            ->usingFileName($this->substance_file->hashName())
+                            ->withCustomProperties(['uploaded_by' => auth()->id()])
+                            ->toMediaCollection('substance_file');
+                    }
                 }
             }
 
@@ -519,7 +557,7 @@ class ProposalForm extends Form
         if (! empty($this->outputs)) {
             foreach ($this->outputs as $output) {
                 $proposal->outputs()->create([
-                    'output_year' => $output['year'] ?? 1, //date('Y'),
+                    'output_year' => $output['year'] ?? 1, // date('Y'),
                     'category' => $output['category'] ?? 'Wajib',
                     'group' => $output['group'] ?? '',
                     'type' => $output['type'] ?? '',

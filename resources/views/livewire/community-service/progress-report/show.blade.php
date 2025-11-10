@@ -58,6 +58,41 @@
                     @enderror
                 </div>
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">File Substansi Laporan (PDF)</label>
+                <input type="file" wire:model="substanceFile" class="form-control @error('substanceFile') is-invalid @enderror"
+                    accept=".pdf" @disabled(!$canEdit) />
+                @error('substanceFile')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-hint">Maksimal 10MB, format PDF</small>
+
+                <div wire:loading wire:target="substanceFile">
+                    <small class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Uploading...
+                    </small>
+                </div>
+
+                @if ($progressReport && $progressReport->hasMedia('substance_file'))
+                    @php
+                        $media = $progressReport->getFirstMedia('substance_file');
+                    @endphp
+                    <div class="alert alert-success mt-2 mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <x-lucide-file-check class="icon text-success me-2" />
+                                <strong>{{ $media->name }}</strong>
+                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                            </div>
+                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                <x-lucide-eye class="icon" /> Lihat
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
