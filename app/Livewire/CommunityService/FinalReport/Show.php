@@ -23,6 +23,8 @@ class Show extends Component
 
     public ?ProgressReport $finalReport = null;
 
+    public bool $canEdit = false;
+
     // Form fields
     public string $summaryUpdate = '';
 
@@ -51,10 +53,13 @@ class Show extends Component
     {
         $this->proposal = $proposal;
 
-        // Check authorization
-        if (! $this->canEditFinalReport()) {
-            abort(403, 'Anda tidak memiliki akses untuk membuat laporan akhir proposal ini.');
+        // Check if user can view this proposal
+        if (! $this->canViewFinalReport()) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat laporan akhir proposal ini.');
         }
+
+        // Check if user can edit (only submitter)
+        $this->canEdit = $this->isSubmitter();
 
         // Load existing final report or initialize new
         $this->finalReport = $proposal->progressReports()->finalReports()->latest()->first();
@@ -66,7 +71,7 @@ class Show extends Component
         }
     }
 
-    protected function canEditFinalReport(): bool
+    protected function canViewFinalReport(): bool
     {
         $user = Auth::user();
 
@@ -75,18 +80,23 @@ class Show extends Component
             return false;
         }
 
-        // Proposal owner can edit
+        // Proposal owner can view
         if ($this->proposal->submitter_id === $user->id) {
             return true;
         }
 
-        // Accepted team members can edit
+        // Accepted team members can view
         $isTeamMember = $this->proposal->teamMembers()
             ->where('user_id', $user->id)
             ->where('status', 'accepted')
             ->exists();
 
         return $isTeamMember;
+    }
+
+    protected function isSubmitter(): bool
+    {
+        return $this->proposal->submitter_id === Auth::id();
     }
 
     protected function loadExistingReport(): void
@@ -204,6 +214,11 @@ class Show extends Component
 
     public function save(): void
     {
+        // Only submitter can save
+        if (! $this->canEdit) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit laporan ini.');
+        }
+
         $this->validate([
             'summaryUpdate' => 'required|min:100',
             'keywordsInput' => 'nullable|string|max:1000',
@@ -415,6 +430,11 @@ class Show extends Component
 
     public function submit()
     {
+        // Only submitter can submit
+        if (! $this->canEdit) {
+            abort(403, 'Anda tidak memiliki akses untuk mengajukan laporan ini.');
+        }
+
         $this->validate([
             'summaryUpdate' => 'required|min:100',
             'keywordsInput' => 'nullable|string|max:1000',

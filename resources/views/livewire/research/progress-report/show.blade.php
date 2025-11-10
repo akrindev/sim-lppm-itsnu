@@ -20,7 +20,7 @@
             <div class="mb-3">
                 <label class="form-label required">Ringkasan Terkini</label>
                 <textarea wire:model="summaryUpdate" rows="8" class="form-control"
-                    placeholder="Masukkan ringkasan kemajuan penelitian..."></textarea>
+                    placeholder="Masukkan ringkasan kemajuan penelitian..." @disabled(!$canEdit)></textarea>
                 @error('summaryUpdate')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -29,7 +29,7 @@
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
                 <input type="text" wire:model="keywordsInput" class="form-control"
-                    placeholder="Contoh: AI; Machine Learning; IoT" />
+                    placeholder="Contoh: AI; Machine Learning; IoT" @disabled(!$canEdit) />
                 <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
                     Learning</small>
                 @error('keywordsInput')
@@ -41,14 +41,14 @@
                 <div class="mb-3 col-md-6">
                     <label class="form-label required">Tahun Pelaporan</label>
                     <input type="number" wire:model="reportingYear" class="form-control" min="2020"
-                        max="2030" />
+                        max="2030" @disabled(!$canEdit) />
                     @error('reportingYear')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
                 <div class="mb-3 col-md-6">
                     <label class="form-label required">Periode</label>
-                    <select wire:model="reportingPeriod" class="form-select">
+                    <select wire:model="reportingPeriod" class="form-select" @disabled(!$canEdit)>
                         <option value="semester_1">Semester 1</option>
                         <option value="semester_2">Semester 2</option>
                         <option value="annual">Tahunan</option>
@@ -115,11 +115,15 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <button type="button" wire:click="editMandatoryOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#modalMandatoryOutput">
-                                            <x-lucide-pencil class="icon" />
-                                        </button>
+                                        @if ($canEdit)
+                                            <button type="button" wire:click="editMandatoryOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#modalMandatoryOutput">
+                                                <x-lucide-pencil class="icon" />
+                                            </button>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -183,11 +187,15 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <button type="button" wire:click="editAdditionalOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#modalAdditionalOutput">
-                                            <x-lucide-pencil class="icon" />
-                                        </button>
+                                        @if ($canEdit)
+                                            <button type="button" wire:click="editAdditionalOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#modalAdditionalOutput">
+                                                <x-lucide-pencil class="icon" />
+                                            </button>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -204,30 +212,32 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="card">
-        <div class="card-body">
-            <div class="justify-content-end btn-list">
-                <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="save">
-                        <x-lucide-save class="icon" /> Simpan Draft
-                    </span>
-                    <span wire:loading wire:target="save">
-                        <span class="me-2 spinner-border spinner-border-sm"></span>
-                        Menyimpan...
-                    </span>
-                </button>
-                <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="submit">
-                        <x-lucide-send class="icon" /> Ajukan Laporan
-                    </span>
-                    <span wire:loading wire:target="submit">
-                        <span class="me-2 spinner-border spinner-border-sm"></span>
-                        Mengajukan...
-                    </span>
-                </button>
+    @if ($canEdit)
+        <div class="card">
+            <div class="card-body">
+                <div class="justify-content-end btn-list">
+                    <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="save">
+                            <x-lucide-save class="icon" /> Simpan Draft
+                        </span>
+                        <span wire:loading wire:target="save">
+                            <span class="me-2 spinner-border spinner-border-sm"></span>
+                            Menyimpan...
+                        </span>
+                    </button>
+                    <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="submit">
+                            <x-lucide-send class="icon" /> Ajukan Laporan
+                        </span>
+                        <span wire:loading wire:target="submit">
+                            <span class="me-2 spinner-border spinner-border-sm"></span>
+                            Mengajukan...
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <!-- Modal: Mandatory Output -->
     @teleport('body')
