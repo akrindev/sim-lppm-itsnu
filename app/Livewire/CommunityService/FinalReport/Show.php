@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Research\ProgressReport;
+namespace App\Livewire\CommunityService\FinalReport;
 
+use App\Enums\ProposalStatus;
 use App\Models\AdditionalOutput;
 use App\Models\Keyword;
 use App\Models\MandatoryOutput;
@@ -20,7 +21,7 @@ class Show extends Component
 
     public Proposal $proposal;
 
-    public ?ProgressReport $progressReport = null;
+    public ?ProgressReport $finalReport = null;
 
     public bool $canEdit = false;
 
@@ -30,8 +31,6 @@ class Show extends Component
     public string $keywordsInput = '';
 
     public int $reportingYear;
-
-    public string $reportingPeriod = 'semester_1';
 
     // Arrays for outputs (indexed by proposal_output_id)
     public array $mandatoryOutputs = [];
@@ -55,26 +54,31 @@ class Show extends Component
         $this->proposal = $proposal;
 
         // Check if user can view this proposal
-        if (! $this->canViewProgressReport()) {
-            abort(403, 'Anda tidak memiliki akses untuk melihat laporan kemajuan proposal ini.');
+        if (! $this->canViewFinalReport()) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat laporan akhir proposal ini.');
         }
 
         // Check if user can edit (only submitter)
         $this->canEdit = $this->isSubmitter();
 
-        // Load latest progress report or initialize new
-        $this->progressReport = $proposal->progressReports()->latest()->first();
+        // Load existing final report or initialize new
+        $this->finalReport = $proposal->progressReports()->finalReports()->latest()->first();
 
-        if ($this->progressReport) {
+        if ($this->finalReport) {
             $this->loadExistingReport();
         } else {
             $this->initializeNewReport();
         }
     }
 
-    protected function canViewProgressReport(): bool
+    protected function canViewFinalReport(): bool
     {
         $user = Auth::user();
+
+        // Proposal must be COMPLETED
+        if ($this->proposal->status !== ProposalStatus::COMPLETED) {
+            return false;
+        }
 
         // Proposal owner can view
         if ($this->proposal->submitter_id === $user->id) {
@@ -97,13 +101,12 @@ class Show extends Component
 
     protected function loadExistingReport(): void
     {
-        $this->summaryUpdate = $this->progressReport->summary_update ?? '';
-        $this->reportingYear = $this->progressReport->reporting_year;
-        $this->reportingPeriod = $this->progressReport->reporting_period;
-        $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
+        $this->summaryUpdate = $this->finalReport->summary_update ?? '';
+        $this->reportingYear = $this->finalReport->reporting_year;
+        $this->keywordsInput = $this->finalReport->keywords()->pluck('name')->join('; ');
 
         // Load existing mandatory outputs
-        foreach ($this->progressReport->mandatoryOutputs as $output) {
+        foreach ($this->finalReport->mandatoryOutputs as $output) {
             // Skip if proposal_output_id is null or empty
             if (empty($output->proposal_output_id)) {
                 continue;
@@ -131,7 +134,7 @@ class Show extends Component
         }
 
         // Load existing additional outputs
-        foreach ($this->progressReport->additionalOutputs as $output) {
+        foreach ($this->finalReport->additionalOutputs as $output) {
             // Skip if proposal_output_id is null or empty
             if (empty($output->proposal_output_id)) {
                 continue;
@@ -220,23 +223,33 @@ class Show extends Component
             'summaryUpdate' => 'required|min:100',
             'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
-            'reportingPeriod' => 'required|in:semester_1,semester_2,annual',
         ]);
 
         DB::transaction(function () {
-            // Create or update progress report
-            if ($this->progressReport) {
-                $this->progressReport->update([
+            // Create or update final report
+            if ($this->finalReport) {
+                $this->finalReport->update([
                     'summary_update' => $this->summaryUpdate,
                     'reporting_year' => $this->reportingYear,
-                    'reporting_period' => $this->reportingPeriod,
                 ]);
             } else {
-                $this->progressReport = ProgressReport::create([
+                // Check if final report already exists
+                $existingFinalReport = $this->proposal->progressReports()
+                    ->where('reporting_period', 'final')
+                    ->first();
+
+                if ($existingFinalReport) {
+                    session()->flash('error', 'Laporan akhir sudah ada untuk proposal ini.');
+                    $this->dispatch('alert', type: 'error', message: 'Laporan akhir sudah ada untuk proposal ini.');
+
+                    return;
+                }
+
+                $this->finalReport = ProgressReport::create([
                     'proposal_id' => $this->proposal->id,
                     'summary_update' => $this->summaryUpdate,
                     'reporting_year' => $this->reportingYear,
-                    'reporting_period' => $this->reportingPeriod,
+                    'reporting_period' => 'final',
                     'status' => 'draft',
                 ]);
             }
@@ -246,10 +259,10 @@ class Show extends Component
             $keywordIds = $this->processKeywords($keywordNames);
 
             // Sync keywords
-            $this->progressReport->keywords()->sync($keywordIds);
+            $this->finalReport->keywords()->sync($keywordIds);
 
             // Update input with cleaned keywords from database
-            $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
+            $this->keywordsInput = $this->finalReport->keywords()->pluck('name')->join('; ');
 
             // Save mandatory outputs
             $this->saveMandatoryOutputs();
@@ -258,8 +271,8 @@ class Show extends Component
             $this->saveAdditionalOutputs();
         });
 
-        session()->flash('success', 'Laporan kemajuan berhasil disimpan sebagai draft.');
-        $this->dispatch('alert', type: 'success', message: 'Laporan kemajuan berhasil disimpan sebagai draft.');
+        session()->flash('success', 'Laporan akhir berhasil disimpan sebagai draft.');
+        $this->dispatch('alert', type: 'success', message: 'Laporan akhir berhasil disimpan sebagai draft.');
     }
 
     /**
@@ -279,7 +292,7 @@ class Show extends Component
 
         // Trim whitespace and filter empty
         $keywords = array_map('trim', $keywords);
-        $keywords = array_filter($keywords, fn($k) => ! empty($k));
+        $keywords = array_filter($keywords, fn ($k) => ! empty($k));
 
         // Remove duplicates (case-insensitive)
         $uniqueKeywords = [];
@@ -336,11 +349,11 @@ class Show extends Component
             // Handle file upload
             $filePath = $data['document_file'] ?? null;
             if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
-                $filePath = $this->tempMandatoryFiles[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/mandatory', 'public');
+                $filePath = $this->tempMandatoryFiles[$proposalOutputId]->store('final-reports/'.$this->proposal->id.'/mandatory', 'public');
             }
 
             $outputData = [
-                'progress_report_id' => $this->progressReport->id,
+                'progress_report_id' => $this->finalReport->id,
                 'proposal_output_id' => $proposalOutputId,
                 'status_type' => $data['status_type'] ?? null,
                 'author_status' => $data['author_status'] ?? null,
@@ -384,16 +397,16 @@ class Show extends Component
             // Handle file uploads
             $documentPath = $data['document_file'] ?? null;
             if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
-                $documentPath = $this->tempAdditionalFiles[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/additional', 'public');
+                $documentPath = $this->tempAdditionalFiles[$proposalOutputId]->store('final-reports/'.$this->proposal->id.'/additional', 'public');
             }
 
             $certPath = $data['publication_certificate'] ?? null;
             if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
-                $certPath = $this->tempAdditionalCerts[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/certificates', 'public');
+                $certPath = $this->tempAdditionalCerts[$proposalOutputId]->store('final-reports/'.$this->proposal->id.'/certificates', 'public');
             }
 
             $outputData = [
-                'progress_report_id' => $this->progressReport->id,
+                'progress_report_id' => $this->finalReport->id,
                 'proposal_output_id' => $proposalOutputId,
                 'status' => $data['status'] ?? null,
                 'book_title' => $data['book_title'] ?? null,
@@ -426,24 +439,23 @@ class Show extends Component
             'summaryUpdate' => 'required|min:100',
             'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
-            'reportingPeriod' => 'required|in:semester_1,semester_2,annual',
         ]);
 
         // Save first
         $this->save();
 
         // Then submit
-        if ($this->progressReport) {
-            $this->progressReport->update([
+        if ($this->finalReport) {
+            $this->finalReport->update([
                 'status' => 'submitted',
                 'submitted_by' => Auth::id(),
                 'submitted_at' => now(),
             ]);
 
-            session()->flash('success', 'Laporan kemajuan berhasil diajukan.');
-            $this->dispatch('alert', type: 'success', message: 'Laporan kemajuan berhasil diajukan.');
+            session()->flash('success', 'Laporan akhir berhasil diajukan.');
+            $this->dispatch('alert', type: 'success', message: 'Laporan akhir berhasil diajukan.');
 
-            return $this->redirect(route('research.progress-report.index'), navigate: true);
+            return $this->redirect(route('community-service.final-report.index'), navigate: true);
         }
     }
 
@@ -477,13 +489,7 @@ class Show extends Component
             "mandatoryOutputs.{$this->editingMandatoryId}.doi" => 'nullable|string|max:255',
         ]);
 
-        // Don't reset editing state immediately to prevent form reset
-        // $this->reset('editingMandatoryId'); // REMOVED - this was causing the reset issue
-
-        // Save is handled by main save() method
         $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-        // $this->dispatch('alert', type: 'success', message: 'Data luaran wajib berhasil disimpan.');
-        // flash
         session()->flash('success', 'Data luaran wajib berhasil disimpan.');
     }
 
@@ -514,16 +520,8 @@ class Show extends Component
             "additionalOutputs.{$this->editingAdditionalId}.book_url" => 'nullable|url',
         ]);
 
-        // Don't reset editing state immediately to prevent form reset
-        // $this->reset('editingAdditionalId'); // REMOVED - this was causing the reset issue
-
         $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
-        // $this->dispatch('alert', type: 'success', message: 'Data luaran tambahan berhasil disimpan.');
-
-        // flash
         session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
-
-        // $this->editingAdditionalId = null;
     }
 
     public function closeMandatoryModal(): void
@@ -542,7 +540,7 @@ class Show extends Component
     {
         $allKeywords = Keyword::orderBy('name')->get();
 
-        return view('livewire.research.progress-report.show', [
+        return view('livewire.community-service.final-report.show', [
             'allKeywords' => $allKeywords,
         ]);
     }

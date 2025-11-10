@@ -1,8 +1,8 @@
-<x-slot:title>Laporan Kemajuan - {{ $proposal->title }}</x-slot:title>
-<x-slot:pageTitle>Laporan Kemajuan</x-slot:pageTitle>
+<x-slot:title>Laporan Akhir - {{ $proposal->title }}</x-slot:title>
+<x-slot:pageTitle>Laporan Akhir</x-slot:pageTitle>
 <x-slot:pageSubtitle>{{ $proposal->title }}</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    <a href="{{ route('research.progress-report.index') }}" class="btn-outline-secondary btn" wire:navigate>
+    <a href="{{ route('community-service.final-report.index') }}" class="btn-outline-secondary btn" wire:navigate>
         <x-lucide-arrow-left class="icon" />
         Kembali
     </a>
@@ -18,9 +18,9 @@
         </div>
         <div class="card-body">
             <div class="mb-3">
-                <label class="form-label required">Ringkasan Terkini</label>
+                <label class="form-label required">Ringkasan Akhir</label>
                 <textarea wire:model="summaryUpdate" rows="8" class="form-control"
-                    placeholder="Masukkan ringkasan kemajuan penelitian..." @disabled(!$canEdit)></textarea>
+                    placeholder="Masukkan ringkasan akhir penelitian..." @disabled(!$canEdit)></textarea>
                 @error('summaryUpdate')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -29,7 +29,7 @@
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
                 <input type="text" wire:model="keywordsInput" class="form-control"
-                    placeholder="Contoh: AI; Machine Learning; IoT" @disabled(!$canEdit) />
+                    placeholder="Contoh: AI; Machine Learning; IoT" /> @disabled(!$canEdit) />
                 <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
                     Learning</small>
                 @error('keywordsInput')
@@ -37,26 +37,13 @@
                 @enderror
             </div>
 
-            <div class="row">
-                <div class="mb-3 col-md-6">
-                    <label class="form-label required">Tahun Pelaporan</label>
-                    <input type="number" wire:model="reportingYear" class="form-control" min="2020"
-                        max="2030" @disabled(!$canEdit) />
-                    @error('reportingYear')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label required">Periode</label>
-                    <select wire:model="reportingPeriod" class="form-select" @disabled(!$canEdit)>
-                        <option value="semester_1">Semester 1</option>
-                        <option value="semester_2">Semester 2</option>
-                        <option value="annual">Tahunan</option>
-                    </select>
-                    @error('reportingPeriod')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
+            <div class="mb-3">
+                <label class="form-label required">Tahun Pelaporan</label>
+                <input type="number" wire:model="reportingYear" class="form-control" min="2020"
+                    max="2030" /> @disabled(!$canEdit) />
+                @error('reportingYear')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
         </div>
     </div>
@@ -117,10 +104,10 @@
                                     <td>
                                         @if ($canEdit)
                                             <button type="button" wire:click="editMandatoryOutput({{ $output->id }})"
-                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#modalMandatoryOutput">
-                                                <x-lucide-pencil class="icon" />
-                                            </button>
+                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#modalMandatoryOutput">
+                                            <x-lucide-pencil class="icon" />
+                                        </button>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
@@ -189,10 +176,10 @@
                                     <td>
                                         @if ($canEdit)
                                             <button type="button" wire:click="editAdditionalOutput({{ $output->id }})"
-                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#modalAdditionalOutput">
-                                                <x-lucide-pencil class="icon" />
-                                            </button>
+                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#modalAdditionalOutput">
+                                            <x-lucide-pencil class="icon" />
+                                        </button>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
@@ -213,30 +200,30 @@
 
     <!-- Action Buttons -->
     @if ($canEdit)
-        <div class="card">
-            <div class="card-body">
-                <div class="justify-content-end btn-list">
-                    <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="save">
-                            <x-lucide-save class="icon" /> Simpan Draft
-                        </span>
-                        <span wire:loading wire:target="save">
-                            <span class="me-2 spinner-border spinner-border-sm"></span>
-                            Menyimpan...
-                        </span>
-                    </button>
-                    <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="submit">
-                            <x-lucide-send class="icon" /> Ajukan Laporan
-                        </span>
-                        <span wire:loading wire:target="submit">
-                            <span class="me-2 spinner-border spinner-border-sm"></span>
-                            Mengajukan...
-                        </span>
-                    </button>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="justify-content-end btn-list">
+                <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="save">
+                        <x-lucide-save class="icon" /> Simpan Draft
+                    </span>
+                    <span wire:loading wire:target="save">
+                        <span class="me-2 spinner-border spinner-border-sm"></span>
+                        Menyimpan...
+                    </span>
+                </button>
+                <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="submit">
+                        <x-lucide-send class="icon" /> Ajukan Laporan Akhir
+                    </span>
+                    <span wire:loading wire:target="submit">
+                        <span class="me-2 spinner-border spinner-border-sm"></span>
+                        Mengajukan...
+                    </span>
+                </button>
             </div>
         </div>
+    </div>
     @endif
 
     <!-- Modal: Mandatory Output -->
@@ -341,7 +328,7 @@
                             <label class="form-label required">Tahun Terbit</label>
                             <input type="number"
                                 wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.publication_year"
-                                class="form-control" min="2000" max="2030" />
+                                class="form-control" min="2000" max="2030" /> @disabled(!$canEdit) />
                             @error("mandatoryOutputs.{$editingMandatoryId}.publication_year")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -506,7 +493,7 @@
                             <label class="form-label">Tahun Terbit</label>
                             <input type="number"
                                 wire:model="additionalOutputs.{{ $editingAdditionalId }}.publication_year"
-                                class="form-control" min="2000" max="2030" />
+                                class="form-control" min="2000" max="2030" /> @disabled(!$canEdit) />
                             @error("additionalOutputs.{$editingAdditionalId}.publication_year")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror

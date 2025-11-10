@@ -86,4 +86,28 @@ class ProgressReport extends Model
     {
         return $this->hasMany(AdditionalOutput::class);
     }
+
+    /**
+     * Check if this is a final report.
+     */
+    public function isFinalReport(): bool
+    {
+        return $this->reporting_period === 'final';
+    }
+
+    /**
+     * Scope a query to only include final reports.
+     */
+    public function scopeFinalReports($query)
+    {
+        return $query->where('reporting_period', 'final');
+    }
+
+    /**
+     * Scope a query to only include progress reports (exclude final).
+     */
+    public function scopeProgressReports($query)
+    {
+        return $query->whereIn('reporting_period', ['semester_1', 'semester_2', 'annual']);
+    }
 }

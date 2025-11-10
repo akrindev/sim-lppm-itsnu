@@ -3,6 +3,7 @@
 use App\Http\Controllers\RoleSwitcherController;
 use App\Livewire\CommunityService\DailyNote\Index as CommunityServiceDailyNoteIndex;
 use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalReportIndex;
+use App\Livewire\CommunityService\FinalReport\Show as CommunityServiceFinalReportShow;
 use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
 use App\Livewire\CommunityService\ProgressReport\Show as CommunityServiceProgressReportShow;
 use App\Livewire\CommunityService\Proposal\Create as CommunityServiceProposalCreate;
@@ -16,6 +17,7 @@ use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
 use App\Livewire\Notifications\NotificationCenter;
 use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
 use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
+use App\Livewire\Research\FinalReport\Show as ResearchFinalReportShow;
 use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
 use App\Livewire\Research\ProgressReport\Show as ResearchProgressReportShow;
 use App\Livewire\Research\Proposal\Create as ResearchProposalCreate;
@@ -69,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('progress-report', ResearchProgressReportIndex::class)->name('progress-report.index');
         Route::get('progress-report/{proposal}', ResearchProgressReportShow::class)->name('progress-report.show');
         Route::get('final-report', ResearchFinalReportIndex::class)->name('final-report.index');
+        Route::get('final-report/{proposal}', ResearchFinalReportShow::class)->name('final-report.show');
         Route::get('daily-note', ResearchDailyNoteIndex::class)->name('daily-note.index');
     });
 
@@ -83,6 +86,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
         Route::get('progress-report/{proposal}', CommunityServiceProgressReportShow::class)->name('progress-report.show');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
+        Route::get('final-report/{proposal}', CommunityServiceFinalReportShow::class)->name('final-report.show');
         Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
     });
 
