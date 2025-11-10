@@ -203,6 +203,7 @@ class Show extends Component
     {
         $this->validate([
             'summaryUpdate' => 'required|min:100',
+            'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
             'reportingPeriod' => 'required|in:semester_1,semester_2,annual',
         ]);
@@ -263,7 +264,7 @@ class Show extends Component
 
         // Trim whitespace and filter empty
         $keywords = array_map('trim', $keywords);
-        $keywords = array_filter($keywords, fn ($k) => ! empty($k));
+        $keywords = array_filter($keywords, fn($k) => ! empty($k));
 
         // Remove duplicates (case-insensitive)
         $uniqueKeywords = [];
@@ -320,7 +321,7 @@ class Show extends Component
             // Handle file upload
             $filePath = $data['document_file'] ?? null;
             if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
-                $filePath = $this->tempMandatoryFiles[$proposalOutputId]->store('progress-reports/'.$this->proposal->id.'/mandatory', 'public');
+                $filePath = $this->tempMandatoryFiles[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/mandatory', 'public');
             }
 
             $outputData = [
@@ -368,12 +369,12 @@ class Show extends Component
             // Handle file uploads
             $documentPath = $data['document_file'] ?? null;
             if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
-                $documentPath = $this->tempAdditionalFiles[$proposalOutputId]->store('progress-reports/'.$this->proposal->id.'/additional', 'public');
+                $documentPath = $this->tempAdditionalFiles[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/additional', 'public');
             }
 
             $certPath = $data['publication_certificate'] ?? null;
             if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
-                $certPath = $this->tempAdditionalCerts[$proposalOutputId]->store('progress-reports/'.$this->proposal->id.'/certificates', 'public');
+                $certPath = $this->tempAdditionalCerts[$proposalOutputId]->store('progress-reports/' . $this->proposal->id . '/certificates', 'public');
             }
 
             $outputData = [
@@ -403,6 +404,7 @@ class Show extends Component
     {
         $this->validate([
             'summaryUpdate' => 'required|min:100',
+            'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
             'reportingPeriod' => 'required|in:semester_1,semester_2,annual',
         ]);
@@ -433,11 +435,6 @@ class Show extends Component
         if (! isset($this->mandatoryOutputs[$proposalOutputId])) {
             $this->mandatoryOutputs[$proposalOutputId] = $this->getEmptyMandatoryOutput();
         }
-
-        // Ensure the data structure is properly initialized to prevent reset issues
-        if (empty($this->mandatoryOutputs[$proposalOutputId])) {
-            $this->mandatoryOutputs[$proposalOutputId] = $this->getEmptyMandatoryOutput();
-        }
     }
 
     public function saveMandatoryOutput(): void
@@ -448,9 +445,16 @@ class Show extends Component
 
         // Validation for single output
         $this->validate([
-            "mandatoryOutputs.{$this->editingMandatoryId}.journal_title" => 'nullable|string|max:255',
-            "mandatoryOutputs.{$this->editingMandatoryId}.article_title" => 'nullable|string|max:255',
-            "mandatoryOutputs.{$this->editingMandatoryId}.publication_year" => 'nullable|integer|between:2000,2030',
+            "mandatoryOutputs.{$this->editingMandatoryId}.status_type" => 'required|in:published,accepted,under_review,rejected',
+            "mandatoryOutputs.{$this->editingMandatoryId}.author_status" => 'required|in:first_author,co_author,corresponding_author',
+            "mandatoryOutputs.{$this->editingMandatoryId}.journal_title" => 'required|string|max:255',
+            "mandatoryOutputs.{$this->editingMandatoryId}.article_title" => 'required|string|max:255',
+            "mandatoryOutputs.{$this->editingMandatoryId}.publication_year" => 'required|integer|between:2000,2030',
+            "mandatoryOutputs.{$this->editingMandatoryId}.issn" => 'nullable|string|max:20',
+            "mandatoryOutputs.{$this->editingMandatoryId}.eissn" => 'nullable|string|max:20',
+            "mandatoryOutputs.{$this->editingMandatoryId}.journal_url" => 'nullable|url',
+            "mandatoryOutputs.{$this->editingMandatoryId}.article_url" => 'nullable|url',
+            "mandatoryOutputs.{$this->editingMandatoryId}.doi" => 'nullable|string|max:255',
         ]);
 
         // Don't reset editing state immediately to prevent form reset
@@ -470,11 +474,6 @@ class Show extends Component
         if (! isset($this->additionalOutputs[$proposalOutputId])) {
             $this->additionalOutputs[$proposalOutputId] = $this->getEmptyAdditionalOutput();
         }
-
-        // Ensure the data structure is properly initialized to prevent reset issues
-        if (empty($this->additionalOutputs[$proposalOutputId])) {
-            $this->additionalOutputs[$proposalOutputId] = $this->getEmptyAdditionalOutput();
-        }
     }
 
     public function saveAdditionalOutput(): void
@@ -485,9 +484,14 @@ class Show extends Component
 
         // Validation for single output
         $this->validate([
-            "additionalOutputs.{$this->editingAdditionalId}.book_title" => 'nullable|string|max:255',
-            "additionalOutputs.{$this->editingAdditionalId}.publisher_name" => 'nullable|string|max:255',
+            "additionalOutputs.{$this->editingAdditionalId}.status" => 'required|in:review,editing,published',
+            "additionalOutputs.{$this->editingAdditionalId}.book_title" => 'required|string|max:255',
+            "additionalOutputs.{$this->editingAdditionalId}.publisher_name" => 'required|string|max:255',
+            "additionalOutputs.{$this->editingAdditionalId}.isbn" => 'nullable|string|max:20',
             "additionalOutputs.{$this->editingAdditionalId}.publication_year" => 'nullable|integer|between:2000,2030',
+            "additionalOutputs.{$this->editingAdditionalId}.total_pages" => 'nullable|integer|min:1',
+            "additionalOutputs.{$this->editingAdditionalId}.publisher_url" => 'nullable|url',
+            "additionalOutputs.{$this->editingAdditionalId}.book_url" => 'nullable|url',
         ]);
 
         // Don't reset editing state immediately to prevent form reset
@@ -504,14 +508,14 @@ class Show extends Component
 
     public function closeMandatoryModal(): void
     {
-        // Clear editing state when modal is actually closed
-        $this->reset('editingMandatoryId');
+        // Clear editing state when modal is closed
+        $this->reset(['editingMandatoryId', 'mandatoryOutputs']);
     }
 
     public function closeAdditionalModal(): void
     {
-        // Clear editing state when modal is actually closed
-        $this->reset('editingAdditionalId');
+        // Clear editing state when modal is closed
+        $this->reset(['editingAdditionalId', 'additionalOutputs']);
     }
 
     public function render()
