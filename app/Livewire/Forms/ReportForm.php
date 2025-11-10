@@ -34,6 +34,21 @@ abstract class ReportForm extends Form
     public array $tempAdditionalFiles = [];
     public array $tempAdditionalCerts = [];
 
+    // File uploads (progress has 1, final has 3)
+    public $substanceFile;
+    public $realizationFile;
+    public $presentationFile;
+
+    /**
+     * Get the report type (progress or final)
+     */
+    abstract protected function getReportType(): string;
+
+    /**
+     * Get file validation rules
+     */
+    abstract protected function getFileValidationRules(): array;
+
     /**
      * Initialize form with Proposal
      */
@@ -218,6 +233,8 @@ abstract class ReportForm extends Form
             $this->saveMandatoryOutputs();
             $this->saveAdditionalOutputs();
 
+            $this->saveReportFiles($report);
+
             DB::commit();
 
             return $report;
@@ -388,8 +405,238 @@ abstract class ReportForm extends Form
             'tempMandatoryFiles',
             'tempAdditionalFiles',
             'tempAdditionalCerts',
+            'substanceFile',
+            'realizationFile',
+            'presentationFile',
         ]);
 
         $this->progressReport = null;
+    }
+
+    /**
+     * Save all report files to media collections
+     */
+    protected function saveReportFiles(\App\Models\ProgressReport $report): void
+    {
+        // Save substance file (all report types have this)
+        if ($this->substanceFile instanceof \Illuminate\Http\UploadedFile && $this->substanceFile->isValid()) {
+            $this->saveFileToCollection($report, $this->substanceFile, 'substance_file');
+        }
+
+        // Save realization file (final reports only)
+        if ($this->realizationFile instanceof \Illuminate\Http\UploadedFile && $this->realizationFile->isValid()) {
+            $this->saveFileToCollection($report, $this->realizationFile, 'realization_file');
+        }
+
+        // Save presentation file (final reports only)
+        if ($this->presentationFile instanceof \Illuminate\Http\UploadedFile && $this->presentationFile->isValid()) {
+            $this->saveFileToCollection($report, $this->presentationFile, 'presentation_file');
+        }
+    }
+
+    /**
+     * Save a single file to media collection
+     */
+    protected function saveFileToCollection(
+        \App\Models\ProgressReport $report,
+        $file,
+        string $collectionName
+    ): void {
+        $report->clearMediaCollection($collectionName);
+        $report
+            ->addMedia($file->getRealPath())
+            ->usingName($file->getClientOriginalName())
+            ->usingFileName($file->getClientOriginalName())
+            ->withCustomProperties([
+                'uploaded_by' => Auth::id(),
+                'proposal_id' => $this->proposal->id,
+                'report_type' => $this->getReportType(),
+            ])
+            ->toMediaCollection($collectionName);
+    }
+
+    /**
+     * Validate all files
+     */
+    public function validateFiles(): void
+    {
+        $this->validate($this->getFileValidationRules());
+    }
+
+    /**
+     * Handle file upload and auto-save
+     * Note: Validation should be done at component level before calling this method
+     */
+    public function handleFileUpload(string $fileProperty): void
+    {
+        // Create draft report if doesn't exist
+        if (!$this->progressReport && $this->{$fileProperty}) {
+            $this->progressReport = \App\Models\ProgressReport::create([
+                'proposal_id' => $this->proposal->id,
+                'summary_update' => $this->summaryUpdate ?: $this->proposal->summary,
+                'reporting_year' => $this->reportingYear,
+                'reporting_period' => $this->reportingPeriod,
+                'status' => 'draft',
+            ]);
+            $this->saveKeywords();
+        }
+
+        // Save the file
+        if ($this->progressReport) {
+            $this->saveReportFiles($this->progressReport);
+        }
+    }
+
+    /**
+     * Save mandatory output with file
+     */
+    public function saveMandatoryOutputWithFile(int $proposalOutputId): void
+    {
+        $this->validateMandatoryOutput($proposalOutputId);
+
+        if (!$this->progressReport) {
+            throw new \Exception('Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
+        }
+
+        $data = $this->mandatoryOutputs[$proposalOutputId] ?? [];
+
+        DB::transaction(function () use ($proposalOutputId, $data) {
+            // Find or create mandatory output
+            $output = \App\Models\MandatoryOutput::where('progress_report_id', $this->progressReport->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            $outputData = [
+                'progress_report_id' => $this->progressReport->id,
+                'proposal_output_id' => $proposalOutputId,
+                'status_type' => $data['status_type'] ?? '',
+                'author_status' => $data['author_status'] ?? '',
+                'journal_title' => $data['journal_title'] ?? '',
+                'issn' => $data['issn'] ?? '',
+                'eissn' => $data['eissn'] ?? '',
+                'indexing_body' => $data['indexing_body'] ?? '',
+                'journal_url' => $data['journal_url'] ?? '',
+                'article_title' => $data['article_title'] ?? '',
+                'publication_year' => !empty($data['publication_year']) ? (int) $data['publication_year'] : null,
+                'volume' => $data['volume'] ?? '',
+                'issue_number' => $data['issue_number'] ?? '',
+                'page_start' => !empty($data['page_start']) ? (int) $data['page_start'] : null,
+                'page_end' => !empty($data['page_end']) ? (int) $data['page_end'] : null,
+                'article_url' => $data['article_url'] ?? '',
+                'doi' => $data['doi'] ?? '',
+            ];
+
+            if ($output) {
+                $output->update($outputData);
+            } else {
+                $output = \App\Models\MandatoryOutput::create($outputData);
+            }
+
+            // Save file if uploaded
+            if (
+                isset($this->tempMandatoryFiles[$proposalOutputId]) &&
+                $this->tempMandatoryFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile
+            ) {
+                $file = $this->tempMandatoryFiles[$proposalOutputId];
+
+                $output->clearMediaCollection('journal_article');
+                $output
+                    ->addMedia($file->getRealPath())
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName($file->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => Auth::id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => $this->getReportType(),
+                    ])
+                    ->toMediaCollection('journal_article');
+
+                unset($this->tempMandatoryFiles[$proposalOutputId]);
+            }
+        });
+    }
+
+    /**
+     * Save additional output with files
+     */
+    public function saveAdditionalOutputWithFile(int $proposalOutputId): void
+    {
+        $this->validateAdditionalOutput($proposalOutputId);
+
+        if (!$this->progressReport) {
+            throw new \Exception('Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
+        }
+
+        $data = $this->additionalOutputs[$proposalOutputId] ?? [];
+
+        DB::transaction(function () use ($proposalOutputId, $data) {
+            // Find or create additional output
+            $output = \App\Models\AdditionalOutput::where('progress_report_id', $this->progressReport->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            $outputData = [
+                'progress_report_id' => $this->progressReport->id,
+                'proposal_output_id' => $proposalOutputId,
+                'status' => $data['status'] ?? '',
+                'book_title' => $data['book_title'] ?? '',
+                'publisher_name' => $data['publisher_name'] ?? '',
+                'isbn' => $data['isbn'] ?? '',
+                'publication_year' => !empty($data['publication_year']) ? (int) $data['publication_year'] : null,
+                'total_pages' => !empty($data['total_pages']) ? (int) $data['total_pages'] : null,
+                'publisher_url' => $data['publisher_url'] ?? '',
+                'book_url' => $data['book_url'] ?? '',
+            ];
+
+            if ($output) {
+                $output->update($outputData);
+            } else {
+                $output = \App\Models\AdditionalOutput::create($outputData);
+            }
+
+            // Save document file if uploaded
+            if (
+                isset($this->tempAdditionalFiles[$proposalOutputId]) &&
+                $this->tempAdditionalFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile
+            ) {
+                $file = $this->tempAdditionalFiles[$proposalOutputId];
+
+                $output->clearMediaCollection('book_document');
+                $output
+                    ->addMedia($file->getRealPath())
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName($file->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => Auth::id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => $this->getReportType(),
+                    ])
+                    ->toMediaCollection('book_document');
+
+                unset($this->tempAdditionalFiles[$proposalOutputId]);
+            }
+
+            // Save certificate file if uploaded
+            if (
+                isset($this->tempAdditionalCerts[$proposalOutputId]) &&
+                $this->tempAdditionalCerts[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile
+            ) {
+                $file = $this->tempAdditionalCerts[$proposalOutputId];
+
+                $output->clearMediaCollection('publication_certificate');
+                $output
+                    ->addMedia($file->getRealPath())
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName($file->hashName())
+                    ->withCustomProperties([
+                        'uploaded_by' => Auth::id(),
+                        'proposal_id' => $this->proposal->id,
+                        'report_type' => $this->getReportType(),
+                    ])
+                    ->toMediaCollection('publication_certificate');
+
+                unset($this->tempAdditionalCerts[$proposalOutputId]);
+            }
+        });
     }
 }

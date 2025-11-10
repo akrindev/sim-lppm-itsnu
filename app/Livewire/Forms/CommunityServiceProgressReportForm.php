@@ -12,4 +12,22 @@ class CommunityServiceProgressReportForm extends ReportForm
     {
         parent::__construct($proposal);
     }
+
+    /**
+     * Get the report type
+     */
+    protected function getReportType(): string
+    {
+        return 'progress';
+    }
+
+    /**
+     * Get file validation rules for progress report (1 file only)
+     */
+    protected function getFileValidationRules(): array
+    {
+        return [
+            'substanceFile' => 'nullable|file|mimes:pdf,application/pdf|max:10240',
+        ];
+    }
 }
