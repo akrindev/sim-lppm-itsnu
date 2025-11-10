@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\CommunityService\ProgressReport;
+namespace App\Livewire\Reports;
 
 use App\Livewire\Abstracts\ReportShow;
 use App\Livewire\Traits\ReportAuthorization;
@@ -20,27 +20,38 @@ class Show extends ReportShow
     use WithFileUploads;
     use ReportAuthorization;
 
-    // Arrays for outputs (indexed by proposal_output_id)
+    // Form data dari ReportForm
+    public string $summaryUpdate = '';
+    public string $keywordsInput = '';
+    public int $reportingYear;
+    public string $reportingPeriod = 'semester_1';
+
+    // Arrays for outputs
     public array $mandatoryOutputs = [];
     public array $additionalOutputs = [];
 
-    // Track which output is being edited
+    // Track editing state
     public ?int $editingMandatoryId = null;
     public ?int $editingAdditionalId = null;
 
-    // Temporary file uploads
+    // File uploads
+    public $substanceFile;
     public array $tempMandatoryFiles = [];
     public array $tempAdditionalFiles = [];
     public array $tempAdditionalCerts = [];
 
-    // Progress Report document files
-    public $substanceFile;
+    // Report configuration
+    protected array $config = [];
 
-    public function mount(Proposal $proposal): void
+    public function mount(Proposal $proposal, string $type = 'progress'): void
     {
         $this->proposal = $proposal;
+        $this->config = $this->getConfig($type);
+
         $this->checkAccess();
         $this->loadReport();
+
+        $this->reportingYear = (int) date('Y');
 
         if ($this->progressReport) {
             $this->loadExistingReport();
@@ -49,56 +60,55 @@ class Show extends ReportShow
         }
     }
 
+    protected function getConfig(string $type): array
+    {
+        $configs = [
+            'research-progress' => [
+                'view' => 'livewire.research.progress-report.show',
+                'route' => 'research.progress-report.index',
+            ],
+            'research-final' => [
+                'view' => 'livewire.research.final-report.show',
+                'route' => 'research.final-report.index',
+            ],
+            'community-service-progress' => [
+                'view' => 'livewire.community-service.progress-report.show',
+                'route' => 'community-service.progress-report.index',
+            ],
+            'community-service-final' => [
+                'view' => 'livewire.community-service.final-report.show',
+                'route' => 'community-service.final-report.index',
+            ],
+        ];
+
+        return $configs[$type] ?? $configs['research-progress'];
+    }
+
     protected function loadExistingReport(): void
     {
-        // Load existing mandatory outputs
-        foreach ($this->progressReport->mandatoryOutputs as $output) {
-            if (empty($output->proposal_output_id)) {
-                continue;
-            }
+        $this->summaryUpdate = $this->progressReport->summary_update ?? '';
+        $this->reportingYear = $this->progressReport->reporting_year;
+        $this->reportingPeriod = $this->progressReport->reporting_period;
+        $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
 
-            $this->mandatoryOutputs[$output->proposal_output_id] = [
-                'id' => $output->id,
-                'status_type' => $output->status_type,
-                'author_status' => $output->author_status,
-                'journal_title' => $output->journal_title,
-                'issn' => $output->issn,
-                'eissn' => $output->eissn,
-                'indexing_body' => $output->indexing_body,
-                'journal_url' => $output->journal_url,
-                'article_title' => $output->article_title,
-                'publication_year' => $output->publication_year,
-                'volume' => $output->volume,
-                'issue_number' => $output->issue_number,
-                'page_start' => $output->page_start,
-                'page_end' => $output->page_end,
-                'article_url' => $output->article_url,
-                'doi' => $output->doi,
-            ];
+        foreach ($this->progressReport->mandatoryOutputs as $output) {
+            if (empty($output->proposal_output_id)) continue;
+
+            $this->mandatoryOutputs[$output->proposal_output_id] = $this->mapMandatoryOutput($output);
         }
 
-        // Load existing additional outputs
         foreach ($this->progressReport->additionalOutputs as $output) {
-            if (empty($output->proposal_output_id)) {
-                continue;
-            }
+            if (empty($output->proposal_output_id)) continue;
 
-            $this->additionalOutputs[$output->proposal_output_id] = [
-                'id' => $output->id,
-                'status' => $output->status,
-                'book_title' => $output->book_title,
-                'publisher_name' => $output->publisher_name,
-                'isbn' => $output->isbn,
-                'publication_year' => $output->publication_year,
-                'total_pages' => $output->total_pages,
-                'publisher_url' => $output->publisher_url,
-                'book_url' => $output->book_url,
-            ];
+            $this->additionalOutputs[$output->proposal_output_id] = $this->mapAdditionalOutput($output);
         }
     }
 
     protected function initializeNewReport(): void
     {
+        $this->summaryUpdate = $this->proposal->summary ?? '';
+        $this->keywordsInput = $this->proposal->keywords()->pluck('name')->join('; ');
+
         foreach ($this->proposal->outputs->where('category', 'Wajib') as $output) {
             $this->mandatoryOutputs[$output->id] = $this->getEmptyMandatoryOutput();
         }
@@ -106,6 +116,43 @@ class Show extends ReportShow
         foreach ($this->proposal->outputs->where('category', 'Tambahan') as $output) {
             $this->additionalOutputs[$output->id] = $this->getEmptyAdditionalOutput();
         }
+    }
+
+    protected function mapMandatoryOutput($output): array
+    {
+        return [
+            'id' => $output->id,
+            'status_type' => $output->status_type,
+            'author_status' => $output->author_status,
+            'journal_title' => $output->journal_title,
+            'issn' => $output->issn,
+            'eissn' => $output->eissn,
+            'indexing_body' => $output->indexing_body,
+            'journal_url' => $output->journal_url,
+            'article_title' => $output->article_title,
+            'publication_year' => $output->publication_year,
+            'volume' => $output->volume,
+            'issue_number' => $output->issue_number,
+            'page_start' => $output->page_start,
+            'page_end' => $output->page_end,
+            'article_url' => $output->article_url,
+            'doi' => $output->doi,
+        ];
+    }
+
+    protected function mapAdditionalOutput($output): array
+    {
+        return [
+            'id' => $output->id,
+            'status' => $output->status,
+            'book_title' => $output->book_title,
+            'publisher_name' => $output->publisher_name,
+            'isbn' => $output->isbn,
+            'publication_year' => $output->publication_year,
+            'total_pages' => $output->total_pages,
+            'publisher_url' => $output->publisher_url,
+            'book_url' => $output->book_url,
+        ];
     }
 
     protected function getEmptyMandatoryOutput(): array
@@ -147,28 +194,31 @@ class Show extends ReportShow
 
     public function save(): void
     {
-        if (!$this->canEdit) {
-            abort(403);
-        }
+        if (!$this->canEdit) abort(403);
 
         $this->validate([
+            'summaryUpdate' => 'required|min:100',
+            'keywordsInput' => 'nullable|string|max:1000',
+            'reportingYear' => 'required|integer|between:2020,2030',
+            'reportingPeriod' => 'required|in:semester_1,semester_2,annual,final',
             'substanceFile' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
         DB::transaction(function () {
-            $reportData = [
-                'summary_update' => $this->progressReport?->summary_update ?? $this->proposal->summary,
-                'reporting_year' => $this->progressReport?->reporting_year ?? (int) date('Y'),
-                'reporting_period' => $this->progressReport?->reporting_period ?? 'semester_1',
-            ];
-
             if ($this->progressReport) {
-                $this->progressReport->update($reportData);
+                $this->progressReport->update([
+                    'summary_update' => $this->summaryUpdate,
+                    'reporting_year' => $this->reportingYear,
+                    'reporting_period' => $this->reportingPeriod,
+                ]);
             } else {
-                $this->progressReport = ProgressReport::create(array_merge($reportData, [
+                $this->progressReport = ProgressReport::create([
                     'proposal_id' => $this->proposal->id,
+                    'summary_update' => $this->summaryUpdate,
+                    'reporting_year' => $this->reportingYear,
+                    'reporting_period' => $this->reportingPeriod,
                     'status' => 'draft',
-                ]));
+                ]);
             }
 
             if ($this->substanceFile) {
@@ -180,24 +230,22 @@ class Show extends ReportShow
                     ->withCustomProperties([
                         'uploaded_by' => auth()->id(),
                         'proposal_id' => $this->proposal->id,
-                        'report_type' => 'progress',
+                        'report_type' => $this->config['route'] ?? 'progress',
                     ])
                     ->toMediaCollection('substance_file');
             }
 
-            $this->saveMandatoryOutputs();
-            $this->saveAdditionalOutputs();
+            $this->syncKeywords();
+            $this->saveOutputs();
         });
 
         $this->dispatch('report-saved');
-        session()->flash('success', 'Laporan kemajuan berhasil disimpan.');
+        session()->flash('success', 'Laporan berhasil disimpan.');
     }
 
     public function submit(): void
     {
-        if (!$this->canEdit) {
-            abort(403);
-        }
+        if (!$this->canEdit) abort(403);
 
         $this->save();
 
@@ -208,21 +256,32 @@ class Show extends ReportShow
                 'submitted_at' => now(),
             ]);
 
-            session()->flash('success', 'Laporan kemajuan berhasil diajukan.');
-            $this->redirect(route('community-service.progress-report.index'), navigate: true);
+            session()->flash('success', 'Laporan berhasil diajukan.');
+            $this->redirect(route($this->config['route']), navigate: true);
         }
     }
 
-    protected function saveMandatoryOutputs(): void
+    protected function syncKeywords(): void
+    {
+        if (empty($this->keywordsInput)) return;
+
+        $keywordNames = array_map('trim', explode(';', $this->keywordsInput));
+        $keywords = [];
+
+        foreach ($keywordNames as $name) {
+            if (empty($name)) continue;
+            $keyword = Keyword::firstOrCreate(['name' => $name], ['name' => $name]);
+            $keywords[] = $keyword->id;
+        }
+
+        $this->progressReport->keywords()->sync($keywords);
+        $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
+    }
+
+    protected function saveOutputs(): void
     {
         foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
-                continue;
-            }
-
-            if (empty($data['status_type']) && empty($data['journal_title'])) {
-                continue;
-            }
+            if (empty($proposalOutputId) || (empty($data['status_type']) && empty($data['journal_title']))) continue;
 
             $outputData = [
                 'progress_report_id' => $this->progressReport->id,
@@ -235,21 +294,18 @@ class Show extends ReportShow
                 'indexing_body' => $data['indexing_body'] ?? null,
                 'journal_url' => $data['journal_url'] ?? null,
                 'article_title' => $data['article_title'] ?? null,
-                'publication_year' => ! empty($data['publication_year']) ? $data['publication_year'] : null,
+                'publication_year' => !empty($data['publication_year']) ? $data['publication_year'] : null,
                 'volume' => $data['volume'] ?? null,
                 'issue_number' => $data['issue_number'] ?? null,
-                'page_start' => ! empty($data['page_start']) ? (int) $data['page_start'] : null,
-                'page_end' => ! empty($data['page_end']) ? (int) $data['page_end'] : null,
+                'page_start' => !empty($data['page_start']) ? (int) $data['page_start'] : null,
+                'page_end' => !empty($data['page_end']) ? (int) $data['page_end'] : null,
                 'article_url' => $data['article_url'] ?? null,
                 'doi' => $data['doi'] ?? null,
             ];
 
-            if (isset($data['id']) && $data['id']) {
-                $mandatoryOutput = MandatoryOutput::find($data['id']);
-                $mandatoryOutput->update($outputData);
-            } else {
-                $mandatoryOutput = MandatoryOutput::create($outputData);
-            }
+            $mandatoryOutput = isset($data['id']) && $data['id']
+                ? tap(MandatoryOutput::find($data['id']))->update($outputData)
+                : MandatoryOutput::create($outputData);
 
             if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
                 $mandatoryOutput->clearMediaCollection('journal_article');
@@ -257,26 +313,13 @@ class Show extends ReportShow
                     ->addMedia($this->tempMandatoryFiles[$proposalOutputId]->getRealPath())
                     ->usingName($this->tempMandatoryFiles[$proposalOutputId]->getClientOriginalName())
                     ->usingFileName($this->tempMandatoryFiles[$proposalOutputId]->hashName())
-                    ->withCustomProperties([
-                        'uploaded_by' => auth()->id(),
-                        'proposal_id' => $this->proposal->id,
-                        'report_type' => 'progress',
-                    ])
+                    ->withCustomProperties(['uploaded_by' => auth()->id()])
                     ->toMediaCollection('journal_article');
             }
         }
-    }
 
-    protected function saveAdditionalOutputs(): void
-    {
         foreach ($this->additionalOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
-                continue;
-            }
-
-            if (empty($data['status']) && empty($data['book_title'])) {
-                continue;
-            }
+            if (empty($proposalOutputId) || (empty($data['status']) && empty($data['book_title']))) continue;
 
             $outputData = [
                 'progress_report_id' => $this->progressReport->id,
@@ -285,18 +328,15 @@ class Show extends ReportShow
                 'book_title' => $data['book_title'] ?? null,
                 'publisher_name' => $data['publisher_name'] ?? null,
                 'isbn' => $data['isbn'] ?? null,
-                'publication_year' => ! empty($data['publication_year']) ? $data['publication_year'] : null,
-                'total_pages' => ! empty($data['total_pages']) ? (int) $data['total_pages'] : null,
+                'publication_year' => !empty($data['publication_year']) ? $data['publication_year'] : null,
+                'total_pages' => !empty($data['total_pages']) ? (int) $data['total_pages'] : null,
                 'publisher_url' => $data['publisher_url'] ?? null,
                 'book_url' => $data['book_url'] ?? null,
             ];
 
-            if (isset($data['id']) && $data['id']) {
-                $additionalOutput = AdditionalOutput::find($data['id']);
-                $additionalOutput->update($outputData);
-            } else {
-                $additionalOutput = AdditionalOutput::create($outputData);
-            }
+            $additionalOutput = isset($data['id']) && $data['id']
+                ? tap(AdditionalOutput::find($data['id']))->update($outputData)
+                : AdditionalOutput::create($outputData);
 
             if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
                 $additionalOutput->clearMediaCollection('book_document');
@@ -304,26 +344,8 @@ class Show extends ReportShow
                     ->addMedia($this->tempAdditionalFiles[$proposalOutputId]->getRealPath())
                     ->usingName($this->tempAdditionalFiles[$proposalOutputId]->getClientOriginalName())
                     ->usingFileName($this->tempAdditionalFiles[$proposalOutputId]->hashName())
-                    ->withCustomProperties([
-                        'uploaded_by' => auth()->id(),
-                        'proposal_id' => $this->proposal->id,
-                        'report_type' => 'progress',
-                    ])
+                    ->withCustomProperties(['uploaded_by' => auth()->id()])
                     ->toMediaCollection('book_document');
-            }
-
-            if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
-                $additionalOutput->clearMediaCollection('publication_certificate');
-                $additionalOutput
-                    ->addMedia($this->tempAdditionalCerts[$proposalOutputId]->getRealPath())
-                    ->usingName($this->tempAdditionalCerts[$proposalOutputId]->getClientOriginalName())
-                    ->usingFileName($this->tempAdditionalCerts[$proposalOutputId]->hashName())
-                    ->withCustomProperties([
-                        'uploaded_by' => auth()->id(),
-                        'proposal_id' => $this->proposal->id,
-                        'report_type' => 'progress',
-                    ])
-                    ->toMediaCollection('publication_certificate');
             }
         }
     }
@@ -331,17 +353,14 @@ class Show extends ReportShow
     public function editMandatoryOutput(int $proposalOutputId): void
     {
         $this->editingMandatoryId = $proposalOutputId;
-
-        if (! isset($this->mandatoryOutputs[$proposalOutputId])) {
+        if (!isset($this->mandatoryOutputs[$proposalOutputId])) {
             $this->mandatoryOutputs[$proposalOutputId] = $this->getEmptyMandatoryOutput();
         }
     }
 
     public function saveMandatoryOutput(): void
     {
-        if (! $this->editingMandatoryId) {
-            return;
-        }
+        if (!$this->editingMandatoryId) return;
 
         $this->validate([
             "mandatoryOutputs.{$this->editingMandatoryId}.status_type" => 'required|in:published,accepted,under_review,rejected',
@@ -363,17 +382,14 @@ class Show extends ReportShow
     public function editAdditionalOutput(int $proposalOutputId): void
     {
         $this->editingAdditionalId = $proposalOutputId;
-
-        if (! isset($this->additionalOutputs[$proposalOutputId])) {
+        if (!isset($this->additionalOutputs[$proposalOutputId])) {
             $this->additionalOutputs[$proposalOutputId] = $this->getEmptyAdditionalOutput();
         }
     }
 
     public function saveAdditionalOutput(): void
     {
-        if (! $this->editingAdditionalId) {
-            return;
-        }
+        if (!$this->editingAdditionalId) return;
 
         $this->validate([
             "additionalOutputs.{$this->editingAdditionalId}.status" => 'required|in:review,editing,published',
@@ -404,7 +420,7 @@ class Show extends ReportShow
     {
         $allKeywords = Keyword::orderBy('name')->get();
 
-        return view('livewire.community-service.progress-report.show', [
+        return view($this->config['view'], [
             'allKeywords' => $allKeywords,
         ]);
     }

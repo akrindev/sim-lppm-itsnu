@@ -69,9 +69,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proposal-revision', ResearchProposalRevisionIndex::class)->name('proposal-revision.index');
         Route::get('proposal-revision/{proposal}', ResearchProposalRevisionShow::class)->name('proposal-revision.show');
         Route::get('progress-report', ResearchProgressReportIndex::class)->name('progress-report.index');
-        Route::get('progress-report/{proposal}', ResearchProgressReportShow::class)->name('progress-report.show');
+        Route::get('progress-report/{proposal}', \App\Livewire\Reports\Show::class)
+            ->name('progress-report.show')
+            ->defaults('type', 'research-progress');
         Route::get('final-report', ResearchFinalReportIndex::class)->name('final-report.index');
-        Route::get('final-report/{proposal}', ResearchFinalReportShow::class)->name('final-report.show');
+        Route::get('final-report/{proposal}', \App\Livewire\Reports\Show::class)
+            ->name('final-report.show')
+            ->defaults('type', 'research-final');
         Route::get('daily-note', ResearchDailyNoteIndex::class)->name('daily-note.index');
     });
 
@@ -84,9 +88,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proposal-revision', CommunityServiceProposalRevisionIndex::class)->name('proposal-revision.index');
         Route::get('proposal-revision/{proposal}', CommunityServiceProposalRevisionShow::class)->name('proposal-revision.show');
         Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
-        Route::get('progress-report/{proposal}', CommunityServiceProgressReportShow::class)->name('progress-report.show');
+        Route::get('progress-report/{proposal}', \App\Livewire\Reports\Show::class)
+            ->name('progress-report.show')
+            ->defaults('type', 'community-service-progress');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
-        Route::get('final-report/{proposal}', CommunityServiceFinalReportShow::class)->name('final-report.show');
+        Route::get('final-report/{proposal}', \App\Livewire\Reports\Show::class)
+            ->name('final-report.show')
+            ->defaults('type', 'community-service-final');
         Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
     });
 
