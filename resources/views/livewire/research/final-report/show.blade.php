@@ -70,9 +70,9 @@
                     </small>
                 </div>
 
-                @if ($finalReport && $finalReport->hasMedia('substance_file'))
+                @if ($progressReport && $progressReport->hasMedia('substance_file'))
                     @php
-                        $media = $finalReport->getFirstMedia('substance_file');
+                        $media = $progressReport->getFirstMedia('substance_file');
                     @endphp
                     <div class="alert alert-success mt-2 mb-0">
                         <div class="d-flex justify-content-between align-items-center">
@@ -105,9 +105,9 @@
                     </small>
                 </div>
 
-                @if ($finalReport && $finalReport->hasMedia('realization_file'))
+                @if ($progressReport && $progressReport->hasMedia('realization_file'))
                     @php
-                        $media = $finalReport->getFirstMedia('realization_file');
+                        $media = $progressReport->getFirstMedia('realization_file');
                     @endphp
                     <div class="alert alert-success mt-2 mb-0">
                         <div class="d-flex justify-content-between align-items-center">
@@ -140,9 +140,9 @@
                     </small>
                 </div>
 
-                @if ($finalReport && $finalReport->hasMedia('presentation_file'))
+                @if ($progressReport && $progressReport->hasMedia('presentation_file'))
                     @php
-                        $media = $finalReport->getFirstMedia('presentation_file');
+                        $media = $progressReport->getFirstMedia('presentation_file');
                     @endphp
                     <div class="alert alert-success mt-2 mb-0">
                         <div class="d-flex justify-content-between align-items-center">
@@ -188,8 +188,8 @@
                         <tbody>
                             @foreach ($wajibs as $index => $output)
                                 @php
-                                    $mandatoryOutput = $finalReport
-                                        ? $finalReport->mandatoryOutputs()->where('proposal_output_id', $output->id)->first()
+                                    $mandatoryOutput = $progressReport
+                                        ? $progressReport->mandatoryOutputs()->where('proposal_output_id', $output->id)->first()
                                         : null;
                                 @endphp
                                 <tr wire:key="wajib-row-{{ $output->id }}">
@@ -287,8 +287,8 @@
                         <tbody>
                             @foreach ($tambahans as $index => $output)
                                 @php
-                                    $additionalOutput = $finalReport
-                                        ? $finalReport->additionalOutputs()->where('proposal_output_id', $output->id)->first()
+                                    $additionalOutput = $progressReport
+                                        ? $progressReport->additionalOutputs()->where('proposal_output_id', $output->id)->first()
                                         : null;
                                 @endphp
                                 <tr wire:key="tambahan-row-{{ $output->id }}">
