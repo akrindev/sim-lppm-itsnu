@@ -16,7 +16,7 @@ class Index extends ReportIndex
 
     protected function getStatusFilter(): array
     {
-        return [ProposalStatus::APPROVED, ProposalStatus::COMPLETED];
+        return [ProposalStatus::COMPLETED];
     }
 
     protected function getViewName(): string
@@ -29,7 +29,7 @@ class Index extends ReportIndex
         return [
             'submitter.identity',
             'focusArea',
-            'progressReports' => fn ($q) => $q->latest(),
+            'progressReports' => fn($q) => $q->latest(),
         ];
     }
 }
