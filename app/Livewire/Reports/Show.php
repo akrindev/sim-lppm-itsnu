@@ -43,7 +43,7 @@ class Show extends ReportShow
     // Report configuration
     protected array $config = [];
 
-    public function mount(Proposal $proposal, string $type = 'progress'): void
+    public function mount(Proposal $proposal, string $type = 'research-progress'): void
     {
         $this->proposal = $proposal;
         $this->config = $this->getConfig($type);
@@ -256,6 +256,11 @@ class Show extends ReportShow
                 'submitted_at' => now(),
             ]);
 
+            // Ensure config is initialized before redirect
+            if (empty($this->config) || !isset($this->config['route'])) {
+                $this->config = $this->getConfig('research-progress');
+            }
+
             session()->flash('success', 'Laporan berhasil diajukan.');
             $this->redirect(route($this->config['route']), navigate: true);
         }
@@ -418,6 +423,11 @@ class Show extends ReportShow
 
     public function render()
     {
+        if (empty($this->config) || !isset($this->config['view'])) {
+            // Re-initialize config if missing (e.g., after component hydration)
+            $this->config = $this->getConfig('research-progress');
+        }
+
         $allKeywords = Keyword::orderBy('name')->get();
 
         return view($this->config['view'], [

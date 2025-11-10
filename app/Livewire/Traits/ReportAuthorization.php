@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Traits;
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Proposal;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\EloquentBuilder;
 
 trait ReportAuthorization
 {
@@ -24,14 +23,14 @@ trait ReportAuthorization
         });
     }
 
-    protected function canEditReport(Model $report): bool
+    protected function canEditReport(Proposal $proposal): bool
     {
         $user = Auth::user();
 
-        return $report->proposal->submitter_id === $user->id
-            || $report->proposal->teamMembers()
-                ->where('user_id', $user->id)
-                ->where('status', 'accepted')
-                ->exists();
+        return $proposal->submitter_id === $user->id
+            || $proposal->teamMembers()
+            ->where('user_id', $user->id)
+            ->where('status', 'accepted')
+            ->exists();
     }
 }
