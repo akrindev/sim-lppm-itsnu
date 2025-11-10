@@ -40,6 +40,18 @@ class DekanApprovalAction
             ];
         }
 
+        // Validate faculty matching: Dekan can only approve proposals from their own faculty
+        $dekan = $dekan ?? Auth::user();
+        $dekanFacultyId = $dekan->identity?->faculty_id;
+        $submitterFacultyId = $proposal->submitter->identity?->faculty_id;
+
+        if ($dekanFacultyId && $submitterFacultyId && $dekanFacultyId !== $submitterFacultyId) {
+            return [
+                'success' => false,
+                'message' => 'Dekan hanya dapat menyetujui proposal dari fakultas yang sama.',
+            ];
+        }
+
         try {
             $newStatus = $decision === 'approved'
                 ? ProposalStatus::APPROVED
@@ -87,7 +99,7 @@ class DekanApprovalAction
 
             return [
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat memproses persetujuan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat memproses persetujuan: '.$e->getMessage(),
             ];
         }
     }

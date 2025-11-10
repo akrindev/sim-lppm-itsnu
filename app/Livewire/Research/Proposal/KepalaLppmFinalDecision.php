@@ -75,7 +75,7 @@ class KepalaLppmFinalDecision extends Component
     public function processDecision(): void
     {
         $user = Auth::user();
-        $isKepalaLppm = $user->hasRole(['kepala lppm', 'rektor']);
+        $isKepalaLppm = $user->hasRole(['kepala lppm']);
 
         if (! $isKepalaLppm) {
             session()->flash('error', 'Anda tidak memiliki akses untuk membuat keputusan');
@@ -145,7 +145,7 @@ class KepalaLppmFinalDecision extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: '.$e->getMessage());
         }
     }
 

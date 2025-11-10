@@ -4,6 +4,8 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use App\Notifications\ReviewerAssignment;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -53,7 +55,7 @@ class KepalaLppmInitialApproval extends Component
     public function approve(): void
     {
         $user = Auth::user();
-        $isKepalaLppm = $user->hasRole(['kepala lppm', 'rektor']);
+        $isKepalaLppm = $user->hasRole(['kepala lppm']);
 
         if (! $isKepalaLppm) {
             session()->flash('error', 'Anda tidak memiliki akses untuk menyetujui proposal');
@@ -81,19 +83,29 @@ class KepalaLppmInitialApproval extends Component
                 'new_status' => ProposalStatus::UNDER_REVIEW->value,
             ]);
 
-            // TODO: Send notification to Admin LPPM to assign reviewers
+            // Send notification to Admin LPPM to assign reviewers
+            $notificationService = app(NotificationService::class);
+            $adminLppmUsers = $notificationService->getUsersByRole(['admin lppm']);
 
-            session()->flash('success', 'Proposal berhasil disetujui dan siap untuk ditugaskan reviewer');
-            $this->dispatch('close-initial-approval-modal');
+            if ($adminLppmUsers->isNotEmpty()) {
+                // Send notification to Admin LPPM
+                $notificationService->sendToMany($adminLppmUsers, new ReviewerAssignment($proposal, $user));
+            }
+
+            session()->flash('success', 'Proposal berhasil disetujui dan siap untuk ditugaskan reviewer oleh Admin LPPM');
+
+            $this->dispatch('close-modal', detail: ['modalId' => 'initialApprovalModal']);
             $this->dispatch('proposal-initial-approved', proposalId: $proposal->id);
             $this->showModal = false;
+            // Refresh page to show updated status
+            $this->dispatch('refresh-page');
         } catch (\Exception $e) {
             Log::error('Kepala LPPM initial approval failed', [
                 'proposal_id' => $proposal->id,
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Terjadi kesalahan saat menyetujui proposal: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat menyetujui proposal: '.$e->getMessage());
         }
     }
 

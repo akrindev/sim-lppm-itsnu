@@ -24,8 +24,8 @@ enum ProposalStatus: string
             self::SUBMITTED => 'Diajukan',
             self::NEED_ASSIGNMENT => 'Perlu Persetujuan Anggota',
             self::APPROVED => 'Disetujui Dekan',
-            self::UNDER_REVIEW => 'Sedang Direview',
-            self::REVIEWED => 'Dalam Review',
+            self::UNDER_REVIEW => 'Menunggu Penugasan Reviewer',
+            self::REVIEWED => 'Sedang Direview',
             self::REVISION_NEEDED => 'Perlu Revisi',
             self::COMPLETED => 'Selesai',
             self::REJECTED => 'Ditolak',
@@ -78,8 +78,8 @@ enum ProposalStatus: string
             self::SUBMITTED => 'Proposal telah diajukan dan menunggu persetujuan Dekan',
             self::NEED_ASSIGNMENT => 'Proposal memerlukan persetujuan anggota tim',
             self::APPROVED => 'Proposal telah disetujui Dekan dan menunggu persetujuan Kepala LPPM',
-            self::UNDER_REVIEW => 'Proposal sedang dalam proses review oleh reviewer',
-            self::REVIEWED => 'Semua reviewer telah menyelesaikan review',
+            self::UNDER_REVIEW => 'Proposal telah disetujui Kepala LPPM untuk direview, menunggu Admin LPPM menugaskan reviewer',
+            self::REVIEWED => 'Proposal sedang dalam proses review oleh reviewer yang telah ditugaskan',
             self::REVISION_NEEDED => 'Proposal memerlukan perbaikan sebelum disetujui',
             self::COMPLETED => 'Proposal telah disetujui dan selesai',
             self::REJECTED => 'Proposal ditolak',
@@ -103,5 +103,13 @@ enum ProposalStatus: string
             self::COMPLETED->value => self::COMPLETED->label(),
             self::REJECTED->value => self::REJECTED->label(),
         ];
+    }
+
+    /**
+     * Mendapatkan array dari semua nilai enum
+     */
+    public static function values(): array
+    {
+        return array_map(fn ($status) => $status->value, self::cases());
     }
 }

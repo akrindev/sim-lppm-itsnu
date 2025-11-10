@@ -14,7 +14,7 @@
     <!-- Ringkasan & Kata Kunci -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📝 Ringkasan & Kata Kunci</h3>
+            <h3 class="card-title"><x-lucide-file-text class="me-2 icon" />Ringkasan & Kata Kunci</h3>
         </div>
         <div class="card-body">
             <div class="mb-3">
@@ -28,13 +28,13 @@
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
-                <select wire:model="selectedKeywords" multiple class="form-select tom-select" x-data="tomSelect"
-                    size="6">
-                    @foreach ($allKeywords as $keyword)
-                        <option value="{{ $keyword->id }}">{{ $keyword->name }}</option>
-                    @endforeach
-                </select>
-                <small class="form-hint">Tekan Ctrl/Cmd untuk memilih lebih dari satu</small>
+                <input type="text" wire:model="keywordsInput" class="form-control"
+                    placeholder="Contoh: AI; Machine Learning; IoT" />
+                <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
+                    Learning</small>
+                @error('keywordsInput')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class="row">
@@ -64,7 +64,7 @@
     <!-- Luaran Wajib -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📚 Luaran Wajib</h3>
+            <h3 class="card-title"><x-lucide-book-open class="me-2 icon" />Luaran Wajib</h3>
         </div>
         <div class="card-body">
             @php
@@ -138,7 +138,7 @@
     <!-- Luaran Tambahan -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📖 Luaran Tambahan</h3>
+            <h3 class="card-title"><x-lucide-book class="me-2 icon" />Luaran Tambahan</h3>
         </div>
         <div class="card-body">
             @php

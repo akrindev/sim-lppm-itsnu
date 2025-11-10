@@ -16,13 +16,13 @@ class RoleSeeder extends Seeder
         $roles = [
             'superadmin', // for it admin / developer only
             'admin lppm',
-            'admin lppm saintek',
-            'admin lppm dekabita',
             'kepala lppm',
+            'dekan',
+            'dekan saintek',
+            'dekan dekabita',
             'dosen',
             'reviewer',
             'rektor',
-            'dekan',
         ];
 
         foreach ($roles as $role) {

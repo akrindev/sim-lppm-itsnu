@@ -73,7 +73,7 @@ class KepalaLppmDashboard extends Component
             ->where('detailable_type', 'App\Models\Research')
             ->where('status', 'completed')->count();
 
-        // Statistik Pengmas
+        // Statistik PKM
         $totalCommunityService = Proposal::whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\CommunityService')->count();
 
@@ -109,7 +109,7 @@ class KepalaLppmDashboard extends Component
             ->limit(10)
             ->get();
 
-        // Data pengmas terbaru
+        // Data PKM terbaru
         $this->recentCommunityService = Proposal::with(['submitter'])
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\CommunityService')

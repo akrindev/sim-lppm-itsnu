@@ -66,10 +66,12 @@
             <strong>Menunggu Review:</strong> {{ $this->pendingReviewers->count() }} reviewer belum menyelesaikan review
         </div>
     @else
-        <div class="alert alert-info" role="alert">
+        {{-- <div class="alert alert-info" role="alert">
             Proposal tidak dapat diputuskan saat ini
-        </div>
+        </div> --}}
     @endif
+
+    <x-tabler.alert />
 
     <!-- Decision Confirmation Modal -->
     @teleport('body')

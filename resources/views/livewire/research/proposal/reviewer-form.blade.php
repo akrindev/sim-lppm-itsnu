@@ -79,6 +79,7 @@
                     </div>
                 </form>
                 <div class="px-4 pb-4">
+                    <x-tabler.alert />
                     <hr>
                 </div>
             @endif

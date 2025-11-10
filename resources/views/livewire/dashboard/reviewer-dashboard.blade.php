@@ -71,7 +71,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Pengmas Ditugaskan</div>
+                                <div class="subheader">PKM Ditugaskan</div>
                             </div>
                             <div class="mb-3 h1">{{ $stats['community_service_assigned'] ?? 0 }}</div>
                             <div class="text-muted">Untuk Direview</div>
@@ -83,7 +83,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Pengmas Selesai</div>
+                                <div class="subheader">PKM Selesai</div>
                             </div>
                             <div class="mb-3 h1">{{ $stats['community_service_completed'] ?? 0 }}</div>
                             <div class="progress progress-sm">
@@ -115,7 +115,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Pengmas Belum</div>
+                                <div class="subheader">PKM Belum</div>
                             </div>
                             <div class="mb-3 h1">{{ $stats['community_service_pending'] ?? 0 }}</div>
                             <div class="progress progress-sm">
@@ -197,11 +197,11 @@
                     </div>
                 </div>
 
-                <!-- Pengmas Terbaru -->
+                <!-- PKM Terbaru -->
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Pengmas Terbaru</h3>
+                            <h3 class="card-title">PKM Terbaru</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="card-table table table-vcenter">
@@ -255,7 +255,7 @@
                                     @empty
                                         <tr>
                                             <td colspan="4" class="py-4 text-muted text-center">
-                                                Belum ada pengmas untuk direview
+                                                Belum ada PKM untuk direview
                                             </td>
                                         </tr>
                                     @endforelse

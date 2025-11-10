@@ -36,12 +36,6 @@ admin lppm (Admin LPPM Umum)
 ├── Konfigurasi sistem
 └── Perawatan umum
 
-admin lppm saintek (Admin LPPM Saintek)
-└── Spesialisasi proposal sains/teknologi
-
-admin lppm dekabita (Admin LPPM Dekabita)
-└── Spesialisasi proposal sosial/humaniora
-
 reviewer (Reviewer Khusus)
 ├── Evaluasi teknis
 ├── Input keahlian domain

@@ -55,7 +55,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Pengmas Saya</div>
+                                <div class="subheader">PKM Saya</div>
                             </div>
                             <div class="mb-3 h1">{{ $stats['my_community_service'] ?? 0 }}</div>
                             <div class="text-muted">Sebagai Pengaju</div>
@@ -79,10 +79,10 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Pengmas Anggota</div>
+                                <div class="subheader">PKM Anggota</div>
                             </div>
                             <div class="mb-3 h1">{{ $stats['community_service_as_member'] ?? 0 }}</div>
-                            <div class="text-muted">Tim Pengmas</div>
+                            <div class="text-muted">Tim PKM</div>
                         </div>
                     </div>
                 </div>
@@ -145,11 +145,11 @@
                     </div>
                 </div>
 
-                <!-- Pengmas Terbaru -->
+                <!-- PKM Terbaru -->
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Pengmas Terbaru</h3>
+                            <h3 class="card-title">PKM Terbaru</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="card-table table table-vcenter">
@@ -191,7 +191,7 @@
                                     @empty
                                         <tr>
                                             <td colspan="3" class="py-4 text-muted text-center">
-                                                Belum ada pengmas
+                                                Belum ada PKM
                                             </td>
                                         </tr>
                                     @endforelse

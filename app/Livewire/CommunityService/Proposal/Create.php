@@ -39,7 +39,7 @@ class Create extends Component
      */
     public function mount(): void
     {
-        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
+        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
     }
 
     /**
@@ -61,6 +61,7 @@ class Create extends Component
             $this->form->validate();
         } catch (\Exception $e) {
             dd($e->getMessage());
+
             // Validation failed, errors will be displayed in the form
             // Do NOT reset the form - keep the data so user can correct errors
             return;
@@ -71,7 +72,7 @@ class Create extends Component
             session()->flash('success', 'Proposal pengabdian masyarakat berhasil dibuat');
             $this->redirect(route('community-service.proposal.show', $proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
         }
     }
 
@@ -167,6 +168,17 @@ class Create extends Component
             ]),
             4 => $this->validate([
                 'form.partner_ids' => 'nullable|array',
+                // Validate that all selected partners have complete data
+                'form.partner_ids.*' => [
+                    'required',
+                    'exists:partners,id',
+                    function ($attribute, $value, $fail) {
+                        $partner = Partner::find($value);
+                        if ($partner && (empty($partner->institution) || empty($partner->country))) {
+                            $fail("Mita '{$partner->name}' harus memiliki data lengkap (Institusi dan Negara wajib diisi)");
+                        }
+                    },
+                ],
             ]),
             default => null,
         };
@@ -222,7 +234,7 @@ class Create extends Component
     public function updatedFormBudgetItems(int $index, string $field): void
     {
         // Auto-fill unit when budget_component_id is selected
-        if ($field === 'budget_component_id' && !empty($this->form->budget_items[$index]['budget_component_id'])) {
+        if ($field === 'budget_component_id' && ! empty($this->form->budget_items[$index]['budget_component_id'])) {
             $componentId = $this->form->budget_items[$index]['budget_component_id'];
             $component = BudgetComponent::find($componentId);
 
@@ -237,8 +249,8 @@ class Create extends Component
         $this->validate([
             'form.new_partner.name' => 'required|string|max:255',
             'form.new_partner.email' => 'nullable|email',
-            'form.new_partner.institution' => 'nullable|string|max:255',
-            'form.new_partner.country' => 'nullable|string|max:255',
+            'form.new_partner.institution' => 'required|string|max:255',
+            'form.new_partner.country' => 'required|string|max:255',
             'form.new_partner.address' => 'nullable|string',
             'form.new_partner_commitment_file' => 'nullable|file|mimes:pdf|max:5120',
         ]);
@@ -249,6 +261,7 @@ class Create extends Component
             'institution' => $this->form->new_partner['institution'],
             'country' => $this->form->new_partner['country'],
             'address' => $this->form->new_partner['address'],
+            'type' => 'External', // Default value for partner type
             'commitment_letter_file' => $this->form->new_partner_commitment_file
                 ? $this->form->new_partner_commitment_file->store('partner-commitments', 'public')
                 : null,

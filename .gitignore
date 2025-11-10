@@ -21,7 +21,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-/docs
+# /docs
 /.serena
 .mcp.json
 CLAUDE.md

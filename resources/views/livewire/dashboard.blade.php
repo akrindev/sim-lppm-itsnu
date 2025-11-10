@@ -58,7 +58,7 @@
                                             <path d="M12 12c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" />
                                             <path d="M12 12c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4z" />
                                         </svg>
-                                        Penelitian & Pengmas
+                                        Penelitian & PKM
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="subheader">Proposal Pengmas</div>
+                                    <div class="subheader">Proposal PKM</div>
                                 </div>
                                 <div class="mb-3 h1">{{ $stats['total_community_service'] ?? 0 }}</div>
                                 <div class="text-muted">
@@ -263,7 +263,7 @@
                                     <div class="subheader">Sebagai Anggota</div>
                                 </div>
                                 <div class="mb-3 h1">{{ $stats['as_team_member'] ?? 0 }}</div>
-                                <div class="text-muted">Tim Peneliti/Pengmas</div>
+                                <div class="text-muted">Tim Peneliti/PKM</div>
                             </div>
                         </div>
                     </div>
@@ -373,7 +373,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="subheader">Proposal Pengmas</div>
+                                    <div class="subheader">Proposal PKM</div>
                                 </div>
                                 <div class="mb-3 h1">{{ $stats['total_community_service'] ?? 0 }}</div>
                             </div>
@@ -447,8 +447,7 @@
                                                     <x-tabler.badge color="primary"
                                                         class="me-1">Penelitian</x-tabler.badge>
                                                 @else
-                                                    <x-tabler.badge color="info"
-                                                        class="me-1">Pengmas</x-tabler.badge>
+                                                    <x-tabler.badge color="info" class="me-1">PKM</x-tabler.badge>
                                                 @endif
                                             </td>
                                             <td>

@@ -42,13 +42,17 @@ class Index extends Component
             'reviewers' => function ($q) {
                 $q->whereIn('status', ['completed', 'pending'])
                     ->with('user');
-            }
+            },
         ]);
 
         // where submitter is current user
         if ($user->hasRole('dosen')) {
             $query->where('submitter_id', $user->id)
-                ->where('status', ProposalStatus::REVISION_NEEDED);
+                ->where(function ($q) {
+                    $q->whereHas('reviewers', function ($sq) {
+                        $sq->where('recommendation', 'revision_needed');
+                    });
+                })->orWhere('status', ProposalStatus::REVISION_NEEDED);
         } elseif ($user->hasRole('reviewer')) {
             $query->whereHas('reviewers', function ($q) use ($user) {
                 $q->where('user_id', $user->id)
@@ -60,13 +64,13 @@ class Index extends Component
             });
         }
 
-        $query->whereHas('reviewers', function ($q) use ($user) {
+        $query->whereHas('reviewers', function ($q) {
             $q->whereIn('status', ['completed', 'pending']);
         });
 
         // Search filter
-        if (!empty($this->search)) {
-            $searchTerm = '%' . $this->search . '%';
+        if (! empty($this->search)) {
+            $searchTerm = '%'.$this->search.'%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
                     ->orWhereHas('submitter', function ($sq) use ($searchTerm) {
@@ -76,7 +80,7 @@ class Index extends Component
         }
 
         // Year filter
-        if (!empty($this->selectedYear)) {
+        if (! empty($this->selectedYear)) {
             $query->whereYear('created_at', $this->selectedYear);
         }
 

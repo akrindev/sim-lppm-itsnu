@@ -61,7 +61,7 @@ class DefaultDashboard extends Component
         $totalResearch = Proposal::whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\Research')->count();
 
-        // Statistik Pengmas
+        // Statistik PKM
         $totalCommunityService = Proposal::whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\CommunityService')->count();
 
@@ -78,7 +78,7 @@ class DefaultDashboard extends Component
             ->limit(5)
             ->get();
 
-        // Data pengmas terbaru
+        // Data PKM terbaru
         $this->recentCommunityService = Proposal::with(['submitter'])
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\CommunityService')

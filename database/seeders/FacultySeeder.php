@@ -15,10 +15,8 @@ class FacultySeeder extends Seeder
 
         if ($itsnu) {
             $faculties = [
-                ['name' => 'Fakultas Teknik', 'code' => 'FT'],
-                ['name' => 'Fakultas Kesehatan', 'code' => 'FK'],
-                ['name' => 'Fakultas Ekonomi dan Bisnis', 'code' => 'FEB'],
-                ['name' => 'Fakultas Hukum', 'code' => 'FH'],
+                ['name' => 'Fakultas Sains dan Teknologi', 'code' => 'SAINTEK'],
+                ['name' => 'Fakultas Desain Kreatif dan Bisnis Digital', 'code' => 'DEKABITA'],
             ];
 
             foreach ($faculties as $faculty) {

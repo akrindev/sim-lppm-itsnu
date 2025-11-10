@@ -39,6 +39,7 @@ class Show extends Component
             'topic',
             'nationalPriority',
             'teamMembers',
+            'statusLogs' => fn ($query) => $query->orderBy('at', 'desc')->with('user'),
         ]);
 
         $this->form->setProposal($proposal);
@@ -61,7 +62,7 @@ class Show extends Component
             session()->flash('success', 'Proposal pengabdian masyarakat berhasil dihapus');
             $this->redirect(route('community-service.proposal.index'));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
         }
     }
 

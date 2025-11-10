@@ -71,7 +71,7 @@ class ReviewerDashboard extends Component
             })
             ->get();
 
-        // Reviewer stats untuk pengmas
+        // Reviewer stats untuk PKM
         $this->communityServiceReviewerStats = ProposalReviewer::with('proposal')
             ->where('user_id', $this->user->id)
             ->whereHas('proposal', function ($query) use ($yearFilter) {
@@ -101,7 +101,7 @@ class ReviewerDashboard extends Component
             })
             ->where('status', 'pending')->count();
 
-        // Statistik Pengmas
+        // Statistik PKM
         $communityServiceAssigned = ProposalReviewer::where('user_id', $this->user->id)
             ->whereHas('proposal', function ($query) use ($yearFilter) {
                 $query->whereYear('created_at', $yearFilter)
@@ -142,7 +142,7 @@ class ReviewerDashboard extends Component
             ->limit(10)
             ->get();
 
-        // Data pengmas terbaru
+        // Data PKM terbaru
         $this->recentCommunityService = Proposal::with(['submitter'])
             ->whereHas('reviewers', function ($query) {
                 $query->where('user_id', $this->user->id);

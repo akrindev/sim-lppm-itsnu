@@ -10,7 +10,9 @@
     </div>
 </x-slot:pageActions>
 
-<div class="row" x-data="{ currentStep: 1 }">
+<div class="row" x-data="{
+    currentStep: 1,
+}">
     <div class="col-md-12">
         <x-tabler.alert />
     </div>
@@ -58,21 +60,35 @@
                     </div>
 
                     <div class="mb-3 row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label"><x-lucide-user class="me-2 icon" />Author</label>
                             <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label"><x-lucide-clipboard-list class="me-2 icon" />Skema
                                 Penelitian</label>
                             <p class="text-reset">{{ $proposal->researchScheme?->name ?? '—' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><x-lucide-calendar class="me-2 icon" />Tanggal
+                                Pengajuan</label>
+                            <p class="text-reset">
+                                {{ $proposal->created_at?->format('d M Y H:i') ?? '—' }}
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><x-lucide-calendar-check class="me-2 icon" />Tanggal
+                                update</label>
+                            <p class="text-reset">
+                                {{ $proposal->detailable->updated_at?->format('d M Y H:i') ?? '—' }}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Macro Research Group Card -->
-            <div class="mb-3 card">
+            <div class="mb-3 card" data-field="Kelompok Makro Riset">
                 <div class="card-header">
                     <h3 class="card-title">1.1 Kelompok Makro Riset</h3>
                     @if ($this->canEdit())
@@ -86,14 +102,15 @@
                 </div>
                 <div class="card-body">
                     @php $research = $proposal->detailable; @endphp
-                    
+
                     @if ($this->canEdit())
                         <div class="mb-3">
                             <label class="form-label required">
                                 <x-lucide-layers class="me-2 icon" />
                                 Kelompok Makro Riset
                             </label>
-                            <select wire:model="macroResearchGroupId" class="form-select @error('macroResearchGroupId') is-invalid @enderror">
+                            <select wire:model="macroResearchGroupId"
+                                class="form-select @error('macroResearchGroupId') is-invalid @enderror">
                                 <option value="">Pilih Kelompok Makro Riset</option>
                                 @foreach ($this->macroResearchGroups as $group)
                                     <option value="{{ $group->id }}">{{ $group->name }}</option>
@@ -104,16 +121,20 @@
                             @enderror
                             @if ($macroResearchGroupId)
                                 @php
-                                    $selectedGroup = $this->macroResearchGroups->firstWhere('id', $macroResearchGroupId);
+                                    $selectedGroup = $this->macroResearchGroups->firstWhere(
+                                        'id',
+                                        $macroResearchGroupId,
+                                    );
                                 @endphp
                                 @if ($selectedGroup?->description)
-                                    <small class="form-hint text-muted">{{ $selectedGroup->description }}</small>
+                                    <small class="text-muted form-hint">{{ $selectedGroup->description }}</small>
                                 @endif
                             @endif
                         </div>
                     @else
                         <div class="mb-3">
-                            <label class="form-label"><x-lucide-layers class="me-2 icon" />Kelompok Makro Riset</label>
+                            <label class="form-label"><x-lucide-layers class="me-2 icon" />Kelompok Makro
+                                Riset</label>
                             <p class="text-reset">{{ $research?->macroResearchGroup?->name ?? '—' }}</p>
                             @if ($research?->macroResearchGroup?->description)
                                 <small class="text-muted">{{ $research->macroResearchGroup->description }}</small>
@@ -124,7 +145,7 @@
             </div>
 
             <!-- File Substansi Card -->
-            <div class="mb-3 card">
+            <div class="mb-3 card" data-field="File Substansi">
                 <div class="card-header">
                     <h3 class="card-title">1.2 File Substansi</h3>
                     @if ($this->canEdit())
@@ -138,7 +159,7 @@
                 </div>
                 <div class="card-body">
                     @php $research = $proposal->detailable; @endphp
-                    
+
                     <!-- Current File -->
                     <div class="mb-3">
                         <label class="form-label"><x-lucide-file class="me-2 icon" />File Substansi Saat Ini</label>
@@ -150,12 +171,12 @@
                                     Download File Substansi
                                 </a>
                                 <small class="text-muted">
-                                    <x-lucide-check class="icon icon-sm text-success" />
+                                    <x-lucide-check class="text-success icon icon-sm" />
                                     File tersedia
                                 </small>
                             </div>
                         @else
-                            <p class="text-muted text-reset mb-0">Tidak ada file substansi</p>
+                            <p class="mb-0 text-muted text-reset">Tidak ada file substansi</p>
                         @endif
                     </div>
 
@@ -166,8 +187,8 @@
                                 <x-lucide-upload class="me-2 icon" />
                                 Upload File Substansi Baru
                             </label>
-                            <input type="file" wire:model="substanceFile" 
-                                class="form-control @error('substanceFile') is-invalid @enderror" 
+                            <input type="file" wire:model="substanceFile"
+                                class="form-control @error('substanceFile') is-invalid @enderror"
                                 accept=".pdf,.doc,.docx" />
                             @error('substanceFile')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -178,15 +199,15 @@
                                     File lama akan diganti dengan file baru.
                                 @endif
                             </small>
-                            
+
                             <!-- Loading indicator -->
                             <div wire:loading wire:target="substanceFile" class="mt-2">
                                 <div class="d-flex align-items-center text-primary">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    <span class="me-2 spinner-border spinner-border-sm"></span>
                                     <small>Mengunggah file...</small>
                                 </div>
                             </div>
-                            
+
                             <!-- Success indicator -->
                             @if ($substanceFile && !$errors->has('substanceFile'))
                                 <div class="mt-2">
@@ -206,7 +227,7 @@
                 <div class="card-header">
                     <h3 class="card-title">1.3 Catatan dan Rekomendasi Reviewer</h3>
                 </div>
-                @php 
+                @php
                     $completedReviewers = $proposal->reviewers->where('status', 'completed');
                 @endphp
                 @if ($completedReviewers->isEmpty())
@@ -220,7 +241,7 @@
                                 <div class="mb-2">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center">
-                                            <x-lucide-user-circle class="me-2 icon text-primary" />
+                                            <x-lucide-user-circle class="me-2 text-primary icon" />
                                             <strong>{{ $reviewer->user?->name ?? 'Reviewer' }}</strong>
                                         </div>
                                         <small class="text-muted">
@@ -231,11 +252,11 @@
 
                                 @if ($reviewer->review_notes)
                                     <div class="mb-2">
-                                        <label class="form-label fw-bold mb-1">
+                                        <label class="mb-1 form-label fw-bold">
                                             <x-lucide-message-square class="icon icon-sm" />
                                             Catatan Review:
                                         </label>
-                                        <div class="p-3 bg-light rounded">
+                                        <div class="bg-light p-3 rounded">
                                             <p class="mb-0 text-reset">{{ $reviewer->review_notes }}</p>
                                         </div>
                                     </div>
@@ -243,7 +264,7 @@
 
                                 @if ($reviewer->recommendation)
                                     <div class="mb-0">
-                                        <label class="form-label fw-bold mb-1">
+                                        <label class="mb-1 form-label fw-bold">
                                             <x-lucide-star class="icon icon-sm" />
                                             Rekomendasi:
                                         </label>
@@ -277,29 +298,6 @@
                 @endif
             </div>
 
-            <!-- Save Button for Submitter -->
-            @if ($this->canEdit())
-                <div class="mb-3 card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
-                                <span wire:loading.remove wire:target="save">
-                                    <x-lucide-save class="icon" />
-                                    Simpan Perubahan
-                                </span>
-                                <span wire:loading wire:target="save">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                    Menyimpan...
-                                </span>
-                            </button>
-                        </div>
-                        <small class="text-muted d-block mt-2">
-                            <x-lucide-info class="icon icon-sm" />
-                            Pastikan Anda telah memilih kelompok makro riset dan/atau mengunggah file substansi baru sebelum menyimpan.
-                        </small>
-                    </div>
-                </div>
-            @endif
         </div>
 
         <!-- Section 2: RAB (Read-Only) -->
@@ -342,7 +340,8 @@
                                                 {{ $item->budgetComponent?->unit ?? '-' }}
                                             </x-tabler.badge>
                                         </td>
-                                        <td class="text-end">Rp {{ number_format($item->unit_price, 2, ',', '.') }}
+                                        <td class="text-end">Rp
+                                            {{ number_format($item->unit_price, 2, ',', '.') }}
                                         </td>
                                         <td class="text-end fw-bold">Rp
                                             {{ number_format($item->total_price, 2, ',', '.') }}</td>
@@ -392,7 +391,8 @@
                             <div class="col-md-12">
                                 <div class="mb-0">
                                     <label class="form-label">Nilai SBK</label>
-                                    <p class="text-reset">Rp {{ number_format($proposal->sbk_value, 2, ',', '.') }}
+                                    <p class="text-reset">Rp
+                                        {{ number_format($proposal->sbk_value, 2, ',', '.') }}
                                     </p>
                                 </div>
                             </div>
@@ -416,5 +416,32 @@
                 </button>
             </div>
         </div>
+
+
+        <!-- Save Button for Submitter -->
+        @if ($this->canEdit())
+            <div class="mt-3 card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" wire:click="save" class="position-relative btn btn-primary"
+                            wire:loading.attr="disabled" wire:target="save" wire:loading.class="btn-loading">
+                            <span wire:loading.remove wire:target="save">
+                                <x-lucide-save class="icon" />
+                                Simpan Perubahan
+                            </span>
+                            <span wire:loading wire:target="save">
+                                <span class="me-2 spinner-border spinner-border-sm"></span>
+                                <span>Menyimpan...</span>
+                            </span>
+                        </button>
+                    </div>
+                    <small class="d-block mt-2 text-muted">
+                        <x-lucide-info class="icon icon-sm" />
+                        Pastikan Anda telah memilih kelompok makro riset dan/atau mengunggah file substansi baru
+                        sebelum menyimpan.
+                    </small>
+                </div>
+            </div>
+        @endif
     </div>
 </div>

@@ -25,7 +25,7 @@ class Show extends Component
     // Form fields
     public string $summaryUpdate = '';
 
-    public array $selectedKeywords = [];
+    public string $keywordsInput = '';
 
     public int $reportingYear;
 
@@ -90,10 +90,15 @@ class Show extends Component
         $this->summaryUpdate = $this->progressReport->summary_update ?? '';
         $this->reportingYear = $this->progressReport->reporting_year;
         $this->reportingPeriod = $this->progressReport->reporting_period;
-        $this->selectedKeywords = $this->progressReport->keywords()->pluck('keywords.id')->toArray();
+        $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
 
         // Load existing mandatory outputs
         foreach ($this->progressReport->mandatoryOutputs as $output) {
+            // Skip if proposal_output_id is null or empty
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
+
             $this->mandatoryOutputs[$output->proposal_output_id] = [
                 'id' => $output->id,
                 'status_type' => $output->status_type,
@@ -117,6 +122,11 @@ class Show extends Component
 
         // Load existing additional outputs
         foreach ($this->progressReport->additionalOutputs as $output) {
+            // Skip if proposal_output_id is null or empty
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
+
             $this->additionalOutputs[$output->proposal_output_id] = [
                 'id' => $output->id,
                 'status' => $output->status,
@@ -137,14 +147,14 @@ class Show extends Component
     {
         $this->summaryUpdate = $this->proposal->summary ?? '';
         $this->reportingYear = (int) date('Y');
-        $this->selectedKeywords = $this->proposal->keywords()->pluck('keywords.id')->toArray();
+        $this->keywordsInput = $this->proposal->keywords()->pluck('name')->join('; ');
 
         // Initialize empty arrays for planned outputs
-        foreach ($this->proposal->outputs->where('category', 'wajib') as $output) {
+        foreach ($this->proposal->outputs->where('category', 'Wajib') as $output) {
             $this->mandatoryOutputs[$output->id] = $this->getEmptyMandatoryOutput();
         }
 
-        foreach ($this->proposal->outputs->where('category', 'tambahan') as $output) {
+        foreach ($this->proposal->outputs->where('category', 'Tambahan') as $output) {
             $this->additionalOutputs[$output->id] = $this->getEmptyAdditionalOutput();
         }
     }
@@ -193,6 +203,7 @@ class Show extends Component
     {
         $this->validate([
             'summaryUpdate' => 'required|min:100',
+            'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
             'reportingPeriod' => 'required|in:semester_1,semester_2,annual',
         ]);
@@ -215,8 +226,15 @@ class Show extends Component
                 ]);
             }
 
+            // Handle keywords: parse from semicolon-separated input
+            $keywordNames = $this->parseKeywordsInput($this->keywordsInput);
+            $keywordIds = $this->processKeywords($keywordNames);
+
             // Sync keywords
-            $this->progressReport->keywords()->sync($this->selectedKeywords);
+            $this->progressReport->keywords()->sync($keywordIds);
+
+            // Update input with cleaned keywords from database
+            $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
 
             // Save mandatory outputs
             $this->saveMandatoryOutputs();
@@ -229,9 +247,72 @@ class Show extends Component
         $this->dispatch('alert', type: 'success', message: 'Laporan kemajuan berhasil disimpan sebagai draft.');
     }
 
+    /**
+     * Parse keywords from semicolon-separated string.
+     *
+     * @param  string  $input  Semicolon-separated keywords
+     * @return array Array of keyword names (trimmed, non-empty, unique)
+     */
+    protected function parseKeywordsInput(string $input): array
+    {
+        if (empty(trim($input))) {
+            return [];
+        }
+
+        // Split by semicolon
+        $keywords = explode(';', $input);
+
+        // Trim whitespace and filter empty
+        $keywords = array_map('trim', $keywords);
+        $keywords = array_filter($keywords, fn($k) => ! empty($k));
+
+        // Remove duplicates (case-insensitive)
+        $uniqueKeywords = [];
+        $seen = [];
+
+        foreach ($keywords as $keyword) {
+            $lowerKeyword = strtolower($keyword);
+            if (! in_array($lowerKeyword, $seen)) {
+                $uniqueKeywords[] = $keyword;
+                $seen[] = $lowerKeyword;
+            }
+        }
+
+        return $uniqueKeywords;
+    }
+
+    /**
+     * Process keywords array, creating new keywords if they don't exist.
+     *
+     * @param  array  $keywordNames  Array of keyword names (strings)
+     * @return array Array of keyword IDs
+     */
+    protected function processKeywords(array $keywordNames): array
+    {
+        $keywordIds = [];
+
+        foreach ($keywordNames as $name) {
+            if (! empty(trim($name))) {
+                // Create new keyword if it doesn't exist
+                $keyword = Keyword::firstOrCreate(
+                    ['name' => trim($name)],
+                    ['name' => trim($name)]
+                );
+                $keywordIds[] = $keyword->id;
+            }
+        }
+
+        return $keywordIds;
+    }
+
     protected function saveMandatoryOutputs(): void
     {
         foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
+            // Skip if invalid proposal_output_id (empty string, null, or not valid)
+            if (empty($proposalOutputId) || ! is_string($proposalOutputId) && ! is_numeric($proposalOutputId)) {
+                continue;
+            }
+
             // Skip if no data entered
             if (empty($data['status_type']) && empty($data['journal_title'])) {
                 continue;
@@ -275,6 +356,11 @@ class Show extends Component
     protected function saveAdditionalOutputs(): void
     {
         foreach ($this->additionalOutputs as $proposalOutputId => $data) {
+            // Skip if invalid proposal_output_id (empty string, null, or not valid)
+            if (empty($proposalOutputId) || ! is_string($proposalOutputId) && ! is_numeric($proposalOutputId)) {
+                continue;
+            }
+
             // Skip if no data entered
             if (empty($data['status']) && empty($data['book_title'])) {
                 continue;
@@ -318,6 +404,7 @@ class Show extends Component
     {
         $this->validate([
             'summaryUpdate' => 'required|min:100',
+            'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
             'reportingPeriod' => 'required|in:semester_1,semester_2,annual',
         ]);
@@ -358,12 +445,20 @@ class Show extends Component
 
         // Validation for single output
         $this->validate([
-            "mandatoryOutputs.{$this->editingMandatoryId}.journal_title" => 'nullable|string|max:255',
-            "mandatoryOutputs.{$this->editingMandatoryId}.article_title" => 'nullable|string|max:255',
-            "mandatoryOutputs.{$this->editingMandatoryId}.publication_year" => 'nullable|integer|between:2000,2030',
+            "mandatoryOutputs.{$this->editingMandatoryId}.status_type" => 'required|in:published,accepted,under_review,rejected',
+            "mandatoryOutputs.{$this->editingMandatoryId}.author_status" => 'required|in:first_author,co_author,corresponding_author',
+            "mandatoryOutputs.{$this->editingMandatoryId}.journal_title" => 'required|string|max:255',
+            "mandatoryOutputs.{$this->editingMandatoryId}.article_title" => 'required|string|max:255',
+            "mandatoryOutputs.{$this->editingMandatoryId}.publication_year" => 'required|integer|between:2000,2030',
+            "mandatoryOutputs.{$this->editingMandatoryId}.issn" => 'nullable|string|max:20',
+            "mandatoryOutputs.{$this->editingMandatoryId}.eissn" => 'nullable|string|max:20',
+            "mandatoryOutputs.{$this->editingMandatoryId}.journal_url" => 'nullable|url',
+            "mandatoryOutputs.{$this->editingMandatoryId}.article_url" => 'nullable|url',
+            "mandatoryOutputs.{$this->editingMandatoryId}.doi" => 'nullable|string|max:255',
         ]);
 
-        $this->reset('editingMandatoryId');
+        // Don't reset editing state immediately to prevent form reset
+        // $this->reset('editingMandatoryId'); // REMOVED - this was causing the reset issue
 
         // Save is handled by main save() method
         $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
@@ -389,12 +484,18 @@ class Show extends Component
 
         // Validation for single output
         $this->validate([
-            "additionalOutputs.{$this->editingAdditionalId}.book_title" => 'nullable|string|max:255',
-            "additionalOutputs.{$this->editingAdditionalId}.publisher_name" => 'nullable|string|max:255',
+            "additionalOutputs.{$this->editingAdditionalId}.status" => 'required|in:review,editing,published',
+            "additionalOutputs.{$this->editingAdditionalId}.book_title" => 'required|string|max:255',
+            "additionalOutputs.{$this->editingAdditionalId}.publisher_name" => 'required|string|max:255',
+            "additionalOutputs.{$this->editingAdditionalId}.isbn" => 'nullable|string|max:20',
             "additionalOutputs.{$this->editingAdditionalId}.publication_year" => 'nullable|integer|between:2000,2030',
+            "additionalOutputs.{$this->editingAdditionalId}.total_pages" => 'nullable|integer|min:1',
+            "additionalOutputs.{$this->editingAdditionalId}.publisher_url" => 'nullable|url',
+            "additionalOutputs.{$this->editingAdditionalId}.book_url" => 'nullable|url',
         ]);
 
-        $this->reset('editingAdditionalId');
+        // Don't reset editing state immediately to prevent form reset
+        // $this->reset('editingAdditionalId'); // REMOVED - this was causing the reset issue
 
         $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
         // $this->dispatch('alert', type: 'success', message: 'Data luaran tambahan berhasil disimpan.');
@@ -403,6 +504,18 @@ class Show extends Component
         session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
 
         // $this->editingAdditionalId = null;
+    }
+
+    public function closeMandatoryModal(): void
+    {
+        // Clear editing state when modal is closed
+        $this->reset(['editingMandatoryId', 'mandatoryOutputs']);
+    }
+
+    public function closeAdditionalModal(): void
+    {
+        // Clear editing state when modal is closed
+        $this->reset(['editingAdditionalId', 'additionalOutputs']);
     }
 
     public function render()

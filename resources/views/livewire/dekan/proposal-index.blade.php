@@ -126,11 +126,6 @@
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
-                                @if ($proposal->summary)
-                                    <small class="text-secondary">
-                                        {{ Str::limit($proposal->summary, 80) }}
-                                    </small>
-                                @endif
                             </td>
                             <td>
                                 @if ($proposal->detailable_type === 'App\Models\Research')

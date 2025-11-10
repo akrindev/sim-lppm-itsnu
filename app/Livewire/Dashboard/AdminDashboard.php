@@ -75,7 +75,7 @@ class AdminDashboard extends Component
             ->where('detailable_type', \App\Models\Research::class)
             ->where('status', 'rejected')->count();
 
-        // Statistik Pengmas
+        // Statistik PKM
         $totalCommunityService = Proposal::whereYear('created_at', $yearFilter)
             ->where('detailable_type', CommunityService::class)->count();
 
@@ -114,7 +114,7 @@ class AdminDashboard extends Component
             ->limit(10)
             ->get();
 
-        // Data pengmas terbaru
+        // Data PKM terbaru
         $this->recentCommunityService = Proposal::with(['submitter'])
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', CommunityService::class)

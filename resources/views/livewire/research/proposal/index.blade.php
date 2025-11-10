@@ -15,6 +15,31 @@
 
 <div>
     <x-tabler.alert />
+
+    <!-- Role-based Tabs (only for regular dosen users) -->
+    @unless (auth()->user()->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
+        <div class="mb-3">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @if($roleFilter === 'ketua') active @endif" 
+                            wire:click="$set('roleFilter', 'ketua')"
+                            role="tab" aria-selected="@if($roleFilter === 'ketua') true @else false @endif">
+                        <x-lucide-crown class="icon me-2" />
+                        Sebagai Ketua
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @if($roleFilter === 'anggota') active @endif" 
+                            wire:click="$set('roleFilter', 'anggota')"
+                            role="tab" aria-selected="@if($roleFilter === 'anggota') true @else false @endif">
+                        <x-lucide-users class="icon me-2" />
+                        Sebagai Anggota
+                    </button>
+                </li>
+            </ul>
+        </div>
+    @endunless
+
     <div class="mb-3 row">
         <div class="col-12">
             <div class="card">
@@ -30,13 +55,9 @@
                         <!-- Status Filter -->
                         <div class="col-md-3">
                             <select class="form-select" wire:model.live="statusFilter">
-                                <option value="all">Semua Status</option>
-                                <option value="draft">Draft</option>
-                                <option value="submitted">Diajukan</option>
-                                <option value="reviewed">Ditinjau</option>
-                                <option value="approved">Disetujui</option>
-                                <option value="rejected">Ditolak</option>
-                                <option value="completed">Selesai</option>
+                                @foreach (\App\Enums\ProposalStatus::filterOptions() as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
                             </select>
                         </div>
 

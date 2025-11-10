@@ -12,6 +12,28 @@
 
 <div>
 
+    <!-- Role-based Tabs -->
+    <div class="mb-3">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link @if($roleFilter === 'ketua') active @endif" 
+                        wire:click="$set('roleFilter', 'ketua')"
+                        role="tab" aria-selected="@if($roleFilter === 'ketua') true @else false @endif">
+                    <x-lucide-crown class="icon me-2" />
+                    Sebagai Ketua
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link @if($roleFilter === 'anggota') active @endif" 
+                        wire:click="$set('roleFilter', 'anggota')"
+                        role="tab" aria-selected="@if($roleFilter === 'anggota') true @else false @endif">
+                    <x-lucide-users class="icon me-2" />
+                    Sebagai Anggota
+                </button>
+            </li>
+        </ul>
+    </div>
+
     <div class="mb-3 row">
         <div class="col-12">
             <div class="card">

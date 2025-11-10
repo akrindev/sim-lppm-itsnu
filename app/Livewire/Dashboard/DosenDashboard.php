@@ -78,7 +78,7 @@ class DosenDashboard extends Component
             ->where('detailable_type', 'App\Models\Research')
             ->where('status', 'approved')->count();
 
-        // Statistik Pengmas
+        // Statistik PKM
         $communityServiceCount = Proposal::where('submitter_id', $this->user->id)
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\CommunityService')
@@ -117,7 +117,7 @@ class DosenDashboard extends Component
             ->limit(10)
             ->get();
 
-        // Data pengmas terbaru
+        // Data PKM terbaru
         $this->recentCommunityService = Proposal::where('submitter_id', $this->user->id)
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\CommunityService')

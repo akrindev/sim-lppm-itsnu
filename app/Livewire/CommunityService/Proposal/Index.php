@@ -33,11 +33,15 @@ class Index extends Component
     #[Url]
     public string $yearFilter = '';
 
+    #[Url]
+    public string $roleFilter = 'ketua';
+
     public function resetFilters(): void
     {
         $this->search = '';
         $this->statusFilter = 'all';
         $this->yearFilter = '';
+        $this->roleFilter = 'ketua';
         $this->resetPage();
     }
 
@@ -65,14 +69,23 @@ class Index extends Component
     #[Computed]
     public function proposals()
     {
-        return Proposal::query()
-            ->where('detailable_type', CommunityService::class)
-            ->where(function ($query) {
-                $query->where('submitter_id', Auth::user()->id)
-                    ->orWhereHas('teamMembers', function ($teamQuery) {
-                        $teamQuery->where('user_id', Auth::user()->id);
-                    });
-            })
+        $user = Auth::user();
+        $query = Proposal::query()
+            ->where('detailable_type', CommunityService::class);
+
+        // Apply role filter
+        if ($this->roleFilter === 'ketua') {
+            // User is the submitter (leader)
+            $query->where('submitter_id', $user->id);
+        } else {
+            // roleFilter = 'anggota': User is a team member with anggota role
+            $query->whereHas('teamMembers', function ($teamQuery) use ($user) {
+                $teamQuery->where('user_id', $user->id)
+                    ->where('role', 'anggota');
+            });
+        }
+
+        return $query
             ->with(['submitter', 'focusArea'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
@@ -179,7 +192,7 @@ class Index extends Component
             $proposal->delete();
             session()->flash('success', 'Proposal berhasil dihapus');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
         }
     }
 }

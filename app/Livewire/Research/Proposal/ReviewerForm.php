@@ -133,9 +133,10 @@ class ReviewerForm extends Component
             $review = $this->myReview;
             $message = $isNew ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
             $this->dispatch('success', message: $message);
-            $this->dispatch('review-submitted', proposalId: $this->proposalId);
+
+            session()->flash('success', $message);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: ' . $e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }
     }
 

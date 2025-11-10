@@ -18,170 +18,183 @@
                 Belum ada mitra yang ditambahkan.
             </div>
         @else
-            <div class="list-group">
-                @foreach ($form->partner_ids as $partnerId)
-                    @php
-                        $partner = $this->partners->find($partnerId);
-                    @endphp
-                    @if ($partner)
-                        <div class="list-group-item" wire:key="partner-{{ $partnerId }}">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="mb-1">{{ $partner->name }}</h5>
-                                    <p class="mb-1 text-muted">
+            <div class="table-responsive">
+                <table class="table table-vcenter">
+                    <thead>
+                        <tr>
+                            <th>Nama Mitra</th>
+                            <th>Institusi</th>
+                            <th>Email</th>
+                            <th>Negara</th>
+                            <th>Alamat</th>
+                            <th>Surat Kesanggupan</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($form->partner_ids as $partnerId)
+                            @php
+                                $partner = $this->partners->find($partnerId);
+                            @endphp
+                            @if ($partner)
+                                <tr wire:key="partner-{{ $partnerId }}">
+                                    <td>
+                                        <div class="font-weight-medium">{{ $partner->name }}</div>
+                                    </td>
+                                    <td>
                                         @if ($partner->institution)
-                                            <x-lucide-building class="icon icon-inline" /> {{ $partner->institution }}
+                                            <div class="d-flex align-items-center">
+                                                <x-lucide-building class="icon me-1 text-muted" />
+                                                {{ $partner->institution }}
+                                            </div>
+                                        @else
+                                            <span class="text-muted">-</span>
                                         @endif
+                                    </td>
+                                    <td>
+                                        @if ($partner->email)
+                                            <a href="mailto:{{ $partner->email }}" class="text-reset">
+                                                <div class="d-flex align-items-center">
+                                                    <x-lucide-mail class="icon me-1 text-muted" />
+                                                    {{ $partner->email }}
+                                                </div>
+                                            </a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
                                         @if ($partner->country)
-                                            <x-lucide-map-pin class="icon icon-inline ms-2" /> {{ $partner->country }}
+                                            <div class="d-flex align-items-center">
+                                                <x-lucide-map-pin class="icon me-1 text-muted" />
+                                                {{ $partner->country }}
+                                            </div>
+                                        @else
+                                            <span class="text-muted">-</span>
                                         @endif
-                                    </p>
-                                    @if ($partner->email)
-                                        <small class="text-muted">
-                                            <x-lucide-mail class="icon icon-inline" /> {{ $partner->email }}
-                                        </small>
-                                    @endif
-                                </div>
-                                <button type="button"
-                                    wire:click="$set('form.partner_ids', {{ json_encode(array_values(array_diff($form->partner_ids, [$partnerId]))) }})"
-                                    class="btn btn-sm btn-danger">
-                                    <x-lucide-x class="icon" />
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-                @endforeach
+                                    </td>
+                                    <td>
+                                        @if ($partner->address)
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ $partner->address }}">
+                                                {{ $partner->address }}
+                                            </div>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($partner->commitment_letter_file)
+                                            <a href="{{ asset('storage/' . $partner->commitment_letter_file) }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-primary">
+                                                <x-lucide-file-text class="icon" />
+                                                Lihat
+                                            </a>
+                                        @else
+                                            <span class="badge bg-yellow-lt text-yellow-fg">
+                                                <x-lucide-file-x class="icon me-1" />
+                                                Tidak Ada
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-list flex-nowrap">
+                                            <button type="button"
+                                                wire:click="$set('form.partner_ids', {{ json_encode(array_values(array_diff($form->partner_ids, [$partnerId]))) }})"
+                                                class="btn btn-sm btn-danger">
+                                                <x-lucide-trash class="icon" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         @endif
     </div>
 </div>
 
 <!-- Modal: Tambah Mitra -->
-<div class="modal fade" id="modal-partner" tabindex="-1" wire:ignore.self>
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Mitra</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <ul class="nav nav-tabs mb-3" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-existing-partner"
-                            type="button" role="tab">
-                            Pilih Mitra Existing
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-new-partner"
-                            type="button" role="tab">
-                            Buat Mitra Baru
-                        </button>
-                    </li>
-                </ul>
-
-                <div class="tab-content">
-                    <!-- Tab: Pilih Existing -->
-                    <div class="tab-pane fade show active" id="tab-existing-partner" role="tabpanel">
-                        <div class="mb-3">
-                            <label class="form-label">Pilih Mitra</label>
-                            <div wire:ignore>
-                                <select class="form-select" x-data="tomSelect" multiple>
-                                    <option value="">-- Pilih Mitra --</option>
-                                    @foreach ($this->partners as $partner)
-                                        <option value="{{ $partner->id }}"
-                                            wire:click="$set('form.partner_ids', [...$wire.form.partner_ids, {{ $partner->id }}])">
-                                            {{ $partner->name }}
-                                            @if ($partner->institution)
-                                                ({{ $partner->institution }})
-                                            @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab: Buat Baru -->
-                    <div class="tab-pane fade" id="tab-new-partner" role="tabpanel">
-                        <div class="mb-3">
-                            <label class="form-label">Nama Mitra <span class="text-danger">*</span></label>
-                            <input type="text" wire:model="form.new_partner.name"
-                                class="form-control @error('form.new_partner.name') is-invalid @enderror"
-                                placeholder="Nama lengkap mitra">
-                            @error('form.new_partner.name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Alamat Surel</label>
-                            <input type="email" wire:model="form.new_partner.email"
-                                class="form-control @error('form.new_partner.email') is-invalid @enderror"
-                                placeholder="email@example.com">
-                            @error('form.new_partner.email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Institusi</label>
-                            <input type="text" wire:model="form.new_partner.institution"
-                                class="form-control @error('form.new_partner.institution') is-invalid @enderror"
-                                placeholder="Nama institusi">
-                            @error('form.new_partner.institution')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Negara</label>
-                            <input type="text" wire:model="form.new_partner.country"
-                                class="form-control @error('form.new_partner.country') is-invalid @enderror"
-                                placeholder="Negara">
-                            @error('form.new_partner.country')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Alamat</label>
-                            <textarea wire:model="form.new_partner.address"
-                                class="form-control @error('form.new_partner.address') is-invalid @enderror"
-                                rows="3" placeholder="Alamat lengkap"></textarea>
-                            @error('form.new_partner.address')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">File Surat Kesanggupan Mitra (PDF)</label>
-                            <input type="file" wire:model="form.new_partner_commitment_file"
-                                class="form-control @error('form.new_partner_commitment_file') is-invalid @enderror"
-                                accept=".pdf">
-                            @error('form.new_partner_commitment_file')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="text-muted">Maksimal 5MB, format PDF</small>
-
-                            @if ($form->new_partner_commitment_file)
-                                <div class="mt-2">
-                                    <x-lucide-file-check class="icon text-success" />
-                                    File terpilih: {{ $form->new_partner_commitment_file->getClientOriginalName() }}
-                                </div>
-                            @endif
-                        </div>
-
-                        <button type="button" wire:click="saveNewPartner" class="btn btn-primary">
-                            <x-lucide-save class="icon" />
-                            Simpan Mitra Baru
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
+<x-tabler.modal id="modal-partner" title="Tambah Mitra Baru" size="lg">
+    <div class="mb-3">
+        <label class="form-label">Nama Mitra <span class="text-danger">*</span></label>
+        <input type="text" wire:model="form.new_partner.name"
+            class="form-control @error('form.new_partner.name') is-invalid @enderror"
+            placeholder="Nama lengkap mitra" required>
+        @error('form.new_partner.name')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
     </div>
-</div>
+
+    <div class="mb-3">
+        <label class="form-label">Alamat Surel</label>
+        <input type="email" wire:model="form.new_partner.email"
+            class="form-control @error('form.new_partner.email') is-invalid @enderror"
+            placeholder="email@example.com">
+        @error('form.new_partner.email')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Institusi <span class="text-danger">*</span></label>
+        <input type="text" wire:model="form.new_partner.institution"
+            class="form-control @error('form.new_partner.institution') is-invalid @enderror"
+            placeholder="Nama institusi" required>
+        @error('form.new_partner.institution')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Negara <span class="text-danger">*</span></label>
+        <input type="text" wire:model="form.new_partner.country"
+            class="form-control @error('form.new_partner.country') is-invalid @enderror"
+            placeholder="Negara" required>
+        @error('form.new_partner.country')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Alamat</label>
+        <textarea wire:model="form.new_partner.address"
+            class="form-control @error('form.new_partner.address') is-invalid @enderror"
+            rows="3" placeholder="Alamat lengkap"></textarea>
+        @error('form.new_partner.address')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">File Surat Kesanggupan Mitra (PDF)</label>
+        <input type="file" wire:model="form.new_partner_commitment_file"
+            class="form-control @error('form.new_partner_commitment_file') is-invalid @enderror"
+            accept=".pdf">
+        @error('form.new_partner_commitment_file')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+        <small class="text-muted">Maksimal 5MB, format PDF</small>
+
+        @if ($form->new_partner_commitment_file)
+            <div class="mt-2">
+                <x-lucide-file-check class="icon text-success" />
+                File terpilih: {{ $form->new_partner_commitment_file->getClientOriginalName() }}
+            </div>
+        @endif
+    </div>
+
+    <x-slot:footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" wire:click="saveNewPartner" class="btn btn-primary">
+            <span wire:loading.remove>
+                <x-lucide-save class="icon" />
+                Simpan Mitra Baru
+            </span>
+            <span wire:loading class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <span wire:loading>Menyimpan...</span>
+        </button>
+    </x-slot:footer>
+</x-tabler.modal>

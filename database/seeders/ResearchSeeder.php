@@ -3,17 +3,25 @@
 namespace Database\Seeders;
 
 use App\Enums\ProposalStatus;
+use App\Models\Proposal;
+use App\Models\ProposalStatusLog;
+use App\Models\Research;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ResearchSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Get necessary data
-        $dosenUsers = \App\Models\User::with('identity')->whereHas('identity', fn($q) => $q->where('type', 'dosen'))->get();
+        // Retrieve all dosen users by role
+        $dosenUsers = User::role('dosen')->get();
+
+        if ($dosenUsers->count() < 2) {
+            $this->command->warn('Tidak cukup dosen untuk membuat proposal penelitian');
+
+            return;
+        }
+
         $keywords = \App\Models\Keyword::all();
         $researchSchemes = \App\Models\ResearchScheme::all();
         $focusAreas = \App\Models\FocusArea::all();
@@ -22,116 +30,182 @@ class ResearchSeeder extends Seeder
         $nationalPriorities = \App\Models\NationalPriority::all();
         $scienceClusters = \App\Models\ScienceCluster::where('level', 1)->get();
 
-        if ($dosenUsers->count() < 2 || $keywords->isEmpty()) {
+        if ($keywords->isEmpty() || $researchSchemes->isEmpty() || $focusAreas->isEmpty()) {
+            $this->command->warn('Master data tidak lengkap untuk membuat proposal');
+
             return;
         }
 
+        // Indonesian research titles organized by category
         $researchTitles = [
-            'Pengembangan Sistem Manajemen Informasi Akademik Berbasis Cloud',
-            'Analisis dan Optimasi Performa Database dengan Machine Learning',
-            'Implementasi IoT untuk Monitoring Energi Terbarukan',
-            'Sistem Rekomendasi Produk Menggunakan Collaborative Filtering',
-            'Keamanan Siber dalam Transaksi E-Commerce',
-            'Aplikasi Mobile untuk Ketahanan Pangan Masyarakat',
-            'Teknologi Blockchain untuk Supply Chain Tracking',
-            'Chatbot AI untuk Layanan Publik',
+            'Artificial Intelligence & Machine Learning' => [
+                'Pengembangan Model Machine Learning untuk Prediksi Penyakit Berbasis Data Klinis',
+                'Sistem Rekomendasi Produk Menggunakan Deep Learning dan Collaborative Filtering',
+                'Analisis Sentimen Media Sosial dengan Natural Language Processing untuk Monitoring Merek',
+                'Deteksi Fraud E-Commerce Menggunakan Ensemble Machine Learning Methods',
+            ],
+            'Cloud Computing & IoT' => [
+                'Implementasi IoT untuk Monitoring Efisiensi Energi Terbarukan di Smart Grid',
+                'Arsitektur Sistem Manajemen Informasi Akademik Berbasis Cloud Computing Microservices',
+                'Platform IoT Terdistribusi untuk Precision Agriculture di Indonesia',
+                'Sistem Monitoring Kualitas Udara Real-time Menggunakan Sensor Jaringan IoT',
+            ],
+            'Cybersecurity & Blockchain' => [
+                'Teknologi Blockchain untuk Transparansi Supply Chain Produk Halal Indonesia',
+                'Sistem Keamanan Multi-Layer pada Transaksi E-Commerce Menggunakan Cryptography Modern',
+                'Smart Contract untuk Verifikasi Kepemilikan Aset Digital di Sektor Keuangan',
+                'Analisis Vulnerabilitas dan Protokol Keamanan Sistem Informasi Publik',
+            ],
+            'Data Science & Analytics' => [
+                'Analisis Big Data untuk Optimasi Performa Database dengan Query Optimization Techniques',
+                'Sistem Business Intelligence untuk Prediksi Tren Pasar Saham Indonesia',
+                'Data Mining pada Log Server untuk Deteksi Anomali Sistem Informasi',
+                'Analisis Pola Migrasi Penduduk Menggunakan Spatial Data Analysis',
+            ],
+            'Software Engineering' => [
+                'Metodologi DevOps untuk Continuous Integration/Continuous Deployment di Perusahaan Startup',
+                'Testing Automation Framework untuk Meningkatkan Kualitas Software Development',
+                'Refactoring Legacy Code dengan Design Patterns Modern',
+                'Sistem Versioning Terdistribusi untuk Collaborative Development Teams',
+            ],
         ];
 
-        // Workflow statuses based on documentation
-        // draft -> submitted -> approved (Dekan) -> need_assignment (Kepala LPPM initial) ->
-        // under_review (reviewers assigned) -> reviewed (all reviews done) -> completed (final approval)
-        $workflowStatuses = [
-            ProposalStatus::DRAFT->value,
-            ProposalStatus::SUBMITTED->value,
-            ProposalStatus::APPROVED->value,
-            ProposalStatus::NEED_ASSIGNMENT->value,
-            ProposalStatus::UNDER_REVIEW->value,
-            ProposalStatus::REVIEWED->value,
-            ProposalStatus::COMPLETED->value,
-            ProposalStatus::REVISION_NEEDED->value,
+        // Flatten titles array
+        $flatTitles = array_reduce($researchTitles, fn ($carry, $category) => array_merge($carry, $category), []);
+
+        // Valid initial statuses (exclude REJECTED, REVISION_NEEDED, NEED_ASSIGNMENT)
+        $validStatuses = [
+            ProposalStatus::DRAFT,
+            ProposalStatus::SUBMITTED,
+            ProposalStatus::APPROVED,
+            ProposalStatus::UNDER_REVIEW,
+            ProposalStatus::REVIEWED,
+            ProposalStatus::COMPLETED,
         ];
+        $titleIndex = 0;
 
-        // Create 8 Research Proposals
-        foreach (range(0, 7) as $i) {
-            $submitter = $dosenUsers->random();
-            $focusArea = $focusAreas->random();
-            $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
-            $status = $workflowStatuses[$i % count($workflowStatuses)];
+        // For each dosen, create proposals covering valid statuses
+        foreach ($dosenUsers as $dosenIndex => $submitter) {
+            foreach ($validStatuses as $statusEnum) {
+                // Create 2 proposals for each status
+                for ($proposalCount = 0; $proposalCount < 2; $proposalCount++) {
+                    // Select focus area and related data
+                    $focusArea = $focusAreas->random();
+                    $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
+                    $topic = $topics->where('theme_id', $theme->id)->first() ?? $topics->random();
 
-            // Create Research detail first
-            $research = \App\Models\Research::factory()->create();
+                    // Create Research detail first
+                    $research = Research::factory()->create();
 
-            // Create proposal with Research
-            $proposal = \App\Models\Proposal::factory()->create([
-                'title' => $researchTitles[$i] ?? fake()->sentence(4),
-                'detailable_type' => \App\Models\Research::class,
-                'detailable_id' => $research->id,
-                'submitter_id' => $submitter->id,
-                'research_scheme_id' => $researchSchemes->random()->id,
-                'focus_area_id' => $focusArea->id,
-                'theme_id' => $theme->id,
-                'topic_id' => $topics->where('theme_id', $theme->id)->first()?->id ?? $topics->random()->id,
-                'national_priority_id' => $nationalPriorities->isNotEmpty() ? $nationalPriorities->random()->id : null,
-                'cluster_level1_id' => $scienceClusters->isNotEmpty() ? $scienceClusters->random()->id : null,
-                'status' => $status,
-                'duration_in_years' => rand(1, 3),
-                'sbk_value' => rand(50, 300) * 1000000, // 50-300 juta
-                'summary' => fake()->paragraph(),
-            ]);
+                    // Create title (cycle through available titles)
+                    $title = $flatTitles[$titleIndex % count($flatTitles)];
+                    $titleIndex++;
 
-            // Attach keywords (3-5 per proposal)
-            if ($keywords->isNotEmpty()) {
-                $proposal->keywords()->attach(
-                    $keywords->random(min(rand(3, 5), $keywords->count()))->pluck('id')
-                );
-            }
-
-            // Attach team members (only dosen, 2-4 anggota)
-            // Team member status: accepted for submitted+ statuses, pending for draft
-            $teamMemberStatus = in_array($status, [ProposalStatus::DRAFT->value, ProposalStatus::NEED_ASSIGNMENT->value])
-                ? 'pending'
-                : 'accepted';
-
-            $availableMembers = $dosenUsers->where('id', '!=', $submitter->id)->random(min(rand(2, 4), $dosenUsers->count() - 1));
-
-            foreach ($availableMembers as $member) {
-                $proposal->teamMembers()->attach($member->id, [
-                    'role' => 'anggota',
-                    'status' => $teamMemberStatus,
-                    'tasks' => fake()->sentence(10),
-                ]);
-            }
-
-            // Create related data
-            \App\Models\ProposalOutput::factory(rand(2, 4))->create(['proposal_id' => $proposal->id]);
-            \App\Models\BudgetItem::factory(rand(5, 8))->create(['proposal_id' => $proposal->id]);
-            \App\Models\ActivitySchedule::factory(rand(6, 12))->create(['proposal_id' => $proposal->id]);
-
-            // Create research stages with dosen as person in charge
-            if ($availableMembers->isNotEmpty()) {
-                \App\Models\ResearchStage::factory(rand(2, 4))->create([
-                    'proposal_id' => $proposal->id,
-                    'person_in_charge_id' => $availableMembers->random()->id,
-                ]);
-            }
-
-            // If status is under_review or reviewed, create reviewers
-            if (in_array($status, [ProposalStatus::UNDER_REVIEW->value, ProposalStatus::REVIEWED->value])) {
-                $reviewers = $dosenUsers->whereNotIn('id', $availableMembers->pluck('id')->push($submitter->id))
-                    ->random(min(2, $dosenUsers->count() - $availableMembers->count() - 1));
-
-                foreach ($reviewers as $reviewer) {
-                    \App\Models\ProposalReviewer::create([
-                        'proposal_id' => $proposal->id,
-                        'user_id' => $reviewer->id,
-                        'status' => $status === ProposalStatus::REVIEWED->value ? 'completed' : 'reviewing',
-                        'review_notes' => $status === ProposalStatus::REVIEWED->value ? fake()->paragraph() : null,
-                        'recommendation' => $status === ProposalStatus::REVIEWED->value
-                            ? fake()->randomElement(['approved', 'revision_needed'])
-                            : null,
+                    // Create Proposal with Research polymorphic relationship
+                    $proposal = Proposal::factory()->create([
+                        'title' => $title,
+                        'detailable_type' => Research::class,
+                        'detailable_id' => $research->id,
+                        'submitter_id' => $submitter->id,
+                        'research_scheme_id' => $researchSchemes->random()->id,
+                        'focus_area_id' => $focusArea->id,
+                        'theme_id' => $theme->id,
+                        'topic_id' => $topic->id,
+                        'national_priority_id' => $nationalPriorities->isNotEmpty() ? $nationalPriorities->random()->id : null,
+                        'cluster_level1_id' => $scienceClusters->isNotEmpty() ? $scienceClusters->random()->id : null,
+                        'status' => $statusEnum,
+                        'duration_in_years' => rand(1, 3),
+                        'sbk_value' => rand(50, 300) * 1000000, // 50-300 juta
+                        'summary' => fake()->paragraph(3),
                     ]);
+
+                    // Create ProposalStatusLog entry for initial status
+                    ProposalStatusLog::create([
+                        'proposal_id' => $proposal->id,
+                        'user_id' => $submitter->id,
+                        'status_before' => ProposalStatus::DRAFT,
+                        'status_after' => $statusEnum,
+                        'at' => $proposal->created_at,
+                    ]);
+
+                    // Attach keywords (3-5 per proposal)
+                    if ($keywords->isNotEmpty()) {
+                        $proposal->keywords()->attach(
+                            $keywords->random(min(rand(3, 5), $keywords->count()))->pluck('id')
+                        );
+                    }
+
+                    // Attach team members (anggota are also dosen, 2-4 per proposal)
+                    $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED])
+                        ? 'pending'
+                        : 'accepted';
+
+                    $availableMembers = $dosenUsers
+                        ->where('id', '!=', $submitter->id)
+                        ->random(min(rand(2, 4), $dosenUsers->count() - 1));
+
+                    foreach ($availableMembers as $member) {
+                        $proposal->teamMembers()->attach($member->id, [
+                            'role' => 'anggota',
+                            'status' => $teamMemberStatus,
+                            'tasks' => fake()->sentence(10),
+                        ]);
+                    }
+
+                    // Create related data
+                    // Mandatory outputs (Luaran Wajib)
+                    \App\Models\ProposalOutput::factory(rand(1, 2))->create([
+                        'proposal_id' => $proposal->id,
+                        'category' => 'Wajib',
+                        'output_year' => rand(1, 3),
+                    ]);
+
+                    // Additional outputs (Luaran Tambahan)
+                    \App\Models\ProposalOutput::factory(rand(1, 2))->create([
+                        'proposal_id' => $proposal->id,
+                        'category' => 'Tambahan',
+                        'output_year' => rand(1, 3),
+                    ]);
+
+                    \App\Models\BudgetItem::factory(rand(5, 8))->create(['proposal_id' => $proposal->id]);
+                    \App\Models\ActivitySchedule::factory(rand(6, 12))->create(['proposal_id' => $proposal->id]);
+
+                    // Create research stages with team members as person in charge
+                    if ($availableMembers->isNotEmpty()) {
+                        \App\Models\ResearchStage::factory(rand(2, 4))->create([
+                            'proposal_id' => $proposal->id,
+                            'person_in_charge_id' => $availableMembers->random()->id,
+                        ]);
+                    }
+
+                    // Create reviewers for UNDER_REVIEW and REVIEWED statuses
+                    if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED])) {
+                        $excludedIds = $availableMembers->pluck('id')->push($submitter->id)->toArray();
+                        $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
+
+                        if ($potentialReviewers->isNotEmpty()) {
+                            $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
+
+                            foreach ($reviewers as $reviewer) {
+                                \App\Models\ProposalReviewer::create([
+                                    'proposal_id' => $proposal->id,
+                                    'user_id' => $reviewer->id,
+                                    'status' => $statusEnum === ProposalStatus::REVIEWED ? 'completed' : 'reviewing',
+                                    'review_notes' => $statusEnum === ProposalStatus::REVIEWED ? fake()->paragraph() : null,
+                                    'recommendation' => $statusEnum === ProposalStatus::REVIEWED
+                                        ? fake()->randomElement(['approved', 'revision_needed'])
+                                        : null,
+                                ]);
+                            }
+                        }
+                    }
+
+                    // $this->command->line("✓ Proposal penelitian dibuat: {$proposal->title} (Status: {$statusEnum->label()})");
                 }
             }
         }
+
+        $totalResearchProposals = Proposal::where('detailable_type', Research::class)->count();
+        $this->command->info("Total proposal penelitian berhasil dibuat: {$totalResearchProposals}");
     }
 }
