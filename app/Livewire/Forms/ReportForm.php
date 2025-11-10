@@ -48,7 +48,7 @@ abstract class ReportForm extends Form
     {
         $this->progressReport = $report;
         $this->summaryUpdate = $report->summary_update ?? '';
-        $this->keywordsInput = $report->keywords->pluck('name')->implode(', ');
+        $this->keywordsInput = $report->keywords->pluck('name')->implode('; ');
         $this->reportingYear = (int) $report->reporting_year;
         $this->reportingPeriod = $report->reporting_period;
 
@@ -248,7 +248,7 @@ abstract class ReportForm extends Form
             return;
         }
 
-        $keywordNames = array_map('trim', explode(',', $this->keywordsInput));
+        $keywordNames = array_map('trim', explode(';', $this->keywordsInput));
         $keywords = [];
 
         foreach ($keywordNames as $name) {

@@ -21,6 +21,12 @@ abstract class ReportOutputShow extends ReportShow
     // Form instance
     public $form;
 
+    // Form properties exposed to Blade (mirrors form properties)
+    public string $summaryUpdate = '';
+    public string $keywordsInput = '';
+    public int $reportingYear;
+    public string $reportingPeriod = 'semester_1';
+
     /**
      * Get the Form class name - to be implemented by child classes
      */
@@ -44,14 +50,40 @@ abstract class ReportOutputShow extends ReportShow
         $formClass = $this->getFormClass();
         $this->form = new $formClass();
         $this->form->initWithProposal($this->proposal);
+        $this->reportingYear = (int) date('Y');
+        $this->reportingPeriod = 'semester_1';
 
         if ($this->progressReport) {
             $this->loadExistingReport($this->progressReport);
             $this->form->setReport($this->progressReport);
+            // Sync form properties to component properties
+            $this->syncFormToComponent();
         } else {
             $this->initializeNewReport($this->proposal);
             $this->form->initializeNewReport();
         }
+    }
+
+    /**
+     * Sync form properties to component properties
+     */
+    protected function syncFormToComponent(): void
+    {
+        $this->summaryUpdate = $this->form->summaryUpdate;
+        $this->keywordsInput = $this->form->keywordsInput;
+        $this->reportingYear = $this->form->reportingYear;
+        $this->reportingPeriod = $this->form->reportingPeriod;
+    }
+
+    /**
+     * Sync component properties to form properties
+     */
+    protected function syncComponentToForm(): void
+    {
+        $this->form->summaryUpdate = $this->summaryUpdate;
+        $this->form->keywordsInput = $this->keywordsInput;
+        $this->form->reportingYear = $this->reportingYear;
+        $this->form->reportingPeriod = $this->reportingPeriod;
     }
 
     /**
@@ -62,6 +94,9 @@ abstract class ReportOutputShow extends ReportShow
         if (!$this->canEdit) {
             abort(403);
         }
+
+        // Sync component properties to form before saving
+        $this->syncComponentToForm();
 
         // Validate substance file
         $this->validateSubstanceFile();
@@ -89,6 +124,9 @@ abstract class ReportOutputShow extends ReportShow
         if (!$this->canEdit) {
             abort(403);
         }
+
+        // Sync component properties to form before submitting
+        $this->syncComponentToForm();
 
         DB::transaction(function () {
             // Submit report via form

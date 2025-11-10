@@ -12,15 +12,25 @@ use App\Models\ProgressReport;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 abstract class ReportFinalShow extends ReportShow
 {
     use HasFileUploads;
     use ManagesOutputs;
 
+    // Form properties for wire:model bindings
+    public string $summaryUpdate = '';
+    public string $keywordsInput = '';
+    public int $reportingYear;
+    public string $reportingPeriod = 'final';
+
     // Final Report document files (3 files instead of 1)
     public $realizationFile;
     public $presentationFile;
+
+    // Temporary file arrays for output documents (from HasFileUploads trait)
+    // Note: These are defined in the trait, not duplicated here
 
     /**
      * Get the Form class name - to be implemented by child classes
@@ -38,6 +48,10 @@ abstract class ReportFinalShow extends ReportShow
     public function mount(Proposal $proposal): void
     {
         $this->proposal = $proposal;
+
+        // Initialize form properties
+        $this->reportingYear = (int) date('Y');
+        $this->reportingPeriod = 'final';
 
         // Check if user can view this proposal
         if (! $this->canViewFinalReport()) {
@@ -92,6 +106,12 @@ abstract class ReportFinalShow extends ReportShow
     {
         parent::loadReport();
 
+        // Load form properties from report
+        $this->summaryUpdate = $report->summary_update ?? '';
+        $this->keywordsInput = $report->keywords->pluck('name')->implode('; ');
+        $this->reportingYear = $report->reporting_year ?? (int) date('Y');
+        $this->reportingPeriod = $report->reporting_period ?? 'final';
+
         // Load outputs via trait
         $this->loadExistingOutputsForReport($report);
     }
@@ -103,24 +123,25 @@ abstract class ReportFinalShow extends ReportShow
     {
         parent::loadReport();
 
+        // Initialize form properties if not already set
+        if (empty($this->summaryUpdate)) {
+            $this->summaryUpdate = $proposal->summary ?? '';
+        }
+        if (empty($this->keywordsInput)) {
+            $this->keywordsInput = $proposal->keywords->pluck('name')->implode('; ') ?? '';
+        }
+        if (empty($this->reportingYear)) {
+            $this->reportingYear = (int) date('Y');
+        }
+        $this->reportingPeriod = 'final';
+
         // Initialize outputs via trait
         $this->initializeOutputsForNewReport($proposal);
     }
 
     /**
-     * Validate Final Report files (3 files)
-     */
-    public function validateFinalReportFiles(): void
-    {
-        $this->validate([
-            'substanceFile' => 'nullable|file|mimes:pdf|max:10240',
-            'realizationFile' => 'nullable|file|mimes:pdf,docx|max:10240',
-            'presentationFile' => 'nullable|file|mimes:pdf,pptx|max:51200',
-        ]);
-    }
-
-    /**
      * Save Final Report files
+     * Only saves files that are still valid UploadedFile instances
      */
     protected function saveFinalReportFiles(ProgressReport $report): void
     {
@@ -134,8 +155,8 @@ abstract class ReportFinalShow extends ReportShow
             throw new \Exception('Unauthorized: User does not have permission to edit this report');
         }
 
-        // Upload substance file
-        if ($this->substanceFile) {
+        // Upload substance file (only if it's still a valid UploadedFile)
+        if ($this->substanceFile instanceof \Illuminate\Http\UploadedFile && $this->substanceFile->isValid()) {
             $report->clearMediaCollection('substance_file');
             $report
                 ->addMedia($this->substanceFile->getRealPath())
@@ -149,8 +170,8 @@ abstract class ReportFinalShow extends ReportShow
                 ->toMediaCollection('substance_file');
         }
 
-        // Upload realization file
-        if ($this->realizationFile) {
+        // Upload realization file (only if it's still a valid UploadedFile)
+        if ($this->realizationFile instanceof \Illuminate\Http\UploadedFile && $this->realizationFile->isValid()) {
             $report->clearMediaCollection('realization_file');
             $report
                 ->addMedia($this->realizationFile->getRealPath())
@@ -164,8 +185,8 @@ abstract class ReportFinalShow extends ReportShow
                 ->toMediaCollection('realization_file');
         }
 
-        // Upload presentation file
-        if ($this->presentationFile) {
+        // Upload presentation file (only if it's still a valid UploadedFile)
+        if ($this->presentationFile instanceof \Illuminate\Http\UploadedFile && $this->presentationFile->isValid()) {
             $report->clearMediaCollection('presentation_file');
             $report
                 ->addMedia($this->presentationFile->getRealPath())
@@ -261,31 +282,33 @@ abstract class ReportFinalShow extends ReportShow
             abort(403);
         }
 
-        DB::transaction(function () {
-            // Files are already validated by Livewire via wire:model
-            // No need to validate again here
+        // Validate report data
+        $this->validateReportData();
 
+        DB::transaction(function () {
             // Save or update the report
             if ($this->progressReport) {
                 $this->progressReport->update([
-                    'summary_update' => $this->progressReport->summary_update ?? $this->proposal->summary,
+                    'summary_update' => $this->summaryUpdate ?: ($this->progressReport->summary_update ?? $this->proposal->summary),
+                    'reporting_year' => $this->reportingYear,
+                    'reporting_period' => $this->reportingPeriod,
                 ]);
             } else {
                 $this->progressReport = ProgressReport::create([
                     'proposal_id' => $this->proposal->id,
-                    'summary_update' => $this->proposal->summary,
-                    'reporting_year' => (int) date('Y'),
-                    'reporting_period' => 'final',
+                    'summary_update' => $this->summaryUpdate ?: $this->proposal->summary,
+                    'reporting_year' => $this->reportingYear,
+                    'reporting_period' => $this->reportingPeriod,
                     'status' => 'draft',
                 ]);
             }
 
-            // Save final report files (only if present)
+            // Save keywords (works for both new and existing reports)
+            $this->saveKeywords();
+
+            // Save final report files (only if files are still UploadedFile instances)
             $this->saveFinalReportFiles($this->progressReport);
         });
-
-        // Reset file properties after successful save
-        $this->reset(['substanceFile', 'realizationFile', 'presentationFile']);
 
         $this->dispatch('report-saved');
         session()->flash('success', 'Dokumen laporan akhir berhasil disimpan.');
@@ -300,14 +323,16 @@ abstract class ReportFinalShow extends ReportShow
             abort(403);
         }
 
-        DB::transaction(function () {
-            // Files are already validated by Livewire via wire:model
-            // No need to validate again here
+        // Validate report data
+        $this->validateReportData();
 
+        DB::transaction(function () {
             // Save or update the report
             if ($this->progressReport) {
                 $this->progressReport->update([
-                    'summary_update' => $this->progressReport->summary_update ?? $this->proposal->summary,
+                    'summary_update' => $this->summaryUpdate ?: ($this->progressReport->summary_update ?? $this->proposal->summary),
+                    'reporting_year' => $this->reportingYear,
+                    'reporting_period' => $this->reportingPeriod,
                     'status' => 'submitted',
                     'submitted_by' => Auth::id(),
                     'submitted_at' => now(),
@@ -315,21 +340,21 @@ abstract class ReportFinalShow extends ReportShow
             } else {
                 $this->progressReport = ProgressReport::create([
                     'proposal_id' => $this->proposal->id,
-                    'summary_update' => $this->proposal->summary,
-                    'reporting_year' => (int) date('Y'),
-                    'reporting_period' => 'final',
+                    'summary_update' => $this->summaryUpdate ?: $this->proposal->summary,
+                    'reporting_year' => $this->reportingYear,
+                    'reporting_period' => $this->reportingPeriod,
                     'status' => 'submitted',
                     'submitted_by' => Auth::id(),
                     'submitted_at' => now(),
                 ]);
             }
 
-            // Save final report files (only if present)
+            // Save keywords (works for both new and existing reports)
+            $this->saveKeywords();
+
+            // Save final report files (only if files are still UploadedFile instances)
             $this->saveFinalReportFiles($this->progressReport);
         });
-
-        // Reset file properties after successful submit
-        $this->reset(['substanceFile', 'realizationFile', 'presentationFile']);
 
         session()->flash('success', 'Dokumen laporan akhir berhasil diajukan.');
         $this->redirect(route($this->getRouteName()), navigate: true);
@@ -337,16 +362,20 @@ abstract class ReportFinalShow extends ReportShow
 
     /**
      * Handle substance file upload
+     * Auto-save the file and don't reset it
      */
     public function updatedSubstanceFile(): void
     {
         if (!$this->canEdit) {
+            $this->reset('substanceFile');
             return;
         }
 
+        // Validate and save
         try {
-            // File is already validated by Livewire when uploaded via wire:model
-            // No need to validate again - just save directly
+            $this->validate([
+                'substanceFile' => 'nullable|file|mimes:pdf,application/pdf|max:10240',
+            ]);
 
             if ($this->substanceFile) {
                 DB::transaction(function () {
@@ -358,31 +387,40 @@ abstract class ReportFinalShow extends ReportShow
                             'reporting_period' => 'final',
                             'status' => 'draft',
                         ]);
+
+                        // Save keywords for new report
+                        $this->saveKeywords();
                     }
 
                     $this->saveFinalReportFiles($this->progressReport);
                 });
 
+                // DON'T reset the file - keep it for save/submit
                 session()->flash('success', 'File substansi laporan berhasil diunggah.');
             }
         } catch (\Exception $e) {
             $this->reset('substanceFile');
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+            \Log::error('Substance file upload error: ' . $e->getMessage());
         }
     }
 
     /**
      * Handle realization file upload
+     * Auto-save the file and don't reset it
      */
     public function updatedRealizationFile(): void
     {
         if (!$this->canEdit) {
+            $this->reset('realizationFile');
             return;
         }
 
+        // Validate and save
         try {
-            // File is already validated by Livewire when uploaded via wire:model
-            // No need to validate again - just save directly
+            $this->validate([
+                'realizationFile' => 'nullable|file|mimes:pdf,docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:10240',
+            ]);
 
             if ($this->realizationFile) {
                 DB::transaction(function () {
@@ -394,31 +432,49 @@ abstract class ReportFinalShow extends ReportShow
                             'reporting_period' => 'final',
                             'status' => 'draft',
                         ]);
+
+                        // Save keywords for new report
+                        $this->saveKeywords();
                     }
 
                     $this->saveFinalReportFiles($this->progressReport);
                 });
 
+                // DON'T reset the file - keep it for save/submit
                 session()->flash('success', 'File realisasi keterlibatan berhasil diunggah.');
             }
         } catch (\Exception $e) {
             $this->reset('realizationFile');
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+            \Log::error('Realization file upload error: ' . $e->getMessage());
         }
     }
 
     /**
      * Handle presentation file upload
+     * Auto-save the file and don't reset it
      */
     public function updatedPresentationFile(): void
     {
         if (!$this->canEdit) {
+            $this->reset('presentationFile');
             return;
         }
 
+        // Validate and save
         try {
-            // File is already validated by Livewire when uploaded via wire:model
-            // No need to validate again - just save directly
+            // Log the MIME type for debugging
+            if ($this->presentationFile instanceof \Illuminate\Http\UploadedFile) {
+                \Log::info('Presentation file MIME type', [
+                    'mime' => $this->presentationFile->getMimeType(),
+                    'clientMimeType' => $this->presentationFile->getClientMimeType(),
+                    'originalName' => $this->presentationFile->getClientOriginalName(),
+                ]);
+            }
+
+            $this->validate([
+                'presentationFile' => 'nullable|file|mimes:pdf,pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip|max:51200',
+            ]);
 
             if ($this->presentationFile) {
                 DB::transaction(function () {
@@ -430,14 +486,19 @@ abstract class ReportFinalShow extends ReportShow
                             'reporting_period' => 'final',
                             'status' => 'draft',
                         ]);
+
+                        // Save keywords for new report
+                        $this->saveKeywords();
                     }
 
                     $this->saveFinalReportFiles($this->progressReport);
                 });
 
+                // DON'T reset the file - keep it for save/submit
                 session()->flash('success', 'File presentasi hasil berhasil diunggah.');
             }
         } catch (\Exception $e) {
+            \Log::error('Presentation file upload error: ' . $e->getMessage());
             $this->reset('presentationFile');
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
@@ -497,6 +558,30 @@ abstract class ReportFinalShow extends ReportShow
     }
 
     /**
+     * Save keywords to the report
+     */
+    protected function saveKeywords(): void
+    {
+        if (empty($this->keywordsInput) || !$this->progressReport) {
+            return;
+        }
+
+        $keywordNames = array_map('trim', explode(';', $this->keywordsInput));
+        $keywords = [];
+
+        foreach ($keywordNames as $name) {
+            if (empty($name)) {
+                continue;
+            }
+
+            $keyword = Keyword::firstOrCreate(['name' => $name]);
+            $keywords[] = $keyword->id;
+        }
+
+        $this->progressReport->keywords()->sync($keywords);
+    }
+
+    /**
      * Get empty mandatory output structure
      */
     protected function getEmptyMandatoryOutput(): array
@@ -537,6 +622,27 @@ abstract class ReportFinalShow extends ReportShow
             'publisher_url' => '',
             'book_url' => '',
         ];
+    }
+
+    /**
+     * Get validation rules
+     */
+    public function rules(): array
+    {
+        return [
+            'summaryUpdate' => ['nullable', 'string', 'min:10'],
+            'keywordsInput' => ['nullable', 'string'],
+            'reportingYear' => ['required', 'integer', 'min:2020', 'max:2099'],
+            'reportingPeriod' => ['required', 'string', 'in:final'],
+        ];
+    }
+
+    /**
+     * Validate report data
+     */
+    public function validateReportData(): void
+    {
+        $this->validate($this->rules());
     }
 
     /**
