@@ -21,17 +21,23 @@ abstract class ReportFinalShow extends ReportShow
 
     // Form properties for wire:model bindings
     public string $summaryUpdate = '';
+
     public string $keywordsInput = '';
+
     public int $reportingYear;
+
     public string $reportingPeriod = 'final';
 
     // Final Report document files (3 files instead of 1)
     public $realizationFile;
+
     public $presentationFile;
 
     // Output document file uploads
     public array $tempMandatoryFiles = [];
+
     public array $tempAdditionalFiles = [];
+
     public array $tempAdditionalCerts = [];
 
     /**
@@ -148,12 +154,12 @@ abstract class ReportFinalShow extends ReportShow
     protected function saveFinalReportFiles(ProgressReport $report): void
     {
         // Ensure proposal is loaded
-        if (!$this->proposal) {
+        if (! $this->proposal) {
             throw new \Exception('Proposal not loaded in component');
         }
 
         // Ensure user has permission
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             throw new \Exception('Unauthorized: User does not have permission to edit this report');
         }
 
@@ -209,7 +215,7 @@ abstract class ReportFinalShow extends ReportShow
     protected function loadExistingOutputsForReport(ProgressReport $report): void
     {
         // Ensure proposal is loaded
-        if (!$this->proposal) {
+        if (! $this->proposal) {
             throw new \Exception('Proposal not loaded in component');
         }
 
@@ -283,7 +289,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function save(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             abort(403);
         }
 
@@ -324,7 +330,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function submit(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             abort(403);
         }
 
@@ -371,8 +377,9 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function updatedSubstanceFile(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             $this->reset('substanceFile');
+
             return;
         }
 
@@ -384,7 +391,7 @@ abstract class ReportFinalShow extends ReportShow
 
             if ($this->substanceFile) {
                 DB::transaction(function () {
-                    if (!$this->progressReport) {
+                    if (! $this->progressReport) {
                         $this->progressReport = ProgressReport::create([
                             'proposal_id' => $this->proposal->id,
                             'summary_update' => $this->proposal->summary,
@@ -406,7 +413,7 @@ abstract class ReportFinalShow extends ReportShow
         } catch (\Exception $e) {
             $this->reset('substanceFile');
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
-            \Log::error('Substance file upload error: ' . $e->getMessage());
+            Log::error('Substance file upload error: ' . $e->getMessage());
         }
     }
 
@@ -416,8 +423,9 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function updatedRealizationFile(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             $this->reset('realizationFile');
+
             return;
         }
 
@@ -429,7 +437,7 @@ abstract class ReportFinalShow extends ReportShow
 
             if ($this->realizationFile) {
                 DB::transaction(function () {
-                    if (!$this->progressReport) {
+                    if (! $this->progressReport) {
                         $this->progressReport = ProgressReport::create([
                             'proposal_id' => $this->proposal->id,
                             'summary_update' => $this->proposal->summary,
@@ -451,7 +459,7 @@ abstract class ReportFinalShow extends ReportShow
         } catch (\Exception $e) {
             $this->reset('realizationFile');
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
-            \Log::error('Realization file upload error: ' . $e->getMessage());
+            Log::error('Realization file upload error: ' . $e->getMessage());
         }
     }
 
@@ -461,8 +469,9 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function updatedPresentationFile(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             $this->reset('presentationFile');
+
             return;
         }
 
@@ -470,7 +479,7 @@ abstract class ReportFinalShow extends ReportShow
         try {
             // Log the MIME type for debugging
             if ($this->presentationFile instanceof \Illuminate\Http\UploadedFile) {
-                \Log::info('Presentation file MIME type', [
+                Log::info('Presentation file MIME type', [
                     'mime' => $this->presentationFile->getMimeType(),
                     'clientMimeType' => $this->presentationFile->getClientMimeType(),
                     'originalName' => $this->presentationFile->getClientOriginalName(),
@@ -483,7 +492,7 @@ abstract class ReportFinalShow extends ReportShow
 
             if ($this->presentationFile) {
                 DB::transaction(function () {
-                    if (!$this->progressReport) {
+                    if (! $this->progressReport) {
                         $this->progressReport = ProgressReport::create([
                             'proposal_id' => $this->proposal->id,
                             'summary_update' => $this->proposal->summary,
@@ -503,7 +512,7 @@ abstract class ReportFinalShow extends ReportShow
                 session()->flash('success', 'File presentasi hasil berhasil diunggah.');
             }
         } catch (\Exception $e) {
-            \Log::error('Presentation file upload error: ' . $e->getMessage());
+            Log::error('Presentation file upload error: ' . $e->getMessage());
             $this->reset('presentationFile');
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
@@ -514,7 +523,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function updatedTempMandatoryFiles(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             return;
         }
 
@@ -532,7 +541,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function updatedTempAdditionalFiles(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             return;
         }
 
@@ -550,7 +559,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function updatedTempAdditionalCerts(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             return;
         }
 
@@ -568,7 +577,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function removeSubstanceFile(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             abort(403);
         }
 
@@ -583,7 +592,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function removeRealizationFile(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             abort(403);
         }
 
@@ -598,7 +607,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     public function removePresentationFile(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             abort(403);
         }
 
@@ -611,22 +620,26 @@ abstract class ReportFinalShow extends ReportShow
     /**
      * Save mandatory output (journal article)
      */
-    public function saveMandatoryOutput(int $proposalOutputId): void
+    public function saveMandatoryOutput(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             abort(403);
         }
 
-        if (!isset($this->mandatoryOutputs[$proposalOutputId])) {
+        $proposalOutputId = $this->editingMandatoryId;
+
+        if (! $proposalOutputId || ! isset($this->mandatoryOutputs[$proposalOutputId])) {
             session()->flash('error', 'Data luaran wajib tidak ditemukan.');
+
             return;
         }
 
         $data = $this->mandatoryOutputs[$proposalOutputId];
 
         // Ensure progress report exists
-        if (!$this->progressReport) {
+        if (! $this->progressReport) {
             session()->flash('error', 'Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
+
             return;
         }
 
@@ -636,7 +649,11 @@ abstract class ReportFinalShow extends ReportShow
                 ->where('proposal_output_id', $proposalOutputId)
                 ->first();
 
-            if (!$output) {
+            // Convert empty strings to null for integer fields
+            $pageStart = ! empty($data['page_start']) ? (int) $data['page_start'] : null;
+            $pageEnd = ! empty($data['page_end']) ? (int) $data['page_end'] : null;
+
+            if (! $output) {
                 $output = \App\Models\MandatoryOutput::create([
                     'progress_report_id' => $this->progressReport->id,
                     'proposal_output_id' => $proposalOutputId,
@@ -651,8 +668,8 @@ abstract class ReportFinalShow extends ReportShow
                     'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
                     'volume' => $data['volume'] ?? '',
                     'issue_number' => $data['issue_number'] ?? '',
-                    'page_start' => $data['page_start'] ?? '',
-                    'page_end' => $data['page_end'] ?? '',
+                    'page_start' => $pageStart,
+                    'page_end' => $pageEnd,
                     'article_url' => $data['article_url'] ?? '',
                     'doi' => $data['doi'] ?? '',
                 ]);
@@ -669,16 +686,18 @@ abstract class ReportFinalShow extends ReportShow
                     'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
                     'volume' => $data['volume'] ?? '',
                     'issue_number' => $data['issue_number'] ?? '',
-                    'page_start' => $data['page_start'] ?? '',
-                    'page_end' => $data['page_end'] ?? '',
+                    'page_start' => $pageStart,
+                    'page_end' => $pageEnd,
                     'article_url' => $data['article_url'] ?? '',
                     'doi' => $data['doi'] ?? '',
                 ]);
             }
 
             // Save file if uploaded
-            if (isset($this->tempMandatoryFiles[$proposalOutputId]) &&
-                $this->tempMandatoryFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile) {
+            if (
+                isset($this->tempMandatoryFiles[$proposalOutputId]) &&
+                $this->tempMandatoryFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile
+            ) {
                 $file = $this->tempMandatoryFiles[$proposalOutputId];
 
                 $output->clearMediaCollection('journal_article');
@@ -707,22 +726,26 @@ abstract class ReportFinalShow extends ReportShow
     /**
      * Save additional output (book)
      */
-    public function saveAdditionalOutput(int $proposalOutputId): void
+    public function saveAdditionalOutput(): void
     {
-        if (!$this->canEdit) {
+        if (! $this->canEdit) {
             abort(403);
         }
 
-        if (!isset($this->additionalOutputs[$proposalOutputId])) {
+        $proposalOutputId = $this->editingAdditionalId;
+
+        if (! $proposalOutputId || ! isset($this->additionalOutputs[$proposalOutputId])) {
             session()->flash('error', 'Data luaran tambahan tidak ditemukan.');
+
             return;
         }
 
         $data = $this->additionalOutputs[$proposalOutputId];
 
         // Ensure progress report exists
-        if (!$this->progressReport) {
+        if (! $this->progressReport) {
             session()->flash('error', 'Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
+
             return;
         }
 
@@ -732,7 +755,10 @@ abstract class ReportFinalShow extends ReportShow
                 ->where('proposal_output_id', $proposalOutputId)
                 ->first();
 
-            if (!$output) {
+            // Convert empty strings to null for integer fields
+            $totalPages = ! empty($data['total_pages']) ? (int) $data['total_pages'] : null;
+
+            if (! $output) {
                 $output = \App\Models\AdditionalOutput::create([
                     'progress_report_id' => $this->progressReport->id,
                     'proposal_output_id' => $proposalOutputId,
@@ -741,7 +767,7 @@ abstract class ReportFinalShow extends ReportShow
                     'publisher_name' => $data['publisher_name'] ?? '',
                     'isbn' => $data['isbn'] ?? '',
                     'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
-                    'total_pages' => $data['total_pages'] ? (int) $data['total_pages'] : null,
+                    'total_pages' => $totalPages,
                     'publisher_url' => $data['publisher_url'] ?? '',
                     'book_url' => $data['book_url'] ?? '',
                 ]);
@@ -752,15 +778,17 @@ abstract class ReportFinalShow extends ReportShow
                     'publisher_name' => $data['publisher_name'] ?? '',
                     'isbn' => $data['isbn'] ?? '',
                     'publication_year' => $data['publication_year'] ? (int) $data['publication_year'] : null,
-                    'total_pages' => $data['total_pages'] ? (int) $data['total_pages'] : null,
+                    'total_pages' => $totalPages,
                     'publisher_url' => $data['publisher_url'] ?? '',
                     'book_url' => $data['book_url'] ?? '',
                 ]);
             }
 
             // Save document file if uploaded
-            if (isset($this->tempAdditionalFiles[$proposalOutputId]) &&
-                $this->tempAdditionalFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile) {
+            if (
+                isset($this->tempAdditionalFiles[$proposalOutputId]) &&
+                $this->tempAdditionalFiles[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile
+            ) {
                 $file = $this->tempAdditionalFiles[$proposalOutputId];
 
                 $output->clearMediaCollection('book_document');
@@ -780,8 +808,10 @@ abstract class ReportFinalShow extends ReportShow
             }
 
             // Save certificate file if uploaded
-            if (isset($this->tempAdditionalCerts[$proposalOutputId]) &&
-                $this->tempAdditionalCerts[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile) {
+            if (
+                isset($this->tempAdditionalCerts[$proposalOutputId]) &&
+                $this->tempAdditionalCerts[$proposalOutputId] instanceof \Illuminate\Http\UploadedFile
+            ) {
                 $file = $this->tempAdditionalCerts[$proposalOutputId];
 
                 $output->clearMediaCollection('publication_certificate');
@@ -818,7 +848,7 @@ abstract class ReportFinalShow extends ReportShow
      */
     protected function saveKeywords(): void
     {
-        if (empty($this->keywordsInput) || !$this->progressReport) {
+        if (empty($this->keywordsInput) || ! $this->progressReport) {
             return;
         }
 

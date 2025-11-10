@@ -39,8 +39,8 @@
 
             <div class="mb-3">
                 <label class="form-label required">Tahun Pelaporan</label>
-                <input type="number" wire:model="reportingYear" class="form-control" min="2020"
-                    max="2030" @disabled(!$canEdit) />
+                <input type="number" wire:model="reportingYear" class="form-control" min="2020" max="2030"
+                    @disabled(!$canEdit) />
                 @error('reportingYear')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -56,8 +56,9 @@
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label">File Substansi Laporan (PDF)</label>
-                <input type="file" wire:model="substanceFile" class="form-control @error('substanceFile') is-invalid @enderror"
-                    accept=".pdf" @disabled(!$canEdit) />
+                <input type="file" wire:model="substanceFile"
+                    class="form-control @error('substanceFile') is-invalid @enderror" accept=".pdf"
+                    @disabled(!$canEdit) />
                 @error('substanceFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -91,8 +92,9 @@
 
             <div class="mb-3">
                 <label class="form-label">File Realisasi Keterlibatan (PDF/DOCX)</label>
-                <input type="file" wire:model="realizationFile" class="form-control @error('realizationFile') is-invalid @enderror"
-                    accept=".pdf,.docx" @disabled(!$canEdit) />
+                <input type="file" wire:model="realizationFile"
+                    class="form-control @error('realizationFile') is-invalid @enderror" accept=".pdf,.docx"
+                    @disabled(!$canEdit) />
                 @error('realizationFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -126,8 +128,9 @@
 
             <div class="mb-3">
                 <label class="form-label">File Presentasi Hasil (PDF/PPTX)</label>
-                <input type="file" wire:model="presentationFile" class="form-control @error('presentationFile') is-invalid @enderror"
-                    accept=".pdf,.pptx" @disabled(!$canEdit) />
+                <input type="file" wire:model="presentationFile"
+                    class="form-control @error('presentationFile') is-invalid @enderror" accept=".pdf,.pptx"
+                    @disabled(!$canEdit) />
                 @error('presentationFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -189,7 +192,10 @@
                             @foreach ($wajibs as $index => $output)
                                 @php
                                     $mandatoryOutput = $progressReport
-                                        ? $progressReport->mandatoryOutputs()->where('proposal_output_id', $output->id)->first()
+                                        ? $progressReport
+                                            ->mandatoryOutputs()
+                                            ->where('proposal_output_id', $output->id)
+                                            ->first()
                                         : null;
                                 @endphp
                                 <tr wire:key="wajib-row-{{ $output->id }}">
@@ -225,7 +231,8 @@
                                             @php
                                                 $media = $mandatoryOutput->getFirstMedia('journal_article');
                                             @endphp
-                                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-success">
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-success">
                                                 <x-lucide-file-check class="icon icon-sm" />
                                                 Lihat Dokumen
                                             </a>
@@ -238,11 +245,12 @@
                                     </td>
                                     <td>
                                         @if ($canEdit)
-                                            <button type="button" wire:click="editMandatoryOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon" data-bs-toggle="modal"
-                                            data-bs-target="#modalMandatoryOutput">
-                                            <x-lucide-pencil class="icon" />
-                                        </button>
+                                            <button type="button"
+                                                wire:click="editMandatoryOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon" data-bs-toggle="modal"
+                                                data-bs-target="#modalMandatoryOutput">
+                                                <x-lucide-pencil class="icon" />
+                                            </button>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
@@ -288,7 +296,10 @@
                             @foreach ($tambahans as $index => $output)
                                 @php
                                     $additionalOutput = $progressReport
-                                        ? $progressReport->additionalOutputs()->where('proposal_output_id', $output->id)->first()
+                                        ? $progressReport
+                                            ->additionalOutputs()
+                                            ->where('proposal_output_id', $output->id)
+                                            ->first()
                                         : null;
                                 @endphp
                                 <tr wire:key="tambahan-row-{{ $output->id }}">
@@ -321,7 +332,8 @@
                                                     @php
                                                         $media = $additionalOutput->getFirstMedia('book_document');
                                                     @endphp
-                                                    <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-success">
+                                                    <a href="{{ $media->getUrl() }}" target="_blank"
+                                                        class="btn btn-sm btn-success">
                                                         <x-lucide-book class="icon icon-sm" />
                                                         Buku
                                                     </a>
@@ -329,9 +341,12 @@
 
                                                 @if ($additionalOutput->hasMedia('publication_certificate'))
                                                     @php
-                                                        $media = $additionalOutput->getFirstMedia('publication_certificate');
+                                                        $media = $additionalOutput->getFirstMedia(
+                                                            'publication_certificate',
+                                                        );
                                                     @endphp
-                                                    <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-info">
+                                                    <a href="{{ $media->getUrl() }}" target="_blank"
+                                                        class="btn btn-sm btn-info">
                                                         <x-lucide-award class="icon icon-sm" />
                                                         Sertifikat
                                                     </a>
@@ -353,11 +368,12 @@
                                     </td>
                                     <td>
                                         @if ($canEdit)
-                                            <button type="button" wire:click="editAdditionalOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon" data-bs-toggle="modal"
-                                            data-bs-target="#modalAdditionalOutput">
-                                            <x-lucide-pencil class="icon" />
-                                        </button>
+                                            <button type="button"
+                                                wire:click="editAdditionalOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon" data-bs-toggle="modal"
+                                                data-bs-target="#modalAdditionalOutput">
+                                                <x-lucide-pencil class="icon" />
+                                            </button>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
@@ -378,30 +394,30 @@
 
     <!-- Action Buttons -->
     @if ($canEdit)
-    <div class="card">
-        <div class="card-body">
-            <div class="justify-content-end btn-list">
-                <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="save">
-                        <x-lucide-save class="icon" /> Simpan Draft
-                    </span>
-                    <span wire:loading wire:target="save">
-                        <span class="me-2 spinner-border spinner-border-sm"></span>
-                        Menyimpan...
-                    </span>
-                </button>
-                <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="submit">
-                        <x-lucide-send class="icon" /> Ajukan Laporan Akhir
-                    </span>
-                    <span wire:loading wire:target="submit">
-                        <span class="me-2 spinner-border spinner-border-sm"></span>
-                        Mengajukan...
-                    </span>
-                </button>
+        <div class="card">
+            <div class="card-body">
+                <div class="justify-content-end btn-list">
+                    <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="save">
+                            <x-lucide-save class="icon" /> Simpan Draft
+                        </span>
+                        <span wire:loading wire:target="save">
+                            <span class="me-2 spinner-border spinner-border-sm"></span>
+                            Menyimpan...
+                        </span>
+                    </button>
+                    <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="submit">
+                            <x-lucide-send class="icon" /> Ajukan Laporan Akhir
+                        </span>
+                        <span wire:loading wire:target="submit">
+                            <span class="me-2 spinner-border spinner-border-sm"></span>
+                            Mengajukan...
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
     @endif
 
     <!-- Modal: Mandatory Output -->
@@ -599,7 +615,7 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveMandatoryOutput({{ $editingMandatoryId }})" class="btn btn-primary"
+                <button type="button" wire:click="saveMandatoryOutput()" class="btn btn-primary"
                     wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="saveMandatoryOutput">
                         <x-lucide-save class="icon" /> Simpan
@@ -762,7 +778,7 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveAdditionalOutput({{ $editingAdditionalId }})" class="btn btn-primary"
+                <button type="button" wire:click="saveAdditionalOutput()" class="btn btn-primary"
                     wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="saveAdditionalOutput">
                         <x-lucide-save class="icon" /> Simpan
