@@ -48,6 +48,119 @@
         </div>
     </div>
 
+    <!-- Dokumen Laporan Akhir -->
+    <div class="mb-3 card">
+        <div class="card-header">
+            <h3 class="card-title"><x-lucide-file-text class="me-2 icon" />Dokumen Laporan Akhir</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">File Substansi Laporan (PDF)</label>
+                <input type="file" wire:model="substanceFile" class="form-control @error('substanceFile') is-invalid @enderror"
+                    accept=".pdf" @disabled(!$canEdit) />
+                @error('substanceFile')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-hint">Maksimal 10MB, format PDF</small>
+
+                <div wire:loading wire:target="substanceFile">
+                    <small class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Uploading...
+                    </small>
+                </div>
+
+                @if ($progressReport && $progressReport->hasMedia('substance_file'))
+                    @php
+                        $media = $progressReport->getFirstMedia('substance_file');
+                    @endphp
+                    <div class="alert alert-success mt-2 mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <x-lucide-file-check class="icon text-success me-2" />
+                                <strong>{{ $media->name }}</strong>
+                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                            </div>
+                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                <x-lucide-eye class="icon" /> Lihat
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">File Realisasi Keterlibatan (PDF/DOCX)</label>
+                <input type="file" wire:model="realizationFile" class="form-control @error('realizationFile') is-invalid @enderror"
+                    accept=".pdf,.docx" @disabled(!$canEdit) />
+                @error('realizationFile')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-hint">Maksimal 10MB, format PDF atau DOCX</small>
+
+                <div wire:loading wire:target="realizationFile">
+                    <small class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Uploading...
+                    </small>
+                </div>
+
+                @if ($progressReport && $progressReport->hasMedia('realization_file'))
+                    @php
+                        $media = $progressReport->getFirstMedia('realization_file');
+                    @endphp
+                    <div class="alert alert-success mt-2 mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <x-lucide-file-check class="icon text-success me-2" />
+                                <strong>{{ $media->name }}</strong>
+                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                            </div>
+                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                <x-lucide-eye class="icon" /> Lihat
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">File Presentasi Hasil (PDF/PPTX)</label>
+                <input type="file" wire:model="presentationFile" class="form-control @error('presentationFile') is-invalid @enderror"
+                    accept=".pdf,.pptx" @disabled(!$canEdit) />
+                @error('presentationFile')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-hint">Maksimal 50MB, format PDF atau PPTX</small>
+
+                <div wire:loading wire:target="presentationFile">
+                    <small class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Uploading...
+                    </small>
+                </div>
+
+                @if ($progressReport && $progressReport->hasMedia('presentation_file'))
+                    @php
+                        $media = $progressReport->getFirstMedia('presentation_file');
+                    @endphp
+                    <div class="alert alert-success mt-2 mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <x-lucide-file-check class="icon text-success me-2" />
+                                <strong>{{ $media->name }}</strong>
+                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                            </div>
+                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                <x-lucide-eye class="icon" /> Lihat
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <!-- Luaran Wajib -->
     <div class="mb-3 card">
         <div class="card-header">
@@ -68,11 +181,17 @@
                                 <th>Tahun Target</th>
                                 <th>Target Status</th>
                                 <th>Status Input</th>
+                                <th>Dokumen</th>
                                 <th class="w-1">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($wajibs as $index => $output)
+                                @php
+                                    $mandatoryOutput = $progressReport
+                                        ? $progressReport->mandatoryOutputs()->where('proposal_output_id', $output->id)->first()
+                                        : null;
+                                @endphp
                                 <tr wire:key="wajib-row-{{ $output->id }}">
                                     <td>{{ $index + 1 }}</td>
                                     <td>
@@ -99,6 +218,22 @@
                                             <x-tabler.badge color="secondary">
                                                 Belum Diisi
                                             </x-tabler.badge>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($mandatoryOutput && $mandatoryOutput->hasMedia('journal_article'))
+                                            @php
+                                                $media = $mandatoryOutput->getFirstMedia('journal_article');
+                                            @endphp
+                                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-success">
+                                                <x-lucide-file-check class="icon icon-sm" />
+                                                Lihat Dokumen
+                                            </a>
+                                        @else
+                                            <span class="text-muted">
+                                                <x-lucide-file-x class="icon icon-sm" />
+                                                Belum Upload
+                                            </span>
                                         @endif
                                     </td>
                                     <td>
@@ -145,11 +280,17 @@
                                 <th>Jenis Luaran</th>
                                 <th>Tahun Target</th>
                                 <th>Status Input</th>
+                                <th>Dokumen</th>
                                 <th class="w-1">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($tambahans as $index => $output)
+                                @php
+                                    $additionalOutput = $progressReport
+                                        ? $progressReport->additionalOutputs()->where('proposal_output_id', $output->id)->first()
+                                        : null;
+                                @endphp
                                 <tr wire:key="tambahan-row-{{ $output->id }}">
                                     <td>{{ $index + 1 }}</td>
                                     <td>
@@ -171,6 +312,43 @@
                                             <x-tabler.badge color="secondary">
                                                 Belum Diisi
                                             </x-tabler.badge>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($additionalOutput)
+                                            <div class="d-flex gap-2">
+                                                @if ($additionalOutput->hasMedia('book_document'))
+                                                    @php
+                                                        $media = $additionalOutput->getFirstMedia('book_document');
+                                                    @endphp
+                                                    <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-success">
+                                                        <x-lucide-book class="icon icon-sm" />
+                                                        Buku
+                                                    </a>
+                                                @endif
+
+                                                @if ($additionalOutput->hasMedia('publication_certificate'))
+                                                    @php
+                                                        $media = $additionalOutput->getFirstMedia('publication_certificate');
+                                                    @endphp
+                                                    <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-info">
+                                                        <x-lucide-award class="icon icon-sm" />
+                                                        Sertifikat
+                                                    </a>
+                                                @endif
+                                            </div>
+
+                                            @if (!$additionalOutput->hasMedia('book_document') && !$additionalOutput->hasMedia('publication_certificate'))
+                                                <span class="text-muted">
+                                                    <x-lucide-file-x class="icon icon-sm" />
+                                                    Belum Upload
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">
+                                                <x-lucide-file-x class="icon icon-sm" />
+                                                Belum Upload
+                                            </span>
                                         @endif
                                     </td>
                                     <td>

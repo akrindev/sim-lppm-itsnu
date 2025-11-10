@@ -111,6 +111,236 @@ tests/
 • PHPDoc blocks for complex logic
 • Indonesian language for UI text, English for code/tables/fields
 
+## Modern Code Practices & Preferences (2024+)
+
+**CRITICAL: Always prioritize DRY, Centralization, and Reusability**
+
+### **OOP Architecture & Design Patterns**
+• **Prefer Abstract Classes for Shared Behavior**
+  - Use `App\Livewire\Abstracts\*` for base components
+  - Example: `ReportIndex`, `ReportShow` as reusable foundations
+  - Child classes override only specific methods
+
+• **Use Traits for Composable Behavior**
+  - Split logic by concern: `ReportFilters`, `ReportAuthorization`, `ReportData`
+  - Mix and match traits in components as needed
+  - Avoid deep inheritance hierarchies (max 2-3 levels)
+
+• **Strategy Pattern for Type Handling**
+  - Use configuration arrays to handle different types
+  - Centralize type-specific logic in one method
+  - Example: `getConfig()` returning view names, routes, validation rules
+
+• **Composition over Inheritance**
+  - Build complex behavior from small, focused traits
+  - Each trait handles ONE responsibility
+  - Prefer dependency injection when needed
+
+### **Livewire v3 Modern Patterns**
+• **Form Objects (RECOMMENDED)**
+  - Use `Livewire\Form` for complex forms
+  - Separate form logic from component logic
+  - Cleaner validation: `$this->form->validate()`
+  - Example: `ReportForm` class in `app/Livewire/Forms/`
+
+• **Single Responsibility per Component**
+  - Index components: List, filter, search only
+  - Show components: Display and edit one entity
+  - Actions: Single operations (create, update, delete)
+  - Generic components for similar functionality
+
+• **Computed Properties for Reactive Data**
+  - Use `#[Computed]` attribute for expensive operations
+  - Cache results automatically by Livewire
+  - Example: `proposals()`, `availableYears()`
+
+• **Events & Dispatching**
+  - Use `$this->dispatch()` for component communication
+  - Emit events with `#[On]` listeners
+  - Example: `dispatch('report-saved')`, `#[On('resetFilters')]`
+
+### **File Organization & Structure**
+• **Organize by Functionality, Not Layer**
+  ```
+  app/Livewire/
+  ├─ Abstracts/         → Reusable base classes
+  ├─ Traits/            → Composable behaviors
+  ├─ Forms/             → Livewire v3 Form objects
+  ├─ Research/          → Feature: Research
+  ├─ CommunityService/  → Feature: PKM
+  └─ Reports/           → Feature: Reporting
+  ```
+
+• **Group Related Logic**
+  - Keep index/show pairs together
+  - Extract common logic to traits
+  - Create generic components for similar features
+
+### **Code Quality & Maintainability**
+• **Eliminate Duplication (90%+ reduction goal)**
+  - 4 similar components → 1 generic + config
+  - Repeated methods → Traits
+  - Duplicate validation → Form objects
+  - Example: 4 Show components (2,414 lines) → 1 Generic (350 lines)
+
+• **Keep Components Small (< 100 lines ideal)**
+  - Extract methods to protected/private
+  - Move form logic to Form objects
+  - Use traits for shared behavior
+  - If component > 200 lines → needs refactoring
+
+• **Type Hints & Return Types (REQUIRED)**
+  ```php
+  protected function getConfig(string $type): array
+  protected function loadData(): void
+  public function save(): void
+  #[Computed]
+  public function items(): Collection
+  ```
+
+• **Early Returns & Guard Clauses**
+  ```php
+  // GOOD
+  if (!$this->canEdit) {
+      abort(403);
+  }
+
+  // AVOID
+  if ($this->canEdit) {
+      // 100 lines of logic
+  }
+  ```
+
+### **Validation & Error Handling**
+• **Validation in Form Objects**
+  - Centralize all form validation
+  - Reuse across components
+  - Clear error messages in Indonesian
+
+• **Database Transactions for Complex Operations**
+  ```php
+  DB::transaction(function () {
+      // Multiple database operations
+  });
+  ```
+
+• **Use Eloquent Methods over Raw Queries**
+  - `firstOrCreate()`, `updateOrCreate()`
+  - Relationship methods with scopes
+  - Eager loading: `with(['relation'])`
+
+### **Performance Optimizations**
+• **Eager Loading (REQUIRED)**
+  - Always use `with()` for relationships
+  - Preload computed data
+  - Use query scopes for reusable filters
+
+• **Computed Properties for Caching**
+  - Expensive calculations
+  - Database queries
+  - Results cached by Livewire
+
+• **Wire:key in Loops (REQUIRED)**
+  - Prevent DOM diffing issues
+  - Better performance with lists
+  - Example: `wire:key="item-{{ $item->id }}"`
+
+### **Authorization & Security**
+• **Authorization Traits (PREFERRED)**
+  - `ReportAuthorization` for common access logic
+  - Consistent permission checks
+  - Easy to test in isolation
+
+• **Role-based Access Control**
+  - Use Spatie permissions
+  - Custom policies for complex logic
+  - Faculty-scoped access for Dekan
+
+• **File Upload Security**
+  - Validate file types & sizes
+  - Use Media Library for storage
+  - Clear collections before adding new files
+
+### **Testing & Quality Assurance**
+• **Test Form Objects Separately**
+  - Validate form logic independently
+  - Test validation rules
+  - Mock dependencies
+
+• **Test Traits via Test Classes**
+  - Create test classes that use traits
+  - Test each behavior in isolation
+
+• **Integration Tests for Components**
+  - Test end-to-end workflows
+  - Verify all features work together
+
+### **Example: Modern Component Structure**
+```php
+<?php
+// Research/ProgressReport/Index.php (36 lines - BEFORE: 100)
+class Index extends ReportIndex  // Extends abstract base
+{
+    protected function getDetailableType(): string
+    {
+        return 'App\Models\Research';
+    }
+
+    protected function getStatusFilter(): array
+    {
+        return [ProposalStatus::APPROVED, ProposalStatus::COMPLETED];
+    }
+
+    // Other methods inherited from ReportIndex
+}
+```
+
+### **Example: Generic Component (Strategy Pattern)**
+```php
+<?php
+// Reports/Show.php (350 lines - BEFORE: 2,414 across 4 files)
+class Show extends ReportShow
+{
+    use WithFileUploads;
+    use ReportAuthorization;
+
+    public function mount(Proposal $proposal, string $type = 'research-progress'): void
+    {
+        $this->proposal = $proposal;
+        $this->config = $this->getConfig($type);  // Strategy pattern
+        // ... other logic
+    }
+
+    protected function getConfig(string $type): array
+    {
+        return [
+            'research-progress' => [
+                'view' => 'livewire.research.progress-report.show',
+                'route' => 'research.progress-report.index',
+            ],
+            // ... other types
+        ];
+    }
+}
+```
+
+### **When to Refactor (SMELL Indicators)**
+• Same code appears in 2+ files → Extract to trait
+• Component > 200 lines → Split responsibilities
+• Complex if/else on type → Use Strategy pattern
+• Duplicate validation rules → Create Form object
+• Deep inheritance chain (4+ levels) → Use composition
+• N+1 queries → Use eager loading
+
+### **Migration Strategy for Legacy Code**
+1. Identify duplicated code patterns
+2. Extract common logic to traits
+3. Create abstract base classes
+4. Refactor children to extend base
+5. Remove duplicate implementations
+6. Create generic components for similar features
+7. Update routes to use new architecture
+
 ## Key Constraints & Business Rules
 
 **Team Management:**

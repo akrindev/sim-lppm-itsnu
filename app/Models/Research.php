@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Research extends Model
+class Research extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ResearchFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, InteractsWithMedia;
 
     /**
      * The type of the auto-incrementing ID's primary key.
@@ -61,5 +63,15 @@ class Research extends Model
     public function macroResearchGroup(): BelongsTo
     {
         return $this->belongsTo(MacroResearchGroup::class);
+    }
+
+    /**
+     * Register media collections for this model.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('substance_file')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf']);
     }
 }

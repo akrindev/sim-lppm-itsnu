@@ -83,8 +83,8 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($partner->commitment_letter_file)
-                                            <a href="{{ asset('storage/' . $partner->commitment_letter_file) }}" 
+                                        @if ($partner->hasMedia('commitment_letter'))
+                                            <a href="{{ $partner->getFirstMediaUrl('commitment_letter') }}" 
                                                target="_blank" 
                                                class="btn btn-sm btn-primary">
                                                 <x-lucide-file-text class="icon" />
