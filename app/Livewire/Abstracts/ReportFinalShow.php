@@ -262,10 +262,8 @@ abstract class ReportFinalShow extends ReportShow
         }
 
         DB::transaction(function () {
-            // Only validate files if they are present
-            if ($this->substanceFile || $this->realizationFile || $this->presentationFile) {
-                $this->validateFinalReportFiles();
-            }
+            // Files are already validated by Livewire via wire:model
+            // No need to validate again here
 
             // Save or update the report
             if ($this->progressReport) {
@@ -303,10 +301,8 @@ abstract class ReportFinalShow extends ReportShow
         }
 
         DB::transaction(function () {
-            // Only validate files if they are present
-            if ($this->substanceFile || $this->realizationFile || $this->presentationFile) {
-                $this->validateFinalReportFiles();
-            }
+            // Files are already validated by Livewire via wire:model
+            // No need to validate again here
 
             // Save or update the report
             if ($this->progressReport) {
@@ -349,7 +345,8 @@ abstract class ReportFinalShow extends ReportShow
         }
 
         try {
-            $this->validateFinalReportFiles();
+            // File is already validated by Livewire when uploaded via wire:model
+            // No need to validate again - just save directly
 
             if ($this->substanceFile) {
                 DB::transaction(function () {
@@ -384,7 +381,8 @@ abstract class ReportFinalShow extends ReportShow
         }
 
         try {
-            $this->validateFinalReportFiles();
+            // File is already validated by Livewire when uploaded via wire:model
+            // No need to validate again - just save directly
 
             if ($this->realizationFile) {
                 DB::transaction(function () {
@@ -419,7 +417,8 @@ abstract class ReportFinalShow extends ReportShow
         }
 
         try {
-            $this->validateFinalReportFiles();
+            // File is already validated by Livewire when uploaded via wire:model
+            // No need to validate again - just save directly
 
             if ($this->presentationFile) {
                 DB::transaction(function () {
