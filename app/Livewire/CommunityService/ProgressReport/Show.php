@@ -94,6 +94,11 @@ class Show extends Component
 
         // Load existing mandatory outputs
         foreach ($this->progressReport->mandatoryOutputs as $output) {
+            // Skip if proposal_output_id is null or empty
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
+
             $this->mandatoryOutputs[$output->proposal_output_id] = [
                 'id' => $output->id,
                 'status_type' => $output->status_type,
@@ -117,6 +122,11 @@ class Show extends Component
 
         // Load existing additional outputs
         foreach ($this->progressReport->additionalOutputs as $output) {
+            // Skip if proposal_output_id is null or empty
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
+
             $this->additionalOutputs[$output->proposal_output_id] = [
                 'id' => $output->id,
                 'status' => $output->status,
@@ -140,11 +150,11 @@ class Show extends Component
         $this->keywordsInput = $this->proposal->keywords()->pluck('name')->join('; ');
 
         // Initialize empty arrays for planned outputs
-        foreach ($this->proposal->outputs->where('category', 'wajib') as $output) {
+        foreach ($this->proposal->outputs->where('category', 'Wajib') as $output) {
             $this->mandatoryOutputs[$output->id] = $this->getEmptyMandatoryOutput();
         }
 
-        foreach ($this->proposal->outputs->where('category', 'tambahan') as $output) {
+        foreach ($this->proposal->outputs->where('category', 'Tambahan') as $output) {
             $this->additionalOutputs[$output->id] = $this->getEmptyAdditionalOutput();
         }
     }
@@ -193,6 +203,7 @@ class Show extends Component
     {
         $this->validate([
             'summaryUpdate' => 'required|min:100',
+            'keywordsInput' => 'nullable|string|max:1000',
             'reportingYear' => 'required|numeric|between:2020,2030',
             'reportingPeriod' => 'required|in:semester_1,semester_2,annual',
         ]);
@@ -297,6 +308,11 @@ class Show extends Component
     protected function saveMandatoryOutputs(): void
     {
         foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
+            // Skip if invalid proposal_output_id (empty string, null, or not valid)
+            if (empty($proposalOutputId) || ! is_string($proposalOutputId) && ! is_numeric($proposalOutputId)) {
+                continue;
+            }
+
             // Skip if no data entered
             if (empty($data['status_type']) && empty($data['journal_title'])) {
                 continue;
@@ -340,6 +356,11 @@ class Show extends Component
     protected function saveAdditionalOutputs(): void
     {
         foreach ($this->additionalOutputs as $proposalOutputId => $data) {
+            // Skip if invalid proposal_output_id (empty string, null, or not valid)
+            if (empty($proposalOutputId) || ! is_string($proposalOutputId) && ! is_numeric($proposalOutputId)) {
+                continue;
+            }
+
             // Skip if no data entered
             if (empty($data['status']) && empty($data['book_title'])) {
                 continue;

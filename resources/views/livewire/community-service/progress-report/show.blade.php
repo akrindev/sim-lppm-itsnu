@@ -14,7 +14,7 @@
     <!-- Ringkasan & Kata Kunci -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📝 Ringkasan & Kata Kunci</h3>
+            <h3 class="card-title"><x-lucide-file-text class="me-2 icon" />Ringkasan & Kata Kunci</h3>
         </div>
         <div class="card-body">
             <div class="mb-3">
@@ -64,7 +64,7 @@
     <!-- Luaran Wajib -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📚 Luaran Wajib</h3>
+            <h3 class="card-title"><x-lucide-book-open class="me-2 icon" />Luaran Wajib</h3>
         </div>
         <div class="card-body">
             @php
@@ -138,7 +138,7 @@
     <!-- Luaran Tambahan -->
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">📖 Luaran Tambahan</h3>
+            <h3 class="card-title"><x-lucide-book class="me-2 icon" />Luaran Tambahan</h3>
         </div>
         <div class="card-body">
             @php
