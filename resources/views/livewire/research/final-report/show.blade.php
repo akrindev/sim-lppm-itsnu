@@ -65,7 +65,7 @@
 
                 <div wire:loading wire:target="substanceFile">
                     <small class="text-muted">
-                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...
                     </small>
                 </div>
@@ -74,12 +74,12 @@
                     @php
                         $media = $progressReport->getFirstMedia('substance_file');
                     @endphp
-                    <div class="alert alert-success mt-2 mb-0">
-                        <div class="d-flex justify-content-between align-items-center">
+                    <div class="mt-2 mb-0 alert alert-success">
+                        <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <x-lucide-file-check class="icon text-success me-2" />
+                                <x-lucide-file-check class="me-2 text-success icon" />
                                 <strong>{{ $media->name }}</strong>
-                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                                <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
                             </div>
                             <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
                                 <x-lucide-eye class="icon" /> Lihat
@@ -100,7 +100,7 @@
 
                 <div wire:loading wire:target="realizationFile">
                     <small class="text-muted">
-                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...
                     </small>
                 </div>
@@ -109,12 +109,12 @@
                     @php
                         $media = $progressReport->getFirstMedia('realization_file');
                     @endphp
-                    <div class="alert alert-success mt-2 mb-0">
-                        <div class="d-flex justify-content-between align-items-center">
+                    <div class="mt-2 mb-0 alert alert-success">
+                        <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <x-lucide-file-check class="icon text-success me-2" />
+                                <x-lucide-file-check class="me-2 text-success icon" />
                                 <strong>{{ $media->name }}</strong>
-                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                                <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
                             </div>
                             <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
                                 <x-lucide-eye class="icon" /> Lihat
@@ -135,7 +135,7 @@
 
                 <div wire:loading wire:target="presentationFile">
                     <small class="text-muted">
-                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...
                     </small>
                 </div>
@@ -144,12 +144,12 @@
                     @php
                         $media = $progressReport->getFirstMedia('presentation_file');
                     @endphp
-                    <div class="alert alert-success mt-2 mb-0">
-                        <div class="d-flex justify-content-between align-items-center">
+                    <div class="mt-2 mb-0 alert alert-success">
+                        <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <x-lucide-file-check class="icon text-success me-2" />
+                                <x-lucide-file-check class="me-2 text-success icon" />
                                 <strong>{{ $media->name }}</strong>
-                                <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                                <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
                             </div>
                             <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
                                 <x-lucide-eye class="icon" /> Lihat
@@ -239,7 +239,7 @@
                                     <td>
                                         @if ($canEdit)
                                             <button type="button" wire:click="editMandatoryOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                            class="btn btn-sm btn-icon" data-bs-toggle="modal"
                                             data-bs-target="#modalMandatoryOutput">
                                             <x-lucide-pencil class="icon" />
                                         </button>
@@ -354,7 +354,7 @@
                                     <td>
                                         @if ($canEdit)
                                             <button type="button" wire:click="editAdditionalOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                            class="btn btn-sm btn-icon" data-bs-toggle="modal"
                                             data-bs-target="#modalAdditionalOutput">
                                             <x-lucide-pencil class="icon" />
                                         </button>

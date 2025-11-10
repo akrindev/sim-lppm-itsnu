@@ -36,6 +36,8 @@ class Show extends ReportShow
 
     // File uploads
     public $substanceFile;
+    public $realizationFile;      // For final reports
+    public $presentationFile;     // For final reports
     public array $tempMandatoryFiles = [];
     public array $tempAdditionalFiles = [];
     public array $tempAdditionalCerts = [];

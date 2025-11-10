@@ -3,9 +3,7 @@
 use App\Http\Controllers\RoleSwitcherController;
 use App\Livewire\CommunityService\DailyNote\Index as CommunityServiceDailyNoteIndex;
 use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalReportIndex;
-use App\Livewire\CommunityService\FinalReport\Show as CommunityServiceFinalReportShow;
 use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
-use App\Livewire\CommunityService\ProgressReport\Show as CommunityServiceProgressReportShow;
 use App\Livewire\CommunityService\Proposal\Create as CommunityServiceProposalCreate;
 use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
 use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalIndex;
@@ -17,9 +15,7 @@ use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
 use App\Livewire\Notifications\NotificationCenter;
 use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
 use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
-use App\Livewire\Research\FinalReport\Show as ResearchFinalReportShow;
 use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
-use App\Livewire\Research\ProgressReport\Show as ResearchProgressReportShow;
 use App\Livewire\Research\Proposal\Create as ResearchProposalCreate;
 use App\Livewire\Research\Proposal\Edit as ResearchProposalEdit;
 use App\Livewire\Research\Proposal\Index as ResearchProposalIndex;
@@ -73,9 +69,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('progress-report.show')
             ->defaults('type', 'research-progress');
         Route::get('final-report', ResearchFinalReportIndex::class)->name('final-report.index');
-        Route::get('final-report/{proposal}', \App\Livewire\Reports\Show::class)
-            ->name('final-report.show')
-            ->defaults('type', 'research-final');
+        Route::get('final-report/{proposal}', \App\Livewire\Research\FinalReport\Show::class)
+            ->name('final-report.show');
         Route::get('daily-note', ResearchDailyNoteIndex::class)->name('daily-note.index');
     });
 
@@ -92,9 +87,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('progress-report.show')
             ->defaults('type', 'community-service-progress');
         Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
-        Route::get('final-report/{proposal}', \App\Livewire\Reports\Show::class)
-            ->name('final-report.show')
-            ->defaults('type', 'community-service-final');
+        Route::get('final-report/{proposal}', \App\Livewire\CommunityService\FinalReport\Show::class)
+            ->name('final-report.show');
         Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
     });
 
