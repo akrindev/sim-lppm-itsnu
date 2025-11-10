@@ -7,6 +7,7 @@ namespace App\Livewire\Traits;
 use App\Models\ProgressReport;
 use App\Models\MandatoryOutput;
 use App\Models\AdditionalOutput;
+use Illuminate\Support\Facades\Auth;
 
 trait HasFileUploads
 {
@@ -73,7 +74,7 @@ trait HasFileUploads
             ->usingName($this->substanceFile->getClientOriginalName())
             ->usingFileName($this->substanceFile->hashName())
             ->withCustomProperties([
-                'uploaded_by' => auth()->id(),
+                'uploaded_by' => Auth::id(),
                 'proposal_id' => $report->proposal_id,
                 'report_type' => $reportType,
             ])
@@ -95,7 +96,7 @@ trait HasFileUploads
             ->usingName($this->tempMandatoryFiles[$proposalOutputId]->getClientOriginalName())
             ->usingFileName($this->tempMandatoryFiles[$proposalOutputId]->hashName())
             ->withCustomProperties([
-                'uploaded_by' => auth()->id(),
+                'uploaded_by' => Auth::id(),
                 'proposal_id' => $output->progressReport->proposal_id,
                 'report_type' => $reportType,
             ])
@@ -117,7 +118,7 @@ trait HasFileUploads
             ->usingName($this->tempAdditionalFiles[$proposalOutputId]->getClientOriginalName())
             ->usingFileName($this->tempAdditionalFiles[$proposalOutputId]->hashName())
             ->withCustomProperties([
-                'uploaded_by' => auth()->id(),
+                'uploaded_by' => Auth::id(),
                 'proposal_id' => $output->progressReport->proposal_id,
                 'report_type' => $reportType,
             ])
@@ -139,7 +140,7 @@ trait HasFileUploads
             ->usingName($this->tempAdditionalCerts[$proposalOutputId]->getClientOriginalName())
             ->usingFileName($this->tempAdditionalCerts[$proposalOutputId]->hashName())
             ->withCustomProperties([
-                'uploaded_by' => auth()->id(),
+                'uploaded_by' => Auth::id(),
                 'proposal_id' => $output->progressReport->proposal_id,
                 'report_type' => $reportType,
             ])
