@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\Traits;
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 trait ReportData
@@ -15,7 +13,16 @@ trait ReportData
         $query = \App\Models\Proposal::where('detailable_type', $detailableType)
             ->whereIn('status', $statuses);
 
-        return $this->filterByUserAccess($query);
+        $query = $this->filterByUserAccess($query);
+
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $roleFilter = property_exists($this, 'roleFilter') ? $this->roleFilter : '';
+
+        if ($roleFilter && ! $user->activeHasAnyRole(['admin lppm', 'kepala lppm', 'rektor'])) {
+            $query = $this->applyRoleFilter($query, $user, $roleFilter);
+        }
+
+        return $query;
     }
 
     protected function applySearchFilter(Builder $query, string $searchTerm): Builder
@@ -24,7 +31,7 @@ trait ReportData
             return $query;
         }
 
-        $searchPattern = '%'.$searchTerm.'%';
+        $searchPattern = '%' . $searchTerm . '%';
 
         return $query->where(function ($q) use ($searchPattern) {
             $q->where('title', 'LIKE', $searchPattern)
@@ -32,6 +39,21 @@ trait ReportData
                     $sq->where('name', 'LIKE', $searchPattern);
                 });
         });
+    }
+
+    protected function applyRoleFilter(Builder $query, $user, string $role): Builder
+    {
+        if ($role === 'ketua') {
+            return $query->where('submitter_id', $user->id);
+        } elseif ($role === 'anggota') {
+            return $query->whereHas('teamMembers', function ($teamQuery) use ($user) {
+                $teamQuery->where('user_id', $user->id)
+                    ->where('role', 'anggota')
+                    ->where('status', 'accepted');
+            });
+        }
+
+        return $query;
     }
 
     protected function applyYearFilter(Builder $query, string $year): Builder
@@ -49,7 +71,7 @@ trait ReportData
             $relations = [
                 'submitter.identity',
                 'focusArea',
-                'progressReports' => fn ($q) => $q->latest(),
+                'progressReports' => fn($q) => $q->latest(),
             ];
         }
 

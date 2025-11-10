@@ -7,6 +7,30 @@
 <div>
     <x-tabler.alert />
 
+    <!-- Role-based Tabs (only for regular dosen users) -->
+    @if (auth()->user()->activeHasAnyRole(['dosen']))
+        <div class="mb-3">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @if ($roleFilter === 'ketua') active @endif"
+                        wire:click="$set('roleFilter', 'ketua')" role="tab"
+                        aria-selected="@if ($roleFilter === 'ketua') true @else false @endif">
+                        <x-lucide-crown class="me-2 icon" />
+                        Sebagai Ketua
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @if ($roleFilter === 'anggota') active @endif"
+                        wire:click="$set('roleFilter', 'anggota')" role="tab"
+                        aria-selected="@if ($roleFilter === 'anggota') true @else false @endif">
+                        <x-lucide-users class="me-2 icon" />
+                        Sebagai Anggota
+                    </button>
+                </li>
+            </ul>
+        </div>
+    @endif
+
     <!-- Search & Filter Section -->
     <div class="mb-3 row">
         <div class="col-12">
@@ -15,7 +39,8 @@
                     <div class="row g-3">
                         <!-- Search Input -->
                         <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Cari berdasarkan judul atau peneliti..."
+                            <input type="text" class="form-control"
+                                placeholder="Cari berdasarkan judul atau peneliti..."
                                 wire:model.live.debounce.300ms="search" />
                         </div>
 
@@ -78,8 +103,7 @@
                                     <small class="text-secondary">
                                         Tahun {{ $finalReport->reporting_year }}
                                         <br>
-                                        <x-tabler.badge :color="$finalReport->status === 'approved' ? 'success' : ($finalReport->status === 'submitted' ? 'info' : 'secondary')"
-                                            class="mt-1">
+                                        <x-tabler.badge :color="$finalReport->status === 'approved' ? 'success' : ($finalReport->status === 'submitted' ? 'info' : 'secondary')" class="mt-1">
                                             {{ ucfirst($finalReport->status) }}
                                         </x-tabler.badge>
                                     </small>
