@@ -41,6 +41,10 @@ class Show extends Component
         // Load existing final report
         $this->progressReport = $proposal->progressReports()->finalReports()->latest()->first();
 
+        if (! $this->progressReport) {
+            $this->progressReport = $proposal->progressReports()->latest()->first();
+        }
+
         // Initialize Livewire Form
         $this->form->initWithProposal($this->proposal);
 
@@ -113,7 +117,7 @@ class Show extends Component
             session()->flash('success', 'File substansi laporan berhasil diunggah.');
         } catch (\Exception $e) {
             $this->form->substanceFile = null;
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
     }
 
@@ -139,7 +143,7 @@ class Show extends Component
             session()->flash('success', 'File realisasi keterlibatan berhasil diunggah.');
         } catch (\Exception $e) {
             $this->form->realizationFile = null;
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
     }
 
@@ -165,7 +169,7 @@ class Show extends Component
             session()->flash('success', 'File presentasi hasil berhasil diunggah.');
         } catch (\Exception $e) {
             $this->form->presentationFile = null;
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
     }
 
@@ -187,7 +191,7 @@ class Show extends Component
             }
             session()->flash('success', 'File dokumen artikel berhasil diunggah.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
     }
 
@@ -209,7 +213,7 @@ class Show extends Component
             }
             session()->flash('success', 'File dokumen buku berhasil diunggah.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
     }
 
@@ -231,7 +235,7 @@ class Show extends Component
             }
             session()->flash('success', 'File surat keterangan berhasil diunggah.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
     }
 
@@ -313,7 +317,7 @@ class Show extends Component
             session()->flash('success', 'Data luaran wajib berhasil disimpan.');
             $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
@@ -350,7 +354,7 @@ class Show extends Component
             session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
             $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
