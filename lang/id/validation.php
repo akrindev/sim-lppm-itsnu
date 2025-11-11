@@ -194,6 +194,25 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'mandatoryOutputs.*.status_type' => 'Status Publikasi',
+        'mandatoryOutputs.*.author_status' => 'Status Penulis',
+        'mandatoryOutputs.*.journal_title' => 'Judul Jurnal',
+        'mandatoryOutputs.*.article_title' => 'Judul Artikel',
+        'mandatoryOutputs.*.publication_year' => 'Tahun Terbit',
+        'mandatoryOutputs.*.issn' => 'ISSN',
+        'mandatoryOutputs.*.eissn' => 'E-ISSN',
+        'mandatoryOutputs.*.journal_url' => 'URL Jurnal',
+        'mandatoryOutputs.*.article_url' => 'URL Artikel',
+        'mandatoryOutputs.*.doi' => 'DOI',
+        'additionalOutputs.*.status' => 'Status Publikasi',
+        'additionalOutputs.*.book_title' => 'Judul Buku',
+        'additionalOutputs.*.publisher_name' => 'Nama Penerbit',
+        'additionalOutputs.*.isbn' => 'ISBN',
+        'additionalOutputs.*.publication_year' => 'Tahun Terbit',
+        'additionalOutputs.*.total_pages' => 'Jumlah Halaman',
+        'additionalOutputs.*.publisher_url' => 'URL Penerbit',
+        'additionalOutputs.*.book_url' => 'URL Buku',
+    ],
 
 ];

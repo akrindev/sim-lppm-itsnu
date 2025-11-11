@@ -12,6 +12,7 @@ use App\Livewire\Traits\ReportAuthorization;
 use App\Models\Keyword;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -85,7 +86,7 @@ class Show extends Component
             // Let Livewire handle validation errors
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan laporan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan laporan: ' . $e->getMessage());
         }
     }
 
@@ -335,7 +336,7 @@ class Show extends Component
             session()->flash('success', 'Data luaran wajib berhasil disimpan.');
             $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
@@ -372,7 +373,7 @@ class Show extends Component
             session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
             $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
@@ -398,6 +399,36 @@ class Show extends Component
     public function getAllKeywords(): \Illuminate\Database\Eloquent\Collection
     {
         return Keyword::orderBy('name')->get();
+    }
+
+    /**
+     * Get mandatory output model by proposal output ID
+     */
+    #[Computed]
+    public function getMandatoryOutput(): ?\App\Models\MandatoryOutput
+    {
+        if (!$this->progressReport || !$this->form->editingMandatoryId) {
+            return null;
+        }
+
+        return \App\Models\MandatoryOutput::where('progress_report_id', $this->progressReport->id)
+            ->where('proposal_output_id', $this->form->editingMandatoryId)
+            ->first();
+    }
+
+    /**
+     * Get additional output model by proposal output ID
+     */
+    #[Computed]
+    public function getAdditionalOutput(): ?\App\Models\AdditionalOutput
+    {
+        if (!$this->progressReport || !$this->form->editingAdditionalId) {
+            return null;
+        }
+
+        return \App\Models\AdditionalOutput::where('progress_report_id', $this->progressReport->id)
+            ->where('proposal_output_id', $this->form->editingAdditionalId)
+            ->first();
     }
 
     /**

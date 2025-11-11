@@ -403,6 +403,7 @@ class ReportForm extends Form
     public function saveMandatoryOutput(int $proposalOutputId): void
     {
         $this->validateMandatoryOutput($proposalOutputId);
+        $this->saveMandatoryOutputWithFile($proposalOutputId);
     }
 
     public function editAdditionalOutput(int $proposalOutputId): void
@@ -417,6 +418,7 @@ class ReportForm extends Form
     public function saveAdditionalOutput(int $proposalOutputId): void
     {
         $this->validateAdditionalOutput($proposalOutputId);
+        $this->saveAdditionalOutputWithFile($proposalOutputId);
     }
 
     public function closeMandatoryModal(): void

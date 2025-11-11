@@ -6,7 +6,6 @@ namespace App\Livewire\Research\ProgressReport;
 
 use App\Livewire\Forms\ResearchProgressReportForm;
 use App\Livewire\Traits\HasFileUploads;
-use App\Livewire\Traits\ManagesOutputs;
 use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Models\Keyword;
@@ -18,7 +17,6 @@ use Livewire\WithFileUploads;
 class Show extends Component
 {
     use HasFileUploads;
-    use ManagesOutputs;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
@@ -41,11 +39,9 @@ class Show extends Component
         if ($this->progressReport) {
             // Load existing report data into form
             $this->form->setReport($this->progressReport);
-            $this->loadExistingReport($this->progressReport);
         } else {
             // Initialize new report structure
             $this->form->initializeNewReport();
-            $this->initializeNewReport($this->proposal);
         }
     }
 
@@ -68,9 +64,6 @@ class Show extends Component
 
             // Save substance file
             $this->saveSubstanceFile($report);
-
-            // Save output files
-            $this->saveOutputFiles($report);
         });
 
         $this->dispatch('report-saved');
@@ -93,9 +86,6 @@ class Show extends Component
 
             // Save substance file
             $this->saveSubstanceFile($report);
-
-            // Save output files
-            $this->saveOutputFiles($report);
         });
 
         session()->flash('success', 'Laporan kemajuan berhasil diajukan.');
@@ -107,46 +97,40 @@ class Show extends Component
      */
     protected function saveOutputFiles($report): void
     {
-        // Save mandatory output files
-        foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
-                continue;
-            }
+        // Files are now saved via saveMandatoryOutputWithFile() and saveAdditionalOutputWithFile()
+        // This method is kept for compatibility but does nothing as files are handled in form
+    }
 
-            if (empty($data['status_type']) && empty($data['journal_title'])) {
-                continue;
-            }
+    /**
+     * Open mandatory output modal
+     */
+    public function editMandatoryOutput(int $proposalOutputId): void
+    {
+        $this->form->editMandatoryOutput($proposalOutputId);
+    }
 
-            // Find the mandatory output
-            $mandatoryOutput = \App\Models\MandatoryOutput::where('progress_report_id', $report->id)
-                ->where('proposal_output_id', $proposalOutputId)
-                ->first();
+    /**
+     * Open additional output modal
+     */
+    public function editAdditionalOutput(int $proposalOutputId): void
+    {
+        $this->form->editAdditionalOutput($proposalOutputId);
+    }
 
-            if ($mandatoryOutput) {
-                $this->saveMandatoryOutputFile($mandatoryOutput, $proposalOutputId);
-            }
-        }
+    /**
+     * Close mandatory modal
+     */
+    public function closeMandatoryModal(): void
+    {
+        $this->form->closeMandatoryModal();
+    }
 
-        // Save additional output files
-        foreach ($this->additionalOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
-                continue;
-            }
-
-            if (empty($data['status']) && empty($data['book_title'])) {
-                continue;
-            }
-
-            // Find the additional output
-            $additionalOutput = \App\Models\AdditionalOutput::where('progress_report_id', $report->id)
-                ->where('proposal_output_id', $proposalOutputId)
-                ->first();
-
-            if ($additionalOutput) {
-                $this->saveAdditionalOutputFile($additionalOutput, $proposalOutputId);
-                $this->saveAdditionalOutputCert($additionalOutput, $proposalOutputId);
-            }
-        }
+    /**
+     * Close additional modal
+     */
+    public function closeAdditionalModal(): void
+    {
+        $this->form->closeAdditionalModal();
     }
 
     /**
