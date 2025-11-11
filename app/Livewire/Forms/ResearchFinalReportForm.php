@@ -8,10 +8,15 @@ use App\Models\Proposal;
 
 class ResearchFinalReportForm extends ReportForm
 {
-    public function __construct()
-    {
-        // Form properties will be initialized via initWithProposal()
-    }
+    // Override report type for final reports
+    protected string $reportType = 'final';
+
+    // Override file validation rules for final report (3 files)
+    protected array $fileValidationRules = [
+        'substanceFile' => 'nullable|file|mimes:pdf,application/pdf|max:10240',
+        'realizationFile' => 'nullable|file|mimes:pdf,docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:10240',
+        'presentationFile' => 'nullable|file|mimes:pdf,pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip|max:51200',
+    ];
 
     /**
      * Initialize form with Proposal - force final period
@@ -20,26 +25,6 @@ class ResearchFinalReportForm extends ReportForm
     {
         parent::initWithProposal($proposal);
         $this->reportingPeriod = 'final'; // Force final for final reports
-    }
-
-    /**
-     * Get the report type
-     */
-    protected function getReportType(): string
-    {
-        return 'final';
-    }
-
-    /**
-     * Get file validation rules for final report (3 files)
-     */
-    protected function getFileValidationRules(): array
-    {
-        return [
-            'substanceFile' => 'nullable|file|mimes:pdf,application/pdf|max:10240',
-            'realizationFile' => 'nullable|file|mimes:pdf,docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:10240',
-            'presentationFile' => 'nullable|file|mimes:pdf,pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip|max:51200',
-        ];
     }
 
     /**

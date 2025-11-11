@@ -19,20 +19,20 @@
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label required">Ringkasan Terkini</label>
-                <textarea wire:model="summaryUpdate" rows="8" class="form-control"
+                <textarea wire:model="form.summaryUpdate" rows="8" class="form-control"
                     placeholder="Masukkan ringkasan kemajuan pengabdian..."></textarea>
-                @error('summaryUpdate')
+                @error('form.summaryUpdate')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
-                <input type="text" wire:model="keywordsInput" class="form-control"
+                <input type="text" wire:model="form.keywordsInput" class="form-control"
                     placeholder="Contoh: AI; Machine Learning; IoT" @disabled(!$canEdit) />
                 <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
                     Learning</small>
-                @error('keywordsInput')
+                @error('form.keywordsInput')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
@@ -40,20 +40,20 @@
             <div class="row">
                 <div class="mb-3 col-md-6">
                     <label class="form-label required">Tahun Pelaporan</label>
-                    <input type="number" wire:model="reportingYear" class="form-control" min="2020"
+                    <input type="number" wire:model="form.reportingYear" class="form-control" min="2020"
                         max="2030" @disabled(!$canEdit) />
-                    @error('reportingYear')
+                    @error('form.reportingYear')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
                 <div class="mb-3 col-md-6">
                     <label class="form-label required">Periode</label>
-                    <select wire:model="reportingPeriod" class="form-select" @disabled(!$canEdit)>
+                    <select wire:model="form.reportingPeriod" class="form-select" @disabled(!$canEdit)>
                         <option value="semester_1">Semester 1</option>
                         <option value="semester_2">Semester 2</option>
                         <option value="annual">Tahunan</option>
                     </select>
-                    @error('reportingPeriod')
+                    @error('form.reportingPeriod')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
@@ -61,14 +61,14 @@
 
             <div class="mb-3">
                 <label class="form-label">File Substansi Laporan (PDF)</label>
-                <input type="file" wire:model="substanceFile" class="form-control @error('substanceFile') is-invalid @enderror"
+                <input type="file" wire:model="form.substanceFile" class="form-control @error('form.substanceFile') is-invalid @enderror"
                     accept=".pdf" @disabled(!$canEdit) />
-                @error('substanceFile')
+                @error('form.substanceFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="form-hint">Maksimal 10MB, format PDF</small>
 
-                <div wire:loading wire:target="substanceFile">
+                <div wire:loading wire:target="form.substanceFile">
                     <small class="text-muted">
                         <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...
@@ -349,7 +349,7 @@
                     <!-- Status Type -->
                     <div class="col-md-6">
                         <label class="form-label required">Status Publikasi</label>
-                        <select wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.status_type" class="form-select">
+                        <select wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.status_type" class="form-select">
                             <option value="">Pilih Status</option>
                             <option value="published">Published</option>
                             <option value="accepted">Accepted</option>
@@ -361,7 +361,7 @@
                     <!-- Author Status -->
                     <div class="col-md-6">
                         <label class="form-label required">Status Penulis</label>
-                        <select wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.author_status"
+                        <select wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.author_status"
                             class="form-select">
                             <option value="">Pilih Status</option>
                             <option value="first_author">First Author</option>
@@ -373,61 +373,61 @@
                     <!-- Journal Title -->
                     <div class="col-md-12">
                         <label class="form-label required">Judul Jurnal</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.journal_title"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.journal_title"
                             class="form-control" placeholder="Masukkan judul jurnal" />
                     </div>
 
                     <!-- ISSN / E-ISSN -->
                     <div class="col-md-6">
                         <label class="form-label">ISSN</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.issn"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.issn"
                             class="form-control" placeholder="1234-5678" />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">E-ISSN</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.eissn"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.eissn"
                             class="form-control" placeholder="1234-5678" />
                     </div>
 
                     <!-- Indexing Body -->
                     <div class="col-md-6">
                         <label class="form-label">Lembaga Pengindex</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.indexing_body"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.indexing_body"
                             class="form-control" placeholder="Scopus, WoS, Sinta, dll" />
                     </div>
 
                     <!-- Journal URL -->
                     <div class="col-md-6">
                         <label class="form-label">URL Jurnal</label>
-                        <input type="url" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.journal_url"
+                        <input type="url" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.journal_url"
                             class="form-control" placeholder="https://" />
                     </div>
 
                     <!-- Article Title -->
                     <div class="col-md-12">
                         <label class="form-label required">Judul Artikel</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.article_title"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.article_title"
                             class="form-control" placeholder="Masukkan judul artikel" />
                     </div>
 
                     <!-- Publication Year -->
                     <div class="col-md-3">
                         <label class="form-label required">Tahun Terbit</label>
-                        <input type="number" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.publication_year"
+                        <input type="number" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.publication_year"
                             class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
                     </div>
 
                     <!-- Volume -->
                     <div class="col-md-3">
                         <label class="form-label">Volume</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.volume"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.volume"
                             class="form-control" placeholder="Vol. 1" />
                     </div>
 
                     <!-- Issue Number -->
                     <div class="col-md-3">
                         <label class="form-label">Nomor</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.issue_number"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.issue_number"
                             class="form-control" placeholder="No. 1" />
                     </div>
 
@@ -435,10 +435,10 @@
                     <div class="col-md-3">
                         <label class="form-label">Halaman</label>
                         <div class="input-group">
-                            <input type="number" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.page_start"
+                            <input type="number" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.page_start"
                                 class="form-control" placeholder="1" />
                             <span class="input-group-text">-</span>
-                            <input type="number" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.page_end"
+                            <input type="number" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.page_end"
                                 class="form-control" placeholder="10" />
                         </div>
                     </div>
@@ -446,14 +446,14 @@
                     <!-- Article URL -->
                     <div class="col-md-6">
                         <label class="form-label">URL Artikel</label>
-                        <input type="url" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.article_url"
+                        <input type="url" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.article_url"
                             class="form-control" placeholder="https://" />
                     </div>
 
                     <!-- DOI -->
                     <div class="col-md-6">
                         <label class="form-label">DOI Artikel</label>
-                        <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.doi"
+                        <input type="text" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.doi"
                             class="form-control" placeholder="10.xxxx/xxxxx" />
                     </div>
 
@@ -511,7 +511,7 @@
                         <!-- Status -->
                         <div class="col-md-12">
                             <label class="form-label required">Status</label>
-                            <select wire:model="additionalOutputs.{{ $editingAdditionalId }}.status" class="form-select">
+                            <select wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.status" class="form-select">
                                 <option value="">Pilih Status</option>
                                 <option value="review">Review</option>
                                 <option value="editing">Editing</option>
@@ -522,7 +522,7 @@
                         <!-- Book Title -->
                         <div class="col-md-12">
                             <label class="form-label required">Judul Buku</label>
-                            <input type="text" wire:model="additionalOutputs.{{ $editingAdditionalId }}.book_title"
+                            <input type="text" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.book_title"
                                 class="form-control" placeholder="Masukkan judul buku" />
                         </div>
 
@@ -530,14 +530,14 @@
                         <div class="col-md-6">
                             <label class="form-label required">Nama Penerbit</label>
                             <input type="text"
-                                wire:model="additionalOutputs.{{ $editingAdditionalId }}.publisher_name"
+                                wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.publisher_name"
                                 class="form-control" placeholder="Masukkan nama penerbit" />
                         </div>
 
                         <!-- ISBN -->
                         <div class="col-md-6">
                             <label class="form-label">ISBN</label>
-                            <input type="text" wire:model="additionalOutputs.{{ $editingAdditionalId }}.isbn"
+                            <input type="text" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.isbn"
                                 class="form-control" placeholder="978-xxx-xxx-xxx-x" />
                         </div>
 
@@ -545,28 +545,28 @@
                         <div class="col-md-6">
                             <label class="form-label">Tahun Terbit</label>
                             <input type="number"
-                                wire:model="additionalOutputs.{{ $editingAdditionalId }}.publication_year"
+                                wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.publication_year"
                                 class="form-control" min="2000" max="2030" /> @disabled(!$canEdit) />
                         </div>
 
                         <!-- Total Pages -->
                         <div class="col-md-6">
                             <label class="form-label">Jumlah Halaman</label>
-                            <input type="number" wire:model="additionalOutputs.{{ $editingAdditionalId }}.total_pages"
+                            <input type="number" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.total_pages"
                                 class="form-control" placeholder="100" />
                         </div>
 
                         <!-- Publisher URL -->
                         <div class="col-md-6">
                             <label class="form-label">URL Web Penerbit</label>
-                            <input type="url" wire:model="additionalOutputs.{{ $editingAdditionalId }}.publisher_url"
+                            <input type="url" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.publisher_url"
                                 class="form-control" placeholder="https://" />
                         </div>
 
                         <!-- Book URL -->
                         <div class="col-md-6">
                             <label class="form-label">URL Buku</label>
-                            <input type="url" wire:model="additionalOutputs.{{ $editingAdditionalId }}.book_url"
+                            <input type="url" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.book_url"
                                 class="form-control" placeholder="https://" />
                         </div>
 

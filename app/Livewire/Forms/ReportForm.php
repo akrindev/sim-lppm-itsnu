@@ -14,40 +14,75 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Form;
 
-abstract class ReportForm extends Form
+class ReportForm extends Form
 {
     public ?ProgressReport $progressReport = null;
-    public Proposal $proposal;
+
+    public ?Proposal $proposal = null;
 
     public string $summaryUpdate = '';
+
     public string $keywordsInput = '';
-    public int $reportingYear;
+
+    public int $reportingYear = 0;
+
     public string $reportingPeriod = 'semester_1';
 
     public array $mandatoryOutputs = [];
+
     public array $additionalOutputs = [];
 
     public ?int $editingMandatoryId = null;
+
     public ?int $editingAdditionalId = null;
 
     public array $tempMandatoryFiles = [];
+
     public array $tempAdditionalFiles = [];
+
     public array $tempAdditionalCerts = [];
 
     // File uploads (progress has 1, final has 3)
     public $substanceFile;
+
     public $realizationFile;
+
     public $presentationFile;
+
+    // Report configuration (can be overridden in child classes)
+    protected string $reportType = 'progress';
+
+    protected array $fileValidationRules = [
+        'substanceFile' => 'nullable|file|mimes:pdf,application/pdf|max:10240',
+    ];
 
     /**
      * Get the report type (progress or final)
      */
-    abstract protected function getReportType(): string;
+    protected function getReportType(): string
+    {
+        return $this->reportType;
+    }
 
     /**
      * Get file validation rules
      */
-    abstract protected function getFileValidationRules(): array;
+    protected function getFileValidationRules(): array
+    {
+        return $this->fileValidationRules;
+    }
+
+    /**
+     * Ensure proposal is initialized
+     *
+     * @throws \RuntimeException
+     */
+    protected function ensureProposalInitialized(): void
+    {
+        if ($this->proposal === null) {
+            throw new \RuntimeException('Proposal must be initialized before using this method. Call initWithProposal() first.');
+        }
+    }
 
     /**
      * Initialize form with Proposal
@@ -115,6 +150,8 @@ abstract class ReportForm extends Form
 
     public function initializeNewReport(): void
     {
+        $this->ensureProposalInitialized();
+
         foreach ($this->proposal->outputs->where('category', 'Wajib') as $output) {
             $this->mandatoryOutputs[$output->id] = $this->getEmptyMandatoryOutput();
         }
@@ -205,8 +242,9 @@ abstract class ReportForm extends Form
         ]);
     }
 
-    public function save(ProgressReport $existingReport = null): ProgressReport
+    public function save(?ProgressReport $existingReport = null): ProgressReport
     {
+        $this->ensureProposalInitialized();
         $this->validateReportData();
 
         DB::beginTransaction();
@@ -244,7 +282,7 @@ abstract class ReportForm extends Form
         }
     }
 
-    public function submit(ProgressReport $existingReport = null): ProgressReport
+    public function submit(?ProgressReport $existingReport = null): ProgressReport
     {
         $report = $this->save($existingReport);
 
@@ -470,7 +508,7 @@ abstract class ReportForm extends Form
     public function handleFileUpload(string $fileProperty): void
     {
         // Create draft report if doesn't exist
-        if (!$this->progressReport && $this->{$fileProperty}) {
+        if (! $this->progressReport && $this->{$fileProperty}) {
             $this->progressReport = \App\Models\ProgressReport::create([
                 'proposal_id' => $this->proposal->id,
                 'summary_update' => $this->summaryUpdate ?: $this->proposal->summary,
@@ -494,7 +532,7 @@ abstract class ReportForm extends Form
     {
         $this->validateMandatoryOutput($proposalOutputId);
 
-        if (!$this->progressReport) {
+        if (! $this->progressReport) {
             throw new \Exception('Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
         }
 
@@ -517,11 +555,11 @@ abstract class ReportForm extends Form
                 'indexing_body' => $data['indexing_body'] ?? '',
                 'journal_url' => $data['journal_url'] ?? '',
                 'article_title' => $data['article_title'] ?? '',
-                'publication_year' => !empty($data['publication_year']) ? (int) $data['publication_year'] : null,
+                'publication_year' => ! empty($data['publication_year']) ? (int) $data['publication_year'] : null,
                 'volume' => $data['volume'] ?? '',
                 'issue_number' => $data['issue_number'] ?? '',
-                'page_start' => !empty($data['page_start']) ? (int) $data['page_start'] : null,
-                'page_end' => !empty($data['page_end']) ? (int) $data['page_end'] : null,
+                'page_start' => ! empty($data['page_start']) ? (int) $data['page_start'] : null,
+                'page_end' => ! empty($data['page_end']) ? (int) $data['page_end'] : null,
                 'article_url' => $data['article_url'] ?? '',
                 'doi' => $data['doi'] ?? '',
             ];
@@ -563,7 +601,7 @@ abstract class ReportForm extends Form
     {
         $this->validateAdditionalOutput($proposalOutputId);
 
-        if (!$this->progressReport) {
+        if (! $this->progressReport) {
             throw new \Exception('Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
         }
 
@@ -582,8 +620,8 @@ abstract class ReportForm extends Form
                 'book_title' => $data['book_title'] ?? '',
                 'publisher_name' => $data['publisher_name'] ?? '',
                 'isbn' => $data['isbn'] ?? '',
-                'publication_year' => !empty($data['publication_year']) ? (int) $data['publication_year'] : null,
-                'total_pages' => !empty($data['total_pages']) ? (int) $data['total_pages'] : null,
+                'publication_year' => ! empty($data['publication_year']) ? (int) $data['publication_year'] : null,
+                'total_pages' => ! empty($data['total_pages']) ? (int) $data['total_pages'] : null,
                 'publisher_url' => $data['publisher_url'] ?? '',
                 'book_url' => $data['book_url'] ?? '',
             ];

@@ -4,32 +4,202 @@ declare(strict_types=1);
 
 namespace App\Livewire\Research\ProgressReport;
 
-use App\Livewire\Abstracts\ReportOutputShow;
 use App\Livewire\Forms\ResearchProgressReportForm;
+use App\Livewire\Traits\HasFileUploads;
+use App\Livewire\Traits\ManagesOutputs;
+use App\Livewire\Traits\ReportAccess;
+use App\Livewire\Traits\ReportAuthorization;
+use App\Models\Keyword;
+use App\Models\Proposal;
+use Illuminate\Support\Facades\DB;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
-class Show extends ReportOutputShow
+class Show extends Component
 {
+    use HasFileUploads;
+    use ManagesOutputs;
+    use ReportAccess;
+    use ReportAuthorization;
+    use WithFileUploads;
+
+    // Form instance - Livewire v3 Form pattern
+    public ResearchProgressReportForm $form;
+
     /**
-     * Get the Form class name
+     * Mount the component
      */
-    protected function getFormClass(): string
+    public function mount(Proposal $proposal): void
     {
-        return ResearchProgressReportForm::class;
+        $this->proposal = $proposal;
+        $this->checkAccess();
+        $this->loadReport();
+
+        // Initialize Livewire Form
+        $this->form->initWithProposal($this->proposal);
+
+        if ($this->progressReport) {
+            // Load existing report data into form
+            $this->form->setReport($this->progressReport);
+            $this->loadExistingReport($this->progressReport);
+        } else {
+            // Initialize new report structure
+            $this->form->initializeNewReport();
+            $this->initializeNewReport($this->proposal);
+        }
     }
 
     /**
-     * Get the route name for redirection
+     * Save the report as draft
      */
-    protected function getRouteName(): string
+    public function save(): void
     {
-        return 'research.progress-report.index';
+        if (! $this->canEdit) {
+            abort(403);
+        }
+
+        // Validate substance file if present
+        $this->validateSubstanceFile();
+
+        DB::transaction(function () {
+            // Save report via form
+            $report = $this->form->save($this->progressReport);
+            $this->progressReport = $report;
+
+            // Save substance file
+            $this->saveSubstanceFile($report);
+
+            // Save output files
+            $this->saveOutputFiles($report);
+        });
+
+        $this->dispatch('report-saved');
+        session()->flash('success', 'Laporan kemajuan berhasil disimpan.');
     }
 
     /**
-     * Get the view name
+     * Submit the report
      */
-    protected function getViewName(): string
+    public function submit(): void
     {
-        return 'livewire.research.progress-report.show';
+        if (! $this->canEdit) {
+            abort(403);
+        }
+
+        DB::transaction(function () {
+            // Submit report via form
+            $report = $this->form->submit($this->progressReport);
+            $this->progressReport = $report;
+
+            // Save substance file
+            $this->saveSubstanceFile($report);
+
+            // Save output files
+            $this->saveOutputFiles($report);
+        });
+
+        session()->flash('success', 'Laporan kemajuan berhasil diajukan.');
+        $this->redirect(route('research.progress-report.index'), navigate: true);
+    }
+
+    /**
+     * Save all output files
+     */
+    protected function saveOutputFiles($report): void
+    {
+        // Save mandatory output files
+        foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
+            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
+                continue;
+            }
+
+            if (empty($data['status_type']) && empty($data['journal_title'])) {
+                continue;
+            }
+
+            // Find the mandatory output
+            $mandatoryOutput = \App\Models\MandatoryOutput::where('progress_report_id', $report->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            if ($mandatoryOutput) {
+                $this->saveMandatoryOutputFile($mandatoryOutput, $proposalOutputId);
+            }
+        }
+
+        // Save additional output files
+        foreach ($this->additionalOutputs as $proposalOutputId => $data) {
+            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
+                continue;
+            }
+
+            if (empty($data['status']) && empty($data['book_title'])) {
+                continue;
+            }
+
+            // Find the additional output
+            $additionalOutput = \App\Models\AdditionalOutput::where('progress_report_id', $report->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            if ($additionalOutput) {
+                $this->saveAdditionalOutputFile($additionalOutput, $proposalOutputId);
+                $this->saveAdditionalOutputCert($additionalOutput, $proposalOutputId);
+            }
+        }
+    }
+
+    /**
+     * Save mandatory output after validation
+     */
+    public function saveMandatoryOutput(int $proposalOutputId): void
+    {
+        $this->form->saveMandatoryOutput($proposalOutputId);
+        $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
+        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+    }
+
+    /**
+     * Save additional output after validation
+     */
+    public function saveAdditionalOutput(int $proposalOutputId): void
+    {
+        $this->form->saveAdditionalOutput($proposalOutputId);
+        $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
+        session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+    }
+
+    /**
+     * Validate mandatory output
+     */
+    public function validateMandatoryOutput(int $proposalOutputId): void
+    {
+        $this->form->validateMandatoryOutput($proposalOutputId);
+    }
+
+    /**
+     * Validate additional output
+     */
+    public function validateAdditionalOutput(int $proposalOutputId): void
+    {
+        $this->form->validateAdditionalOutput($proposalOutputId);
+    }
+
+    /**
+     * Get all keywords for the view
+     */
+    public function getAllKeywords(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Keyword::orderBy('name')->get();
+    }
+
+    /**
+     * Render the view
+     */
+    public function render()
+    {
+        return view('livewire.research.progress-report.show', [
+            'allKeywords' => $this->getAllKeywords(),
+        ]);
     }
 }

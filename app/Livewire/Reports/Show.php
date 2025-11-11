@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Reports;
 
-use App\Livewire\Abstracts\ReportShow;
+use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Models\AdditionalOutput;
 use App\Models\Keyword;
@@ -13,33 +13,45 @@ use App\Models\ProgressReport;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class Show extends ReportShow
+class Show extends Component
 {
-    use WithFileUploads;
+    use ReportAccess;
     use ReportAuthorization;
+    use WithFileUploads;
 
     // Form data dari ReportForm
     public string $summaryUpdate = '';
+
     public string $keywordsInput = '';
+
     public int $reportingYear;
+
     public string $reportingPeriod = 'semester_1';
 
     // Arrays for outputs
     public array $mandatoryOutputs = [];
+
     public array $additionalOutputs = [];
 
     // Track editing state
     public ?int $editingMandatoryId = null;
+
     public ?int $editingAdditionalId = null;
 
     // File uploads
     public $substanceFile;
+
     public $realizationFile;      // For final reports
+
     public $presentationFile;     // For final reports
+
     public array $tempMandatoryFiles = [];
+
     public array $tempAdditionalFiles = [];
+
     public array $tempAdditionalCerts = [];
 
     // Report configuration
@@ -94,13 +106,17 @@ class Show extends ReportShow
         $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
 
         foreach ($this->progressReport->mandatoryOutputs as $output) {
-            if (empty($output->proposal_output_id)) continue;
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
 
             $this->mandatoryOutputs[$output->proposal_output_id] = $this->mapMandatoryOutput($output);
         }
 
         foreach ($this->progressReport->additionalOutputs as $output) {
-            if (empty($output->proposal_output_id)) continue;
+            if (empty($output->proposal_output_id)) {
+                continue;
+            }
 
             $this->additionalOutputs[$output->proposal_output_id] = $this->mapAdditionalOutput($output);
         }
@@ -196,7 +212,9 @@ class Show extends ReportShow
 
     public function save(): void
     {
-        if (!$this->canEdit) abort(403);
+        if (! $this->canEdit) {
+            abort(403);
+        }
 
         $this->validate([
             'summaryUpdate' => 'required|min:100',
@@ -247,7 +265,9 @@ class Show extends ReportShow
 
     public function submit(): void
     {
-        if (!$this->canEdit) abort(403);
+        if (! $this->canEdit) {
+            abort(403);
+        }
 
         $this->save();
 
@@ -259,7 +279,7 @@ class Show extends ReportShow
             ]);
 
             // Ensure config is initialized before redirect
-            if (empty($this->config) || !isset($this->config['route'])) {
+            if (empty($this->config) || ! isset($this->config['route'])) {
                 $this->config = $this->getConfig('research-progress');
             }
 
@@ -270,13 +290,17 @@ class Show extends ReportShow
 
     protected function syncKeywords(): void
     {
-        if (empty($this->keywordsInput)) return;
+        if (empty($this->keywordsInput)) {
+            return;
+        }
 
         $keywordNames = array_map('trim', explode(';', $this->keywordsInput));
         $keywords = [];
 
         foreach ($keywordNames as $name) {
-            if (empty($name)) continue;
+            if (empty($name)) {
+                continue;
+            }
             $keyword = Keyword::firstOrCreate(['name' => $name], ['name' => $name]);
             $keywords[] = $keyword->id;
         }
@@ -288,7 +312,9 @@ class Show extends ReportShow
     protected function saveOutputs(): void
     {
         foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (empty($data['status_type']) && empty($data['journal_title']))) continue;
+            if (empty($proposalOutputId) || (empty($data['status_type']) && empty($data['journal_title']))) {
+                continue;
+            }
 
             $outputData = [
                 'progress_report_id' => $this->progressReport->id,
@@ -301,11 +327,11 @@ class Show extends ReportShow
                 'indexing_body' => $data['indexing_body'] ?? null,
                 'journal_url' => $data['journal_url'] ?? null,
                 'article_title' => $data['article_title'] ?? null,
-                'publication_year' => !empty($data['publication_year']) ? $data['publication_year'] : null,
+                'publication_year' => ! empty($data['publication_year']) ? $data['publication_year'] : null,
                 'volume' => $data['volume'] ?? null,
                 'issue_number' => $data['issue_number'] ?? null,
-                'page_start' => !empty($data['page_start']) ? (int) $data['page_start'] : null,
-                'page_end' => !empty($data['page_end']) ? (int) $data['page_end'] : null,
+                'page_start' => ! empty($data['page_start']) ? (int) $data['page_start'] : null,
+                'page_end' => ! empty($data['page_end']) ? (int) $data['page_end'] : null,
                 'article_url' => $data['article_url'] ?? null,
                 'doi' => $data['doi'] ?? null,
             ];
@@ -326,7 +352,9 @@ class Show extends ReportShow
         }
 
         foreach ($this->additionalOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (empty($data['status']) && empty($data['book_title']))) continue;
+            if (empty($proposalOutputId) || (empty($data['status']) && empty($data['book_title']))) {
+                continue;
+            }
 
             $outputData = [
                 'progress_report_id' => $this->progressReport->id,
@@ -335,8 +363,8 @@ class Show extends ReportShow
                 'book_title' => $data['book_title'] ?? null,
                 'publisher_name' => $data['publisher_name'] ?? null,
                 'isbn' => $data['isbn'] ?? null,
-                'publication_year' => !empty($data['publication_year']) ? $data['publication_year'] : null,
-                'total_pages' => !empty($data['total_pages']) ? (int) $data['total_pages'] : null,
+                'publication_year' => ! empty($data['publication_year']) ? $data['publication_year'] : null,
+                'total_pages' => ! empty($data['total_pages']) ? (int) $data['total_pages'] : null,
                 'publisher_url' => $data['publisher_url'] ?? null,
                 'book_url' => $data['book_url'] ?? null,
             ];
@@ -360,14 +388,16 @@ class Show extends ReportShow
     public function editMandatoryOutput(int $proposalOutputId): void
     {
         $this->editingMandatoryId = $proposalOutputId;
-        if (!isset($this->mandatoryOutputs[$proposalOutputId])) {
+        if (! isset($this->mandatoryOutputs[$proposalOutputId])) {
             $this->mandatoryOutputs[$proposalOutputId] = $this->getEmptyMandatoryOutput();
         }
     }
 
     public function saveMandatoryOutput(): void
     {
-        if (!$this->editingMandatoryId) return;
+        if (! $this->editingMandatoryId) {
+            return;
+        }
 
         $this->validate([
             "mandatoryOutputs.{$this->editingMandatoryId}.status_type" => 'required|in:published,accepted,under_review,rejected',
@@ -389,14 +419,16 @@ class Show extends ReportShow
     public function editAdditionalOutput(int $proposalOutputId): void
     {
         $this->editingAdditionalId = $proposalOutputId;
-        if (!isset($this->additionalOutputs[$proposalOutputId])) {
+        if (! isset($this->additionalOutputs[$proposalOutputId])) {
             $this->additionalOutputs[$proposalOutputId] = $this->getEmptyAdditionalOutput();
         }
     }
 
     public function saveAdditionalOutput(): void
     {
-        if (!$this->editingAdditionalId) return;
+        if (! $this->editingAdditionalId) {
+            return;
+        }
 
         $this->validate([
             "additionalOutputs.{$this->editingAdditionalId}.status" => 'required|in:review,editing,published',
@@ -425,7 +457,7 @@ class Show extends ReportShow
 
     public function render()
     {
-        if (empty($this->config) || !isset($this->config['view'])) {
+        if (empty($this->config) || ! isset($this->config['view'])) {
             // Re-initialize config if missing (e.g., after component hydration)
             $this->config = $this->getConfig('research-progress');
         }
