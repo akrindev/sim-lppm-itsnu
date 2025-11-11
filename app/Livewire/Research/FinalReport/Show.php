@@ -6,6 +6,7 @@ namespace App\Livewire\Research\FinalReport;
 
 use App\Enums\ProposalStatus;
 use App\Livewire\Forms\ResearchFinalReportForm;
+use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Models\Keyword;
@@ -16,6 +17,7 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
+    use HasFileUploads;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
@@ -66,14 +68,29 @@ class Show extends Component
             abort(403);
         }
 
-        DB::transaction(function () {
-            // Save report via form
-            $report = $this->form->save($this->progressReport);
-            $this->progressReport = $report;
-        });
+        try {
+            DB::transaction(function () {
+                // Save report via form
+                $report = $this->form->save($this->progressReport);
+                $this->progressReport = $report;
 
-        $this->dispatch('report-saved');
-        session()->flash('success', 'Laporan akhir berhasil disimpan.');
+                // Save report files
+                $this->saveSubstanceFile($report, 'final');
+                $this->saveRealizationFile($report, 'final');
+                $this->savePresentationFile($report, 'final');
+
+                // Save output files
+                $this->saveOutputFiles($report);
+            });
+
+            $this->dispatch('report-saved');
+            session()->flash('success', 'Laporan akhir berhasil disimpan.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Let Livewire handle validation errors
+            throw $e;
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menyimpan laporan: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -89,6 +106,14 @@ class Show extends Component
             // Submit report via form
             $report = $this->form->submit($this->progressReport);
             $this->progressReport = $report;
+
+            // Save report files
+            $this->saveSubstanceFile($report, 'final');
+            $this->saveRealizationFile($report, 'final');
+            $this->savePresentationFile($report, 'final');
+
+            // Save output files
+            $this->saveOutputFiles($report);
         });
 
         session()->flash('success', 'Laporan akhir berhasil diajukan.');
@@ -96,100 +121,115 @@ class Show extends Component
     }
 
     /**
+     * Save all output files
+     */
+    protected function saveOutputFiles($report): void
+    {
+        // Save mandatory output files
+        foreach ($this->form->mandatoryOutputs as $proposalOutputId => $data) {
+            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
+                continue;
+            }
+
+            if (empty($data['status_type']) && empty($data['journal_title'])) {
+                continue;
+            }
+
+            // Find the mandatory output
+            $mandatoryOutput = \App\Models\MandatoryOutput::where('progress_report_id', $report->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            if ($mandatoryOutput && isset($this->tempMandatoryFiles[$proposalOutputId])) {
+                $this->saveMandatoryOutputFile($mandatoryOutput, $proposalOutputId, 'final');
+            }
+        }
+
+        // Save additional output files
+        foreach ($this->form->additionalOutputs as $proposalOutputId => $data) {
+            if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
+                continue;
+            }
+
+            if (empty($data['status']) && empty($data['book_title'])) {
+                continue;
+            }
+
+            // Find the additional output
+            $additionalOutput = \App\Models\AdditionalOutput::where('progress_report_id', $report->id)
+                ->where('proposal_output_id', $proposalOutputId)
+                ->first();
+
+            if ($additionalOutput) {
+                if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
+                    $this->saveAdditionalOutputFile($additionalOutput, $proposalOutputId, 'final');
+                }
+                if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
+                    $this->saveAdditionalOutputCert($additionalOutput, $proposalOutputId, 'final');
+                }
+            }
+        }
+    }
+
+    /**
      * Handle substance file upload (real-time)
      */
-    public function updatedFormSubstanceFile(): void
+    public function updatedSubstanceFile(): void
     {
         if (! $this->canEdit) {
-            $this->form->substanceFile = null;
+            $this->substanceFile = null;
 
             return;
         }
 
         // Validate file
-        $this->validate([
-            'form.substanceFile' => 'required|file|mimes:pdf|max:10240',
-        ]);
-
-        try {
-            $this->form->handleFileUpload('substanceFile');
-            $this->progressReport = $this->form->progressReport;
-            session()->flash('success', 'File substansi laporan berhasil diunggah.');
-        } catch (\Exception $e) {
-            $this->form->substanceFile = null;
-            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
-        }
+        $this->validateSubstanceFile();
     }
 
     /**
      * Handle realization file upload (real-time)
      */
-    public function updatedFormRealizationFile(): void
+    public function updatedRealizationFile(): void
     {
         if (! $this->canEdit) {
-            $this->form->realizationFile = null;
+            $this->realizationFile = null;
 
             return;
         }
 
         // Validate file
-        $this->validate([
-            'form.realizationFile' => 'required|file|mimes:pdf|max:10240',
-        ]);
-
-        try {
-            $this->form->handleFileUpload('realizationFile');
-            $this->progressReport = $this->form->progressReport;
-            session()->flash('success', 'File realisasi keterlibatan berhasil diunggah.');
-        } catch (\Exception $e) {
-            $this->form->realizationFile = null;
-            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
-        }
+        $this->validateRealizationFile();
     }
 
     /**
      * Handle presentation file upload (real-time)
      */
-    public function updatedFormPresentationFile(): void
+    public function updatedPresentationFile(): void
     {
         if (! $this->canEdit) {
-            $this->form->presentationFile = null;
+            $this->presentationFile = null;
 
             return;
         }
 
         // Validate file
-        $this->validate([
-            'form.presentationFile' => 'required|file|mimes:pdf,ppt,pptx|max:51200',
-        ]);
-
-        try {
-            $this->form->handleFileUpload('presentationFile');
-            $this->progressReport = $this->form->progressReport;
-            session()->flash('success', 'File presentasi hasil berhasil diunggah.');
-        } catch (\Exception $e) {
-            $this->form->presentationFile = null;
-            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
-        }
+        $this->validatePresentationFile();
     }
 
     /**
      * Handle mandatory output file upload (real-time)
      */
-    public function updatedFormTempMandatoryFiles(): void
+    public function updatedTempMandatoryFiles(): void
     {
         if (! $this->canEdit) {
             return;
         }
 
         try {
-            // Validate file via form
-            foreach ($this->form->tempMandatoryFiles as $proposalOutputId => $file) {
-                $this->validate([
-                    "form.tempMandatoryFiles.{$proposalOutputId}" => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-                ]);
+            // Validate file
+            foreach ($this->tempMandatoryFiles as $proposalOutputId => $file) {
+                $this->validateMandatoryFile($proposalOutputId);
             }
-            session()->flash('success', 'File dokumen artikel berhasil diunggah.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
@@ -198,20 +238,17 @@ class Show extends Component
     /**
      * Handle additional output file upload (real-time)
      */
-    public function updatedFormTempAdditionalFiles(): void
+    public function updatedTempAdditionalFiles(): void
     {
         if (! $this->canEdit) {
             return;
         }
 
         try {
-            // Validate file via form
-            foreach ($this->form->tempAdditionalFiles as $proposalOutputId => $file) {
-                $this->validate([
-                    "form.tempAdditionalFiles.{$proposalOutputId}" => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-                ]);
+            // Validate file
+            foreach ($this->tempAdditionalFiles as $proposalOutputId => $file) {
+                $this->validateAdditionalFile($proposalOutputId);
             }
-            session()->flash('success', 'File dokumen buku berhasil diunggah.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }
@@ -220,20 +257,17 @@ class Show extends Component
     /**
      * Handle additional output certificate upload (real-time)
      */
-    public function updatedFormTempAdditionalCerts(): void
+    public function updatedTempAdditionalCerts(): void
     {
         if (! $this->canEdit) {
             return;
         }
 
         try {
-            // Validate file via form
-            foreach ($this->form->tempAdditionalCerts as $proposalOutputId => $file) {
-                $this->validate([
-                    "form.tempAdditionalCerts.{$proposalOutputId}" => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
-                ]);
+            // Validate file
+            foreach ($this->tempAdditionalCerts as $proposalOutputId => $file) {
+                $this->validateAdditionalCert($proposalOutputId);
             }
-            session()->flash('success', 'File surat keterangan berhasil diunggah.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
         }

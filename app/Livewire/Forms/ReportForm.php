@@ -201,7 +201,7 @@ class ReportForm extends Form
     public function rules(): array
     {
         return [
-            'summaryUpdate' => ['nullable', 'string', 'min:10'],
+            'summaryUpdate' => ['required', 'string', 'min:10'],
             'reportingYear' => ['required', 'integer', 'min:2020', 'max:2099'],
             'reportingPeriod' => ['required', 'string', Rule::in(['semester_1', 'semester_2', 'annual', 'final'])],
         ];

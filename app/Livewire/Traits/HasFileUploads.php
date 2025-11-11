@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Traits;
 
-use App\Models\ProgressReport;
-use App\Models\MandatoryOutput;
 use App\Models\AdditionalOutput;
+use App\Models\MandatoryOutput;
+use App\Models\ProgressReport;
 use Illuminate\Support\Facades\Auth;
 
 trait HasFileUploads
@@ -14,9 +14,16 @@ trait HasFileUploads
     // Progress Report document files
     public $substanceFile;
 
+    // Final Report additional files
+    public $realizationFile;
+
+    public $presentationFile;
+
     // Temporary file uploads
     public array $tempMandatoryFiles = [];
+
     public array $tempAdditionalFiles = [];
+
     public array $tempAdditionalCerts = [];
 
     /**
@@ -26,6 +33,26 @@ trait HasFileUploads
     {
         $this->validate([
             'substanceFile' => 'nullable|file|mimes:pdf|max:10240',
+        ]);
+    }
+
+    /**
+     * Validate realization file upload
+     */
+    public function validateRealizationFile(): void
+    {
+        $this->validate([
+            'realizationFile' => 'nullable|file|mimes:pdf,docx|max:10240',
+        ]);
+    }
+
+    /**
+     * Validate presentation file upload
+     */
+    public function validatePresentationFile(): void
+    {
+        $this->validate([
+            'presentationFile' => 'nullable|file|mimes:pdf,ppt,pptx|max:51200',
         ]);
     }
 
@@ -79,6 +106,50 @@ trait HasFileUploads
                 'report_type' => $reportType,
             ])
             ->toMediaCollection('substance_file');
+    }
+
+    /**
+     * Save realization file to media collection
+     */
+    protected function saveRealizationFile(ProgressReport $report, string $reportType = 'final'): void
+    {
+        if (! $this->realizationFile) {
+            return;
+        }
+
+        $report->clearMediaCollection('realization_file');
+        $report
+            ->addMedia($this->realizationFile->getRealPath())
+            ->usingName($this->realizationFile->getClientOriginalName())
+            ->usingFileName($this->realizationFile->hashName())
+            ->withCustomProperties([
+                'uploaded_by' => Auth::id(),
+                'proposal_id' => $report->proposal_id,
+                'report_type' => $reportType,
+            ])
+            ->toMediaCollection('realization_file');
+    }
+
+    /**
+     * Save presentation file to media collection
+     */
+    protected function savePresentationFile(ProgressReport $report, string $reportType = 'final'): void
+    {
+        if (! $this->presentationFile) {
+            return;
+        }
+
+        $report->clearMediaCollection('presentation_file');
+        $report
+            ->addMedia($this->presentationFile->getRealPath())
+            ->usingName($this->presentationFile->getClientOriginalName())
+            ->usingFileName($this->presentationFile->hashName())
+            ->withCustomProperties([
+                'uploaded_by' => Auth::id(),
+                'proposal_id' => $report->proposal_id,
+                'report_type' => $reportType,
+            ])
+            ->toMediaCollection('presentation_file');
     }
 
     /**
@@ -156,6 +227,22 @@ trait HasFileUploads
     }
 
     /**
+     * Clear realization file
+     */
+    public function clearRealizationFile(): void
+    {
+        $this->reset('realizationFile');
+    }
+
+    /**
+     * Clear presentation file
+     */
+    public function clearPresentationFile(): void
+    {
+        $this->reset('presentationFile');
+    }
+
+    /**
      * Clear mandatory file
      */
     public function clearMandatoryFile(int $proposalOutputId): void
@@ -186,6 +273,8 @@ trait HasFileUploads
     {
         $this->reset([
             'substanceFile',
+            'realizationFile',
+            'presentationFile',
             'tempMandatoryFiles',
             'tempAdditionalFiles',
             'tempAdditionalCerts',
