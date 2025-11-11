@@ -61,8 +61,9 @@
 
             <div class="mb-3">
                 <label class="form-label">File Substansi Laporan (PDF)</label>
-                <input type="file" wire:model="substanceFile" class="form-control @error('substanceFile') is-invalid @enderror"
-                    accept=".pdf" @disabled(!$canEdit) />
+                <input type="file" wire:model="substanceFile"
+                    class="form-control @error('substanceFile') is-invalid @enderror" accept=".pdf"
+                    @disabled(!$canEdit) />
                 @error('substanceFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -124,7 +125,10 @@
                             @foreach ($wajibs as $index => $output)
                                 @php
                                     $mandatoryOutput = $progressReport
-                                        ? $progressReport->mandatoryOutputs()->where('proposal_output_id', $output->id)->first()
+                                        ? $progressReport
+                                            ->mandatoryOutputs()
+                                            ->where('proposal_output_id', $output->id)
+                                            ->first()
                                         : null;
                                 @endphp
                                 <tr wire:key="wajib-row-{{ $output->id }}">
@@ -160,7 +164,8 @@
                                             @php
                                                 $media = $mandatoryOutput->getFirstMedia('journal_article');
                                             @endphp
-                                            <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-success">
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-success">
                                                 <x-lucide-file-check class="icon icon-sm" />
                                                 Lihat Dokumen
                                             </a>
@@ -173,11 +178,12 @@
                                     </td>
                                     <td>
                                         @if ($canEdit)
-                                            <button type="button" wire:click="editMandatoryOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#modalMandatoryOutput">
-                                            <x-lucide-pencil class="icon" />
-                                        </button>
+                                            <button type="button"
+                                                wire:click="editMandatoryOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#modalMandatoryOutput">
+                                                <x-lucide-pencil class="icon" />
+                                            </button>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
@@ -223,7 +229,10 @@
                             @foreach ($tambahans as $index => $output)
                                 @php
                                     $additionalOutput = $progressReport
-                                        ? $progressReport->additionalOutputs()->where('proposal_output_id', $output->id)->first()
+                                        ? $progressReport
+                                            ->additionalOutputs()
+                                            ->where('proposal_output_id', $output->id)
+                                            ->first()
                                         : null;
                                 @endphp
                                 <tr wire:key="tambahan-row-{{ $output->id }}">
@@ -256,7 +265,8 @@
                                                     @php
                                                         $media = $additionalOutput->getFirstMedia('book_document');
                                                     @endphp
-                                                    <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-success">
+                                                    <a href="{{ $media->getUrl() }}" target="_blank"
+                                                        class="btn btn-sm btn-success">
                                                         <x-lucide-book class="icon icon-sm" />
                                                         Buku
                                                     </a>
@@ -264,9 +274,12 @@
 
                                                 @if ($additionalOutput->hasMedia('publication_certificate'))
                                                     @php
-                                                        $media = $additionalOutput->getFirstMedia('publication_certificate');
+                                                        $media = $additionalOutput->getFirstMedia(
+                                                            'publication_certificate',
+                                                        );
                                                     @endphp
-                                                    <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-info">
+                                                    <a href="{{ $media->getUrl() }}" target="_blank"
+                                                        class="btn btn-sm btn-info">
                                                         <x-lucide-award class="icon icon-sm" />
                                                         Sertifikat
                                                     </a>
@@ -288,11 +301,12 @@
                                     </td>
                                     <td>
                                         @if ($canEdit)
-                                            <button type="button" wire:click="editAdditionalOutput({{ $output->id }})"
-                                            class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#modalAdditionalOutput">
-                                            <x-lucide-pencil class="icon" />
-                                        </button>
+                                            <button type="button"
+                                                wire:click="editAdditionalOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#modalAdditionalOutput">
+                                                <x-lucide-pencil class="icon" />
+                                            </button>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
@@ -313,30 +327,30 @@
 
     <!-- Action Buttons -->
     @if ($canEdit)
-    <div class="card">
-        <div class="card-body">
-            <div class="justify-content-end btn-list">
-                <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="save">
-                        <x-lucide-save class="icon" /> Simpan Draft
-                    </span>
-                    <span wire:loading wire:target="save">
-                        <span class="me-2 spinner-border spinner-border-sm"></span>
-                        Menyimpan...
-                    </span>
-                </button>
-                <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="submit">
-                        <x-lucide-send class="icon" /> Ajukan Laporan
-                    </span>
-                    <span wire:loading wire:target="submit">
-                        <span class="me-2 spinner-border spinner-border-sm"></span>
-                        Mengajukan...
-                    </span>
-                </button>
+        <div class="card">
+            <div class="card-body">
+                <div class="justify-content-end btn-list">
+                    <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="save">
+                            <x-lucide-save class="icon" /> Simpan Draft
+                        </span>
+                        <span wire:loading wire:target="save">
+                            <span class="me-2 spinner-border spinner-border-sm"></span>
+                            Menyimpan...
+                        </span>
+                    </button>
+                    <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="submit">
+                            <x-lucide-send class="icon" /> Ajukan Laporan
+                        </span>
+                        <span wire:loading wire:target="submit">
+                            <span class="me-2 spinner-border spinner-border-sm"></span>
+                            Mengajukan...
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
     @endif
 
     <!-- Modal: Mandatory Output -->
@@ -345,11 +359,30 @@
             wire:ignore.self>
 
             <x-slot:body>
+                @if ($errors->any())
+                    <x-tabler.alert type="danger" class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <x-lucide-alert-circle class="me-2 icon" />
+                            <div>
+                                <h4 class="mb-1 alert-title">Terjadi Kesalahan!</h4>
+                                <div class="text-secondary">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </x-tabler.alert>
+                @endif
+
                 <div class="row g-3">
                     <!-- Status Type -->
                     <div class="col-md-6">
                         <label class="form-label required">Status Publikasi</label>
-                        <select wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.status_type" class="form-select">
+                        <select wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.status_type"
+                            class="form-select">
                             <option value="">Pilih Status</option>
                             <option value="published">Published</option>
                             <option value="accepted">Accepted</option>
@@ -413,7 +446,8 @@
                     <!-- Publication Year -->
                     <div class="col-md-3">
                         <label class="form-label required">Tahun Terbit</label>
-                        <input type="number" wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.publication_year"
+                        <input type="number"
+                            wire:model="form.mandatoryOutputs.{{ $editingMandatoryId }}.publication_year"
                             class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
                     </div>
 
@@ -462,15 +496,26 @@
                         <label class="form-label">Dokumen Artikel (PDF)</label>
                         <input type="file" wire:model="tempMandatoryFiles.{{ $editingMandatoryId }}"
                             class="form-control" accept=".pdf" />
-                        @if (isset($mandatoryOutputs[$editingMandatoryId]['document_file']) &&
-                                $mandatoryOutputs[$editingMandatoryId]['document_file']
-                        )
-                            <div class="mt-2">
-                                <small class="text-success">
-                                    <x-lucide-check class="icon icon-sm" />
-                                    File tersimpan
-                                </small>
-                            </div>
+                        @error("tempMandatoryFiles.{$editingMandatoryId}")
+                            <div class="d-block invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @if ($mandatoryOutput = $this->mandatoryOutput)
+                            @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
+                                <div class="bg-light mt-2 p-2 border rounded">
+                                    <div class="d-flex align-items-center">
+                                        <x-lucide-file-text class="me-2 text-primary icon" />
+                                        <div class="flex-fill">
+                                            <small class="text-muted">File yang sudah diunggah:</small><br>
+                                            <strong>{{ $media->file_name }}</strong>
+                                            <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                KB)</small>
+                                        </div>
+                                        <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
+                                            <x-lucide-download class="icon" /> Download
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
                         @endif
                         <div wire:loading wire:target="tempMandatoryFiles.{{ $editingMandatoryId }}">
                             <small class="text-muted">
@@ -506,12 +551,31 @@
             wire:ignore.self>
 
             <x-slot:body>
+                @if ($errors->any())
+                    <x-tabler.alert type="danger" class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <x-lucide-alert-circle class="me-2 icon" />
+                            <div>
+                                <h4 class="mb-1 alert-title">Terjadi Kesalahan!</h4>
+                                <div class="text-secondary">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </x-tabler.alert>
+                @endif
+
                 @if ($editingAdditionalId)
                     <div class="row g-3">
                         <!-- Status -->
                         <div class="col-md-12">
                             <label class="form-label required">Status</label>
-                            <select wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.status" class="form-select">
+                            <select wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.status"
+                                class="form-select">
                                 <option value="">Pilih Status</option>
                                 <option value="review">Review</option>
                                 <option value="editing">Editing</option>
@@ -522,7 +586,8 @@
                         <!-- Book Title -->
                         <div class="col-md-12">
                             <label class="form-label required">Judul Buku</label>
-                            <input type="text" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.book_title"
+                            <input type="text"
+                                wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.book_title"
                                 class="form-control" placeholder="Masukkan judul buku" />
                         </div>
 
@@ -552,14 +617,16 @@
                         <!-- Total Pages -->
                         <div class="col-md-6">
                             <label class="form-label">Jumlah Halaman</label>
-                            <input type="number" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.total_pages"
+                            <input type="number"
+                                wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.total_pages"
                                 class="form-control" placeholder="100" />
                         </div>
 
                         <!-- Publisher URL -->
                         <div class="col-md-6">
                             <label class="form-label">URL Web Penerbit</label>
-                            <input type="url" wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.publisher_url"
+                            <input type="url"
+                                wire:model="form.additionalOutputs.{{ $editingAdditionalId }}.publisher_url"
                                 class="form-control" placeholder="https://" />
                         </div>
 
@@ -575,15 +642,27 @@
                             <label class="form-label">Dokumen Buku/Draft</label>
                             <input type="file" wire:model="tempAdditionalFiles.{{ $editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($additionalOutputs[$editingAdditionalId]['document_file']) &&
-                                    $additionalOutputs[$editingAdditionalId]['document_file']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
+                            @error("tempAdditionalFiles.{$editingAdditionalId}")
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('book_document'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
                             <div wire:loading wire:target="tempAdditionalFiles.{{ $editingAdditionalId }}">
                                 <small class="text-muted">
@@ -598,15 +677,27 @@
                             <label class="form-label">Surat Keterangan Terbit</label>
                             <input type="file" wire:model="tempAdditionalCerts.{{ $editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($additionalOutputs[$editingAdditionalId]['publication_certificate']) &&
-                                    $additionalOutputs[$editingAdditionalId]['publication_certificate']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
+                            @error("tempAdditionalCerts.{$editingAdditionalId}")
+                                <div class="d-block invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
                             <div wire:loading wire:target="tempAdditionalCerts.{{ $editingAdditionalId }}">
                                 <small class="text-muted">

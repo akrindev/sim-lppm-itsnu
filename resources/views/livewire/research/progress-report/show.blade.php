@@ -360,7 +360,7 @@
 
             <x-slot:body>
                 @if ($errors->any())
-                    <div class="alert alert-danger mb-3">
+                    <div class="mb-3 alert alert-danger">
                         <ul class="mb-0">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -538,34 +538,34 @@
                             <label class="form-label">Dokumen Artikel (PDF)</label>
                             <input type="file" wire:model="tempMandatoryFiles.{{ $editingMandatoryId }}"
                                 class="form-control" accept=".pdf" />
-                            @php
-                                $mandatoryOutputForFile = $progressReport
-                                    ? $progressReport->mandatoryOutputs()
-                                        ->where('proposal_output_id', $editingMandatoryId)
-                                        ->first()
-                                    : null;
-                            @endphp
-                            @if ($mandatoryOutputForFile && $mandatoryOutputForFile->hasMedia('journal_article'))
-                                @php $media = $mandatoryOutputForFile->getFirstMedia('journal_article'); @endphp
-                                <div class="mt-2 alert alert-success">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <x-lucide-file-check class="me-2 icon text-success" />
-                                            <strong>{{ $media->name }}</strong>
-                                            <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
-                                        </div>
-                                        <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
-                                            <x-lucide-eye class="icon" /> Lihat
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
+                            @error("tempMandatoryFiles.{$editingMandatoryId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                             <div wire:loading wire:target="tempMandatoryFiles.{{ $editingMandatoryId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($mandatoryOutput = $this->mandatoryOutput)
+                                @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 @else
@@ -598,7 +598,7 @@
 
             <x-slot:body>
                 @if ($errors->any())
-                    <div class="alert alert-danger mb-3">
+                    <div class="mb-3 alert alert-danger">
                         <ul class="mb-0">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -703,34 +703,34 @@
                             <label class="form-label">Dokumen Buku/Draft</label>
                             <input type="file" wire:model="tempAdditionalFiles.{{ $editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @php
-                                $additionalOutputForFile = $progressReport
-                                    ? $progressReport->additionalOutputs()
-                                        ->where('proposal_output_id', $editingAdditionalId)
-                                        ->first()
-                                    : null;
-                            @endphp
-                            @if ($additionalOutputForFile && $additionalOutputForFile->hasMedia('book_document'))
-                                @php $media = $additionalOutputForFile->getFirstMedia('book_document'); @endphp
-                                <div class="mt-2 alert alert-success">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <x-lucide-file-check class="me-2 icon text-success" />
-                                            <strong>{{ $media->name }}</strong>
-                                            <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
-                                        </div>
-                                        <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
-                                            <x-lucide-eye class="icon" /> Lihat
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
+                            @error("tempAdditionalFiles.{$editingAdditionalId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                             <div wire:loading wire:target="tempAdditionalFiles.{{ $editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('book_document'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
 
                         <!-- Publication Certificate -->
@@ -738,27 +738,34 @@
                             <label class="form-label">Surat Keterangan Terbit</label>
                             <input type="file" wire:model="tempAdditionalCerts.{{ $editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @if ($additionalOutputForFile && $additionalOutputForFile->hasMedia('publication_certificate'))
-                                @php $media = $additionalOutputForFile->getFirstMedia('publication_certificate'); @endphp
-                                <div class="mt-2 alert alert-success">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <x-lucide-file-check class="me-2 icon text-success" />
-                                            <strong>{{ $media->name }}</strong>
-                                            <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
-                                        </div>
-                                        <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
-                                            <x-lucide-eye class="icon" /> Lihat
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
+                            @error("tempAdditionalCerts.{$editingAdditionalId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                             <div wire:loading wire:target="tempAdditionalCerts.{{ $editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 @else
