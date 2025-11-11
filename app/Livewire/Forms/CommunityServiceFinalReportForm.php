@@ -11,13 +11,6 @@ class CommunityServiceFinalReportForm extends ReportForm
     // Override report type for final reports
     protected string $reportType = 'final';
 
-    // Override file validation rules for final report (3 files)
-    protected array $fileValidationRules = [
-        'substanceFile' => 'nullable|file|mimes:pdf,application/pdf|max:10240',
-        'realizationFile' => 'nullable|file|mimes:pdf,docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:10240',
-        'presentationFile' => 'nullable|file|mimes:pdf,pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip|max:51200',
-    ];
-
     /**
      * Initialize form with Proposal - force final period
      */
@@ -33,6 +26,9 @@ class CommunityServiceFinalReportForm extends ReportForm
     public function setReport(\App\Models\ProgressReport $report): void
     {
         parent::setReport($report);
+
+        // Force reporting period to 'final' for final reports
+        $this->reportingPeriod = 'final';
 
         // Load file status for final reports
         foreach ($report->mandatoryOutputs as $output) {
@@ -86,8 +82,26 @@ class CommunityServiceFinalReportForm extends ReportForm
      */
     public function rules(): array
     {
-        return array_merge(parent::rules(), [
-            'reportingPeriod' => ['required', 'string', 'in:final'],
-        ]);
+        $rules = parent::rules();
+        // Override reportingPeriod to only allow 'final'
+        $rules['reportingPeriod'] = ['required', 'string', 'in:final'];
+
+        return $rules;
+    }
+
+    /**
+     * Override save to ensure summaryUpdate has a default value
+     */
+    public function save(?\App\Models\ProgressReport $existingReport = null): \App\Models\ProgressReport
+    {
+        // Ensure summaryUpdate has a value before validation
+        if (empty($this->summaryUpdate)) {
+            $this->summaryUpdate = $this->progressReport?->summary_update ?? $this->proposal->summary ?? '';
+        }
+
+        // Force reporting period to 'final' before validation
+        $this->reportingPeriod = 'final';
+
+        return parent::save($existingReport);
     }
 }

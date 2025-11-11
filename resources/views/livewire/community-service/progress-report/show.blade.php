@@ -61,14 +61,14 @@
 
             <div class="mb-3">
                 <label class="form-label">File Substansi Laporan (PDF)</label>
-                <input type="file" wire:model="form.substanceFile" class="form-control @error('form.substanceFile') is-invalid @enderror"
+                <input type="file" wire:model="substanceFile" class="form-control @error('substanceFile') is-invalid @enderror"
                     accept=".pdf" @disabled(!$canEdit) />
-                @error('form.substanceFile')
+                @error('substanceFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="form-hint">Maksimal 10MB, format PDF</small>
 
-                <div wire:loading wire:target="form.substanceFile">
+                <div wire:loading wire:target="substanceFile">
                     <small class="text-muted">
                         <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...

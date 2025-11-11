@@ -56,15 +56,15 @@
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label">File Substansi Laporan (PDF)</label>
-                <input type="file" wire:model="form.substanceFile"
-                    class="form-control @error('form.substanceFile') is-invalid @enderror" accept=".pdf"
+                <input type="file" wire:model="substanceFile"
+                    class="form-control @error('substanceFile') is-invalid @enderror" accept=".pdf"
                     @disabled(!$canEdit) />
-                @error('form.substanceFile')
+                @error('substanceFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="form-hint">Maksimal 10MB, format PDF</small>
 
-                <div wire:loading wire:target="form.substanceFile">
+                <div wire:loading wire:target="substanceFile">
                     <small class="text-muted">
                         <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...
@@ -92,15 +92,15 @@
 
             <div class="mb-3">
                 <label class="form-label">File Realisasi Keterlibatan (PDF/DOCX)</label>
-                <input type="file" wire:model="form.realizationFile"
-                    class="form-control @error('form.realizationFile') is-invalid @enderror" accept=".pdf,.docx"
+                <input type="file" wire:model="realizationFile"
+                    class="form-control @error('realizationFile') is-invalid @enderror" accept=".pdf,.docx"
                     @disabled(!$canEdit) />
-                @error('form.realizationFile')
+                @error('realizationFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="form-hint">Maksimal 10MB, format PDF atau DOCX</small>
 
-                <div wire:loading wire:target="form.realizationFile">
+                <div wire:loading wire:target="realizationFile">
                     <small class="text-muted">
                         <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...
@@ -128,15 +128,15 @@
 
             <div class="mb-3">
                 <label class="form-label">File Presentasi Hasil (PDF/PPTX)</label>
-                <input type="file" wire:model="form.presentationFile"
-                    class="form-control @error('form.presentationFile') is-invalid @enderror" accept=".pdf,.pptx"
-                    @disabled(!$canEdit) />
-                @error('form.presentationFile')
+                <input type="file" wire:model="presentationFile"
+                    class="form-control @error('presentationFile') is-invalid @enderror"
+                    accept=".pdf,.ppt,.pptx" @disabled(!$canEdit) />
+                @error('presentationFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
                 <small class="form-hint">Maksimal 50MB, format PDF atau PPTX</small>
 
-                <div wire:loading wire:target="form.presentationFile">
+                <div wire:loading wire:target="presentationFile">
                     <small class="text-muted">
                         <span class="me-2 spinner-border spinner-border-sm"></span>
                         Uploading...
@@ -596,7 +596,7 @@
                         <!-- File Upload -->
                         <div class="col-md-12">
                             <label class="form-label">Dokumen Artikel (PDF)</label>
-                            <input type="file" wire:model="form.tempMandatoryFiles.{{ $form->editingMandatoryId }}"
+                            <input type="file" wire:model="tempMandatoryFiles.{{ $form->editingMandatoryId }}"
                                 class="form-control" accept=".pdf" />
                             @if (isset($mandatoryOutputs[$editingMandatoryId]['document_file']) &&
                                     $mandatoryOutputs[$editingMandatoryId]['document_file']
@@ -608,7 +608,7 @@
                                     </small>
                                 </div>
                             @endif
-                            <div wire:loading wire:target="form.tempMandatoryFiles.{{ $form->editingMandatoryId }}">
+                            <div wire:loading wire:target="tempMandatoryFiles.{{ $form->editingMandatoryId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
@@ -742,7 +742,7 @@
                         <!-- Document File -->
                         <div class="col-md-6">
                             <label class="form-label">Dokumen Buku/Draft</label>
-                            <input type="file" wire:model="form.tempAdditionalFiles.{{ $form->editingAdditionalId }}"
+                            <input type="file" wire:model="tempAdditionalFiles.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
                             @if (isset($additionalOutputs[$editingAdditionalId]['document_file']) &&
                                     $additionalOutputs[$editingAdditionalId]['document_file']
@@ -754,7 +754,7 @@
                                     </small>
                                 </div>
                             @endif
-                            <div wire:loading wire:target="form.tempAdditionalFiles.{{ $form->editingAdditionalId }}">
+                            <div wire:loading wire:target="tempAdditionalFiles.{{ $form->editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
@@ -765,7 +765,7 @@
                         <!-- Publication Certificate -->
                         <div class="col-md-6">
                             <label class="form-label">Surat Keterangan Terbit</label>
-                            <input type="file" wire:model="form.tempAdditionalCerts.{{ $form->editingAdditionalId }}"
+                            <input type="file" wire:model="tempAdditionalCerts.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
                             @if (isset($additionalOutputs[$editingAdditionalId]['publication_certificate']) &&
                                     $additionalOutputs[$editingAdditionalId]['publication_certificate']
@@ -777,7 +777,7 @@
                                     </small>
                                 </div>
                             @endif
-                            <div wire:loading wire:target="form.tempAdditionalCerts.{{ $form->editingAdditionalId }}">
+                            <div wire:loading wire:target="tempAdditionalCerts.{{ $form->editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
