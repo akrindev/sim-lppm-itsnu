@@ -129,8 +129,8 @@
             <div class="mb-3">
                 <label class="form-label">File Presentasi Hasil (PDF/PPTX)</label>
                 <input type="file" wire:model="presentationFile"
-                    class="form-control @error('presentationFile') is-invalid @enderror"
-                    accept=".pdf,.ppt,.pptx" @disabled(!$canEdit) />
+                    class="form-control @error('presentationFile') is-invalid @enderror" accept=".pdf,.ppt,.pptx"
+                    @disabled(!$canEdit) />
                 @error('presentationFile')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -426,6 +426,27 @@
             wire:ignore.self onHide="closeMandatoryModal">
 
             <x-slot:body>
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <x-lucide-alert-circle class="icon alert-icon" />
+                            </div>
+                            <div>
+                                <h4 class="alert-title">Terdapat kesalahan pada form!</h4>
+                                <div class="text-secondary">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                    </div>
+                @endif
+
                 @if ($form->editingMandatoryId)
                     <div class="row g-3">
                         <!-- Status Type -->
@@ -598,22 +619,34 @@
                             <label class="form-label">Dokumen Artikel (PDF)</label>
                             <input type="file" wire:model="tempMandatoryFiles.{{ $form->editingMandatoryId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($mandatoryOutputs[$editingMandatoryId]['document_file']) &&
-                                    $mandatoryOutputs[$editingMandatoryId]['document_file']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
-                            @endif
+                            @error("tempMandatoryFiles.{$form->editingMandatoryId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                             <div wire:loading wire:target="tempMandatoryFiles.{{ $form->editingMandatoryId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($mandatoryOutput = $this->mandatoryOutput)
+                                @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 @else
@@ -645,6 +678,27 @@
             wire:ignore.self onHide="closeAdditionalModal">
 
             <x-slot:body>
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <x-lucide-alert-circle class="icon alert-icon" />
+                            </div>
+                            <div>
+                                <h4 class="alert-title">Terdapat kesalahan pada form!</h4>
+                                <div class="text-secondary">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                    </div>
+                @endif
+
                 @if ($form->editingAdditionalId)
                     <div class="row g-3">
                         <!-- Status -->
@@ -744,22 +798,34 @@
                             <label class="form-label">Dokumen Buku/Draft</label>
                             <input type="file" wire:model="tempAdditionalFiles.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($additionalOutputs[$editingAdditionalId]['document_file']) &&
-                                    $additionalOutputs[$editingAdditionalId]['document_file']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
-                            @endif
+                            @error("tempAdditionalFiles.{$form->editingAdditionalId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                             <div wire:loading wire:target="tempAdditionalFiles.{{ $form->editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('book_document'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
 
                         <!-- Publication Certificate -->
@@ -767,22 +833,34 @@
                             <label class="form-label">Surat Keterangan Terbit</label>
                             <input type="file" wire:model="tempAdditionalCerts.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($additionalOutputs[$editingAdditionalId]['publication_certificate']) &&
-                                    $additionalOutputs[$editingAdditionalId]['publication_certificate']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
-                            @endif
+                            @error("tempAdditionalCerts.{$form->editingAdditionalId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                             <div wire:loading wire:target="tempAdditionalCerts.{{ $form->editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 @else

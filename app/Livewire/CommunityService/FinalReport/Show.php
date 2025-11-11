@@ -405,7 +405,7 @@ class Show extends Component
      * Get mandatory output model by proposal output ID
      */
     #[Computed]
-    public function getMandatoryOutput(): ?\App\Models\MandatoryOutput
+    public function mandatoryOutput(): ?\App\Models\MandatoryOutput
     {
         if (!$this->progressReport || !$this->form->editingMandatoryId) {
             return null;
@@ -420,7 +420,7 @@ class Show extends Component
      * Get additional output model by proposal output ID
      */
     #[Computed]
-    public function getAdditionalOutput(): ?\App\Models\AdditionalOutput
+    public function additionalOutput(): ?\App\Models\AdditionalOutput
     {
         if (!$this->progressReport || !$this->form->editingAdditionalId) {
             return null;
