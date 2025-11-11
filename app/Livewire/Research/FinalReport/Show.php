@@ -6,8 +6,6 @@ namespace App\Livewire\Research\FinalReport;
 
 use App\Enums\ProposalStatus;
 use App\Livewire\Forms\ResearchFinalReportForm;
-use App\Livewire\Traits\HasFileUploads;
-use App\Livewire\Traits\ManagesOutputs;
 use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Models\Keyword;
@@ -18,8 +16,6 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
-    use HasFileUploads;
-    use ManagesOutputs;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
@@ -51,10 +47,6 @@ class Show extends Component
         if ($this->progressReport) {
             // Load existing report data into form
             $this->form->setReport($this->progressReport);
-
-            // Load output arrays to component for display
-            $this->mandatoryOutputs = $this->form->mandatoryOutputs;
-            $this->additionalOutputs = $this->form->additionalOutputs;
         } else {
             // Initialize new report structure
             $this->form->initializeNewReport();
@@ -74,10 +66,6 @@ class Show extends Component
             // Save report via form
             $report = $this->form->save($this->progressReport);
             $this->progressReport = $report;
-
-            // Sync output arrays back
-            $this->mandatoryOutputs = $this->form->mandatoryOutputs;
-            $this->additionalOutputs = $this->form->additionalOutputs;
         });
 
         $this->dispatch('report-saved');
@@ -191,8 +179,12 @@ class Show extends Component
         }
 
         try {
-            // Auto-save the file
-            $this->validateMandatoryFile($this->editingMandatoryId);
+            // Validate file via form
+            foreach ($this->form->tempMandatoryFiles as $proposalOutputId => $file) {
+                $this->validate([
+                    "form.tempMandatoryFiles.{$proposalOutputId}" => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+                ]);
+            }
             session()->flash('success', 'File dokumen artikel berhasil diunggah.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
@@ -209,8 +201,12 @@ class Show extends Component
         }
 
         try {
-            // Auto-save the file
-            $this->validateAdditionalFile($this->editingAdditionalId);
+            // Validate file via form
+            foreach ($this->form->tempAdditionalFiles as $proposalOutputId => $file) {
+                $this->validate([
+                    "form.tempAdditionalFiles.{$proposalOutputId}" => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+                ]);
+            }
             session()->flash('success', 'File dokumen buku berhasil diunggah.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
@@ -227,8 +223,12 @@ class Show extends Component
         }
 
         try {
-            // Auto-save the file
-            $this->validateAdditionalCert($this->editingAdditionalId);
+            // Validate file via form
+            foreach ($this->form->tempAdditionalCerts as $proposalOutputId => $file) {
+                $this->validate([
+                    "form.tempAdditionalCerts.{$proposalOutputId}" => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+                ]);
+            }
             session()->flash('success', 'File surat keterangan berhasil diunggah.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
@@ -281,20 +281,20 @@ class Show extends Component
     }
 
     /**
+     * Edit mandatory output - open modal
+     */
+    public function editMandatoryOutput(int $proposalOutputId): void
+    {
+        $this->form->editMandatoryOutput($proposalOutputId);
+    }
+
+    /**
      * Save mandatory output (journal article)
      */
-    public function saveMandatoryOutput(): void
+    public function saveMandatoryOutput(int $proposalOutputId): void
     {
         if (! $this->canEdit) {
             abort(403);
-        }
-
-        $proposalOutputId = $this->editingMandatoryId;
-
-        if (! $proposalOutputId || ! isset($this->mandatoryOutputs[$proposalOutputId])) {
-            session()->flash('error', 'Data luaran wajib tidak ditemukan.');
-
-            return;
         }
 
         if (! $this->progressReport) {
@@ -304,40 +304,34 @@ class Show extends Component
         }
 
         try {
-            // Sync to form
-            $this->form->mandatoryOutputs = $this->mandatoryOutputs;
-            $this->form->tempMandatoryFiles = $this->tempMandatoryFiles;
+            // Ensure form has the progress report reference
             $this->form->progressReport = $this->progressReport;
 
             // Save via form
             $this->form->saveMandatoryOutputWithFile($proposalOutputId);
 
-            // Sync back
-            $this->mandatoryOutputs = $this->form->mandatoryOutputs;
-            $this->tempMandatoryFiles = $this->form->tempMandatoryFiles;
-
             session()->flash('success', 'Data luaran wajib berhasil disimpan.');
-            $this->closeMandatoryModal();
+            $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
     /**
+     * Edit additional output - open modal
+     */
+    public function editAdditionalOutput(int $proposalOutputId): void
+    {
+        $this->form->editAdditionalOutput($proposalOutputId);
+    }
+
+    /**
      * Save additional output (book)
      */
-    public function saveAdditionalOutput(): void
+    public function saveAdditionalOutput(int $proposalOutputId): void
     {
         if (! $this->canEdit) {
             abort(403);
-        }
-
-        $proposalOutputId = $this->editingAdditionalId;
-
-        if (! $proposalOutputId || ! isset($this->additionalOutputs[$proposalOutputId])) {
-            session()->flash('error', 'Data luaran tambahan tidak ditemukan.');
-
-            return;
         }
 
         if (! $this->progressReport) {
@@ -347,25 +341,33 @@ class Show extends Component
         }
 
         try {
-            // Sync to form
-            $this->form->additionalOutputs = $this->additionalOutputs;
-            $this->form->tempAdditionalFiles = $this->tempAdditionalFiles;
-            $this->form->tempAdditionalCerts = $this->form->tempAdditionalCerts;
+            // Ensure form has the progress report reference
             $this->form->progressReport = $this->progressReport;
 
             // Save via form
             $this->form->saveAdditionalOutputWithFile($proposalOutputId);
 
-            // Sync back
-            $this->additionalOutputs = $this->form->additionalOutputs;
-            $this->tempAdditionalFiles = $this->form->tempAdditionalFiles;
-            $this->tempAdditionalCerts = $this->form->tempAdditionalCerts;
-
             session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
-            $this->closeAdditionalModal();
+            $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Close mandatory modal
+     */
+    public function closeMandatoryModal(): void
+    {
+        $this->form->closeMandatoryModal();
+    }
+
+    /**
+     * Close additional modal
+     */
+    public function closeAdditionalModal(): void
+    {
+        $this->form->closeAdditionalModal();
     }
 
     /**

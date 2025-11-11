@@ -46,7 +46,6 @@ class Show extends Component
         $this->progressReport = $proposal->progressReports()->finalReports()->latest()->first();
 
         // Initialize Livewire Form
-        $this->form = new CommunityServiceFinalReportForm;
         $this->form->initWithProposal($this->proposal);
 
         if ($this->progressReport) {
