@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Traits;
 
-use App\Models\ProgressReport;
-use App\Models\MandatoryOutput;
 use App\Models\AdditionalOutput;
+use App\Models\MandatoryOutput;
+use App\Models\ProgressReport;
 use Illuminate\Support\Facades\Auth;
 
 trait HasFileUploads
@@ -14,9 +14,16 @@ trait HasFileUploads
     // Progress Report document files
     public $substanceFile;
 
+    // Final Report additional files
+    public $realizationFile;
+
+    public $presentationFile;
+
     // Temporary file uploads
     public array $tempMandatoryFiles = [];
+
     public array $tempAdditionalFiles = [];
+
     public array $tempAdditionalCerts = [];
 
     /**
@@ -26,6 +33,26 @@ trait HasFileUploads
     {
         $this->validate([
             'substanceFile' => 'nullable|file|mimes:pdf|max:10240',
+        ]);
+    }
+
+    /**
+     * Validate realization file upload
+     */
+    public function validateRealizationFile(): void
+    {
+        $this->validate([
+            'realizationFile' => 'nullable|file|mimes:pdf,docx|max:10240',
+        ]);
+    }
+
+    /**
+     * Validate presentation file upload
+     */
+    public function validatePresentationFile(): void
+    {
+        $this->validate([
+            'presentationFile' => 'nullable|file|mimes:pdf,ppt,pptx|max:51200',
         ]);
     }
 
@@ -64,7 +91,12 @@ trait HasFileUploads
      */
     protected function saveSubstanceFile(ProgressReport $report, string $reportType = 'progress'): void
     {
-        if (! $this->substanceFile) {
+        if (! $this->substanceFile || ! $this->substanceFile instanceof \Illuminate\Http\UploadedFile) {
+            return;
+        }
+
+        // Check if file still exists (Livewire temp files are deleted after first request)
+        if (! file_exists($this->substanceFile->getRealPath())) {
             return;
         }
 
@@ -82,6 +114,60 @@ trait HasFileUploads
     }
 
     /**
+     * Save realization file to media collection
+     */
+    protected function saveRealizationFile(ProgressReport $report, string $reportType = 'final'): void
+    {
+        if (! $this->realizationFile || ! $this->realizationFile instanceof \Illuminate\Http\UploadedFile) {
+            return;
+        }
+
+        // Check if file still exists (Livewire temp files are deleted after first request)
+        if (! file_exists($this->realizationFile->getRealPath())) {
+            return;
+        }
+
+        $report->clearMediaCollection('realization_file');
+        $report
+            ->addMedia($this->realizationFile->getRealPath())
+            ->usingName($this->realizationFile->getClientOriginalName())
+            ->usingFileName($this->realizationFile->hashName())
+            ->withCustomProperties([
+                'uploaded_by' => Auth::id(),
+                'proposal_id' => $report->proposal_id,
+                'report_type' => $reportType,
+            ])
+            ->toMediaCollection('realization_file');
+    }
+
+    /**
+     * Save presentation file to media collection
+     */
+    protected function savePresentationFile(ProgressReport $report, string $reportType = 'final'): void
+    {
+        if (! $this->presentationFile || ! $this->presentationFile instanceof \Illuminate\Http\UploadedFile) {
+            return;
+        }
+
+        // Check if file still exists (Livewire temp files are deleted after first request)
+        if (! file_exists($this->presentationFile->getRealPath())) {
+            return;
+        }
+
+        $report->clearMediaCollection('presentation_file');
+        $report
+            ->addMedia($this->presentationFile->getRealPath())
+            ->usingName($this->presentationFile->getClientOriginalName())
+            ->usingFileName($this->presentationFile->hashName())
+            ->withCustomProperties([
+                'uploaded_by' => Auth::id(),
+                'proposal_id' => $report->proposal_id,
+                'report_type' => $reportType,
+            ])
+            ->toMediaCollection('presentation_file');
+    }
+
+    /**
      * Save mandatory output file (journal article)
      */
     protected function saveMandatoryOutputFile(MandatoryOutput $output, int $proposalOutputId, string $reportType = 'progress'): void
@@ -90,11 +176,18 @@ trait HasFileUploads
             return;
         }
 
+        $file = $this->tempMandatoryFiles[$proposalOutputId];
+
+        // Check if file is valid and still exists
+        if (! $file instanceof \Illuminate\Http\UploadedFile || ! file_exists($file->getRealPath())) {
+            return;
+        }
+
         $output->clearMediaCollection('journal_article');
         $output
-            ->addMedia($this->tempMandatoryFiles[$proposalOutputId]->getRealPath())
-            ->usingName($this->tempMandatoryFiles[$proposalOutputId]->getClientOriginalName())
-            ->usingFileName($this->tempMandatoryFiles[$proposalOutputId]->hashName())
+            ->addMedia($file->getRealPath())
+            ->usingName($file->getClientOriginalName())
+            ->usingFileName($file->hashName())
             ->withCustomProperties([
                 'uploaded_by' => Auth::id(),
                 'proposal_id' => $output->progressReport->proposal_id,
@@ -112,11 +205,18 @@ trait HasFileUploads
             return;
         }
 
+        $file = $this->tempAdditionalFiles[$proposalOutputId];
+
+        // Check if file is valid and still exists
+        if (! $file instanceof \Illuminate\Http\UploadedFile || ! file_exists($file->getRealPath())) {
+            return;
+        }
+
         $output->clearMediaCollection('book_document');
         $output
-            ->addMedia($this->tempAdditionalFiles[$proposalOutputId]->getRealPath())
-            ->usingName($this->tempAdditionalFiles[$proposalOutputId]->getClientOriginalName())
-            ->usingFileName($this->tempAdditionalFiles[$proposalOutputId]->hashName())
+            ->addMedia($file->getRealPath())
+            ->usingName($file->getClientOriginalName())
+            ->usingFileName($file->hashName())
             ->withCustomProperties([
                 'uploaded_by' => Auth::id(),
                 'proposal_id' => $output->progressReport->proposal_id,
@@ -134,11 +234,18 @@ trait HasFileUploads
             return;
         }
 
+        $file = $this->tempAdditionalCerts[$proposalOutputId];
+
+        // Check if file is valid and still exists
+        if (! $file instanceof \Illuminate\Http\UploadedFile || ! file_exists($file->getRealPath())) {
+            return;
+        }
+
         $output->clearMediaCollection('publication_certificate');
         $output
-            ->addMedia($this->tempAdditionalCerts[$proposalOutputId]->getRealPath())
-            ->usingName($this->tempAdditionalCerts[$proposalOutputId]->getClientOriginalName())
-            ->usingFileName($this->tempAdditionalCerts[$proposalOutputId]->hashName())
+            ->addMedia($file->getRealPath())
+            ->usingName($file->getClientOriginalName())
+            ->usingFileName($file->hashName())
             ->withCustomProperties([
                 'uploaded_by' => Auth::id(),
                 'proposal_id' => $output->progressReport->proposal_id,
@@ -153,6 +260,22 @@ trait HasFileUploads
     public function clearSubstanceFile(): void
     {
         $this->reset('substanceFile');
+    }
+
+    /**
+     * Clear realization file
+     */
+    public function clearRealizationFile(): void
+    {
+        $this->reset('realizationFile');
+    }
+
+    /**
+     * Clear presentation file
+     */
+    public function clearPresentationFile(): void
+    {
+        $this->reset('presentationFile');
     }
 
     /**
@@ -186,6 +309,8 @@ trait HasFileUploads
     {
         $this->reset([
             'substanceFile',
+            'realizationFile',
+            'presentationFile',
             'tempMandatoryFiles',
             'tempAdditionalFiles',
             'tempAdditionalCerts',

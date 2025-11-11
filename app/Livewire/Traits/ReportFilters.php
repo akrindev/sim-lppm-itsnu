@@ -15,9 +15,12 @@ trait ReportFilters
     #[Url]
     public string $selectedYear = '';
 
+    #[Url]
+    public string $roleFilter = 'ketua';
+
     #[On('resetFilters')]
     public function resetFilters(): void
     {
-        $this->reset(['search', 'selectedYear']);
+        $this->reset(['search', 'selectedYear', 'roleFilter']);
     }
 }

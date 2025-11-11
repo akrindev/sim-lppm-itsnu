@@ -11,6 +11,27 @@
 <div>
     <x-tabler.alert />
 
+    @if ($errors->any())
+        <div class="mb-3 alert alert-danger alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>
+                    <x-lucide-alert-circle class="icon alert-icon" />
+                </div>
+                <div>
+                    <h4 class="alert-title">Terdapat kesalahan!</h4>
+                    <div class="text-secondary">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Ringkasan & Kata Kunci -->
     <div class="mb-3 card">
         <div class="card-header">
@@ -19,29 +40,29 @@
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label required">Ringkasan Akhir</label>
-                <textarea wire:model="summaryUpdate" rows="8" class="form-control"
+                <textarea wire:model="form.summaryUpdate" rows="8" class="form-control"
                     placeholder="Masukkan ringkasan akhir penelitian..." @disabled(!$canEdit)></textarea>
-                @error('summaryUpdate')
+                @error('form.summaryUpdate')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
-                <input type="text" wire:model="keywordsInput" class="form-control"
+                <input type="text" wire:model="form.keywordsInput" class="form-control"
                     placeholder="Contoh: AI; Machine Learning; IoT" @disabled(!$canEdit) />
                 <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
                     Learning</small>
-                @error('keywordsInput')
+                @error('form.keywordsInput')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label required">Tahun Pelaporan</label>
-                <input type="number" wire:model="reportingYear" class="form-control" min="2020" max="2030"
+                <input type="number" wire:model="form.reportingYear" class="form-control" min="2020" max="2030"
                     @disabled(!$canEdit) />
-                @error('reportingYear')
+                @error('form.reportingYear')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
@@ -212,8 +233,8 @@
                                     <td>
                                         @php
                                             $hasData =
-                                                isset($mandatoryOutputs[$output->id]['status_type']) &&
-                                                !empty($mandatoryOutputs[$output->id]['status_type']);
+                                                isset($form->mandatoryOutputs[$output->id]['status_type']) &&
+                                                !empty($form->mandatoryOutputs[$output->id]['status_type']);
                                         @endphp
                                         @if ($hasData)
                                             <x-tabler.badge color="success">
@@ -311,8 +332,8 @@
                                     <td>
                                         @php
                                             $hasData =
-                                                isset($additionalOutputs[$output->id]['status']) &&
-                                                !empty($additionalOutputs[$output->id]['status']);
+                                                isset($form->additionalOutputs[$output->id]['status']) &&
+                                                !empty($form->additionalOutputs[$output->id]['status']);
                                         @endphp
                                         @if ($hasData)
                                             <x-tabler.badge color="success">
@@ -426,12 +447,33 @@
             wire:ignore.self onHide="closeMandatoryModal">
 
             <x-slot:body>
-                @if ($editingMandatoryId)
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <x-lucide-alert-circle class="icon alert-icon" />
+                            </div>
+                            <div>
+                                <h4 class="alert-title">Terdapat kesalahan pada form!</h4>
+                                <div class="text-secondary">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                    </div>
+                @endif
+
+                @if ($form->editingMandatoryId)
                     <div class="row g-3">
                         <!-- Status Type -->
                         <div class="col-md-6">
                             <label class="form-label required">Status Publikasi</label>
-                            <select wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.status_type"
+                            <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.status_type"
                                 class="form-select">
                                 <option value="">Pilih Status</option>
                                 <option value="published">Published</option>
@@ -439,7 +481,7 @@
                                 <option value="under_review">Under Review</option>
                                 <option value="rejected">Rejected</option>
                             </select>
-                            @error("mandatoryOutputs.{$editingMandatoryId}.status_type")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.status_type")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -447,14 +489,14 @@
                         <!-- Author Status -->
                         <div class="col-md-6">
                             <label class="form-label required">Status Penulis</label>
-                            <select wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.author_status"
+                            <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.author_status"
                                 class="form-select">
                                 <option value="">Pilih Status</option>
                                 <option value="first_author">First Author</option>
                                 <option value="co_author">Co-Author</option>
                                 <option value="corresponding_author">Corresponding Author</option>
                             </select>
-                            @error("mandatoryOutputs.{$editingMandatoryId}.author_status")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.author_status")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -462,9 +504,10 @@
                         <!-- Journal Title -->
                         <div class="col-md-12">
                             <label class="form-label required">Judul Jurnal</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.journal_title"
+                            <input type="text"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_title"
                                 class="form-control" placeholder="Masukkan judul jurnal" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.journal_title")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.journal_title")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -472,17 +515,18 @@
                         <!-- ISSN / E-ISSN -->
                         <div class="col-md-6">
                             <label class="form-label">ISSN</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.issn"
+                            <input type="text" wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.issn"
                                 class="form-control" placeholder="1234-5678" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.issn")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.issn")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">E-ISSN</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.eissn"
+                            <input type="text"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.eissn"
                                 class="form-control" placeholder="1234-5678" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.eissn")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.eissn")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -490,9 +534,10 @@
                         <!-- Indexing Body -->
                         <div class="col-md-6">
                             <label class="form-label">Lembaga Pengindex</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.indexing_body"
+                            <input type="text"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.indexing_body"
                                 class="form-control" placeholder="Scopus, WoS, Sinta, dll" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.indexing_body")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.indexing_body")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -500,9 +545,10 @@
                         <!-- Journal URL -->
                         <div class="col-md-6">
                             <label class="form-label">URL Jurnal</label>
-                            <input type="url" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.journal_url"
+                            <input type="url"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_url"
                                 class="form-control" placeholder="https://" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.journal_url")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.journal_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -510,9 +556,10 @@
                         <!-- Article Title -->
                         <div class="col-md-12">
                             <label class="form-label required">Judul Artikel</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.article_title"
+                            <input type="text"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_title"
                                 class="form-control" placeholder="Masukkan judul artikel" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.article_title")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.article_title")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -521,9 +568,9 @@
                         <div class="col-md-3">
                             <label class="form-label required">Tahun Terbit</label>
                             <input type="number"
-                                wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.publication_year"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.publication_year"
                                 class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.publication_year")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.publication_year")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -531,9 +578,10 @@
                         <!-- Volume -->
                         <div class="col-md-3">
                             <label class="form-label">Volume</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.volume"
+                            <input type="text"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.volume"
                                 class="form-control" placeholder="Vol. 1" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.volume")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.volume")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -541,9 +589,10 @@
                         <!-- Issue Number -->
                         <div class="col-md-3">
                             <label class="form-label">Nomor</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.issue_number"
+                            <input type="text"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.issue_number"
                                 class="form-control" placeholder="No. 1" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.issue_number")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.issue_number")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -552,13 +601,15 @@
                         <div class="col-md-3">
                             <label class="form-label">Halaman</label>
                             <div class="input-group">
-                                <input type="number" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.page_start"
+                                <input type="number"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.page_start"
                                     class="form-control" placeholder="1" />
                                 <span class="input-group-text">-</span>
-                                <input type="number" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.page_end"
+                                <input type="number"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.page_end"
                                     class="form-control" placeholder="10" />
                             </div>
-                            @error("mandatoryOutputs.{$editingMandatoryId}.page_start")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.page_start")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -566,9 +617,10 @@
                         <!-- Article URL -->
                         <div class="col-md-6">
                             <label class="form-label">URL Artikel</label>
-                            <input type="url" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.article_url"
+                            <input type="url"
+                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_url"
                                 class="form-control" placeholder="https://" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.article_url")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.article_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -576,9 +628,9 @@
                         <!-- DOI -->
                         <div class="col-md-6">
                             <label class="form-label">DOI Artikel</label>
-                            <input type="text" wire:model="mandatoryOutputs.{{ $editingMandatoryId }}.doi"
+                            <input type="text" wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.doi"
                                 class="form-control" placeholder="10.xxxx/xxxxx" />
-                            @error("mandatoryOutputs.{$editingMandatoryId}.doi")
+                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.doi")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -586,24 +638,36 @@
                         <!-- File Upload -->
                         <div class="col-md-12">
                             <label class="form-label">Dokumen Artikel (PDF)</label>
-                            <input type="file" wire:model="tempMandatoryFiles.{{ $editingMandatoryId }}"
+                            <input type="file" wire:model="tempMandatoryFiles.{{ $form->editingMandatoryId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($mandatoryOutputs[$editingMandatoryId]['document_file']) &&
-                                    $mandatoryOutputs[$editingMandatoryId]['document_file']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
-                            @endif
-                            <div wire:loading wire:target="tempMandatoryFiles.{{ $editingMandatoryId }}">
+                            @error("tempMandatoryFiles.{$form->editingMandatoryId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                            <div wire:loading wire:target="tempMandatoryFiles.{{ $form->editingMandatoryId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($mandatoryOutput = $this->mandatoryOutput)
+                                @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 @else
@@ -615,8 +679,8 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveMandatoryOutput()" class="btn btn-primary"
-                    wire:loading.attr="disabled">
+                <button type="button" wire:click="saveMandatoryOutput({{ $form->editingMandatoryId }})"
+                    class="btn btn-primary" wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="saveMandatoryOutput">
                         <x-lucide-save class="icon" /> Simpan
                     </span>
@@ -635,18 +699,40 @@
             wire:ignore.self onHide="closeAdditionalModal">
 
             <x-slot:body>
-                @if ($editingAdditionalId)
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <x-lucide-alert-circle class="icon alert-icon" />
+                            </div>
+                            <div>
+                                <h4 class="alert-title">Terdapat kesalahan pada form!</h4>
+                                <div class="text-secondary">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                    </div>
+                @endif
+
+                @if ($form->editingAdditionalId)
                     <div class="row g-3">
                         <!-- Status -->
                         <div class="col-md-12">
                             <label class="form-label required">Status</label>
-                            <select wire:model="additionalOutputs.{{ $editingAdditionalId }}.status" class="form-select">
+                            <select wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.status"
+                                class="form-select">
                                 <option value="">Pilih Status</option>
                                 <option value="review">Review</option>
                                 <option value="editing">Editing</option>
                                 <option value="published">Terbit</option>
                             </select>
-                            @error("additionalOutputs.{$editingAdditionalId}.status")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.status")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -654,9 +740,10 @@
                         <!-- Book Title -->
                         <div class="col-md-12">
                             <label class="form-label required">Judul Buku</label>
-                            <input type="text" wire:model="additionalOutputs.{{ $editingAdditionalId }}.book_title"
+                            <input type="text"
+                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.book_title"
                                 class="form-control" placeholder="Masukkan judul buku" />
-                            @error("additionalOutputs.{$editingAdditionalId}.book_title")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.book_title")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -665,9 +752,9 @@
                         <div class="col-md-6">
                             <label class="form-label required">Nama Penerbit</label>
                             <input type="text"
-                                wire:model="additionalOutputs.{{ $editingAdditionalId }}.publisher_name"
+                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publisher_name"
                                 class="form-control" placeholder="Masukkan nama penerbit" />
-                            @error("additionalOutputs.{$editingAdditionalId}.publisher_name")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.publisher_name")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -675,9 +762,10 @@
                         <!-- ISBN -->
                         <div class="col-md-6">
                             <label class="form-label">ISBN</label>
-                            <input type="text" wire:model="additionalOutputs.{{ $editingAdditionalId }}.isbn"
+                            <input type="text"
+                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.isbn"
                                 class="form-control" placeholder="978-xxx-xxx-xxx-x" />
-                            @error("additionalOutputs.{$editingAdditionalId}.isbn")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.isbn")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -686,9 +774,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Tahun Terbit</label>
                             <input type="number"
-                                wire:model="additionalOutputs.{{ $editingAdditionalId }}.publication_year"
+                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publication_year"
                                 class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
-                            @error("additionalOutputs.{$editingAdditionalId}.publication_year")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.publication_year")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -696,9 +784,10 @@
                         <!-- Total Pages -->
                         <div class="col-md-6">
                             <label class="form-label">Jumlah Halaman</label>
-                            <input type="number" wire:model="additionalOutputs.{{ $editingAdditionalId }}.total_pages"
+                            <input type="number"
+                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.total_pages"
                                 class="form-control" placeholder="100" />
-                            @error("additionalOutputs.{$editingAdditionalId}.total_pages")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.total_pages")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -706,9 +795,10 @@
                         <!-- Publisher URL -->
                         <div class="col-md-6">
                             <label class="form-label">URL Web Penerbit</label>
-                            <input type="url" wire:model="additionalOutputs.{{ $editingAdditionalId }}.publisher_url"
+                            <input type="url"
+                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publisher_url"
                                 class="form-control" placeholder="https://" />
-                            @error("additionalOutputs.{$editingAdditionalId}.publisher_url")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.publisher_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -716,9 +806,10 @@
                         <!-- Book URL -->
                         <div class="col-md-6">
                             <label class="form-label">URL Buku</label>
-                            <input type="url" wire:model="additionalOutputs.{{ $editingAdditionalId }}.book_url"
+                            <input type="url"
+                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.book_url"
                                 class="form-control" placeholder="https://" />
-                            @error("additionalOutputs.{$editingAdditionalId}.book_url")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.book_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -726,47 +817,71 @@
                         <!-- Document File -->
                         <div class="col-md-6">
                             <label class="form-label">Dokumen Buku/Draft</label>
-                            <input type="file" wire:model="tempAdditionalFiles.{{ $editingAdditionalId }}"
+                            <input type="file" wire:model="tempAdditionalFiles.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($additionalOutputs[$editingAdditionalId]['document_file']) &&
-                                    $additionalOutputs[$editingAdditionalId]['document_file']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
-                            @endif
-                            <div wire:loading wire:target="tempAdditionalFiles.{{ $editingAdditionalId }}">
+                            @error("tempAdditionalFiles.{$form->editingAdditionalId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                            <div wire:loading wire:target="tempAdditionalFiles.{{ $form->editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('book_document'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
 
                         <!-- Publication Certificate -->
                         <div class="col-md-6">
                             <label class="form-label">Surat Keterangan Terbit</label>
-                            <input type="file" wire:model="tempAdditionalCerts.{{ $editingAdditionalId }}"
+                            <input type="file" wire:model="tempAdditionalCerts.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" />
-                            @if (isset($additionalOutputs[$editingAdditionalId]['publication_certificate']) &&
-                                    $additionalOutputs[$editingAdditionalId]['publication_certificate']
-                            )
-                                <div class="mt-2">
-                                    <small class="text-success">
-                                        <x-lucide-check class="icon icon-sm" />
-                                        File tersimpan
-                                    </small>
-                                </div>
-                            @endif
-                            <div wire:loading wire:target="tempAdditionalCerts.{{ $editingAdditionalId }}">
+                            @error("tempAdditionalCerts.{$form->editingAdditionalId}")
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                            <div wire:loading wire:target="tempAdditionalCerts.{{ $form->editingAdditionalId }}">
                                 <small class="text-muted">
                                     <span class="me-2 spinner-border spinner-border-sm"></span>
                                     Uploading...
                                 </small>
                             </div>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 @else
@@ -778,8 +893,8 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveAdditionalOutput()" class="btn btn-primary"
-                    wire:loading.attr="disabled">
+                <button type="button" wire:click="saveAdditionalOutput({{ $form->editingAdditionalId }})"
+                    class="btn btn-primary" wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="saveAdditionalOutput">
                         <x-lucide-save class="icon" /> Simpan
                     </span>
