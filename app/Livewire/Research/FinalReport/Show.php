@@ -12,6 +12,7 @@ use App\Livewire\Traits\ReportAuthorization;
 use App\Models\Keyword;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -406,6 +407,36 @@ class Show extends Component
     public function closeAdditionalModal(): void
     {
         $this->form->closeAdditionalModal();
+    }
+
+    /**
+     * Get mandatory output model for editing
+     */
+    #[Computed]
+    public function mandatoryOutput(): ?\App\Models\MandatoryOutput
+    {
+        if (!$this->progressReport || !$this->form->editingMandatoryId) {
+            return null;
+        }
+
+        return \App\Models\MandatoryOutput::where('progress_report_id', $this->progressReport->id)
+            ->where('proposal_output_id', $this->form->editingMandatoryId)
+            ->first();
+    }
+
+    /**
+     * Get additional output model for editing
+     */
+    #[Computed]
+    public function additionalOutput(): ?\App\Models\AdditionalOutput
+    {
+        if (!$this->progressReport || !$this->form->editingAdditionalId) {
+            return null;
+        }
+
+        return \App\Models\AdditionalOutput::where('progress_report_id', $this->progressReport->id)
+            ->where('proposal_output_id', $this->form->editingAdditionalId)
+            ->first();
     }
 
     /**

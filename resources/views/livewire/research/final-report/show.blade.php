@@ -649,24 +649,24 @@
                                     Uploading...
                                 </small>
                             </div>
-                            @if ($this->getMandatoryOutput && $this->getMandatoryOutput->getFirstMedia('journal_article'))
-                                @php
-                                    $media = $this->getMandatoryOutput->getFirstMedia('journal_article');
-                                @endphp
-                                <div class="bg-light mt-2 p-2 border rounded">
-                                    <div class="d-flex align-items-center">
-                                        <x-lucide-file-text class="me-2 text-primary icon" />
-                                        <div class="flex-fill">
-                                            <small class="text-muted">File yang sudah diunggah:</small><br>
-                                            <strong>{{ $media->file_name }}</strong>
-                                            <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
-                                                KB)</small>
+                            @if ($mandatoryOutput = $this->mandatoryOutput)
+                                @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
                                         </div>
-                                        <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
-                                            <x-lucide-download class="icon" /> Download
-                                        </a>
                                     </div>
-                                </div>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -828,24 +828,24 @@
                                     Uploading...
                                 </small>
                             </div>
-                            @if ($this->getAdditionalOutput && $this->getAdditionalOutput->getFirstMedia('book_document'))
-                                @php
-                                    $media = $this->getAdditionalOutput->getFirstMedia('book_document');
-                                @endphp
-                                <div class="bg-light mt-2 p-2 border rounded">
-                                    <div class="d-flex align-items-center">
-                                        <x-lucide-file-text class="me-2 text-primary icon" />
-                                        <div class="flex-fill">
-                                            <small class="text-muted">File yang sudah diunggah:</small><br>
-                                            <strong>{{ $media->file_name }}</strong>
-                                            <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
-                                                KB)</small>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('book_document'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
                                         </div>
-                                        <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
-                                            <x-lucide-download class="icon" /> Download
-                                        </a>
                                     </div>
-                                </div>
+                                @endif
                             @endif
                         </div>
 
@@ -863,24 +863,24 @@
                                     Uploading...
                                 </small>
                             </div>
-                            @if ($this->getAdditionalOutput && $this->getAdditionalOutput->getFirstMedia('publication_certificate'))
-                                @php
-                                    $media = $this->getAdditionalOutput->getFirstMedia('publication_certificate');
-                                @endphp
-                                <div class="bg-light mt-2 p-2 border rounded">
-                                    <div class="d-flex align-items-center">
-                                        <x-lucide-file-text class="me-2 text-primary icon" />
-                                        <div class="flex-fill">
-                                            <small class="text-muted">File yang sudah diunggah:</small><br>
-                                            <strong>{{ $media->file_name }}</strong>
-                                            <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
-                                                KB)</small>
+                            @if ($additionalOutput = $this->additionalOutput)
+                                @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
+                                    <div class="bg-light mt-2 p-2 border rounded">
+                                        <div class="d-flex align-items-center">
+                                            <x-lucide-file-text class="me-2 text-primary icon" />
+                                            <div class="flex-fill">
+                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                                <strong>{{ $media->file_name }}</strong>
+                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
+                                                    KB)</small>
+                                            </div>
+                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <x-lucide-download class="icon" /> Download
+                                            </a>
                                         </div>
-                                        <a href="{{ $media->getUrl() }}" target="_blank" class="btn btn-sm btn-primary">
-                                            <x-lucide-download class="icon" /> Download
-                                        </a>
                                     </div>
-                                </div>
+                                @endif
                             @endif
                         </div>
                     </div>
