@@ -18,8 +18,6 @@ class RoleSeeder extends Seeder
             'admin lppm',
             'kepala lppm',
             'dekan',
-            'dekan saintek',
-            'dekan dekabita',
             'dosen',
             'reviewer',
             'rektor',

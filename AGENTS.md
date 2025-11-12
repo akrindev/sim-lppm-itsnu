@@ -68,7 +68,7 @@ tests/
 1. `superadmin` - IT administrators
 2. `admin lppm` - Operational management, reviewer assignment
 3. `kepala lppm` - LPPM Director, initial + final approvals
-4. `dekan` / `dekan saintek` / `dekan dekabita` - Faculty deans, first approval
+4. `dekan` - Faculty deans, first approval
 5. `dosen` - Lecturers, proposal creators
 6. `reviewer` - Expert evaluators
 7. `rektor` - University Rector, strategic oversight

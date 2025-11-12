@@ -58,16 +58,16 @@ graph TD
 
 ### Tabel Progres Status
 
-| Tahap | Status | Aktor | Durasi | Langkah Berikutnya |
-|-------|--------|-------|--------|---------------------|
-| 1 | DRAFT | Dosen | Variabel | Undangan tim |
-| 2 | NEED_ASSIGNMENT | Dosen/Tim | 1-2 minggu | Persetujuan tim |
-| 3 | SUBMITTED | Dekan | 3-5 hari | Review Dekan |
-| 4 | APPROVED | Kepala LPPM | 2-3 hari | Persetujuan awal Kepala LPPM |
-| 5 | UNDER_REVIEW | Admin LPPM | 1-2 hari | Penugasan reviewer |
-| 6 | UNDER_REVIEW | Reviewer | 7-14 hari | Penyelesaian review |
-| 7 | REVIEWED | Kepala LPPM | 2-3 hari | Keputusan akhir |
-| 8 | COMPLETED / REVISION_NEEDED / REJECTED | - | - | Terminal atau loop revisi |
+| Tahap | Status                                 | Aktor       | Durasi     | Langkah Berikutnya           |
+| ----- | -------------------------------------- | ----------- | ---------- | ---------------------------- |
+| 1     | DRAFT                                  | Dosen       | Variabel   | Undangan tim                 |
+| 2     | NEED_ASSIGNMENT                        | Dosen/Tim   | 1-2 minggu | Persetujuan tim              |
+| 3     | SUBMITTED                              | Dekan       | 3-5 hari   | Review Dekan                 |
+| 4     | APPROVED                               | Kepala LPPM | 2-3 hari   | Persetujuan awal Kepala LPPM |
+| 5     | UNDER_REVIEW                           | Admin LPPM  | 1-2 hari   | Penugasan reviewer           |
+| 6     | UNDER_REVIEW                           | Reviewer    | 7-14 hari  | Penyelesaian review          |
+| 7     | REVIEWED                               | Kepala LPPM | 2-3 hari   | Keputusan akhir              |
+| 8     | COMPLETED / REVISION_NEEDED / REJECTED | -           | -          | Terminal atau loop revisi    |
 
 **Durasi Rata-rata Total:** 2-3 minggu (tanpa revisi)
 
@@ -392,7 +392,7 @@ sequenceDiagram
     participant S as Sistem
     participant DB as Basis Data
 
-    De->>S: Login (role: dekan/dekan saintek/dekan dekabita)
+    De->>S: Login (role: dekan)
     S->>S: Cek role aktif + fakultas terkait
     
     De->>S: Buka daftar proposal
@@ -409,7 +409,6 @@ sequenceDiagram
 
 **Poin Penting:**
 - Dekan hanya dapat melihat proposal dari fakultasnya
-- Dekan Saintek: sains & teknologi; Dekan Dekabita: desain, komunikasi, bisnis, bahasa
 - Sistem otomatis memfilter berdasarkan afiliasi fakultas
 - Dashboard menampilkan statistik lingkup fakultas
 
@@ -723,31 +722,31 @@ sequenceDiagram
 
 ### Aktor & Tanggung Jawab Utama
 
-| Aktor | Tanggung Jawab Utama | Aksi Kritis |
-|-------|-----------------------|-------------|
-| **Dosen** | Pembuatan & submit proposal | Buat, undang tim, submit, revisi, laporan kemajuan |
-| **Anggota Tim** | Penerimaan kolaborasi | Terima/tolak undangan |
-| **Dekan** | Persetujuan tingkat fakultas | Setujui proposal (SUBMITTED → APPROVED) |
-| **Kepala LPPM** | Pengawasan strategis | Persetujuan awal (APPROVED → UNDER_REVIEW) + keputusan akhir (REVIEWED → COMPLETED/REVISION_NEEDED) |
-| **Admin LPPM** | Koordinasi operasional | Tugaskan reviewer, kelola master data, kelola pengguna |
-| **Reviewer** | Evaluasi ahli | Review proposal, beri rekomendasi |
+| Aktor           | Tanggung Jawab Utama         | Aksi Kritis                                                                                         |
+| --------------- | ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| **Dosen**       | Pembuatan & submit proposal  | Buat, undang tim, submit, revisi, laporan kemajuan                                                  |
+| **Anggota Tim** | Penerimaan kolaborasi        | Terima/tolak undangan                                                                               |
+| **Dekan**       | Persetujuan tingkat fakultas | Setujui proposal (SUBMITTED → APPROVED)                                                             |
+| **Kepala LPPM** | Pengawasan strategis         | Persetujuan awal (APPROVED → UNDER_REVIEW) + keputusan akhir (REVIEWED → COMPLETED/REVISION_NEEDED) |
+| **Admin LPPM**  | Koordinasi operasional       | Tugaskan reviewer, kelola master data, kelola pengguna                                              |
+| **Reviewer**    | Evaluasi ahli                | Review proposal, beri rekomendasi                                                                   |
 
 ### Pemicu Notifikasi
 
-| Kejadian | Penerima | Kanal |
-|----------|----------|-------|
-| Proposal Disubmit | Dekan, Admin LPPM, Tim | Email + DB |
-| Undangan Tim | Anggota yang diundang | Email + DB |
-| Penerimaan Tim | Pengusul | DB |
-| Penolakan Tim | Pengusul | DB |
-| Persetujuan Dekan | Kepala LPPM, Pengusul, Tim | Email + DB |
-| Persetujuan Awal Kepala LPPM | Admin LPPM | Email + DB |
-| Reviewer Ditugaskan | Reviewer | Email + DB |
-| Review Selesai (satu) | Admin LPPM | DB |
-| Semua Review Selesai | Kepala LPPM, Admin LPPM | Email + DB |
-| Keputusan Akhir | Pengusul, Tim, Dekan, Admin | Email + DB |
-| Pengingat Review | Reviewer | Email |
-| Review Overdue | Reviewer, Admin LPPM | Email |
+| Kejadian                     | Penerima                    | Kanal      |
+| ---------------------------- | --------------------------- | ---------- |
+| Proposal Disubmit            | Dekan, Admin LPPM, Tim      | Email + DB |
+| Undangan Tim                 | Anggota yang diundang       | Email + DB |
+| Penerimaan Tim               | Pengusul                    | DB         |
+| Penolakan Tim                | Pengusul                    | DB         |
+| Persetujuan Dekan            | Kepala LPPM, Pengusul, Tim  | Email + DB |
+| Persetujuan Awal Kepala LPPM | Admin LPPM                  | Email + DB |
+| Reviewer Ditugaskan          | Reviewer                    | Email + DB |
+| Review Selesai (satu)        | Admin LPPM                  | DB         |
+| Semua Review Selesai         | Kepala LPPM, Admin LPPM     | Email + DB |
+| Keputusan Akhir              | Pengusul, Tim, Dekan, Admin | Email + DB |
+| Pengingat Review             | Reviewer                    | Email      |
+| Review Overdue               | Reviewer, Admin LPPM        | Email      |
 
 ### Jalur Alternatif
 
@@ -773,17 +772,17 @@ Status apa pun → (Anggota tim menolak) → NEED_ASSIGNMENT
 
 ### Waktu Proses Rata-rata
 
-| Tahap | Durasi | Risiko Bottleneck |
-|-------|--------|-------------------|
-| Pembuatan Proposal | 3-7 hari | Beban Dosen |
-| Persetujuan Tim | 1-2 minggu | Respons anggota |
-| Review Dekan | 3-5 hari | Beban fakultas |
-| Persetujuan Awal Kepala | 2-3 hari | Waktu telaah strategis |
-| Penugasan Reviewer | 1-2 hari | Koordinasi Admin |
-| Evaluasi Reviewer | 7-14 hari | **TINGGI** - Ketersediaan reviewer |
-| Keputusan Akhir Kepala | 2-3 hari | Analisis hasil review |
-| **TOTAL (tanpa revisi)** | **2-3 minggu** | - |
-| **Dengan satu siklus revisi** | **4-6 minggu** | - |
+| Tahap                         | Durasi         | Risiko Bottleneck                  |
+| ----------------------------- | -------------- | ---------------------------------- |
+| Pembuatan Proposal            | 3-7 hari       | Beban Dosen                        |
+| Persetujuan Tim               | 1-2 minggu     | Respons anggota                    |
+| Review Dekan                  | 3-5 hari       | Beban fakultas                     |
+| Persetujuan Awal Kepala       | 2-3 hari       | Waktu telaah strategis             |
+| Penugasan Reviewer            | 1-2 hari       | Koordinasi Admin                   |
+| Evaluasi Reviewer             | 7-14 hari      | **TINGGI** - Ketersediaan reviewer |
+| Keputusan Akhir Kepala        | 2-3 hari       | Analisis hasil review              |
+| **TOTAL (tanpa revisi)**      | **2-3 minggu** | -                                  |
+| **Dengan satu siklus revisi** | **4-6 minggu** | -                                  |
 
 ### Otomasi Sistem
 

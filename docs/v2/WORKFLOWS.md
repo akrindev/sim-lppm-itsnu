@@ -58,16 +58,16 @@ graph TD
 
 ### Status Progression Table
 
-| Stage | Status | Actor | Duration | Next Step |
-|-------|--------|-------|----------|-----------|
-| 1 | DRAFT | Dosen | Variable | Team invitations |
-| 2 | NEED_ASSIGNMENT | Dosen/Team | 1-2 weeks | Team acceptance |
-| 3 | SUBMITTED | Dekan | 3-5 days | Dekan review |
-| 4 | APPROVED | Kepala LPPM | 2-3 days | Kepala LPPM initial approval |
-| 5 | UNDER_REVIEW | Admin LPPM | 1-2 days | Reviewer assignment |
-| 6 | UNDER_REVIEW | Reviewers | 7-14 days | Reviews completion |
-| 7 | REVIEWED | Kepala LPPM | 2-3 days | Final decision |
-| 8 | COMPLETED / REVISION_NEEDED / REJECTED | - | - | Terminal or revision loop |
+| Stage | Status                                 | Actor       | Duration  | Next Step                    |
+| ----- | -------------------------------------- | ----------- | --------- | ---------------------------- |
+| 1     | DRAFT                                  | Dosen       | Variable  | Team invitations             |
+| 2     | NEED_ASSIGNMENT                        | Dosen/Team  | 1-2 weeks | Team acceptance              |
+| 3     | SUBMITTED                              | Dekan       | 3-5 days  | Dekan review                 |
+| 4     | APPROVED                               | Kepala LPPM | 2-3 days  | Kepala LPPM initial approval |
+| 5     | UNDER_REVIEW                           | Admin LPPM  | 1-2 days  | Reviewer assignment          |
+| 6     | UNDER_REVIEW                           | Reviewers   | 7-14 days | Reviews completion           |
+| 7     | REVIEWED                               | Kepala LPPM | 2-3 days  | Final decision               |
+| 8     | COMPLETED / REVISION_NEEDED / REJECTED | -           | -         | Terminal or revision loop    |
 
 **Total Average Duration:** 2-3 weeks (without revisions)
 
@@ -392,7 +392,7 @@ sequenceDiagram
     participant S as System
     participant DB as Database
 
-    De->>S: Login (role: dekan/dekan saintek/dekan dekabita)
+    De->>S: Login (role: dekan)
     S->>S: Check active role + faculty assignment
     
     De->>S: Navigate to proposals list
@@ -409,8 +409,6 @@ sequenceDiagram
 
 **Key Points:**
 - Dekan can only see proposals from their own faculty
-- Dekan Saintek: Science & Technology faculty
-- Dekan Dekabita: Design, Communication, Business, Language faculty
 - System automatically filters by faculty affiliation
 - Dashboard shows faculty-scoped statistics
 
@@ -789,31 +787,31 @@ sequenceDiagram
 
 ### Key Actors & Responsibilities
 
-| Actor | Primary Responsibility | Critical Actions |
-|-------|------------------------|------------------|
-| **Dosen** | Proposal creation & submission | Create, invite team, submit, revise, progress reports |
-| **Team Members** | Collaboration acceptance | Accept/reject invitations |
-| **Dekan** | First-level approval | Approve proposals from faculty (SUBMITTED → APPROVED) |
-| **Kepala LPPM** | Strategic oversight | Initial approval (APPROVED → UNDER_REVIEW) + Final decision (REVIEWED → COMPLETED/REVISION_NEEDED) |
-| **Admin LPPM** | Operational coordination | Assign reviewers, manage master data, user management |
-| **Reviewers** | Expert evaluation | Review proposals, provide recommendations |
+| Actor            | Primary Responsibility         | Critical Actions                                                                                   |
+| ---------------- | ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| **Dosen**        | Proposal creation & submission | Create, invite team, submit, revise, progress reports                                              |
+| **Team Members** | Collaboration acceptance       | Accept/reject invitations                                                                          |
+| **Dekan**        | First-level approval           | Approve proposals from faculty (SUBMITTED → APPROVED)                                              |
+| **Kepala LPPM**  | Strategic oversight            | Initial approval (APPROVED → UNDER_REVIEW) + Final decision (REVIEWED → COMPLETED/REVISION_NEEDED) |
+| **Admin LPPM**   | Operational coordination       | Assign reviewers, manage master data, user management                                              |
+| **Reviewers**    | Expert evaluation              | Review proposals, provide recommendations                                                          |
 
 ### Notification Triggers
 
-| Event | Recipients | Channels |
-|-------|-----------|----------|
-| Proposal Submitted | Dekan, Admin LPPM, Team | Email + DB |
-| Team Invitation | Invited Member | Email + DB |
-| Team Acceptance | Submitter | DB |
-| Team Rejection | Submitter | DB |
-| Dekan Approval | Kepala LPPM, Submitter, Team | Email + DB |
-| Kepala LPPM Initial Approval | Admin LPPM | Email + DB |
-| Reviewer Assigned | Reviewer | Email + DB |
-| Review Completed (one) | Admin LPPM | DB |
-| All Reviews Completed | Kepala LPPM, Admin LPPM | Email + DB |
-| Final Decision | Submitter, Team, Dekan, Admin | Email + DB |
-| Review Reminder | Reviewer | Email |
-| Review Overdue | Reviewer, Admin LPPM | Email |
+| Event                        | Recipients                    | Channels   |
+| ---------------------------- | ----------------------------- | ---------- |
+| Proposal Submitted           | Dekan, Admin LPPM, Team       | Email + DB |
+| Team Invitation              | Invited Member                | Email + DB |
+| Team Acceptance              | Submitter                     | DB         |
+| Team Rejection               | Submitter                     | DB         |
+| Dekan Approval               | Kepala LPPM, Submitter, Team  | Email + DB |
+| Kepala LPPM Initial Approval | Admin LPPM                    | Email + DB |
+| Reviewer Assigned            | Reviewer                      | Email + DB |
+| Review Completed (one)       | Admin LPPM                    | DB         |
+| All Reviews Completed        | Kepala LPPM, Admin LPPM       | Email + DB |
+| Final Decision               | Submitter, Team, Dekan, Admin | Email + DB |
+| Review Reminder              | Reviewer                      | Email      |
+| Review Overdue               | Reviewer, Admin LPPM          | Email      |
 
 ### Alternative Pathways
 
@@ -839,17 +837,17 @@ Any status → (Team member rejects) → NEED_ASSIGNMENT
 
 ### Average Processing Times
 
-| Stage | Duration | Bottleneck Risk |
-|-------|----------|-----------------|
-| Proposal Creation | 3-7 days | Dosen workload |
-| Team Acceptance | 1-2 weeks | Team member responsiveness |
-| Dekan Review | 3-5 days | Faculty workload |
-| Kepala LPPM Initial | 2-3 days | Strategic review time |
-| Reviewer Assignment | 1-2 days | Admin coordination |
-| Reviewer Evaluation | 7-14 days | **HIGH** - Reviewer availability |
-| Kepala LPPM Final | 2-3 days | Review analysis |
-| **TOTAL (without revisions)** | **2-3 weeks** | - |
-| **With one revision cycle** | **4-6 weeks** | - |
+| Stage                         | Duration      | Bottleneck Risk                  |
+| ----------------------------- | ------------- | -------------------------------- |
+| Proposal Creation             | 3-7 days      | Dosen workload                   |
+| Team Acceptance               | 1-2 weeks     | Team member responsiveness       |
+| Dekan Review                  | 3-5 days      | Faculty workload                 |
+| Kepala LPPM Initial           | 2-3 days      | Strategic review time            |
+| Reviewer Assignment           | 1-2 days      | Admin coordination               |
+| Reviewer Evaluation           | 7-14 days     | **HIGH** - Reviewer availability |
+| Kepala LPPM Final             | 2-3 days      | Review analysis                  |
+| **TOTAL (without revisions)** | **2-3 weeks** | -                                |
+| **With one revision cycle**   | **4-6 weeks** | -                                |
 
 ### System Automation
 

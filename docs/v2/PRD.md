@@ -231,11 +231,9 @@ The platform transforms manual, paper-based grant management into an automated, 
 2. **Admin LPPM:** Reviewer assignment, master data management, user administration
 3. **Kepala LPPM:** Strategic oversight, initial/final approvals
 4. **Dekan:** Faculty-level first approval
-5. **Dekan Saintek:** Science faculty proposals
-6. **Dekan Dekabita:** Social science faculty proposals
-7. **Dosen:** Proposal creation, submission, progress reporting
-8. **Reviewer:** Expert evaluation and recommendations
-9. **Rektor:** Strategic approval for high-priority proposals
+5. **Dosen:** Proposal creation, submission, progress reporting
+6. **Reviewer:** Expert evaluation and recommendations
+7. **Rektor:** Strategic approval for high-priority proposals
 
 **Permission System:**
 - Spatie Laravel Permission package
@@ -491,10 +489,10 @@ The platform transforms manual, paper-based grant management into an automated, 
 
 ## Document Approval
 
-| Role | Name | Signature | Date |
-|------|------|-----------|------|
-| Product Owner | LPPM ITSNU | ___________ | ___________ |
-| Technical Lead | IT Team | ___________ | ___________ |
+| Role                       | Name        | Signature   | Date        |
+| -------------------------- | ----------- | ----------- | ----------- |
+| Product Owner              | LPPM ITSNU  | ___________ | ___________ |
+| Technical Lead             | IT Team     | ___________ | ___________ |
 | Stakeholder Representative | Kepala LPPM | ___________ | ___________ |
 
 ---
