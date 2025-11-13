@@ -61,17 +61,19 @@ tests/
 - `Proposal` - Polymorphic model (morph: research/community_service)
 - `Research` & `CommunityService` - Type-specific data
 - `ProposalReviewer` - Review workflow tracking
-- `User` - Spatie permission-based roles (9 roles)
+- `User` - Spatie permission-based roles (7 system roles defined in `RoleSeeder.php`)
 - `ActivitySchedule`, `BudgetItem`, `ProposalOutput` - Supporting entities
 
-**9 System Roles:**
-1. `superadmin` - IT administrators
+**7 System Roles** (defined in `database/seeders/RoleSeeder.php`):
+1. `superadmin` - IT administrators / developers
 2. `admin lppm` - Operational management, reviewer assignment
 3. `kepala lppm` - LPPM Director, initial + final approvals
 4. `dekan` - Faculty deans, first approval
 5. `dosen` - Lecturers, proposal creators
 6. `reviewer` - Expert evaluators
 7. `rektor` - University Rector, strategic oversight
+
+**Note:** Team member roles (`ketua`/`anggota`) are stored in `proposal_user` pivot table, not as system roles.
 
 ## Development Patterns & Constraints
 
@@ -495,7 +497,7 @@ php artisan view:clear
 • **PRD.md** - Product requirements, features, user stories
 • **ERD.md** - Database schema (45+ tables)
 • **WORKFLOWS.md** - Complete process flows, sequence diagrams
-• **ROLES.md** - 9 roles, permissions matrix
+• **ROLES.md** - 7 system roles, permissions matrix
 • **STATUS-TRANSITIONS.md** - State machine, valid transitions
 • **DATA-STRUCTURES.md** - Research vs PKM differences
 • **MASTER-DATA.md** - Taxonomy, reference data

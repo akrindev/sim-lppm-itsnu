@@ -162,11 +162,11 @@ Kendala: anggaran terbatas, timeline iteratif, hosting on-premise, SDM IT terbat
 
 ## Persetujuan Dokumen
 
-| Peran | Nama | Tanda Tangan | Tanggal |
-|------|------|--------------|---------|
-| Product Owner | LPPM ITSNU | ___________ | ___________ |
-| Technical Lead | Tim TI | ___________ | ___________ |
-| Perwakilan Pemangku Kepentingan | Kepala LPPM | ___________ | ___________ |
+| Peran                           | Nama        | Tanda Tangan | Tanggal     |
+| ------------------------------- | ----------- | ------------ | ----------- |
+| Product Owner                   | LPPM ITSNU  | ___________  | ___________ |
+| Technical Lead                  | Tim TI      | ___________  | ___________ |
+| Perwakilan Pemangku Kepentingan | Kepala LPPM | ___________  | ___________ |
 
 ---
 

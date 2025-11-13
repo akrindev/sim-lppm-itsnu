@@ -73,6 +73,469 @@ graph TD
 
 ---
 
+## Ringkasan Workflow Keseluruhan
+
+### Gambaran Umum Proses
+
+Sistem SIM LPPM ITSNU mengimplementasikan alur persetujuan multi-tahap yang menyeluruh untuk mengelola siklus hidup proposal penelitian dan pengabdian kepada masyarakat. Proses ini dirancang untuk memastikan transparansi, kolaborasi tim yang efektif, dan evaluasi berkualitas tinggi sebelum persetujuan final.
+
+#### Workflow Lengkap Antar Role
+
+```mermaid
+sequenceDiagram
+    participant D as Dosen
+    participant T as Anggota Tim
+    participant Dekan
+    participant KL as Kepala LPPM
+    participant A as Admin LPPM
+    participant R as Reviewer
+    participant S as Sistem
+
+    %% Fase 1: Dosen - Draft & Undangan Tim
+    Note over D,S: Fase 1: DRAFT & Tim Assembly (Dosen)
+    D->>S: Buat proposal → DRAFT
+    D->>S: Undang anggota tim
+    S->>T: Kirim undangan
+    
+    %% Fase 2: Tim Persetujuan
+    Note over T,S: Fase 2: Persetujuan Tim
+    loop Setiap anggota
+        T->>S: Terima/Tolak
+        alt Tolak
+            S->>D: Status → NEED_ASSIGNMENT
+        end
+    end
+    
+    %% Fase 3: Dosen Submit
+    Note over D,Dekan: Fase 3: Submit & Review Dekan
+    D->>S: Submit proposal (semua terima) → SUBMITTED
+    S->>Dekan: Notifikasi: Review proposal
+    
+    %% Fase 4: Dekan Approval
+    Dekan->>S: Review proposal
+    alt Dekan: Setujui
+        S->>S: Status → APPROVED
+    else Dekan: Perbaiki Tim
+        S->>D: Status → NEED_ASSIGNMENT
+        D->>S: Perbaiki tim & resubmit
+    else Dekan: Tolak
+        S->>S: Status → REJECTED
+    end
+    
+    %% Fase 5: Kepala LPPM Awal
+    Note over KL,Admin: Fase 4: Persetujuan Awal Kepala LPPM
+    S->>KL: Notifikasi: Persetujuan awal
+    KL->>S: Review & setujui
+    S->>S: Status → UNDER_REVIEW
+    
+    %% Fase 6: Admin & Reviewer
+    Note over A,R: Fase 5: Penugasan & Review
+    S->>A: Notifikasi: Tugaskan reviewer
+    A->>S: Tugaskan reviewer
+    S->>R: Notifikasi: Anda ditugaskan
+    
+    loop Setiap reviewer
+        R->>S: Review proposal
+        R->>S: Submit rekomendasi
+    end
+    S->>S: Semua selesai → REVIEWED
+    
+    %% Fase 7: Kepala LPPM Final
+    Note over KL,S: Fase 6: Keputusan Akhir Kepala LPPM
+    S->>KL: Notifikasi: Semua review selesai
+    KL->>S: Review hasil review
+    alt Setujui
+        S->>S: Status → COMPLETED
+    else Revisi
+        S->>D: Status → REVISION_NEEDED
+        D->>S: Revisi & resubmit → SUBMITTED
+    else Tolak
+        S->>S: Status → REJECTED
+    end
+```
+
+#### Status Workflow & Transisi
+
+```
+DRAFT
+  ↓
+NEED_ASSIGNMENT ← (jika ada penolakan tim)
+  ↓
+SUBMITTED → APPROVED → UNDER_REVIEW → REVIEWED → COMPLETED
+  ↓           ↓           ↓              ↓
+  ├─REJECTED  ├─REJECTED  └─REJECTED    ├─REJECTED
+  └─REVISION_NEEDED (from REVIEWED, loop ke SUBMITTED)
+```
+
+---
+
+### Workflow Berdasarkan Role
+
+#### 1. DOSEN - Peran Pemrakarsa & Revisi
+
+```mermaid
+sequenceDiagram
+    participant D as Dosen
+    participant T as Anggota Tim
+    participant S as Sistem
+    participant N as Notifikasi
+
+    %% Tahap 1: Buat Draft
+    Note over D,S: Tahap 1: Membuat & Menyusun Proposal
+    D->>S: Membuat proposal baru
+    S->>D: Status: DRAFT
+    D->>S: Mengisi detail (judul, metodologi, anggaran, jadwal, luaran)
+    D->>S: Simpan sebagai DRAFT
+    
+    %% Tahap 2: Undang Tim
+    Note over D,T: Tahap 2: Merekrut Anggota Tim
+    D->>S: Undang anggota (ketua/anggota)
+    S->>T: Kirim email + notifikasi aplikasi
+    
+    loop Respons Anggota
+        T->>S: Terima atau Tolak
+        alt Tolak
+            S->>S: Proposal → NEED_ASSIGNMENT
+            N->>D: Beri tahu: ada yang menolak
+        end
+    end
+    
+    %% Tahap 3: Submit
+    Note over D,S: Tahap 3: Submit Proposal
+    D->>S: Cek: Semua anggota sudah terima?
+    alt Ya, Semua Terima
+        D->>S: Submit proposal
+        S->>S: Status → SUBMITTED
+        N->>D: Konfirmasi: Proposal disubmit
+    else Ada yang Tolak/Pending
+        N->>D: Tidak bisa submit: Perbaiki tim
+        D->>S: Hapus/ganti anggota
+        D->>S: Undang anggota baru
+        loop Tunggu Respons Baru
+            T->>S: Terima undangan
+        end
+        D->>S: Submit ulang
+    end
+    
+    %% Tahap 4: Tunggu Review
+    Note over D,S: Tahap 4: Menunggu Persetujuan (Passive)
+    S->>N: Review sedang berlangsung
+    N->>D: Status updates (Dekan approve, Reviewer assigned, dll.)
+    
+    %% Tahap 5: Revisi (jika diperlukan)
+    Note over D,S: Tahap 5: Revisi Jika Diminta
+    alt Kepala LPPM: Minta Revisi
+        N->>D: Status → REVISION_NEEDED + catatan reviewer
+        D->>S: Baca catatan reviewer
+        D->>S: Edit proposal sesuai masukan
+        D->>S: Submit revisi
+        S->>S: Status → SUBMITTED (ulang alur)
+    else Approved atau Rejected
+        N->>D: Status final: COMPLETED / REJECTED
+    end
+```
+
+**Aksi Utama Dosen:**
+- Membuat proposal (DRAFT)
+- Mengundang anggota tim → semua harus menerima
+- Submit proposal (SUBMITTED)
+- Menerima feedback dari reviewer
+- Revisi jika diminta (loop ke SUBMITTED)
+- Submit laporan kemajuan (untuk proposal COMPLETED)
+
+---
+
+#### 2. DEKAN - Persetujuan Pertama
+
+```mermaid
+sequenceDiagram
+    participant Dekan
+    participant S as Sistem
+    participant D as Dosen
+    participant N as Notifikasi
+
+    %% Tahap 1: Menerima Notifikasi
+    Note over Dekan,S: Tahap 1: Notifikasi & Akses Proposal
+    N->>Dekan: Proposal disubmit dari fakultas Anda
+    Dekan->>S: Login & buka notifikasi
+    Dekan->>S: Lihat daftar proposal SUBMITTED dari fakultas
+    
+    %% Tahap 2: Review
+    Note over Dekan,S: Tahap 2: Meninjau Proposal (3-5 hari)
+    Dekan->>S: Buka detail proposal
+    S->>Dekan: Tampilkan proposal lengkap:
+    Note over S,Dekan: - Judul, ringkasan, tujuan
+    Note over S,Dekan: - Metodologi / solusi
+    Note over S,Dekan: - Anggaran & item biaya
+    Note over S,Dekan: - Komposisi tim & kualifikasi
+    Note over S,Dekan: - Jadwal kegiatan
+    
+    Dekan->>S: Evaluasi kelayakan & keselarasan
+    
+    %% Tahap 3: Keputusan
+    Note over Dekan,S: Tahap 3: Membuat Keputusan
+    alt Setujui
+        Dekan->>S: Klik "Approve"
+        S->>S: Status → APPROVED
+        N->>D: Email: Proposal disetujui Dekan
+        N->>Dekan: Konfirmasi: Approval berhasil
+    else Perlu Perbaikan Tim
+        Dekan->>S: Klik "Need Assignment"
+        S->>S: Status → NEED_ASSIGNMENT
+        N->>D: Email: Perbaiki komposisi tim
+        N->>Dekan: Keputusan tercatat
+    else Tolak (Jarang)
+        Dekan->>S: Klik "Reject" + alasan
+        S->>S: Status → REJECTED
+        N->>D: Email: Proposal ditolak
+    end
+    
+    %% Tahap 4: Selesai
+    Note over Dekan,S: Tahap 4: Proposal Berlanjut ke Kepala LPPM
+    Dekan->>S: Proposal diperbarui (ditinjau)
+    S->>S: Dashboard update count
+```
+
+**Aksi Utama Dekan:**
+- Menerima notifikasi proposal dari fakultas sendiri
+- Meninjau proposal dalam 3-5 hari
+- Memutuskan: Setujui → APPROVED | Perbaikan Tim → NEED_ASSIGNMENT | Tolak (jarang)
+- Hanya melihat proposal dari fakultasnya
+
+---
+
+#### 3. KEPALA LPPM - Dua Tahap Persetujuan
+
+```mermaid
+sequenceDiagram
+    participant KL as Kepala LPPM
+    participant S as Sistem
+    participant A as Admin LPPM
+    participant D as Dosen
+    participant R as Reviewer
+    participant N as Notifikasi
+
+    %% Tahap 1: Persetujuan Awal
+    Note over KL,S: Tahap 1: Persetujuan Awal (APPROVED → UNDER_REVIEW)
+    N->>KL: Proposal disetujui Dekan
+    KL->>S: Login & review proposal
+    KL->>S: Verifikasi: Admin, kewajaran anggaran, kelayakan
+    
+    alt Setujui untuk Review
+        KL->>S: Klik "Approve for Review"
+        S->>S: Status → UNDER_REVIEW
+        S->>A: Notifikasi: Tugaskan reviewer
+        N->>KL: Konfirmasi: Siap penugasan
+    else Tolak (Jarang)
+        KL->>S: Klik "Reject"
+        S->>S: Status → REJECTED
+        N->>D: Proposal ditolak
+    end
+    
+    %% Tahap 2: Penugasan Reviewer (Admin LPPM)
+    Note over A,R: Tahap 2: Admin LPPM Menugaskan Reviewer
+    A->>S: Pilih reviewer sesuai keahlian
+    S->>R: Notifikasi: Anda ditugaskan review
+    A->>S: Monitor progres review (7-14 hari)
+    
+    %% Tahap 3: Review Selesai
+    Note over R,S: Tahap 3: Reviewer Menyelesaikan Review
+    loop Setiap reviewer
+        R->>S: Submit review + rekomendasi
+    end
+    S->>S: Semua selesai? → Status REVIEWED
+    N->>KL: Notifikasi: Semua review selesai
+    
+    %% Tahap 4: Keputusan Akhir
+    Note over KL,S: Tahap 4: Keputusan Akhir (REVIEWED → COMPLETED/REVISION_NEEDED)
+    KL->>S: Review ringkasan dari semua reviewer
+    S->>KL: Tampilkan skor, rekomendasi, catatan
+    KL->>S: Analisis & tentukan keputusan final
+    
+    alt Setujui (COMPLETED)
+        KL->>S: Klik "Approve"
+        S->>S: Status → COMPLETED
+        N->>D: Proposal disetujui! Siap eksekusi
+        N->>A: Proposal COMPLETED
+    else Minta Revisi
+        KL->>S: Klik "Request Revision" + catatan
+        S->>S: Status → REVISION_NEEDED
+        N->>D: Email: Revisi proposal + catatan reviewer
+        D->>S: Revisi & resubmit → SUBMITTED (ulang alur)
+    else Tolak
+        KL->>S: Klik "Reject" + alasan
+        S->>S: Status → REJECTED
+        N->>D: Proposal ditolak final
+    end
+```
+
+**Aksi Utama Kepala LPPM:**
+- **Tahap 1 (Awal):** Menerima proposal APPROVED → verifikasi → UNDER_REVIEW
+- **Tahap 2 (Monitor):** Monitoring penugasan reviewer (koordinasi dgn Admin LPPM)
+- **Tahap 3 (Akhir):** Menerima proposal REVIEWED → review hasil → keputusan final
+  - COMPLETED: Siap eksekusi
+  - REVISION_NEEDED: Dosen revisi, resubmit
+  - REJECTED: Terminal
+
+---
+
+#### 4. ADMIN LPPM - Koordinator Operasional
+
+```mermaid
+sequenceDiagram
+    participant A as Admin LPPM
+    participant S as Sistem
+    participant DB as Database
+    participant R as Reviewer
+    participant KL as Kepala LPPM
+    participant N as Notifikasi
+
+    %% Tahap 1: Menerima Notifikasi
+    Note over A,S: Tahap 1: Menerima Request Penugasan
+    N->>A: Proposal UNDER_REVIEW - Tugaskan reviewer
+    A->>S: Login & buka proposal
+    S->>A: Tampilkan detail proposal
+    
+    %% Tahap 2: Memilih Reviewer
+    Note over A,S: Tahap 2: Memilih Reviewer Tepat
+    A->>S: Query reviewer tersedia
+    S->>DB: Cari reviewer by expertise/focus area
+    DB->>S: Kembalikan daftar reviewer
+    A->>S: Evaluasi: Tidak ada conflict of interest?
+    A->>S: Pilih 1-3 reviewer sesuai keahlian
+    
+    %% Tahap 3: Penugasan
+    Note over A,R: Tahap 3: Menugaskan Reviewer
+    loop Setiap reviewer
+        A->>S: Tugaskan reviewer + deadline (7-14 hari)
+        S->>DB: INSERT proposal_reviewer (status: pending)
+        N->>R: Email: Anda ditugaskan review proposal X
+        N->>R: Deadline: [date]
+    end
+    N->>A: Konfirmasi: Semua reviewer ditugaskan
+    
+    %% Tahap 4: Monitoring
+    Note over A,S: Tahap 4: Monitoring Progres Review
+    A->>S: Dashboard: Status review setiap reviewer
+    S->>DB: Query proposal_reviewer WHERE status != 'completed'
+    
+    loop Setiap hari
+        A->>S: Cek: Ada yang overdue?
+        alt 3 Hari Sebelum Deadline
+            N->>R: Pengingat: Review jatuh tempo 3 hari
+        end
+        alt 1 Hari Setelah Deadline
+            N->>R: Overdue: Batas waktu terlewati
+            N->>A: Alert: Reviewer X terlambat
+        end
+    end
+    
+    %% Tahap 5: Review Selesai
+    Note over A,S: Tahap 5: Menunggu Semua Review Selesai
+    loop Setiap reviewer
+        R->>S: Submit review
+        S->>DB: Update status = 'completed'
+        N->>A: Reviewer X selesai review
+    end
+    
+    alt Semua Selesai
+        S->>S: Status proposal → REVIEWED
+        N->>KL: Notifikasi: Semua reviewer selesai
+        N->>A: Ringkasan: Review summary
+    end
+```
+
+**Aksi Utama Admin LPPM:**
+- Menerima notifikasi penugasan reviewer
+- Memilih reviewer tepat (expertise, no conflict)
+- Menugaskan reviewer (1-3 orang) dengan deadline
+- Monitoring progres review (reminder, overdue alerts)
+- Dokumentasi hasil penugasan
+
+---
+
+#### 5. REVIEWER - Evaluator Ahli
+
+```mermaid
+sequenceDiagram
+    participant R as Reviewer
+    participant S as Sistem
+    participant DB as Database
+    participant A as Admin LPPM
+    participant N as Notifikasi
+
+    %% Tahap 1: Notifikasi Penugasan
+    Note over R,S: Tahap 1: Menerima Penugasan
+    N->>R: Email: Anda ditugaskan review proposal X
+    N->>R: Deadline: [date] (7-14 hari)
+    R->>S: Login & buka notifikasi
+    
+    %% Tahap 2: Akses Proposal
+    Note over R,S: Tahap 2: Mengakses Proposal
+    R->>S: Buka detail proposal
+    S->>DB: Muat proposal lengkap
+    DB->>S: Kembalikan proposal + detailable (research/PKM)
+    S->>R: Tampilkan:
+    Note over S,R: - Judul, ringkasan, tujuan
+    Note over S,R: - Metodologi / solusi
+    Note over S,R: - Luaran rencana
+    Note over S,R: - Anggaran & kewajaran
+    Note over S,R: - Jadwal & feasibility
+    
+    %% Tahap 3: Review (Active)
+    Note over R,S: Tahap 3: Melakukan Review (7-14 hari)
+    R->>S: Update status → "reviewing"
+    R->>S: Baca & analisis proposal detail
+    R->>S: Evaluasi:
+    Note over R,S: - Keaslian ide
+    Note over R,S: - Kelayakan metodologi
+    Note over R,S: - Kewajaran anggaran
+    Note over R,S: - Feasibility timeline
+    Note over R,S: - Kualitas luaran
+    
+    %% Tahap 4: Submit Review
+    Note over R,S: Tahap 4: Mensubmit Review
+    R->>S: Buka form review
+    R->>S: Isi catatan review
+    R->>S: Pilih rekomendasi:
+    Note over R,S: - APPROVED (recommended)
+    Note over R,S: - REVISION_NEEDED (with comments)
+    Note over R,S: - REJECTED (not recommended)
+    R->>S: Klik "Submit Review"
+    S->>DB: INSERT/UPDATE review
+    S->>DB: Update proposal_reviewer.status = 'completed'
+    
+    %% Tahap 5: Konfirmasi & Selesai
+    Note over R,S: Tahap 5: Review Tercatat
+    N->>R: Konfirmasi: Review berhasil disubmit
+    N->>A: Alert: Reviewer X selesai
+    
+    Note over R,S: Catatan: Reviewer TIDAK BISA edit review setelah submit
+    Note over R,S: (untuk integritas data)
+```
+
+**Aksi Utama Reviewer:**
+- Menerima notifikasi penugasan + deadline
+- Mengakses dan membaca proposal
+- Melakukan evaluasi detail (metodologi, anggaran, feasibility)
+- Mengisi review + memilih rekomendasi
+- Submit review (final, tidak bisa diubah)
+- Menunggu notifikasi keputusan akhir
+
+---
+
+#### Blokir Kritis dalam Workflow
+
+| Kondisi                    | Impact                | Solusi                | Role Terkait        |
+| -------------------------- | --------------------- | --------------------- | ------------------- |
+| Ada anggota tim menolak    | Tidak bisa submit     | Hapus/ganti anggota   | **Dosen**           |
+| Ada anggota tim pending    | Tidak bisa submit     | Tunggu respons semua  | **Dosen, Anggota**  |
+| Dekan belum approve        | Terhenti di SUBMITTED | Review dalam 3-5 hari | **Dekan**           |
+| Ada reviewer belum selesai | Status UNDER_REVIEW   | Selesaikan review     | **Reviewer, Admin** |
+| Kepala LPPM minta revisi   | Loop ke SUBMITTED     | Revisi & resubmit     | **Dosen**           |
+
+---
+
 ## Alur Dosen
 
 ### Alur 1: Buat & Submit Proposal
