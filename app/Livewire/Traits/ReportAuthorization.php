@@ -14,6 +14,10 @@ trait ReportAuthorization
     {
         $user = Auth::user();
 
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor'])) {
+            return $query;
+        }
+
         return $query->where(function ($q) use ($user) {
             $q->where('submitter_id', $user->id)
                 ->orWhereHas('teamMembers', function ($subQuery) use ($user) {
@@ -29,8 +33,8 @@ trait ReportAuthorization
 
         return $proposal->submitter_id === $user->id
             || $proposal->teamMembers()
-                ->where('user_id', $user->id)
-                ->where('status', 'accepted')
-                ->exists();
+            ->where('user_id', $user->id)
+            ->where('status', 'accepted')
+            ->exists();
     }
 }
