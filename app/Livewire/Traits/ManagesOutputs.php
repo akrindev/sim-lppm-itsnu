@@ -6,17 +6,17 @@ namespace App\Livewire\Traits;
 
 use App\Models\ProgressReport;
 use App\Models\Proposal;
-use App\Models\AdditionalOutput;
-use App\Models\MandatoryOutput;
 
 trait ManagesOutputs
 {
     // Arrays for outputs (indexed by proposal_output_id)
     public array $mandatoryOutputs = [];
+
     public array $additionalOutputs = [];
 
     // Track which output is being edited
     public ?int $editingMandatoryId = null;
+
     public ?int $editingAdditionalId = null;
 
     /**

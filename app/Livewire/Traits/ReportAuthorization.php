@@ -29,8 +29,8 @@ trait ReportAuthorization
 
         return $proposal->submitter_id === $user->id
             || $proposal->teamMembers()
-            ->where('user_id', $user->id)
-            ->where('status', 'accepted')
-            ->exists();
+                ->where('user_id', $user->id)
+                ->where('status', 'accepted')
+                ->exists();
     }
 }

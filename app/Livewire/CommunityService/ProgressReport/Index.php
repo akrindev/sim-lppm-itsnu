@@ -29,7 +29,7 @@ class Index extends ReportIndex
         return [
             'submitter.identity',
             'focusArea',
-            'progressReports' => fn($q) => $q->latest(),
+            'progressReports' => fn ($q) => $q->latest(),
         ];
     }
 }

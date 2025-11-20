@@ -129,7 +129,7 @@ class ReviewerForm extends Component
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: ' . $e->getMessage());
+            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }
     }
 

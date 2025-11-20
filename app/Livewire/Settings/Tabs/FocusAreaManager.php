@@ -2,9 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
-use App\Livewire\Settings\MasterData;
 use App\Models\FocusArea;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -73,7 +71,6 @@ class FocusAreaManager extends Component
     {
         $this->reset(['name', 'editingId']);
     }
-
 
     public function handleConfirmDeleteAction(): void
     {

@@ -9,10 +9,10 @@ class BudgetGroupSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * 
+     *
      * Based on BIMA Kemdikbud RAB Components 2024-2025
      * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2025
-     * 
+     *
      * Budget Percentage Limits:
      * - Honor/Upah: Max 10%
      * - Teknologi & Inovasi (Bahan/Peralatan): Min 50%

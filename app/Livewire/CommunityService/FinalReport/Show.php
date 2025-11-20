@@ -95,7 +95,7 @@ class Show extends Component
             // Let Livewire handle validation errors
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan laporan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan laporan: '.$e->getMessage());
         }
     }
 

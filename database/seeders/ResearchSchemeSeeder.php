@@ -8,7 +8,7 @@ class ResearchSchemeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * 
+     *
      * Based on BIMA Kemdikbud 2024-2025
      * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2025
      */

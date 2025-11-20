@@ -4,7 +4,6 @@ namespace App\Livewire\Settings\Tabs;
 
 use App\Models\FocusArea;
 use App\Models\Theme;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -83,7 +82,6 @@ class ThemeManager extends Component
     {
         $this->reset(['name', 'focusAreaId', 'editingId']);
     }
-
 
     public function handleConfirmDeleteAction(): void
     {

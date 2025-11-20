@@ -4,7 +4,6 @@ namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Faculty;
 use App\Models\Institution;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -88,7 +87,6 @@ class FacultyManager extends Component
     {
         $this->reset(['name', 'code', 'institutionId', 'editingId']);
     }
-
 
     public function handleConfirmDeleteAction(): void
     {

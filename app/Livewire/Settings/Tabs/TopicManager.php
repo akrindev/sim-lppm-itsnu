@@ -4,7 +4,6 @@ namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Theme;
 use App\Models\Topic;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -83,7 +82,6 @@ class TopicManager extends Component
     {
         $this->reset(['name', 'themeId', 'editingId']);
     }
-
 
     public function handleConfirmDeleteAction(): void
     {

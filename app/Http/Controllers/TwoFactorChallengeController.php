@@ -92,7 +92,7 @@ class TwoFactorChallengeController extends Controller
      */
     protected function throttleKey(): string
     {
-        return 'two-factor-auth:' . request()->ip();
+        return 'two-factor-auth:'.request()->ip();
     }
 
     /**
@@ -106,6 +106,7 @@ class TwoFactorChallengeController extends Controller
 
         try {
             $secret = decrypt($user->two_factor_secret);
+
             return app(TwoFactorAuthenticationProvider::class)->verify(
                 $secret,
                 $code

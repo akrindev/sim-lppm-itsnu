@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\Livewire\Abstracts;
 
-use App\Enums\ProposalStatus;
-use App\Livewire\Traits\ReportFilters;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Livewire\Traits\ReportData;
+use App\Livewire\Traits\ReportFilters;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 abstract class ReportIndex extends Component
 {
-    use ReportFilters;
     use ReportAuthorization;
     use ReportData;
+    use ReportFilters;
 
     abstract protected function getDetailableType(): string;
 

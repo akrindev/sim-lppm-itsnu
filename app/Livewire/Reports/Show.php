@@ -77,8 +77,6 @@ class Show extends Component
         return $configs[$type] ?? $configs['research-progress'];
     }
 
-
-
     public function save(): void
     {
         if (! $this->canEdit) {
@@ -140,7 +138,7 @@ class Show extends Component
             return;
         }
 
-        //Use editing ID if no parameter provided (for backward compatibility)
+        // Use editing ID if no parameter provided (for backward compatibility)
         $proposalOutputId = $proposalOutputId ?? $this->form->editingMandatoryId;
 
         if (! $proposalOutputId) {
@@ -165,7 +163,7 @@ class Show extends Component
             $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
             session()->flash('success', 'Data luaran wajib berhasil disimpan.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
@@ -209,7 +207,7 @@ class Show extends Component
             $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
             session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
@@ -229,7 +227,7 @@ class Show extends Component
     #[\Livewire\Attributes\Computed]
     public function mandatoryOutput(): ?MandatoryOutput
     {
-        if (!$this->progressReport || !$this->form->editingMandatoryId) {
+        if (! $this->progressReport || ! $this->form->editingMandatoryId) {
             return null;
         }
 
@@ -244,7 +242,7 @@ class Show extends Component
     #[\Livewire\Attributes\Computed]
     public function additionalOutput(): ?AdditionalOutput
     {
-        if (!$this->progressReport || !$this->form->editingAdditionalId) {
+        if (! $this->progressReport || ! $this->form->editingAdditionalId) {
             return null;
         }
 

@@ -31,7 +31,7 @@ trait ReportData
             return $query;
         }
 
-        $searchPattern = '%' . $searchTerm . '%';
+        $searchPattern = '%'.$searchTerm.'%';
 
         return $query->where(function ($q) use ($searchPattern) {
             $q->where('title', 'LIKE', $searchPattern)
@@ -71,7 +71,7 @@ trait ReportData
             $relations = [
                 'submitter.identity',
                 'focusArea',
-                'progressReports' => fn($q) => $q->latest(),
+                'progressReports' => fn ($q) => $q->latest(),
             ];
         }
 

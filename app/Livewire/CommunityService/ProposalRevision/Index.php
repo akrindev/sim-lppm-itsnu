@@ -62,12 +62,12 @@ class Index extends Component
             'reviewers' => function ($q) {
                 $q->where('status', 'completed')
                     ->with('user');
-            }
+            },
         ]);
 
         // Search filter
-        if (!empty($this->search)) {
-            $searchTerm = '%' . $this->search . '%';
+        if (! empty($this->search)) {
+            $searchTerm = '%'.$this->search.'%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
                     ->orWhereHas('submitter', function ($sq) use ($searchTerm) {
@@ -77,7 +77,7 @@ class Index extends Component
         }
 
         // Year filter
-        if (!empty($this->selectedYear)) {
+        if (! empty($this->selectedYear)) {
             $query->whereYear('created_at', $this->selectedYear);
         }
 

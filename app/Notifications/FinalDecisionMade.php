@@ -91,8 +91,8 @@ class FinalDecisionMade extends Notification implements ShouldQueue
         };
 
         $message = (new MailMessage)
-            ->subject('[SIM LPPM] ' . $subject)
-            ->greeting('Halo, ' . $notifiable->name . '!')
+            ->subject('[SIM LPPM] '.$subject)
+            ->greeting('Halo, '.$notifiable->name.'!')
             ->line("Keputusan final telah dibuat untuk proposal **{$this->proposal->title}**.");
 
         if ($this->decision === 'approved') {

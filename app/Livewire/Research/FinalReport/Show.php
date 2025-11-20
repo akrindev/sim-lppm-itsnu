@@ -91,7 +91,7 @@ class Show extends Component
             // Let Livewire handle validation errors
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan laporan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan laporan: '.$e->getMessage());
         }
     }
 
@@ -233,7 +233,7 @@ class Show extends Component
                 $this->validateMandatoryFile($proposalOutputId);
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
         }
     }
 
@@ -252,7 +252,7 @@ class Show extends Component
                 $this->validateAdditionalFile($proposalOutputId);
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
         }
     }
 
@@ -271,7 +271,7 @@ class Show extends Component
                 $this->validateAdditionalCert($proposalOutputId);
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: ' . $e->getMessage());
+            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
         }
     }
 
@@ -353,7 +353,7 @@ class Show extends Component
             session()->flash('success', 'Data luaran wajib berhasil disimpan.');
             $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
@@ -390,7 +390,7 @@ class Show extends Component
             session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
             $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
@@ -416,7 +416,7 @@ class Show extends Component
     #[Computed]
     public function mandatoryOutput(): ?\App\Models\MandatoryOutput
     {
-        if (!$this->progressReport || !$this->form->editingMandatoryId) {
+        if (! $this->progressReport || ! $this->form->editingMandatoryId) {
             return null;
         }
 
@@ -431,7 +431,7 @@ class Show extends Component
     #[Computed]
     public function additionalOutput(): ?\App\Models\AdditionalOutput
     {
-        if (!$this->progressReport || !$this->form->editingAdditionalId) {
+        if (! $this->progressReport || ! $this->form->editingAdditionalId) {
             return null;
         }
 

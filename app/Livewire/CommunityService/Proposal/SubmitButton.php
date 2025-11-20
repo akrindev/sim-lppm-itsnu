@@ -67,7 +67,7 @@ class SubmitButton extends Component
             $this->redirect(route('community-service.proposal.show', $proposal->id));
         } else {
             $this->dispatch('error', message: $result['message']);
-            session()->flash('error', 'Gagal mengajukan proposal: ' . $result['message']);
+            session()->flash('error', 'Gagal mengajukan proposal: '.$result['message']);
         }
     }
 
