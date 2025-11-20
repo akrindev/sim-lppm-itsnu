@@ -49,28 +49,12 @@ class ReportForm extends Form
 
     public $presentationFile;
 
-    // Report configuration (can be overridden in child classes)
-    protected string $reportType = 'progress';
+    // Report configuration
+    public string $type = 'progress'; // 'progress' or 'final'
 
     protected array $fileValidationRules = [
         'substanceFile' => 'nullable|file|mimes:pdf,application/pdf|max:10240',
     ];
-
-    /**
-     * Get the report type (progress or final)
-     */
-    protected function getReportType(): string
-    {
-        return $this->reportType;
-    }
-
-    /**
-     * Get file validation rules
-     */
-    protected function getFileValidationRules(): array
-    {
-        return $this->fileValidationRules;
-    }
 
     /**
      * Ensure proposal is initialized
@@ -91,7 +75,12 @@ class ReportForm extends Form
     {
         $this->proposal = $proposal;
         $this->reportingYear = (int) date('Y');
-        $this->reportingPeriod = 'semester_1';
+
+        if ($this->type === 'final') {
+            $this->reportingPeriod = 'final';
+        } else {
+            $this->reportingPeriod = 'semester_1';
+        }
     }
 
     public function setReport(ProgressReport $report): void
@@ -102,13 +91,18 @@ class ReportForm extends Form
         $this->reportingYear = (int) $report->reporting_year;
         $this->reportingPeriod = $report->reporting_period;
 
+        // Force final period if type is final
+        if ($this->type === 'final') {
+            $this->reportingPeriod = 'final';
+        }
+
         // Load mandatory outputs
         foreach ($report->mandatoryOutputs as $output) {
             if (empty($output->proposal_output_id)) {
                 continue;
             }
 
-            $this->mandatoryOutputs[$output->proposal_output_id] = [
+            $data = [
                 'id' => $output->id,
                 'status_type' => $output->status_type,
                 'author_status' => $output->author_status,
@@ -126,6 +120,13 @@ class ReportForm extends Form
                 'article_url' => $output->article_url,
                 'doi' => $output->doi,
             ];
+
+            // Add file status for final reports
+            if ($this->type === 'final') {
+                $data['document_file'] = $output->getFirstMedia('journal_article') ? true : false;
+            }
+
+            $this->mandatoryOutputs[$output->proposal_output_id] = $data;
         }
 
         // Load additional outputs
@@ -134,7 +135,7 @@ class ReportForm extends Form
                 continue;
             }
 
-            $this->additionalOutputs[$output->proposal_output_id] = [
+            $data = [
                 'id' => $output->id,
                 'status' => $output->status,
                 'book_title' => $output->book_title,
@@ -145,6 +146,14 @@ class ReportForm extends Form
                 'publisher_url' => $output->publisher_url,
                 'book_url' => $output->book_url,
             ];
+
+            // Add file status for final reports
+            if ($this->type === 'final') {
+                $data['document_file'] = $output->getFirstMedia('book_document') ? true : false;
+                $data['publication_certificate'] = $output->getFirstMedia('publication_certificate') ? true : false;
+            }
+
+            $this->additionalOutputs[$output->proposal_output_id] = $data;
         }
     }
 
@@ -163,7 +172,7 @@ class ReportForm extends Form
 
     protected function getEmptyMandatoryOutput(): array
     {
-        return [
+        $data = [
             'id' => null,
             'status_type' => '',
             'author_status' => '',
@@ -181,11 +190,17 @@ class ReportForm extends Form
             'article_url' => '',
             'doi' => '',
         ];
+
+        if ($this->type === 'final') {
+            $data['document_file'] = false;
+        }
+
+        return $data;
     }
 
     protected function getEmptyAdditionalOutput(): array
     {
-        return [
+        $data = [
             'id' => null,
             'status' => '',
             'book_title' => '',
@@ -196,15 +211,28 @@ class ReportForm extends Form
             'publisher_url' => '',
             'book_url' => '',
         ];
+
+        if ($this->type === 'final') {
+            $data['document_file'] = false;
+            $data['publication_certificate'] = false;
+        }
+
+        return $data;
     }
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'summaryUpdate' => ['required', 'string', 'min:10'],
             'reportingYear' => ['required', 'integer', 'min:2020', 'max:2099'],
             'reportingPeriod' => ['required', 'string', Rule::in(['semester_1', 'semester_2', 'annual', 'final'])],
         ];
+
+        if ($this->type === 'final') {
+            $rules['reportingPeriod'] = ['required', 'string', 'in:final'];
+        }
+
+        return $rules;
     }
 
     public function validateReportData(): void
@@ -245,13 +273,24 @@ class ReportForm extends Form
     public function save(?ProgressReport $existingReport = null): ProgressReport
     {
         $this->ensureProposalInitialized();
+
+        // Ensure summaryUpdate has a value before validation
+        if (empty($this->summaryUpdate)) {
+            $this->summaryUpdate = $this->progressReport?->summary_update ?? $this->proposal->summary ?? '';
+        }
+
+        // Force reporting period to 'final' before validation if type is final
+        if ($this->type === 'final') {
+            $this->reportingPeriod = 'final';
+        }
+
         $this->validateReportData();
 
         DB::beginTransaction();
 
         try {
             $reportData = [
-                'summary_update' => $this->summaryUpdate ?: ($this->progressReport?->summary_update ?? $this->proposal->summary),
+                'summary_update' => $this->summaryUpdate,
                 'reporting_year' => $this->reportingYear,
                 'reporting_period' => $this->reportingPeriod,
             ];
@@ -490,7 +529,7 @@ class ReportForm extends Form
             ->withCustomProperties([
                 'uploaded_by' => Auth::id(),
                 'proposal_id' => $this->proposal->id,
-                'report_type' => $this->getReportType(),
+                'report_type' => $this->type,
             ])
             ->toMediaCollection($collectionName);
     }
@@ -500,7 +539,7 @@ class ReportForm extends Form
      */
     public function validateFiles(): void
     {
-        $this->validate($this->getFileValidationRules());
+        $this->validate($this->fileValidationRules);
     }
 
     /**
@@ -587,7 +626,7 @@ class ReportForm extends Form
                     ->withCustomProperties([
                         'uploaded_by' => Auth::id(),
                         'proposal_id' => $this->proposal->id,
-                        'report_type' => $this->getReportType(),
+                        'report_type' => $this->type,
                     ])
                     ->toMediaCollection('journal_article');
 
@@ -649,7 +688,7 @@ class ReportForm extends Form
                     ->withCustomProperties([
                         'uploaded_by' => Auth::id(),
                         'proposal_id' => $this->proposal->id,
-                        'report_type' => $this->getReportType(),
+                        'report_type' => $this->type,
                     ])
                     ->toMediaCollection('book_document');
 
@@ -671,7 +710,7 @@ class ReportForm extends Form
                     ->withCustomProperties([
                         'uploaded_by' => Auth::id(),
                         'proposal_id' => $this->proposal->id,
-                        'report_type' => $this->getReportType(),
+                        'report_type' => $this->type,
                     ])
                     ->toMediaCollection('publication_certificate');
 

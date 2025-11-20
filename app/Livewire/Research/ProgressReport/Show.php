@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Research\ProgressReport;
 
-use App\Livewire\Forms\ResearchProgressReportForm;
+use App\Livewire\Forms\ReportForm;
 use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
@@ -23,7 +23,7 @@ class Show extends Component
     use WithFileUploads;
 
     // Form instance - Livewire v3 Form pattern
-    public ResearchProgressReportForm $form;
+    public ReportForm $form;
 
     /**
      * Mount the component
@@ -35,6 +35,7 @@ class Show extends Component
         $this->loadReport();
 
         // Initialize Livewire Form
+        $this->form->type = 'progress';
         $this->form->initWithProposal($this->proposal);
 
         if ($this->progressReport) {

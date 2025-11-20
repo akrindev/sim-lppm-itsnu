@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Research\FinalReport;
 
 use App\Enums\ProposalStatus;
-use App\Livewire\Forms\ResearchFinalReportForm;
+use App\Livewire\Forms\ReportForm;
 use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
@@ -24,7 +24,7 @@ class Show extends Component
     use WithFileUploads;
 
     // Form instance - Livewire v3 Form pattern
-    public ResearchFinalReportForm $form;
+    public ReportForm $form;
 
     /**
      * Mount the component
@@ -49,6 +49,7 @@ class Show extends Component
         }
 
         // Initialize Livewire Form
+        $this->form->type = 'final';
         $this->form->initWithProposal($this->proposal);
 
         if ($this->progressReport) {
