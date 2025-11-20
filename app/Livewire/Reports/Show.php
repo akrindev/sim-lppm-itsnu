@@ -151,8 +151,16 @@ class Show extends Component
             // Ensure form has the progress report reference
             $this->form->progressReport = $this->progressReport;
 
+            // Transfer files from component to form
+            if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
+                $this->form->tempMandatoryFiles[$proposalOutputId] = $this->tempMandatoryFiles[$proposalOutputId];
+            }
+
             // Save via form
             $this->form->saveMandatoryOutputWithFile($proposalOutputId);
+
+            // Clear the component's temp files
+            unset($this->tempMandatoryFiles[$proposalOutputId]);
 
             $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
             session()->flash('success', 'Data luaran wajib berhasil disimpan.');
@@ -183,8 +191,20 @@ class Show extends Component
             // Ensure form has the progress report reference
             $this->form->progressReport = $this->progressReport;
 
+            // Transfer files from component to form
+            if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
+                $this->form->tempAdditionalFiles[$proposalOutputId] = $this->tempAdditionalFiles[$proposalOutputId];
+            }
+            if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
+                $this->form->tempAdditionalCerts[$proposalOutputId] = $this->tempAdditionalCerts[$proposalOutputId];
+            }
+
             // Save via form
             $this->form->saveAdditionalOutputWithFile($proposalOutputId);
+
+            // Clear the component's temp files
+            unset($this->tempAdditionalFiles[$proposalOutputId]);
+            unset($this->tempAdditionalCerts[$proposalOutputId]);
 
             $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
             session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
