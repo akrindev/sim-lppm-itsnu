@@ -22,7 +22,7 @@ class StudyProgramSeeder extends Seeder
         // - Teknik Industri
 
         // dekabita study programs
-        //- Kriya Batik
+        // - Kriya Batik
         // - Administrasi Perkantoran
         // - Akuntansi
 

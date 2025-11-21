@@ -72,7 +72,7 @@ class AssignReviewersAction
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Gagal menugaskan reviewer: ' . $e->getMessage(),
+                'message' => 'Gagal menugaskan reviewer: '.$e->getMessage(),
             ];
         }
     }

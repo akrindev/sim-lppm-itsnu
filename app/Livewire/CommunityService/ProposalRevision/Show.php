@@ -108,7 +108,7 @@ class Show extends Component
             // Refresh proposal data
             $this->form->setProposal($this->form->proposal->fresh());
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan perubahan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan perubahan: '.$e->getMessage());
         }
     }
 

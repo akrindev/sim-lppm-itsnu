@@ -223,12 +223,12 @@
                             @php
                                 $media = $research->getFirstMedia('substance_file');
                             @endphp
-                            <div class="alert alert-info mb-0">
-                                <div class="d-flex justify-content-between align-items-center">
+                            <div class="mb-0 alert alert-info">
+                                <div class="d-flex align-items-center justify-content-between">
                                     <div>
-                                        <x-lucide-file-text class="icon text-primary me-2" />
+                                        <x-lucide-file-text class="me-2 text-primary icon" />
                                         <strong>{{ $media->name }}</strong>
-                                        <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                                        <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
                                     </div>
                                     <a href="{{ $media->getUrl() }}" target="_blank"
                                         class="btn-outline-primary btn btn-sm">
@@ -493,7 +493,7 @@
             </div>
 
             <!-- Dekan Approval (Status: SUBMITTED) -->
-            @if (auth()->user()->hasRole(['dekan', 'dekan saintek', 'dekan dekabita']) && $proposal->status->value === 'submitted')
+            @if (auth()->user()->hasRole(['dekan']) && $proposal->status->value === 'submitted')
                 <div class="mb-3 card">
                     <div class="card-header">
                         <h3 class="card-title">Persetujuan Dekan</h3>
@@ -654,19 +654,20 @@
                             @foreach ($proposal->statusLogs as $log)
                                 <div class="timeline-item">
                                     <div class="timeline-content">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="d-flex align-items-start justify-content-between mb-2">
                                             <div>
                                                 <strong>{{ $log->status_before?->label() ?? '—' }}</strong>
-                                                <x-lucide-arrow-right class="mx-2 icon" style="width: 1rem; height: 1rem;" />
+                                                <x-lucide-arrow-right class="mx-2 icon"
+                                                    style="width: 1rem; height: 1rem;" />
                                                 <strong>{{ $log->status_after->label() }}</strong>
                                             </div>
                                             <small class="text-muted">{{ $log->at->format('d M Y H:i') }}</small>
                                         </div>
-                                        <p class="text-secondary mb-1">
+                                        <p class="mb-1 text-secondary">
                                             Oleh: <strong>{{ $log->user?->name ?? '—' }}</strong>
                                         </p>
                                         @if ($log->notes)
-                                            <p class="text-secondary mb-0">
+                                            <p class="mb-0 text-secondary">
                                                 Catatan: {{ $log->notes }}
                                             </p>
                                         @endif

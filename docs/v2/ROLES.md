@@ -20,17 +20,15 @@
 
 ### System Roles (9 Total)
 
-| # | Role Name | Code | Level | User Count | Primary Function |
-|---|-----------|------|-------|------------|------------------|
-| 1 | Super Admin | `superadmin` | System | 1-2 | IT administration, full system access |
-| 2 | Admin LPPM | `admin lppm` | Institution | 2-5 | Operational management, reviewer coordination |
-| 3 | Kepala LPPM | `kepala lppm` | Institution | 1 | Strategic leadership, final approvals |
-| 4 | Dekan | `dekan` | Faculty | 1 per faculty | First-level proposal approval |
-| 5 | Dekan Saintek | `dekan saintek` | Faculty | 1 | Science & Technology faculty approval |
-| 6 | Dekan Dekabita | `dekan dekabita` | Faculty | 1 | Social science faculty approval |
-| 7 | Dosen | `dosen` | Individual | Many | Proposal creation, submission |
-| 8 | Reviewer | `reviewer` | Expert | Many | Proposal evaluation |
-| 9 | Rektor | `rektor` | University | 1 | Strategic oversight (rarely active) |
+| #   | Role Name   | Code          | Level       | User Count    | Primary Function                              |
+| --- | ----------- | ------------- | ----------- | ------------- | --------------------------------------------- |
+| 1   | Super Admin | `superadmin`  | System      | 1-2           | IT administration, full system access         |
+| 2   | Admin LPPM  | `admin lppm`  | Institution | 2-5           | Operational management, reviewer coordination |
+| 3   | Kepala LPPM | `kepala lppm` | Institution | 1             | Strategic leadership, final approvals         |
+| 4   | Dekan       | `dekan`       | Faculty     | 1 per faculty | First-level proposal approval                 |
+| 7   | Dosen       | `dosen`       | Individual  | Many          | Proposal creation, submission                 |
+| 8   | Reviewer    | `reviewer`    | Expert      | Many          | Proposal evaluation                           |
+| 9   | Rektor      | `rektor`      | University  | 1             | Strategic oversight (rarely active)           |
 
 ### Role Hierarchy
 
@@ -68,170 +66,170 @@ graph TD
 
 ### Proposal Management
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Create Proposal** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **View All Proposals** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | 🔒 Assigned | ✅ |
-| **View Proposal Detail** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own/Team | 🔒 Assigned | ✅ |
-| **Edit Draft Proposal** | ✅ | ✅ | ✅ | ✅ | 🔒 Own | ❌ | ❌ |
-| **Edit Submitted Proposal** | ✅ | ✅ | ✔️ Metadata | ❌ | ❌ | ❌ | ❌ |
-| **Delete Proposal** | ✅ | ✅ | ✔️ Draft | ❌ | 🔒 Own Draft | ❌ | ❌ |
-| **Submit Proposal** | ✅ | ✅ | ✅ | ✅ | 🔒 Own | ❌ | ❌ |
-| **Resubmit (Revision)** | ✅ | ✅ | ✅ | ✅ | 🔒 Own | ❌ | ❌ |
+| Permission                  | superadmin | admin lppm | kepala lppm |  dekan*   |    dosen    |  reviewer  | rektor |
+| --------------------------- | :--------: | :--------: | :---------: | :-------: | :---------: | :--------: | :----: |
+| **Create Proposal**         |     ✅      |     ✅      |      ✅      |     ✅     |      ✅      |     ❌      |   ❌    |
+| **View All Proposals**      |     ✅      |     ✅      |      ✅      | 🔒 Faculty |    🔒 Own    | 🔒 Assigned |   ✅    |
+| **View Proposal Detail**    |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own/Team  | 🔒 Assigned |   ✅    |
+| **Edit Draft Proposal**     |     ✅      |     ✅      |      ✅      |     ✅     |    🔒 Own    |     ❌      |   ❌    |
+| **Edit Submitted Proposal** |     ✅      |     ✅      | ✔️ Metadata  |     ❌     |      ❌      |     ❌      |   ❌    |
+| **Delete Proposal**         |     ✅      |     ✅      |   ✔️ Draft   |     ❌     | 🔒 Own Draft |     ❌      |   ❌    |
+| **Submit Proposal**         |     ✅      |     ✅      |      ✅      |     ✅     |    🔒 Own    |     ❌      |   ❌    |
+| **Resubmit (Revision)**     |     ✅      |     ✅      |      ✅      |     ✅     |    🔒 Own    |     ❌      |   ❌    |
 
-*dekan = includes dekan, dekan saintek, dekan dekabita (faculty-scoped)
+*dekan = includes dekan
 
 ---
 
 ### Approval Workflow
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Dekan Approval** | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Dekan Request Team Fix** | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Kepala LPPM Initial Approval** | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✔️ Override |
-| **Kepala LPPM Final Decision** | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✔️ Override |
-| **Reject Proposal** | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✔️ Strategic |
-| **Mark as Completed** | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Request Revision** | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Override Status** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✔️ Emergency |
+| Permission                       | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer |   rektor    |
+| -------------------------------- | :--------: | :--------: | :---------: | :----: | :---: | :------: | :---------: |
+| **Dekan Approval**               |     ✅      |     ❌      |      ❌      |   ✅    |   ❌   |    ❌     |      ❌      |
+| **Dekan Request Team Fix**       |     ✅      |     ❌      |      ❌      |   ✅    |   ❌   |    ❌     |      ❌      |
+| **Kepala LPPM Initial Approval** |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     | ✔️ Override  |
+| **Kepala LPPM Final Decision**   |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     | ✔️ Override  |
+| **Reject Proposal**              |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     | ✔️ Strategic |
+| **Mark as Completed**            |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     |      ❌      |
+| **Request Revision**             |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     |      ❌      |
+| **Override Status**              |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     | ✔️ Emergency |
 
 ---
 
 ### Team Management
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Invite Team Members** | ✅ | ✅ | ✅ | ✅ | 🔒 Own | ❌ | ❌ |
-| **Remove Team Member** | ✅ | ✅ | ✔️ Admin | ❌ | 🔒 Own | ❌ | ❌ |
-| **Accept Team Invitation** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **Reject Team Invitation** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **View Team Members** | ✅ | ✅ | ✅ | 🔒 Faculty | ✅ | 🔒 Assigned | ✅ |
-| **Assign Team Tasks** | ✅ | ✅ | ✅ | ❌ | 🔒 Own | ❌ | ❌ |
-| **View Pending Invitations** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | ❌ | ❌ |
+| Permission                   | superadmin | admin lppm | kepala lppm |  dekan*   | dosen |  reviewer  | rektor |
+| ---------------------------- | :--------: | :--------: | :---------: | :-------: | :---: | :--------: | :----: |
+| **Invite Team Members**      |     ✅      |     ✅      |      ✅      |     ✅     | 🔒 Own |     ❌      |   ❌    |
+| **Remove Team Member**       |     ✅      |     ✅      |   ✔️ Admin   |     ❌     | 🔒 Own |     ❌      |   ❌    |
+| **Accept Team Invitation**   |     ✅      |     ✅      |      ✅      |     ✅     |   ✅   |     ❌      |   ❌    |
+| **Reject Team Invitation**   |     ✅      |     ✅      |      ✅      |     ✅     |   ✅   |     ❌      |   ❌    |
+| **View Team Members**        |     ✅      |     ✅      |      ✅      | 🔒 Faculty |   ✅   | 🔒 Assigned |   ✅    |
+| **Assign Team Tasks**        |     ✅      |     ✅      |      ✅      |     ❌     | 🔒 Own |     ❌      |   ❌    |
+| **View Pending Invitations** |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |     ❌      |   ❌    |
 
 ---
 
 ### Review Management
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Assign Reviewers** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Remove Reviewer** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **View Reviewer Assignments** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | 🔒 Own | ✅ |
-| **Submit Review** | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **Edit Own Review** | ✅ | ❌ | ❌ | ❌ | ❌ | ✔️ Before Submit | ❌ |
-| **View All Reviews** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | 🔒 Own | ✅ |
-| **View Review Notes** | ✅ | ✅ | ✅ | ❌ | 🔒 Own | 🔒 Own | ✅ |
-| **View Review Summary** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | ❌ | ✅ |
+| Permission                    | superadmin | admin lppm | kepala lppm |  dekan*   | dosen |    reviewer     | rektor |
+| ----------------------------- | :--------: | :--------: | :---------: | :-------: | :---: | :-------------: | :----: |
+| **Assign Reviewers**          |     ✅      |     ✅      |   ✔️ View    |     ❌     |   ❌   |        ❌        |   ❌    |
+| **Remove Reviewer**           |     ✅      |     ✅      |      ❌      |     ❌     |   ❌   |        ❌        |   ❌    |
+| **View Reviewer Assignments** |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |      🔒 Own      |   ✅    |
+| **Submit Review**             |     ✅      |     ❌      |      ❌      |     ❌     |   ❌   |        ✅        |   ❌    |
+| **Edit Own Review**           |     ✅      |     ❌      |      ❌      |     ❌     |   ❌   | ✔️ Before Submit |   ❌    |
+| **View All Reviews**          |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |      🔒 Own      |   ✅    |
+| **View Review Notes**         |     ✅      |     ✅      |      ✅      |     ❌     | 🔒 Own |      🔒 Own      |   ✅    |
+| **View Review Summary**       |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |        ❌        |   ✅    |
 
 ---
 
 ### Budget Management
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Add Budget Items** | ✅ | ✅ | ✅ | ✅ | 🔒 Own Draft | ❌ | ❌ |
-| **Edit Budget Items** | ✅ | ✅ | ✔️ Admin | ❌ | 🔒 Own Draft | ❌ | ❌ |
-| **Delete Budget Items** | ✅ | ✅ | ✔️ Admin | ❌ | 🔒 Own Draft | ❌ | ❌ |
-| **View Budget Details** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own/Team | 🔒 Assigned | ✅ |
-| **Export Budget Summary** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | ❌ | ✅ |
-| **Approve Budget** | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ✔️ Strategic |
+| Permission                | superadmin | admin lppm | kepala lppm |  dekan*   |    dosen    |  reviewer  |   rektor    |
+| ------------------------- | :--------: | :--------: | :---------: | :-------: | :---------: | :--------: | :---------: |
+| **Add Budget Items**      |     ✅      |     ✅      |      ✅      |     ✅     | 🔒 Own Draft |     ❌      |      ❌      |
+| **Edit Budget Items**     |     ✅      |     ✅      |   ✔️ Admin   |     ❌     | 🔒 Own Draft |     ❌      |      ❌      |
+| **Delete Budget Items**   |     ✅      |     ✅      |   ✔️ Admin   |     ❌     | 🔒 Own Draft |     ❌      |      ❌      |
+| **View Budget Details**   |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own/Team  | 🔒 Assigned |      ✅      |
+| **Export Budget Summary** |     ✅      |     ✅      |      ✅      | 🔒 Faculty |    🔒 Own    |     ❌      |      ✅      |
+| **Approve Budget**        |     ✅      |     ❌      |      ✅      |     ✅     |      ❌      |     ❌      | ✔️ Strategic |
 
 ---
 
 ### Progress Reporting
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Create Progress Report** | ✅ | ✅ | ✅ | ✅ | 🔒 Own | ❌ | ❌ |
-| **Submit Progress Report** | ✅ | ✅ | ✅ | ✅ | 🔒 Own | ❌ | ❌ |
-| **Edit Draft Report** | ✅ | ✅ | ✅ | ❌ | 🔒 Own | ❌ | ❌ |
-| **Approve Progress Report** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **View All Reports** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | ❌ | ✅ |
-| **View Report Details** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own/Team | ❌ | ✅ |
-| **Add Mandatory Outputs** | ✅ | ✅ | ✅ | ❌ | 🔒 Own | ❌ | ❌ |
-| **Add Additional Outputs** | ✅ | ✅ | ✅ | ❌ | 🔒 Own | ❌ | ❌ |
+| Permission                  | superadmin | admin lppm | kepala lppm |  dekan*   |   dosen    | reviewer | rektor |
+| --------------------------- | :--------: | :--------: | :---------: | :-------: | :--------: | :------: | :----: |
+| **Create Progress Report**  |     ✅      |     ✅      |      ✅      |     ✅     |   🔒 Own    |    ❌     |   ❌    |
+| **Submit Progress Report**  |     ✅      |     ✅      |      ✅      |     ✅     |   🔒 Own    |    ❌     |   ❌    |
+| **Edit Draft Report**       |     ✅      |     ✅      |      ✅      |     ❌     |   🔒 Own    |    ❌     |   ❌    |
+| **Approve Progress Report** |     ✅      |     ✅      |      ✅      |     ❌     |     ❌      |    ❌     |   ❌    |
+| **View All Reports**        |     ✅      |     ✅      |      ✅      | 🔒 Faculty |   🔒 Own    |    ❌     |   ✅    |
+| **View Report Details**     |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own/Team |    ❌     |   ✅    |
+| **Add Mandatory Outputs**   |     ✅      |     ✅      |      ✅      |     ❌     |   🔒 Own    |    ❌     |   ❌    |
+| **Add Additional Outputs**  |     ✅      |     ✅      |      ✅      |     ❌     |   🔒 Own    |    ❌     |   ❌    |
 
 ---
 
 ### Master Data Management
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Manage Focus Areas** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Themes** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Topics** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Keywords** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Research Schemes** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage National Priorities** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Science Clusters** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Budget Groups** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Budget Components** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **Manage Partners** | ✅ | ✅ | ✔️ View | ❌ | ✔️ View | ❌ | ❌ |
-| **Manage Faculties** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Manage Study Programs** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Manage Institutions** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Manage Macro Research Groups** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
+| Permission                       | superadmin | admin lppm | kepala lppm | dekan* | dosen  | reviewer | rektor |
+| -------------------------------- | :--------: | :--------: | :---------: | :----: | :----: | :------: | :----: |
+| **Manage Focus Areas**           |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Themes**                |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Topics**                |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Keywords**              |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Research Schemes**      |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage National Priorities**   |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Science Clusters**      |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Budget Groups**         |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Budget Components**     |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Partners**              |     ✅      |     ✅      |   ✔️ View    |   ❌    | ✔️ View |    ❌     |   ❌    |
+| **Manage Faculties**             |     ✅      |     ✅      |      ❌      |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Study Programs**        |     ✅      |     ✅      |      ❌      |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Institutions**          |     ✅      |     ✅      |      ❌      |   ❌    |   ❌    |    ❌     |   ❌    |
+| **Manage Macro Research Groups** |     ✅      |     ✅      |   ✔️ View    |   ❌    |   ❌    |    ❌     |   ❌    |
 
 ---
 
 ### User Management
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Create User** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Edit User** | ✅ | ✅ | ❌ | ❌ | 🔒 Own Profile | ❌ | ❌ |
-| **Delete User** | ✅ | ✔️ Dosen/Reviewer | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Assign Roles** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Remove Roles** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **View All Users** | ✅ | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ |
-| **View User Details** | ✅ | ✅ | ✔️ Limited | ❌ | 🔒 Own | ❌ | ❌ |
-| **Edit Own Profile** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Change Own Password** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Enable 2FA** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Reset User Password** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Permission              | superadmin |    admin lppm    | kepala lppm | dekan* |     dosen     | reviewer | rektor |
+| ----------------------- | :--------: | :--------------: | :---------: | :----: | :-----------: | :------: | :----: |
+| **Create User**         |     ✅      |        ✅         |      ❌      |   ❌    |       ❌       |    ❌     |   ❌    |
+| **Edit User**           |     ✅      |        ✅         |      ❌      |   ❌    | 🔒 Own Profile |    ❌     |   ❌    |
+| **Delete User**         |     ✅      | ✔️ Dosen/Reviewer |      ❌      |   ❌    |       ❌       |    ❌     |   ❌    |
+| **Assign Roles**        |     ✅      |        ✅         |      ❌      |   ❌    |       ❌       |    ❌     |   ❌    |
+| **Remove Roles**        |     ✅      |        ✅         |      ❌      |   ❌    |       ❌       |    ❌     |   ❌    |
+| **View All Users**      |     ✅      |        ✅         |   ✔️ View    |   ❌    |       ❌       |    ❌     |   ❌    |
+| **View User Details**   |     ✅      |        ✅         |  ✔️ Limited  |   ❌    |     🔒 Own     |    ❌     |   ❌    |
+| **Edit Own Profile**    |     ✅      |        ✅         |      ✅      |   ✅    |       ✅       |    ✅     |   ✅    |
+| **Change Own Password** |     ✅      |        ✅         |      ✅      |   ✅    |       ✅       |    ✅     |   ✅    |
+| **Enable 2FA**          |     ✅      |        ✅         |      ✅      |   ✅    |       ✅       |    ✅     |   ✅    |
+| **Reset User Password** |     ✅      |        ✅         |      ❌      |   ❌    |       ❌       |    ❌     |   ❌    |
 
 ---
 
 ### Reports & Analytics
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **View Dashboard** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | 🔒 Own | ✅ |
-| **View Proposal Statistics** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | ❌ | ✅ |
-| **Generate Reports** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | ❌ | ✅ |
-| **Export Data (CSV/Excel)** | ✅ | ✅ | ✅ | 🔒 Faculty | 🔒 Own | ❌ | ✅ |
-| **View System Analytics** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **View Review Statistics** | ✅ | ✅ | ✅ | 🔒 Faculty | ❌ | 🔒 Own | ✅ |
-| **View Faculty Comparison** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Permission                   | superadmin | admin lppm | kepala lppm |  dekan*   | dosen | reviewer | rektor |
+| ---------------------------- | :--------: | :--------: | :---------: | :-------: | :---: | :------: | :----: |
+| **View Dashboard**           |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |  🔒 Own   |   ✅    |
+| **View Proposal Statistics** |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |    ❌     |   ✅    |
+| **Generate Reports**         |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |    ❌     |   ✅    |
+| **Export Data (CSV/Excel)**  |     ✅      |     ✅      |      ✅      | 🔒 Faculty | 🔒 Own |    ❌     |   ✅    |
+| **View System Analytics**    |     ✅      |     ✅      |      ✅      |     ❌     |   ❌   |    ❌     |   ✅    |
+| **View Review Statistics**   |     ✅      |     ✅      |      ✅      | 🔒 Faculty |   ❌   |  🔒 Own   |   ✅    |
+| **View Faculty Comparison**  |     ✅      |     ✅      |      ✅      |     ❌     |   ❌   |    ❌     |   ✅    |
 
 ---
 
 ### Notifications
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **View Own Notifications** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Mark as Read** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Delete Notifications** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Send Manual Notifications** | ✅ | ✅ | ✔️ Limited | ❌ | ❌ | ❌ | ❌ |
-| **Configure Notification Preferences** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **View All Notifications Log** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Permission                             | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
+| -------------------------------------- | :--------: | :--------: | :---------: | :----: | :---: | :------: | :----: |
+| **View Own Notifications**             |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| **Mark as Read**                       |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| **Delete Notifications**               |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| **Send Manual Notifications**          |     ✅      |     ✅      |  ✔️ Limited  |   ❌    |   ❌   |    ❌     |   ❌    |
+| **Configure Notification Preferences** |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| **View All Notifications Log**         |     ✅      |     ✅      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
 
 ---
 
 ### System Administration
 
-| Permission | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| **Access Telescope** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **View System Logs** | ✅ | ✔️ Limited | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Run Artisan Commands** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Manage Database** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Configure System Settings** | ✅ | ✔️ Limited | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **View Queue Jobs** | ✅ | ✔️ View | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Clear Cache** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Permission                    | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
+| ----------------------------- | :--------: | :--------: | :---------: | :----: | :---: | :------: | :----: |
+| **Access Telescope**          |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| **View System Logs**          |     ✅      | ✔️ Limited  |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| **Run Artisan Commands**      |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| **Manage Database**           |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| **Configure System Settings** |     ✅      | ✔️ Limited  |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| **View Queue Jobs**           |     ✅      |   ✔️ View   |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| **Clear Cache**               |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
 
 ---
 
@@ -328,7 +326,7 @@ graph TD
 
 ---
 
-### 4. Dekan / Dekan Saintek / Dekan Dekabita (Faculty Dean)
+### 4. Dekan
 
 **Purpose:** Faculty-level proposal approval and oversight
 
@@ -345,8 +343,6 @@ graph TD
 
 **Role Variants:**
 - **Dekan:** General dean (can see all faculties, limited edit)
-- **Dekan Saintek:** Science & Technology faculty only
-- **Dekan Dekabita:** Design, Communication, Business, Language faculty only
 
 **Critical Permissions:**
 - ✅ Approve proposals from own faculty
@@ -473,14 +469,14 @@ graph TD
 
 ### Access Scope Definitions
 
-| Scope | Description | Applies To |
-|-------|-------------|------------|
-| **System-wide** | Unrestricted access to all data | superadmin |
-| **Institution-wide** | All faculties, all proposals | admin lppm, kepala lppm, rektor |
-| **Faculty-scoped** | Own faculty proposals only | dekan, dekan saintek, dekan dekabita |
-| **Team-scoped** | Own proposals + team memberships | dosen |
-| **Assignment-scoped** | Only assigned proposals | reviewer |
-| **Own-only** | Personal data and activities | All roles (for own profile) |
+| Scope                 | Description                      | Applies To                      |
+| --------------------- | -------------------------------- | ------------------------------- |
+| **System-wide**       | Unrestricted access to all data  | superadmin                      |
+| **Institution-wide**  | All faculties, all proposals     | admin lppm, kepala lppm, rektor |
+| **Faculty-scoped**    | Own faculty proposals only       | dekan                           |
+| **Team-scoped**       | Own proposals + team memberships | dosen                           |
+| **Assignment-scoped** | Only assigned proposals          | reviewer                        |
+| **Own-only**          | Personal data and activities     | All roles (for own profile)     |
 
 ---
 
@@ -497,7 +493,7 @@ elseif ($user->hasRole(['admin lppm', 'kepala lppm', 'rektor'])) {
     $proposals = Proposal::all(); // Institution-wide
 }
 
-elseif ($user->hasRole(['dekan', 'dekan saintek', 'dekan dekabita'])) {
+elseif ($user->hasRole(['dekan'])) {
     $facultyId = $user->identity->faculty_id;
     $proposals = Proposal::whereHas('submitter.identity', function($q) use ($facultyId) {
         $q->where('faculty_id', $facultyId);
@@ -528,7 +524,7 @@ elseif ($user->hasRole('reviewer')) {
 public function canApprove(User $user, Proposal $proposal): bool
 {
     // Dekan approval
-    if ($user->hasRole(['dekan', 'dekan saintek', 'dekan dekabita'])) {
+    if ($user->hasRole(['dekan'])) {
         return $proposal->status === ProposalStatus::SUBMITTED
             && $user->identity->faculty_id === $proposal->submitter->identity->faculty_id;
     }
@@ -640,15 +636,15 @@ if ($user->activeRole() === 'dosen') {
 
 ## Summary Table: Who Can Do What?
 
-| Action | Executor | Prerequisites | Notification Sent To |
-|--------|----------|---------------|----------------------|
-| Create Proposal | Dosen | None | None (draft) |
-| Submit Proposal | Dosen | All team accepted | Dekan, Admin LPPM, Team |
-| Dekan Approve | Dekan | Status = SUBMITTED | Kepala LPPM, Submitter, Team |
-| Kepala Initial Approve | Kepala LPPM | Status = APPROVED | Admin LPPM |
-| Assign Reviewers | Admin LPPM | Status = UNDER_REVIEW | Reviewer(s) |
-| Submit Review | Reviewer | Assigned | Admin LPPM (each), Kepala LPPM (all done) |
-| Kepala Final Decision | Kepala LPPM | Status = REVIEWED | Submitter, Team, Dekan, Admin |
+| Action                 | Executor    | Prerequisites         | Notification Sent To                      |
+| ---------------------- | ----------- | --------------------- | ----------------------------------------- |
+| Create Proposal        | Dosen       | None                  | None (draft)                              |
+| Submit Proposal        | Dosen       | All team accepted     | Dekan, Admin LPPM, Team                   |
+| Dekan Approve          | Dekan       | Status = SUBMITTED    | Kepala LPPM, Submitter, Team              |
+| Kepala Initial Approve | Kepala LPPM | Status = APPROVED     | Admin LPPM                                |
+| Assign Reviewers       | Admin LPPM  | Status = UNDER_REVIEW | Reviewer(s)                               |
+| Submit Review          | Reviewer    | Assigned              | Admin LPPM (each), Kepala LPPM (all done) |
+| Kepala Final Decision  | Kepala LPPM | Status = REVIEWED     | Submitter, Team, Dekan, Admin             |
 
 ---
 

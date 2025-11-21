@@ -4,55 +4,27 @@ declare(strict_types=1);
 
 namespace App\Livewire\Reports;
 
+use App\Livewire\Forms\ReportForm;
+use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Models\AdditionalOutput;
 use App\Models\Keyword;
 use App\Models\MandatoryOutput;
-use App\Models\ProgressReport;
 use App\Models\Proposal;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class Show extends Component
 {
+    use HasFileUploads;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
 
-    // Form data dari ReportForm
-    public string $summaryUpdate = '';
-
-    public string $keywordsInput = '';
-
-    public int $reportingYear;
-
-    public string $reportingPeriod = 'semester_1';
-
-    // Arrays for outputs
-    public array $mandatoryOutputs = [];
-
-    public array $additionalOutputs = [];
-
-    // Track editing state
-    public ?int $editingMandatoryId = null;
-
-    public ?int $editingAdditionalId = null;
-
-    // File uploads
-    public $substanceFile;
-
-    public $realizationFile;      // For final reports
-
-    public $presentationFile;     // For final reports
-
-    public array $tempMandatoryFiles = [];
-
-    public array $tempAdditionalFiles = [];
-
-    public array $tempAdditionalCerts = [];
+    // Form instance - Livewire v3 Form pattern
+    public ReportForm $form;
 
     // Report configuration
     protected array $config = [];
@@ -65,12 +37,19 @@ class Show extends Component
         $this->checkAccess();
         $this->loadReport();
 
-        $this->reportingYear = (int) date('Y');
+        // Determine report type for ReportForm
+        $reportType = str_contains($type, 'final') ? 'final' : 'progress';
+
+        // Initialize Livewire Form
+        $this->form->type = $reportType;
+        $this->form->initWithProposal($this->proposal);
 
         if ($this->progressReport) {
-            $this->loadExistingReport();
+            // Load existing report data into form
+            $this->form->setReport($this->progressReport);
         } else {
-            $this->initializeNewReport();
+            // Initialize new report structure
+            $this->form->initializeNewReport();
         }
     }
 
@@ -98,165 +77,26 @@ class Show extends Component
         return $configs[$type] ?? $configs['research-progress'];
     }
 
-    protected function loadExistingReport(): void
-    {
-        $this->summaryUpdate = $this->progressReport->summary_update ?? '';
-        $this->reportingYear = $this->progressReport->reporting_year;
-        $this->reportingPeriod = $this->progressReport->reporting_period;
-        $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
-
-        foreach ($this->progressReport->mandatoryOutputs as $output) {
-            if (empty($output->proposal_output_id)) {
-                continue;
-            }
-
-            $this->mandatoryOutputs[$output->proposal_output_id] = $this->mapMandatoryOutput($output);
-        }
-
-        foreach ($this->progressReport->additionalOutputs as $output) {
-            if (empty($output->proposal_output_id)) {
-                continue;
-            }
-
-            $this->additionalOutputs[$output->proposal_output_id] = $this->mapAdditionalOutput($output);
-        }
-    }
-
-    protected function initializeNewReport(): void
-    {
-        $this->summaryUpdate = $this->proposal->summary ?? '';
-        $this->keywordsInput = $this->proposal->keywords()->pluck('name')->join('; ');
-
-        foreach ($this->proposal->outputs->where('category', 'Wajib') as $output) {
-            $this->mandatoryOutputs[$output->id] = $this->getEmptyMandatoryOutput();
-        }
-
-        foreach ($this->proposal->outputs->where('category', 'Tambahan') as $output) {
-            $this->additionalOutputs[$output->id] = $this->getEmptyAdditionalOutput();
-        }
-    }
-
-    protected function mapMandatoryOutput($output): array
-    {
-        return [
-            'id' => $output->id,
-            'status_type' => $output->status_type,
-            'author_status' => $output->author_status,
-            'journal_title' => $output->journal_title,
-            'issn' => $output->issn,
-            'eissn' => $output->eissn,
-            'indexing_body' => $output->indexing_body,
-            'journal_url' => $output->journal_url,
-            'article_title' => $output->article_title,
-            'publication_year' => $output->publication_year,
-            'volume' => $output->volume,
-            'issue_number' => $output->issue_number,
-            'page_start' => $output->page_start,
-            'page_end' => $output->page_end,
-            'article_url' => $output->article_url,
-            'doi' => $output->doi,
-        ];
-    }
-
-    protected function mapAdditionalOutput($output): array
-    {
-        return [
-            'id' => $output->id,
-            'status' => $output->status,
-            'book_title' => $output->book_title,
-            'publisher_name' => $output->publisher_name,
-            'isbn' => $output->isbn,
-            'publication_year' => $output->publication_year,
-            'total_pages' => $output->total_pages,
-            'publisher_url' => $output->publisher_url,
-            'book_url' => $output->book_url,
-        ];
-    }
-
-    protected function getEmptyMandatoryOutput(): array
-    {
-        return [
-            'id' => null,
-            'status_type' => '',
-            'author_status' => '',
-            'journal_title' => '',
-            'issn' => '',
-            'eissn' => '',
-            'indexing_body' => '',
-            'journal_url' => '',
-            'article_title' => '',
-            'publication_year' => '',
-            'volume' => '',
-            'issue_number' => '',
-            'page_start' => '',
-            'page_end' => '',
-            'article_url' => '',
-            'doi' => '',
-        ];
-    }
-
-    protected function getEmptyAdditionalOutput(): array
-    {
-        return [
-            'id' => null,
-            'status' => '',
-            'book_title' => '',
-            'publisher_name' => '',
-            'isbn' => '',
-            'publication_year' => '',
-            'total_pages' => '',
-            'publisher_url' => '',
-            'book_url' => '',
-        ];
-    }
-
     public function save(): void
     {
         if (! $this->canEdit) {
             abort(403);
         }
 
-        $this->validate([
-            'summaryUpdate' => 'required|min:100',
-            'keywordsInput' => 'nullable|string|max:1000',
-            'reportingYear' => 'required|integer|between:2020,2030',
-            'reportingPeriod' => 'required|in:semester_1,semester_2,annual,final',
-            'substanceFile' => 'nullable|file|mimes:pdf|max:10240',
-        ]);
+        // Validate substance file if present
+        if ($this->form->substanceFile) {
+            $this->validate([
+                'form.substanceFile' => 'nullable|file|mimes:pdf|max:10240',
+            ]);
+        }
 
         DB::transaction(function () {
-            if ($this->progressReport) {
-                $this->progressReport->update([
-                    'summary_update' => $this->summaryUpdate,
-                    'reporting_year' => $this->reportingYear,
-                    'reporting_period' => $this->reportingPeriod,
-                ]);
-            } else {
-                $this->progressReport = ProgressReport::create([
-                    'proposal_id' => $this->proposal->id,
-                    'summary_update' => $this->summaryUpdate,
-                    'reporting_year' => $this->reportingYear,
-                    'reporting_period' => $this->reportingPeriod,
-                    'status' => 'draft',
-                ]);
-            }
+            // Save report via form
+            $report = $this->form->save($this->progressReport);
+            $this->progressReport = $report;
 
-            if ($this->substanceFile) {
-                $this->progressReport->clearMediaCollection('substance_file');
-                $this->progressReport
-                    ->addMedia($this->substanceFile->getRealPath())
-                    ->usingName($this->substanceFile->getClientOriginalName())
-                    ->usingFileName($this->substanceFile->hashName())
-                    ->withCustomProperties([
-                        'uploaded_by' => auth()->id(),
-                        'proposal_id' => $this->proposal->id,
-                        'report_type' => $this->config['route'] ?? 'progress',
-                    ])
-                    ->toMediaCollection('substance_file');
-            }
-
-            $this->syncKeywords();
-            $this->saveOutputs();
+            // Save substance file if provided
+            $this->saveSubstanceFile($report);
         });
 
         $this->dispatch('report-saved');
@@ -269,190 +109,146 @@ class Show extends Component
             abort(403);
         }
 
-        $this->save();
+        DB::transaction(function () {
+            // Submit report via form
+            $report = $this->form->submit($this->progressReport);
+            $this->progressReport = $report;
 
-        if ($this->progressReport) {
-            $this->progressReport->update([
-                'status' => 'submitted',
-                'submitted_by' => Auth::id(),
-                'submitted_at' => now(),
-            ]);
+            // Save substance file
+            $this->saveSubstanceFile($report);
+        });
 
-            // Ensure config is initialized before redirect
-            if (empty($this->config) || ! isset($this->config['route'])) {
-                $this->config = $this->getConfig('research-progress');
-            }
-
-            session()->flash('success', 'Laporan berhasil diajukan.');
-            $this->redirect(route($this->config['route']), navigate: true);
-        }
-    }
-
-    protected function syncKeywords(): void
-    {
-        if (empty($this->keywordsInput)) {
-            return;
+        // Ensure config is initialized before redirect
+        if (empty($this->config) || ! isset($this->config['route'])) {
+            $this->config = $this->getConfig('research-progress');
         }
 
-        $keywordNames = array_map('trim', explode(';', $this->keywordsInput));
-        $keywords = [];
-
-        foreach ($keywordNames as $name) {
-            if (empty($name)) {
-                continue;
-            }
-            $keyword = Keyword::firstOrCreate(['name' => $name], ['name' => $name]);
-            $keywords[] = $keyword->id;
-        }
-
-        $this->progressReport->keywords()->sync($keywords);
-        $this->keywordsInput = $this->progressReport->keywords()->pluck('name')->join('; ');
-    }
-
-    protected function saveOutputs(): void
-    {
-        foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (empty($data['status_type']) && empty($data['journal_title']))) {
-                continue;
-            }
-
-            $outputData = [
-                'progress_report_id' => $this->progressReport->id,
-                'proposal_output_id' => $proposalOutputId,
-                'status_type' => $data['status_type'] ?? null,
-                'author_status' => $data['author_status'] ?? null,
-                'journal_title' => $data['journal_title'] ?? null,
-                'issn' => $data['issn'] ?? null,
-                'eissn' => $data['eissn'] ?? null,
-                'indexing_body' => $data['indexing_body'] ?? null,
-                'journal_url' => $data['journal_url'] ?? null,
-                'article_title' => $data['article_title'] ?? null,
-                'publication_year' => ! empty($data['publication_year']) ? $data['publication_year'] : null,
-                'volume' => $data['volume'] ?? null,
-                'issue_number' => $data['issue_number'] ?? null,
-                'page_start' => ! empty($data['page_start']) ? (int) $data['page_start'] : null,
-                'page_end' => ! empty($data['page_end']) ? (int) $data['page_end'] : null,
-                'article_url' => $data['article_url'] ?? null,
-                'doi' => $data['doi'] ?? null,
-            ];
-
-            $mandatoryOutput = isset($data['id']) && $data['id']
-                ? tap(MandatoryOutput::find($data['id']))->update($outputData)
-                : MandatoryOutput::create($outputData);
-
-            if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
-                $mandatoryOutput->clearMediaCollection('journal_article');
-                $mandatoryOutput
-                    ->addMedia($this->tempMandatoryFiles[$proposalOutputId]->getRealPath())
-                    ->usingName($this->tempMandatoryFiles[$proposalOutputId]->getClientOriginalName())
-                    ->usingFileName($this->tempMandatoryFiles[$proposalOutputId]->hashName())
-                    ->withCustomProperties(['uploaded_by' => auth()->id()])
-                    ->toMediaCollection('journal_article');
-            }
-        }
-
-        foreach ($this->additionalOutputs as $proposalOutputId => $data) {
-            if (empty($proposalOutputId) || (empty($data['status']) && empty($data['book_title']))) {
-                continue;
-            }
-
-            $outputData = [
-                'progress_report_id' => $this->progressReport->id,
-                'proposal_output_id' => $proposalOutputId,
-                'status' => $data['status'] ?? null,
-                'book_title' => $data['book_title'] ?? null,
-                'publisher_name' => $data['publisher_name'] ?? null,
-                'isbn' => $data['isbn'] ?? null,
-                'publication_year' => ! empty($data['publication_year']) ? $data['publication_year'] : null,
-                'total_pages' => ! empty($data['total_pages']) ? (int) $data['total_pages'] : null,
-                'publisher_url' => $data['publisher_url'] ?? null,
-                'book_url' => $data['book_url'] ?? null,
-            ];
-
-            $additionalOutput = isset($data['id']) && $data['id']
-                ? tap(AdditionalOutput::find($data['id']))->update($outputData)
-                : AdditionalOutput::create($outputData);
-
-            if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
-                $additionalOutput->clearMediaCollection('book_document');
-                $additionalOutput
-                    ->addMedia($this->tempAdditionalFiles[$proposalOutputId]->getRealPath())
-                    ->usingName($this->tempAdditionalFiles[$proposalOutputId]->getClientOriginalName())
-                    ->usingFileName($this->tempAdditionalFiles[$proposalOutputId]->hashName())
-                    ->withCustomProperties(['uploaded_by' => auth()->id()])
-                    ->toMediaCollection('book_document');
-            }
-        }
+        session()->flash('success', 'Laporan berhasil diajukan.');
+        $this->redirect(route($this->config['route']), navigate: true);
     }
 
     public function editMandatoryOutput(int $proposalOutputId): void
     {
-        $this->editingMandatoryId = $proposalOutputId;
-        if (! isset($this->mandatoryOutputs[$proposalOutputId])) {
-            $this->mandatoryOutputs[$proposalOutputId] = $this->getEmptyMandatoryOutput();
-        }
+        $this->form->editMandatoryOutput($proposalOutputId);
     }
 
-    public function saveMandatoryOutput(): void
+    public function saveMandatoryOutput(?int $proposalOutputId = null): void
     {
-        if (! $this->editingMandatoryId) {
+        if (! $this->canEdit || ! $this->progressReport) {
             return;
         }
 
-        $this->validate([
-            "mandatoryOutputs.{$this->editingMandatoryId}.status_type" => 'required|in:published,accepted,under_review,rejected',
-            "mandatoryOutputs.{$this->editingMandatoryId}.author_status" => 'required|in:first_author,co_author,corresponding_author',
-            "mandatoryOutputs.{$this->editingMandatoryId}.journal_title" => 'required|string|max:255',
-            "mandatoryOutputs.{$this->editingMandatoryId}.article_title" => 'required|string|max:255',
-            "mandatoryOutputs.{$this->editingMandatoryId}.publication_year" => 'required|integer|between:2000,2030',
-            "mandatoryOutputs.{$this->editingMandatoryId}.issn" => 'nullable|string|max:20',
-            "mandatoryOutputs.{$this->editingMandatoryId}.eissn" => 'nullable|string|max:20',
-            "mandatoryOutputs.{$this->editingMandatoryId}.journal_url" => 'nullable|url',
-            "mandatoryOutputs.{$this->editingMandatoryId}.article_url" => 'nullable|url',
-            "mandatoryOutputs.{$this->editingMandatoryId}.doi" => 'nullable|string|max:255',
-        ]);
+        // Use editing ID if no parameter provided (for backward compatibility)
+        $proposalOutputId = $proposalOutputId ?? $this->form->editingMandatoryId;
 
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+        if (! $proposalOutputId) {
+            return;
+        }
+
+        try {
+            // Ensure form has the progress report reference
+            $this->form->progressReport = $this->progressReport;
+
+            // Transfer files from component to form
+            if (isset($this->tempMandatoryFiles[$proposalOutputId])) {
+                $this->form->tempMandatoryFiles[$proposalOutputId] = $this->tempMandatoryFiles[$proposalOutputId];
+            }
+
+            // Save via form
+            $this->form->saveMandatoryOutputWithFile($proposalOutputId);
+
+            // Clear the component's temp files
+            unset($this->tempMandatoryFiles[$proposalOutputId]);
+
+            $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
+            session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+        }
     }
 
     public function editAdditionalOutput(int $proposalOutputId): void
     {
-        $this->editingAdditionalId = $proposalOutputId;
-        if (! isset($this->additionalOutputs[$proposalOutputId])) {
-            $this->additionalOutputs[$proposalOutputId] = $this->getEmptyAdditionalOutput();
-        }
+        $this->form->editAdditionalOutput($proposalOutputId);
     }
 
-    public function saveAdditionalOutput(): void
+    public function saveAdditionalOutput(?int $proposalOutputId = null): void
     {
-        if (! $this->editingAdditionalId) {
+        if (! $this->canEdit || ! $this->progressReport) {
             return;
         }
 
-        $this->validate([
-            "additionalOutputs.{$this->editingAdditionalId}.status" => 'required|in:review,editing,published',
-            "additionalOutputs.{$this->editingAdditionalId}.book_title" => 'required|string|max:255',
-            "additionalOutputs.{$this->editingAdditionalId}.publisher_name" => 'required|string|max:255',
-            "additionalOutputs.{$this->editingAdditionalId}.isbn" => 'nullable|string|max:20',
-            "additionalOutputs.{$this->editingAdditionalId}.publication_year" => 'nullable|integer|between:2000,2030',
-            "additionalOutputs.{$this->editingAdditionalId}.total_pages" => 'nullable|integer|min:1',
-            "additionalOutputs.{$this->editingAdditionalId}.publisher_url" => 'nullable|url',
-            "additionalOutputs.{$this->editingAdditionalId}.book_url" => 'nullable|url',
-        ]);
+        // Use editing ID if no parameter provided (for backward compatibility)
+        $proposalOutputId = $proposalOutputId ?? $this->form->editingAdditionalId;
 
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
-        session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+        if (! $proposalOutputId) {
+            return;
+        }
+
+        try {
+            // Ensure form has the progress report reference
+            $this->form->progressReport = $this->progressReport;
+
+            // Transfer files from component to form
+            if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
+                $this->form->tempAdditionalFiles[$proposalOutputId] = $this->tempAdditionalFiles[$proposalOutputId];
+            }
+            if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
+                $this->form->tempAdditionalCerts[$proposalOutputId] = $this->tempAdditionalCerts[$proposalOutputId];
+            }
+
+            // Save via form
+            $this->form->saveAdditionalOutputWithFile($proposalOutputId);
+
+            // Clear the component's temp files
+            unset($this->tempAdditionalFiles[$proposalOutputId]);
+            unset($this->tempAdditionalCerts[$proposalOutputId]);
+
+            $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
+            session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+        }
     }
 
     public function closeMandatoryModal(): void
     {
-        $this->reset(['editingMandatoryId', 'mandatoryOutputs']);
+        $this->form->closeMandatoryModal();
     }
 
     public function closeAdditionalModal(): void
     {
-        $this->reset(['editingAdditionalId', 'additionalOutputs']);
+        $this->form->closeAdditionalModal();
+    }
+
+    /**
+     * Get mandatory output model for editing
+     */
+    #[\Livewire\Attributes\Computed]
+    public function mandatoryOutput(): ?MandatoryOutput
+    {
+        if (! $this->progressReport || ! $this->form->editingMandatoryId) {
+            return null;
+        }
+
+        return MandatoryOutput::where('progress_report_id', $this->progressReport->id)
+            ->where('proposal_output_id', $this->form->editingMandatoryId)
+            ->first();
+    }
+
+    /**
+     * Get additional output model for editing
+     */
+    #[\Livewire\Attributes\Computed]
+    public function additionalOutput(): ?AdditionalOutput
+    {
+        if (! $this->progressReport || ! $this->form->editingAdditionalId) {
+            return null;
+        }
+
+        return AdditionalOutput::where('progress_report_id', $this->progressReport->id)
+            ->where('proposal_output_id', $this->form->editingAdditionalId)
+            ->first();
     }
 
     public function render()
@@ -466,6 +262,8 @@ class Show extends Component
 
         return view($this->config['view'], [
             'allKeywords' => $allKeywords,
+            'editingMandatoryId' => $this->form->editingMandatoryId,
+            'editingAdditionalId' => $this->form->editingAdditionalId,
         ]);
     }
 }

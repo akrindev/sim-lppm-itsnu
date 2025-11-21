@@ -48,11 +48,15 @@ trait ReportAccess
     {
         $user = Auth::user();
 
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor'])) {
+            return true;
+        }
+
         return $this->proposal->submitter_id === $user->id
             || $this->proposal->teamMembers()
-                ->where('user_id', $user->id)
-                ->where('status', 'accepted')
-                ->exists();
+            ->where('user_id', $user->id)
+            ->where('status', 'accepted')
+            ->exists();
     }
 
     /**

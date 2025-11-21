@@ -3,8 +3,8 @@
 namespace App\Livewire\Review;
 
 use App\Models\Proposal;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -20,7 +20,7 @@ class CommunityService extends Component
 
     public function mount(): void
     {
-        if (!Auth::user()->hasRole('reviewer')) {
+        if (! Auth::user()->hasRole('reviewer')) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
     }
@@ -43,11 +43,11 @@ class CommunityService extends Component
                 'detailable',
                 'reviewers' => function ($query) {
                     $query->where('user_id', Auth::id());
-                }
+                },
             ]);
 
-        if (!empty($this->search)) {
-            $searchTerm = '%' . $this->search . '%';
+        if (! empty($this->search)) {
+            $searchTerm = '%'.$this->search.'%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
                     ->orWhereHas('submitter', function ($sq) use ($searchTerm) {
@@ -56,7 +56,7 @@ class CommunityService extends Component
             });
         }
 
-        if (!empty($this->selectedYear)) {
+        if (! empty($this->selectedYear)) {
             $query->whereYear('created_at', $this->selectedYear);
         }
 

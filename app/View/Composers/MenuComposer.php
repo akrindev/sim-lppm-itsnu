@@ -103,7 +103,27 @@ class MenuComposer
                 'title' => 'Persetujuan Dekan',
                 'icon' => 'clipboard-check',
                 'route' => 'dekan.proposals.index',
-                'roles' => ['dekan', 'dekan saintek', 'dekan dekabita'],
+                'roles' => ['dekan'],
+            ],
+            // Kepala LPPM menus
+            [
+                'title' => 'Persetujuan Awal',
+                'icon' => 'checkbox',
+                'route' => 'kepala-lppm.initial-approval',
+                'roles' => ['kepala lppm', 'rektor'],
+            ],
+            [
+                'title' => 'Persetujuan Akhir',
+                'icon' => 'circle-check',
+                'route' => 'kepala-lppm.final-decision',
+                'roles' => ['kepala lppm', 'rektor'],
+            ],
+            // Admin LPPM - Reviewer Assignment
+            [
+                'title' => 'Penugasan Reviewer',
+                'icon' => 'user-check',
+                'route' => 'admin-lppm.assign-reviewers',
+                'roles' => ['admin lppm'],
             ],
             // Reviewer menu
             [
@@ -117,6 +137,19 @@ class MenuComposer
                 'icon' => 'lifebuoy',
                 'route' => 'review.community-service',
                 'roles' => ['reviewer'],
+            ],
+            // Laporan - Reports menu
+            [
+                'title' => 'Laporan',
+                'icon' => 'file-analytics',
+                'roles' => ['admin lppm', 'rektor'],
+                'children' => [
+                    [
+                        'title' => 'Laporan Penelitian',
+                        'icon' => 'report',
+                        'route' => 'reports.research',
+                    ],
+                ],
             ],
             // kelola pengguna - admin lppm
             [

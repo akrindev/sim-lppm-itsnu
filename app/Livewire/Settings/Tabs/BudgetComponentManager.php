@@ -4,7 +4,6 @@ namespace App\Livewire\Settings\Tabs;
 
 use App\Models\BudgetComponent;
 use App\Models\BudgetGroup;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;

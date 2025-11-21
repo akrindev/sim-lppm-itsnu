@@ -20,17 +20,15 @@
 
 ### Peran Sistem (Total 9)
 
-| # | Nama Peran | Kode | Level | Perkiraan Jumlah Pengguna | Fungsi Utama |
-|---|------------|------|-------|---------------------------|--------------|
-| 1 | Super Admin | `superadmin` | Sistem | 1-2 | Administrasi TI, akses penuh |
-| 2 | Admin LPPM | `admin lppm` | Institusi | 2-5 | Manajemen operasional, koordinasi reviewer |
-| 3 | Kepala LPPM | `kepala lppm` | Institusi | 1 | Kepemimpinan strategis, persetujuan akhir |
-| 4 | Dekan | `dekan` | Fakultas | 1 per fakultas | Persetujuan tingkat pertama |
-| 5 | Dekan Saintek | `dekan saintek` | Fakultas | 1 | Persetujuan fakultas saintek |
-| 6 | Dekan Dekabita | `dekan dekabita` | Fakultas | 1 | Persetujuan fakultas desain/kom/bisnis/bahasa |
-| 7 | Dosen | `dosen` | Individu | Banyak | Pembuatan & pengajuan proposal |
-| 8 | Reviewer | `reviewer` | Pakar | Banyak | Evaluasi proposal |
-| 9 | Rektor | `rektor` | Universitas | 1 | Pengawasan strategis (jarang aktif) |
+| #   | Nama Peran  | Kode          | Level       | Perkiraan Jumlah Pengguna | Fungsi Utama                               |
+| --- | ----------- | ------------- | ----------- | ------------------------- | ------------------------------------------ |
+| 1   | Super Admin | `superadmin`  | Sistem      | 1-2                       | Administrasi TI, akses penuh               |
+| 2   | Admin LPPM  | `admin lppm`  | Institusi   | 2-5                       | Manajemen operasional, koordinasi reviewer |
+| 3   | Kepala LPPM | `kepala lppm` | Institusi   | 1                         | Kepemimpinan strategis, persetujuan akhir  |
+| 4   | Dekan       | `dekan`       | Fakultas    | 1 per fakultas            | Persetujuan tingkat pertama                |
+| 7   | Dosen       | `dosen`       | Individu    | Banyak                    | Pembuatan & pengajuan proposal             |
+| 8   | Reviewer    | `reviewer`    | Pakar       | Banyak                    | Evaluasi proposal                          |
+| 9   | Rektor      | `rektor`      | Universitas | 1                         | Pengawasan strategis (jarang aktif)        |
 
 ### Hirarki Peran
 
@@ -68,170 +66,170 @@ graph TD
 
 ### Manajemen Proposal
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Buat Proposal | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Lihat Semua Proposal | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Tugas | ✅ |
-| Lihat Detail Proposal | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik/Tim | 🔒 Tugas | ✅ |
-| Edit Draft Proposal | ✅ | ✅ | ✅ | ✅ | 🔒 Milik sendiri | ❌ | ❌ |
-| Edit Proposal Disubmit | ✅ | ✅ | ✔️ Metadata | ❌ | ❌ | ❌ | ❌ |
-| Hapus Proposal | ✅ | ✅ | ✔️ Draft | ❌ | 🔒 Draft sendiri | ❌ | ❌ |
-| Submit Proposal | ✅ | ✅ | ✅ | ✅ | 🔒 Milik sendiri | ❌ | ❌ |
-| Resubmit (Revisi) | ✅ | ✅ | ✅ | ✅ | 🔒 Milik sendiri | ❌ | ❌ |
+| Izin                   | superadmin | admin lppm | kepala lppm |   dekan*   |      dosen      | reviewer | rektor |
+| ---------------------- | :--------: | :--------: | :---------: | :--------: | :-------------: | :------: | :----: |
+| Buat Proposal          |     ✅      |     ✅      |      ✅      |     ✅      |        ✅        |    ❌     |   ❌    |
+| Lihat Semua Proposal   |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Tugas  |   ✅    |
+| Lihat Detail Proposal  |     ✅      |     ✅      |      ✅      | 🔒 Fakultas |   🔒 Milik/Tim   | 🔒 Tugas  |   ✅    |
+| Edit Draft Proposal    |     ✅      |     ✅      |      ✅      |     ✅      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Edit Proposal Disubmit |     ✅      |     ✅      | ✔️ Metadata  |     ❌      |        ❌        |    ❌     |   ❌    |
+| Hapus Proposal         |     ✅      |     ✅      |   ✔️ Draft   |     ❌      | 🔒 Draft sendiri |    ❌     |   ❌    |
+| Submit Proposal        |     ✅      |     ✅      |      ✅      |     ✅      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Resubmit (Revisi)      |     ✅      |     ✅      |      ✅      |     ✅      | 🔒 Milik sendiri |    ❌     |   ❌    |
 
-*dekan mencakup dekan, dekan saintek, dekan dekabita (skop fakultas)
+*dekan mencakup dekan
 
 ---
 
 ### Alur Persetujuan
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Persetujuan Dekan | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| Permintaan Perbaikan Tim (Dekan) | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| Persetujuan Awal Kepala LPPM | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✔️ Override |
-| Keputusan Akhir Kepala LPPM | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✔️ Override |
-| Tolak Proposal | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✔️ Strategis |
-| Tandai Selesai | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Minta Revisi | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Override Status | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✔️ Darurat |
+| Izin                             | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer |   rektor    |
+| -------------------------------- | :--------: | :--------: | :---------: | :----: | :---: | :------: | :---------: |
+| Persetujuan Dekan                |     ✅      |     ❌      |      ❌      |   ✅    |   ❌   |    ❌     |      ❌      |
+| Permintaan Perbaikan Tim (Dekan) |     ✅      |     ❌      |      ❌      |   ✅    |   ❌   |    ❌     |      ❌      |
+| Persetujuan Awal Kepala LPPM     |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     | ✔️ Override  |
+| Keputusan Akhir Kepala LPPM      |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     | ✔️ Override  |
+| Tolak Proposal                   |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     | ✔️ Strategis |
+| Tandai Selesai                   |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     |      ❌      |
+| Minta Revisi                     |     ✅      |     ❌      |      ✅      |   ❌    |   ❌   |    ❌     |      ❌      |
+| Override Status                  |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |  ✔️ Darurat  |
 
 ---
 
 ### Manajemen Tim
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Undang Anggota Tim | ✅ | ✅ | ✅ | ✅ | 🔒 Milik sendiri | ❌ | ❌ |
-| Hapus Anggota Tim | ✅ | ✅ | ✔️ Admin | ❌ | 🔒 Milik sendiri | ❌ | ❌ |
-| Terima Undangan Tim | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Tolak Undangan Tim | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Lihat Anggota Tim | ✅ | ✅ | ✅ | 🔒 Fakultas | ✅ | 🔒 Tugas | ✅ |
-| Tetapkan Tugas Tim | ✅ | ✅ | ✅ | ❌ | 🔒 Milik sendiri | ❌ | ❌ |
-| Lihat Undangan Pending | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | ❌ | ❌ |
+| Izin                   | superadmin | admin lppm | kepala lppm |   dekan*   |      dosen      | reviewer | rektor |
+| ---------------------- | :--------: | :--------: | :---------: | :--------: | :-------------: | :------: | :----: |
+| Undang Anggota Tim     |     ✅      |     ✅      |      ✅      |     ✅      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Hapus Anggota Tim      |     ✅      |     ✅      |   ✔️ Admin   |     ❌      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Terima Undangan Tim    |     ✅      |     ✅      |      ✅      |     ✅      |        ✅        |    ❌     |   ❌    |
+| Tolak Undangan Tim     |     ✅      |     ✅      |      ✅      |     ✅      |        ✅        |    ❌     |   ❌    |
+| Lihat Anggota Tim      |     ✅      |     ✅      |      ✅      | 🔒 Fakultas |        ✅        | 🔒 Tugas  |   ✅    |
+| Tetapkan Tugas Tim     |     ✅      |     ✅      |      ✅      |     ❌      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Lihat Undangan Pending |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri |    ❌     |   ❌    |
 
 ---
 
 ### Manajemen Review
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Tugaskan Reviewer | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Hapus Reviewer | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Lihat Penugasan Reviewer | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Milik sendiri | ✅ |
-| Submit Review | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| Edit Review Sendiri | ✅ | ❌ | ❌ | ❌ | ❌ | ✔️ Sebelum Submit | ❌ |
-| Lihat Semua Review | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Milik sendiri | ✅ |
-| Lihat Catatan Review | ✅ | ✅ | ✅ | ❌ | 🔒 Milik sendiri | 🔒 Milik sendiri | ✅ |
-| Lihat Ringkasan Review | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | ❌ | ✅ |
+| Izin                     | superadmin | admin lppm | kepala lppm |   dekan*   |      dosen      |     reviewer     | rektor |
+| ------------------------ | :--------: | :--------: | :---------: | :--------: | :-------------: | :--------------: | :----: |
+| Tugaskan Reviewer        |     ✅      |     ✅      |   ✔️ Lihat   |     ❌      |        ❌        |        ❌         |   ❌    |
+| Hapus Reviewer           |     ✅      |     ✅      |      ❌      |     ❌      |        ❌        |        ❌         |   ❌    |
+| Lihat Penugasan Reviewer |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Milik sendiri  |   ✅    |
+| Submit Review            |     ✅      |     ❌      |      ❌      |     ❌      |        ❌        |        ✅         |   ❌    |
+| Edit Review Sendiri      |     ✅      |     ❌      |      ❌      |     ❌      |        ❌        | ✔️ Sebelum Submit |   ❌    |
+| Lihat Semua Review       |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Milik sendiri  |   ✅    |
+| Lihat Catatan Review     |     ✅      |     ✅      |      ✅      |     ❌      | 🔒 Milik sendiri | 🔒 Milik sendiri  |   ✅    |
+| Lihat Ringkasan Review   |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri |        ❌         |   ✅    |
 
 ---
 
 ### Manajemen Anggaran
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Tambah Item Anggaran | ✅ | ✅ | ✅ | ✅ | 🔒 Draft sendiri | ❌ | ❌ |
-| Edit Item Anggaran | ✅ | ✅ | ✔️ Admin | ❌ | 🔒 Draft sendiri | ❌ | ❌ |
-| Hapus Item Anggaran | ✅ | ✅ | ✔️ Admin | ❌ | 🔒 Draft sendiri | ❌ | ❌ |
-| Lihat Detail Anggaran | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik/Tim | 🔒 Tugas | ✅ |
-| Ekspor Ringkasan Anggaran | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | ❌ | ✅ |
-| Setujui Anggaran | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ✔️ Strategis |
+| Izin                      | superadmin | admin lppm | kepala lppm |   dekan*   |      dosen      | reviewer |   rektor    |
+| ------------------------- | :--------: | :--------: | :---------: | :--------: | :-------------: | :------: | :---------: |
+| Tambah Item Anggaran      |     ✅      |     ✅      |      ✅      |     ✅      | 🔒 Draft sendiri |    ❌     |      ❌      |
+| Edit Item Anggaran        |     ✅      |     ✅      |   ✔️ Admin   |     ❌      | 🔒 Draft sendiri |    ❌     |      ❌      |
+| Hapus Item Anggaran       |     ✅      |     ✅      |   ✔️ Admin   |     ❌      | 🔒 Draft sendiri |    ❌     |      ❌      |
+| Lihat Detail Anggaran     |     ✅      |     ✅      |      ✅      | 🔒 Fakultas |   🔒 Milik/Tim   | 🔒 Tugas  |      ✅      |
+| Ekspor Ringkasan Anggaran |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri |    ❌     |      ✅      |
+| Setujui Anggaran          |     ✅      |     ❌      |      ✅      |     ✅      |        ❌        |    ❌     | ✔️ Strategis |
 
 ---
 
 ### Pelaporan Progres
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Buat Laporan Kemajuan | ✅ | ✅ | ✅ | ✅ | 🔒 Milik sendiri | ❌ | ❌ |
-| Submit Laporan Kemajuan | ✅ | ✅ | ✅ | ✅ | 🔒 Milik sendiri | ❌ | ❌ |
-| Edit Draft Laporan | ✅ | ✅ | ✅ | ❌ | 🔒 Milik sendiri | ❌ | ❌ |
-| Setujui Laporan Kemajuan | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Lihat Semua Laporan | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | ❌ | ✅ |
-| Lihat Detail Laporan | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik/Tim | ❌ | ✅ |
-| Tambah Luaran Wajib | ✅ | ✅ | ✅ | ❌ | 🔒 Milik sendiri | ❌ | ❌ |
-| Tambah Luaran Tambahan | ✅ | ✅ | ✅ | ❌ | 🔒 Milik sendiri | ❌ | ❌ |
+| Izin                     | superadmin | admin lppm | kepala lppm |   dekan*   |      dosen      | reviewer | rektor |
+| ------------------------ | :--------: | :--------: | :---------: | :--------: | :-------------: | :------: | :----: |
+| Buat Laporan Kemajuan    |     ✅      |     ✅      |      ✅      |     ✅      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Submit Laporan Kemajuan  |     ✅      |     ✅      |      ✅      |     ✅      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Edit Draft Laporan       |     ✅      |     ✅      |      ✅      |     ❌      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Setujui Laporan Kemajuan |     ✅      |     ✅      |      ✅      |     ❌      |        ❌        |    ❌     |   ❌    |
+| Lihat Semua Laporan      |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri |    ❌     |   ✅    |
+| Lihat Detail Laporan     |     ✅      |     ✅      |      ✅      | 🔒 Fakultas |   🔒 Milik/Tim   |    ❌     |   ✅    |
+| Tambah Luaran Wajib      |     ✅      |     ✅      |      ✅      |     ❌      | 🔒 Milik sendiri |    ❌     |   ❌    |
+| Tambah Luaran Tambahan   |     ✅      |     ✅      |      ✅      |     ❌      | 🔒 Milik sendiri |    ❌     |   ❌    |
 
 ---
 
 ### Manajemen Data Master
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Kelola Focus Areas | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Themes | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Topics | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Keywords | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Research Schemes | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola National Priorities | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Science Clusters | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Budget Groups | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Budget Components | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Kelola Partners | ✅ | ✅ | ✔️ Lihat | ❌ | ✔️ Lihat | ❌ | ❌ |
-| Kelola Faculties | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Kelola Study Programs | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Kelola Institutions | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Kelola Macro Research Groups | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
+| Izin                         | superadmin | admin lppm | kepala lppm | dekan* |  dosen  | reviewer | rektor |
+| ---------------------------- | :--------: | :--------: | :---------: | :----: | :-----: | :------: | :----: |
+| Kelola Focus Areas           |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Themes                |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Topics                |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Keywords              |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Research Schemes      |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola National Priorities   |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Science Clusters      |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Budget Groups         |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Budget Components     |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Partners              |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    | ✔️ Lihat |    ❌     |   ❌    |
+| Kelola Faculties             |     ✅      |     ✅      |      ❌      |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Study Programs        |     ✅      |     ✅      |      ❌      |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Institutions          |     ✅      |     ✅      |      ❌      |   ❌    |    ❌    |    ❌     |   ❌    |
+| Kelola Macro Research Groups |     ✅      |     ✅      |   ✔️ Lihat   |   ❌    |    ❌    |    ❌     |   ❌    |
 
 ---
 
 ### Manajemen Pengguna
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Buat Pengguna | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Edit Pengguna | ✅ | ✅ | ❌ | ❌ | 🔒 Profil sendiri | ❌ | ❌ |
-| Hapus Pengguna | ✅ | ✔️ Dosen/Reviewer | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Tetapkan Peran | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Cabut Peran | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Lihat Semua Pengguna | ✅ | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ |
-| Lihat Detail Pengguna | ✅ | ✅ | ✔️ Terbatas | ❌ | 🔒 Milik sendiri | ❌ | ❌ |
-| Edit Profil Sendiri | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Ganti Password Sendiri | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Aktifkan 2FA | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Reset Password Pengguna | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Izin                    | superadmin |    admin lppm    | kepala lppm | dekan* |      dosen       | reviewer | rektor |
+| ----------------------- | :--------: | :--------------: | :---------: | :----: | :--------------: | :------: | :----: |
+| Buat Pengguna           |     ✅      |        ✅         |      ❌      |   ❌    |        ❌         |    ❌     |   ❌    |
+| Edit Pengguna           |     ✅      |        ✅         |      ❌      |   ❌    | 🔒 Profil sendiri |    ❌     |   ❌    |
+| Hapus Pengguna          |     ✅      | ✔️ Dosen/Reviewer |      ❌      |   ❌    |        ❌         |    ❌     |   ❌    |
+| Tetapkan Peran          |     ✅      |        ✅         |      ❌      |   ❌    |        ❌         |    ❌     |   ❌    |
+| Cabut Peran             |     ✅      |        ✅         |      ❌      |   ❌    |        ❌         |    ❌     |   ❌    |
+| Lihat Semua Pengguna    |     ✅      |        ✅         |   ✔️ Lihat   |   ❌    |        ❌         |    ❌     |   ❌    |
+| Lihat Detail Pengguna   |     ✅      |        ✅         | ✔️ Terbatas  |   ❌    | 🔒 Milik sendiri  |    ❌     |   ❌    |
+| Edit Profil Sendiri     |     ✅      |        ✅         |      ✅      |   ✅    |        ✅         |    ✅     |   ✅    |
+| Ganti Password Sendiri  |     ✅      |        ✅         |      ✅      |   ✅    |        ✅         |    ✅     |   ✅    |
+| Aktifkan 2FA            |     ✅      |        ✅         |      ✅      |   ✅    |        ✅         |    ✅     |   ✅    |
+| Reset Password Pengguna |     ✅      |        ✅         |      ❌      |   ❌    |        ❌         |    ❌     |   ❌    |
 
 ---
 
 ### Laporan & Analitik
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Lihat Dashboard | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Milik sendiri | ✅ |
-| Lihat Statistik Proposal | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | ❌ | ✅ |
-| Hasilkan Laporan | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | ❌ | ✅ |
-| Ekspor Data (CSV/Excel) | ✅ | ✅ | ✅ | 🔒 Fakultas | 🔒 Milik sendiri | ❌ | ✅ |
-| Lihat Analitik Sistem | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
-| Lihat Statistik Review | ✅ | ✅ | ✅ | 🔒 Fakultas | ❌ | 🔒 Milik sendiri | ✅ |
-| Lihat Perbandingan Fakultas | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Izin                        | superadmin | admin lppm | kepala lppm |   dekan*   |      dosen      |    reviewer     | rektor |
+| --------------------------- | :--------: | :--------: | :---------: | :--------: | :-------------: | :-------------: | :----: |
+| Lihat Dashboard             |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri | 🔒 Milik sendiri |   ✅    |
+| Lihat Statistik Proposal    |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri |        ❌        |   ✅    |
+| Hasilkan Laporan            |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri |        ❌        |   ✅    |
+| Ekspor Data (CSV/Excel)     |     ✅      |     ✅      |      ✅      | 🔒 Fakultas | 🔒 Milik sendiri |        ❌        |   ✅    |
+| Lihat Analitik Sistem       |     ✅      |     ✅      |      ✅      |     ❌      |        ❌        |        ❌        |   ✅    |
+| Lihat Statistik Review      |     ✅      |     ✅      |      ✅      | 🔒 Fakultas |        ❌        | 🔒 Milik sendiri |   ✅    |
+| Lihat Perbandingan Fakultas |     ✅      |     ✅      |      ✅      |     ❌      |        ❌        |        ❌        |   ✅    |
 
 ---
 
 ### Notifikasi
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Lihat Notifikasi Sendiri | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Tandai Dibaca | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Hapus Notifikasi | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Kirim Notifikasi Manual | ✅ | ✅ | ✔️ Terbatas | ❌ | ❌ | ❌ | ❌ |
-| Atur Preferensi Notifikasi | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Lihat Log Semua Notifikasi | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Izin                       | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
+| -------------------------- | :--------: | :--------: | :---------: | :----: | :---: | :------: | :----: |
+| Lihat Notifikasi Sendiri   |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| Tandai Dibaca              |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| Hapus Notifikasi           |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| Kirim Notifikasi Manual    |     ✅      |     ✅      | ✔️ Terbatas  |   ❌    |   ❌   |    ❌     |   ❌    |
+| Atur Preferensi Notifikasi |     ✅      |     ✅      |      ✅      |   ✅    |   ✅   |    ✅     |   ✅    |
+| Lihat Log Semua Notifikasi |     ✅      |     ✅      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
 
 ---
 
 ### Administrasi Sistem
 
-| Izin | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
-|------|:----------:|:----------:|:-----------:|:------:|:-----:|:--------:|:------:|
-| Akses Telescope | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Lihat Log Sistem | ✅ | ✔️ Terbatas | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Jalankan Artisan | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Kelola Basis Data | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Konfigurasi Sistem | ✅ | ✔️ Terbatas | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Lihat Antrian Pekerjaan | ✅ | ✔️ Lihat | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Bersihkan Cache | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Izin                    | superadmin | admin lppm | kepala lppm | dekan* | dosen | reviewer | rektor |
+| ----------------------- | :--------: | :--------: | :---------: | :----: | :---: | :------: | :----: |
+| Akses Telescope         |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| Lihat Log Sistem        |     ✅      | ✔️ Terbatas |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| Jalankan Artisan        |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| Kelola Basis Data       |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| Konfigurasi Sistem      |     ✅      | ✔️ Terbatas |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| Lihat Antrian Pekerjaan |     ✅      |  ✔️ Lihat   |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
+| Bersihkan Cache         |     ✅      |     ❌      |      ❌      |   ❌    |   ❌   |    ❌     |   ❌    |
 
 ---
 
@@ -318,7 +316,7 @@ graph TD
 
 ---
 
-### 4. Dekan / Dekan Saintek / Dekan Dekabita
+### 4. Dekan 
 
 **Tujuan:** Persetujuan tingkat fakultas & pengawasan  
 **Level Akses:** Skop fakultas sendiri
@@ -330,7 +328,7 @@ graph TD
 - Minta perbaikan tim bila diperlukan (SUBMITTED → NEED_ASSIGNMENT)
 
 **Varian Peran:**
-- Dekan (umum), Dekan Saintek (sains & teknologi), Dekan Dekabita (desain/kom/bisnis/bahasa)
+- Dekan
 
 **Izin Kritis:**
 - ✅ Setujui proposal lingkup fakultas
@@ -411,14 +409,14 @@ graph TD
 
 ### Definisi Cakupan Akses
 
-| Skop | Deskripsi | Berlaku Untuk |
-|------|-----------|---------------|
-| Sistem | Akses tanpa batas | superadmin |
-| Institusi | Semua fakultas & proposal | admin lppm, kepala lppm, rektor |
-| Fakultas | Hanya proposal fakultas sendiri | dekan (termasuk saintek/dekabita) |
-| Tim | Proposal milik sendiri + keanggotaan | dosen |
-| Penugasan | Hanya proposal yang ditugaskan | reviewer |
-| Pribadi | Data & aktivitas pribadi | semua peran |
+| Skop      | Deskripsi                            | Berlaku Untuk                     |
+| --------- | ------------------------------------ | --------------------------------- |
+| Sistem    | Akses tanpa batas                    | superadmin                        |
+| Institusi | Semua fakultas & proposal            | admin lppm, kepala lppm, rektor   |
+| Fakultas  | Hanya proposal fakultas sendiri      | dekan (termasuk saintek/dekabita) |
+| Tim       | Proposal milik sendiri + keanggotaan | dosen                             |
+| Penugasan | Hanya proposal yang ditugaskan       | reviewer                          |
+| Pribadi   | Data & aktivitas pribadi             | semua peran                       |
 
 ### Contoh Penyaringan Query per Peran
 
@@ -427,7 +425,7 @@ if ($user->hasRole('superadmin')) {
     $proposals = Proposal::all();
 } elseif ($user->hasRole(['admin lppm', 'kepala lppm', 'rektor'])) {
     $proposals = Proposal::all();
-} elseif ($user->hasRole(['dekan', 'dekan saintek', 'dekan dekabita'])) {
+} elseif ($user->hasRole(['dekan'])) {
     $facultyId = $user->identity->faculty_id;
     $proposals = Proposal::whereHas('submitter.identity', function($q) use ($facultyId) {
         $q->where('faculty_id', $facultyId);
@@ -449,7 +447,7 @@ if ($user->hasRole('superadmin')) {
 ```php
 public function canApprove(User $user, Proposal $proposal): bool
 {
-    if ($user->hasRole(['dekan', 'dekan saintek', 'dekan dekabita'])) {
+    if ($user->hasRole(['dekan'])) {
         return $proposal->status === ProposalStatus::SUBMITTED
             && $user->identity->faculty_id === $proposal->submitter->identity->faculty_id;
     }
@@ -513,15 +511,15 @@ public function hasRole($role, $guard = null): bool
 
 ## Tabel Ringkas: Siapa Melakukan Apa
 
-| Aksi | Pelaksana | Prasyarat | Notifikasi Ke |
-|------|-----------|-----------|---------------|
-| Buat Proposal | Dosen | - | - |
-| Submit Proposal | Dosen | Semua tim menerima | Dekan, Admin, Tim |
-| Persetujuan Dekan | Dekan | Status = SUBMITTED | Kepala, Pengusul, Tim |
-| Persetujuan Awal Kepala | Kepala LPPM | Status = APPROVED | Admin LPPM |
-| Penugasan Reviewer | Admin LPPM | Status = UNDER_REVIEW | Reviewer |
-| Submit Review | Reviewer | Ditugaskan | Admin (tiap review), Kepala (semua selesai) |
-| Keputusan Akhir | Kepala LPPM | Status = REVIEWED | Pengusul, Tim, Dekan |
+| Aksi                    | Pelaksana   | Prasyarat             | Notifikasi Ke                               |
+| ----------------------- | ----------- | --------------------- | ------------------------------------------- |
+| Buat Proposal           | Dosen       | -                     | -                                           |
+| Submit Proposal         | Dosen       | Semua tim menerima    | Dekan, Admin, Tim                           |
+| Persetujuan Dekan       | Dekan       | Status = SUBMITTED    | Kepala, Pengusul, Tim                       |
+| Persetujuan Awal Kepala | Kepala LPPM | Status = APPROVED     | Admin LPPM                                  |
+| Penugasan Reviewer      | Admin LPPM  | Status = UNDER_REVIEW | Reviewer                                    |
+| Submit Review           | Reviewer    | Ditugaskan            | Admin (tiap review), Kepala (semua selesai) |
+| Keputusan Akhir         | Kepala LPPM | Status = REVIEWED     | Pengusul, Tim, Dekan                        |
 
 ---
 

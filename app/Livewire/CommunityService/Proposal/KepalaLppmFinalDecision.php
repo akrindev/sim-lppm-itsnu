@@ -145,7 +145,7 @@ class KepalaLppmFinalDecision extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: '.$e->getMessage());
         }
     }
 

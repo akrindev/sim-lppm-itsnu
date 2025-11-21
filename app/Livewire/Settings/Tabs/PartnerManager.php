@@ -3,7 +3,6 @@
 namespace App\Livewire\Settings\Tabs;
 
 use App\Models\Partner;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;

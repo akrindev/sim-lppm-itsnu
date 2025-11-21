@@ -93,7 +93,7 @@ class KepalaLppmInitialApproval extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Terjadi kesalahan saat menyetujui proposal: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat menyetujui proposal: '.$e->getMessage());
         }
     }
 

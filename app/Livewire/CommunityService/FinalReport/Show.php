@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\CommunityService\FinalReport;
 
 use App\Enums\ProposalStatus;
-use App\Livewire\Forms\CommunityServiceFinalReportForm;
+use App\Livewire\Forms\ReportForm;
 use App\Livewire\Traits\HasFileUploads;
+use App\Livewire\Traits\ManagesOutputs;
 use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Models\Keyword;
@@ -19,12 +20,13 @@ use Livewire\WithFileUploads;
 class Show extends Component
 {
     use HasFileUploads;
+    use ManagesOutputs;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
 
     // Form instance - Livewire v3 Form pattern
-    public CommunityServiceFinalReportForm $form;
+    public ReportForm $form;
 
     /**
      * Mount the component
@@ -44,15 +46,22 @@ class Show extends Component
         // Load existing final report
         $this->progressReport = $proposal->progressReports()->finalReports()->latest()->first();
 
+        if (! $this->progressReport) {
+            $this->progressReport = $proposal->progressReports()->latest()->first();
+        }
+
         // Initialize Livewire Form
+        $this->form->type = 'final';
         $this->form->initWithProposal($this->proposal);
 
         if ($this->progressReport) {
             // Load existing report data into form
             $this->form->setReport($this->progressReport);
+            $this->loadExistingReport($this->progressReport);
         } else {
             // Initialize new report structure
             $this->form->initializeNewReport();
+            $this->initializeNewReport($this->proposal);
         }
     }
 
@@ -86,7 +95,7 @@ class Show extends Component
             // Let Livewire handle validation errors
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan laporan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan laporan: '.$e->getMessage());
         }
     }
 
@@ -123,7 +132,7 @@ class Show extends Component
     protected function saveOutputFiles($report): void
     {
         // Save mandatory output files
-        foreach ($this->form->mandatoryOutputs as $proposalOutputId => $data) {
+        foreach ($this->mandatoryOutputs as $proposalOutputId => $data) {
             if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
                 continue;
             }
@@ -137,13 +146,13 @@ class Show extends Component
                 ->where('proposal_output_id', $proposalOutputId)
                 ->first();
 
-            if ($mandatoryOutput && isset($this->tempMandatoryFiles[$proposalOutputId])) {
+            if ($mandatoryOutput) {
                 $this->saveMandatoryOutputFile($mandatoryOutput, $proposalOutputId, 'final');
             }
         }
 
         // Save additional output files
-        foreach ($this->form->additionalOutputs as $proposalOutputId => $data) {
+        foreach ($this->additionalOutputs as $proposalOutputId => $data) {
             if (empty($proposalOutputId) || (! is_string($proposalOutputId) && ! is_numeric($proposalOutputId))) {
                 continue;
             }
@@ -158,18 +167,14 @@ class Show extends Component
                 ->first();
 
             if ($additionalOutput) {
-                if (isset($this->tempAdditionalFiles[$proposalOutputId])) {
-                    $this->saveAdditionalOutputFile($additionalOutput, $proposalOutputId, 'final');
-                }
-                if (isset($this->tempAdditionalCerts[$proposalOutputId])) {
-                    $this->saveAdditionalOutputCert($additionalOutput, $proposalOutputId, 'final');
-                }
+                $this->saveAdditionalOutputFile($additionalOutput, $proposalOutputId, 'final');
+                $this->saveAdditionalOutputCert($additionalOutput, $proposalOutputId, 'final');
             }
         }
     }
 
     /**
-     * Handle substance file upload (real-time validation)
+     * Handle substance file upload (real-time)
      */
     public function updatedSubstanceFile(): void
     {
@@ -179,11 +184,12 @@ class Show extends Component
             return;
         }
 
+        // Validate file
         $this->validateSubstanceFile();
     }
 
     /**
-     * Handle realization file upload (real-time validation)
+     * Handle realization file upload (real-time)
      */
     public function updatedRealizationFile(): void
     {
@@ -193,11 +199,12 @@ class Show extends Component
             return;
         }
 
+        // Validate file
         $this->validateRealizationFile();
     }
 
     /**
-     * Handle presentation file upload (real-time validation)
+     * Handle presentation file upload (real-time)
      */
     public function updatedPresentationFile(): void
     {
@@ -207,55 +214,8 @@ class Show extends Component
             return;
         }
 
+        // Validate file
         $this->validatePresentationFile();
-    }
-
-    /**
-     * Handle mandatory output file upload (real-time validation)
-     */
-    public function updatedTempMandatoryFiles(): void
-    {
-        if (! $this->canEdit) {
-            return;
-        }
-
-        foreach ($this->tempMandatoryFiles as $proposalOutputId => $file) {
-            $this->validate([
-                "tempMandatoryFiles.{$proposalOutputId}" => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-            ]);
-        }
-    }
-
-    /**
-     * Handle additional output file upload (real-time validation)
-     */
-    public function updatedTempAdditionalFiles(): void
-    {
-        if (! $this->canEdit) {
-            return;
-        }
-
-        foreach ($this->tempAdditionalFiles as $proposalOutputId => $file) {
-            $this->validate([
-                "tempAdditionalFiles.{$proposalOutputId}" => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-            ]);
-        }
-    }
-
-    /**
-     * Handle additional output certificate upload (real-time validation)
-     */
-    public function updatedTempAdditionalCerts(): void
-    {
-        if (! $this->canEdit) {
-            return;
-        }
-
-        foreach ($this->tempAdditionalCerts as $proposalOutputId => $file) {
-            $this->validate([
-                "tempAdditionalCerts.{$proposalOutputId}" => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            ]);
-        }
     }
 
     /**
@@ -304,110 +264,48 @@ class Show extends Component
     }
 
     /**
-     * Edit mandatory output - open modal
-     */
-    public function editMandatoryOutput(int $proposalOutputId): void
-    {
-        $this->form->editMandatoryOutput($proposalOutputId);
-    }
-
-    /**
-     * Save mandatory output (journal article)
+     * Save mandatory output after validation
      */
     public function saveMandatoryOutput(int $proposalOutputId): void
     {
-        if (! $this->canEdit) {
-            abort(403);
-        }
-
-        if (! $this->progressReport) {
-            session()->flash('error', 'Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
-
-            return;
-        }
-
-        try {
-            // Ensure form has the progress report reference
-            $this->form->progressReport = $this->progressReport;
-
-            // Save via form
-            $this->form->saveMandatoryOutputWithFile($proposalOutputId);
-
-            session()->flash('success', 'Data luaran wajib berhasil disimpan.');
-            $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-        } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
-        }
+        $this->form->saveMandatoryOutput($proposalOutputId);
+        $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
+        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
     }
 
     /**
-     * Edit additional output - open modal
-     */
-    public function editAdditionalOutput(int $proposalOutputId): void
-    {
-        $this->form->editAdditionalOutput($proposalOutputId);
-    }
-
-    /**
-     * Save additional output (book)
+     * Save additional output after validation
      */
     public function saveAdditionalOutput(int $proposalOutputId): void
     {
-        if (! $this->canEdit) {
-            abort(403);
-        }
-
-        if (! $this->progressReport) {
-            session()->flash('error', 'Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
-
-            return;
-        }
-
-        try {
-            // Ensure form has the progress report reference
-            $this->form->progressReport = $this->progressReport;
-
-            // Save via form
-            $this->form->saveAdditionalOutputWithFile($proposalOutputId);
-
-            session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
-            $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
-        } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
-        }
+        $this->form->saveAdditionalOutput($proposalOutputId);
+        $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
+        session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
     }
 
     /**
-     * Close mandatory modal
+     * Validate mandatory output
      */
-    public function closeMandatoryModal(): void
+    public function validateMandatoryOutput(int $proposalOutputId): void
     {
-        $this->form->closeMandatoryModal();
+        $this->form->validateMandatoryOutput($proposalOutputId);
     }
 
     /**
-     * Close additional modal
+     * Validate additional output
      */
-    public function closeAdditionalModal(): void
+    public function validateAdditionalOutput(int $proposalOutputId): void
     {
-        $this->form->closeAdditionalModal();
+        $this->form->validateAdditionalOutput($proposalOutputId);
     }
 
     /**
-     * Get all keywords for the view
-     */
-    public function getAllKeywords(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Keyword::orderBy('name')->get();
-    }
-
-    /**
-     * Get mandatory output model by proposal output ID
+     * Get mandatory output model for editing
      */
     #[Computed]
     public function mandatoryOutput(): ?\App\Models\MandatoryOutput
     {
-        if (!$this->progressReport || !$this->form->editingMandatoryId) {
+        if (! $this->progressReport || ! $this->form->editingMandatoryId) {
             return null;
         }
 
@@ -417,18 +315,26 @@ class Show extends Component
     }
 
     /**
-     * Get additional output model by proposal output ID
+     * Get additional output model for editing
      */
     #[Computed]
     public function additionalOutput(): ?\App\Models\AdditionalOutput
     {
-        if (!$this->progressReport || !$this->form->editingAdditionalId) {
+        if (! $this->progressReport || ! $this->form->editingAdditionalId) {
             return null;
         }
 
         return \App\Models\AdditionalOutput::where('progress_report_id', $this->progressReport->id)
             ->where('proposal_output_id', $this->form->editingAdditionalId)
             ->first();
+    }
+
+    /**
+     * Get all keywords for the view
+     */
+    public function getAllKeywords(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Keyword::orderBy('name')->get();
     }
 
     /**

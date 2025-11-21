@@ -103,6 +103,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('community-service', ReviewCommunityService::class)->name('community-service');
     });
 
+    // Kepala LPPM Routes
+    Route::middleware(['role:kepala lppm|rektor'])->prefix('kepala-lppm')->name('kepala-lppm.')->group(function () {
+        Route::get('persetujuan-awal', \App\Livewire\KepalaLppm\InitialApproval::class)->name('initial-approval');
+        Route::get('persetujuan-akhir', \App\Livewire\KepalaLppm\FinalDecision::class)->name('final-decision');
+    });
+
+    // Admin LPPM Routes
+    Route::middleware(['role:admin lppm'])->prefix('admin-lppm')->name('admin-lppm.')->group(function () {
+        Route::get('penugasan-reviewer', \App\Livewire\AdminLppm\ReviewerAssignment::class)->name('assign-reviewers');
+    });
+
     Route::get('settings', SettingsIndex::class)
         ->middleware(['auth', 'verified'])
         ->name('settings');

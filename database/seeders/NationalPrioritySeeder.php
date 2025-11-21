@@ -8,7 +8,7 @@ class NationalPrioritySeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * 
+     *
      * Based on Prioritas Riset Nasional (PRN) 2024-2025
      * Reference: Perpres No. 38 Tahun 2018 - Rencana Induk Riset Nasional 2017-2045
      * Total: 49 specific innovation research agendas under 9 focus areas
