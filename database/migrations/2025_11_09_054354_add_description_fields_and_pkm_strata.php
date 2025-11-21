@@ -29,7 +29,9 @@ return new class extends Migration
 
         // Modify strata enum to include PKM
         // Note: Laravel doesn't support modifying enums directly, so we use raw SQL
-        DB::statement("ALTER TABLE research_schemes MODIFY COLUMN strata ENUM('Dasar', 'Terapan', 'Pengembangan', 'PKM') COMMENT 'Strata Penelitian/PKM'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE research_schemes MODIFY COLUMN strata ENUM('Dasar', 'Terapan', 'Pengembangan', 'PKM') COMMENT 'Strata Penelitian/PKM'");
+        }
     }
 
     /**
@@ -47,6 +49,8 @@ return new class extends Migration
         });
 
         // Revert strata enum back to original
-        DB::statement("ALTER TABLE research_schemes MODIFY COLUMN strata ENUM('Dasar', 'Terapan', 'Pengembangan') COMMENT 'Strata Penelitian'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE research_schemes MODIFY COLUMN strata ENUM('Dasar', 'Terapan', 'Pengembangan') COMMENT 'Strata Penelitian'");
+        }
     }
 };
