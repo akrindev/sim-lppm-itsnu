@@ -31,10 +31,6 @@ trait ReportAuthorization
     {
         $user = Auth::user();
 
-        return $proposal->submitter_id === $user->id
-            || $proposal->teamMembers()
-            ->where('user_id', $user->id)
-            ->where('status', 'accepted')
-            ->exists();
+        return $proposal->submitter_id === $user->id;
     }
 }
