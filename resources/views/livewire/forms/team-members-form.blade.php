@@ -3,7 +3,7 @@
     @if (!empty($members))
         <div class="mb-4">
             <div class="table-responsive">
-                <table class="table table-hover table-sm">
+                <table class="table-hover table-sm table">
                     <thead class="table-light">
                         <tr>
                             <th>NAMA / NIDN</th>
@@ -18,6 +18,10 @@
                                 <td class="align-middle">
                                     {{ $member['name'] }}<br />
                                     <small class="text-muted"><code>{{ $member['nidn'] }}</code></small>
+                                    @if (!empty($member['sinta_id']))
+                                        <br /><small class="text-muted">Sinta ID:
+                                            <code>{{ $member['sinta_id'] }}</code></small>
+                                    @endif
                                 </td>
                                 <td class="align-middle">{{ $member['tugas'] }}</td>
                                 <td class="align-middle">
@@ -51,7 +55,7 @@
     </button>
 
     @error('members')
-        <div class="d-block mt-2 text-danger">{{ $message }}</div>
+        <div class="d-block text-danger mt-2">{{ $message }}</div>
     @enderror
 
     <!-- Add Member Modal -->
@@ -75,7 +79,7 @@
                 </div>
 
                 @if ($memberFound && $foundMember)
-                    <div class="mb-3 alert alert-success">
+                    <div class="alert alert-success mb-3">
 
                         <div class="alert-icon">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/check -->
@@ -86,8 +90,8 @@
                             </svg>
                         </div>
 
-                        <dl class="mb-0 row g-2 small">
-                            <div class="mb-2 col-12"><strong>Anggota Ditemukan:</strong></div> <br>
+                        <dl class="row g-2 small mb-0">
+                            <div class="col-12 mb-2"><strong>Anggota Ditemukan:</strong></div> <br>
                             <dt class="text-bold col-12 col-sm-4">Nama</dt>
                             <dd class="col-12 col-sm-8">{{ $foundMember['name'] }}</dd>
 
@@ -108,6 +112,11 @@
 
                             <dt class="text-bold col-12 col-sm-4">Tipe Identitas</dt>
                             <dd class="col-12 col-sm-8">{{ $foundMember['identity_type'] }}</dd>
+
+                            @if (!empty($foundMember['sinta_id']))
+                                <dt class="text-bold col-12 col-sm-4">Sinta ID</dt>
+                                <dd class="col-12 col-sm-8">{{ $foundMember['sinta_id'] }}</dd>
+                            @endif
                         </dl>
                     </div>
                 @endif
@@ -157,7 +166,7 @@
                                 Apakah Anda yakin ingin menghapus <strong>{{ $member['name'] }}</strong> dari daftar
                                 {{ strtolower($memberLabel) }}?
                             </p>
-                            <p class="mb-0 text-danger small">
+                            <p class="text-danger small mb-0">
                                 Tindakan ini tidak dapat dibatalkan.
                             </p>
                         </div>

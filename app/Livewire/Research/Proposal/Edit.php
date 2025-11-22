@@ -52,10 +52,10 @@ class Edit extends Component
         }
 
         // Set author name
-        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
+        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
 
         // Generate a unique, stable component ID for this instance
-        $this->componentId = 'lwc-'.Str::random(10);
+        $this->componentId = 'lwc-' . Str::random(10);
 
         // Load proposal data into form
         $this->form->setProposal($proposal);
@@ -84,7 +84,7 @@ class Edit extends Component
 
             $this->redirect(route('research.proposal.show', $this->form->proposal), navigate: true);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal memperbarui proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal memperbarui proposal: ' . $e->getMessage());
         }
     }
 
@@ -177,13 +177,20 @@ class Edit extends Component
                 'form.cluster_level1_id' => 'required|exists:science_clusters,id',
                 'form.summary' => 'required|string|min:100',
                 'form.author_tasks' => 'required',
+                'form.members' => 'required|array|min:1',
             ]),
             2 => $this->validate([
-                'form.macro_research_group_id' => 'nullable|exists:macro_research_groups,id',
+                'form.macro_research_group_id' => 'required|exists:macro_research_groups,id',
                 'form.substance_file' => 'nullable|file|mimes:pdf|max:10240',
+                'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                    $hasWajib = collect($value)->contains('category', 'Wajib');
+                    if (!$hasWajib) {
+                        $fail('Harus ada setidaknya satu luaran dengan kategori Wajib.');
+                    }
+                }],
             ]),
             3 => $this->validate([
-                'form.budget_items' => 'nullable|array',
+                'form.budget_items' => 'required|array|min:1',
             ]),
             4 => $this->validate([
                 'form.partner_ids' => 'nullable|array',
@@ -231,12 +238,27 @@ class Edit extends Component
         $this->form->budget_items = array_values($this->form->budget_items);
     }
 
-    public function calculateTotal(int $index): void
+    public function updated($property, $value): void
     {
-        $item = &$this->form->budget_items[$index];
-        $volume = floatval($item['volume'] ?? 0);
-        $unitPrice = floatval($item['unit_price'] ?? 0);
-        $item['total'] = $volume * $unitPrice;
+        // Handle budget items updates
+        if (Str::startsWith($property, 'form.budget_items.')) {
+            $parts = explode('.', $property);
+            // form.budget_items.0.budget_component_id
+            if (count($parts) === 4) {
+                $index = (int) $parts[2];
+                $field = $parts[3];
+
+                // Auto-fill unit when budget_component_id is selected
+                if ($field === 'budget_component_id' && ! empty($this->form->budget_items[$index]['budget_component_id'])) {
+                    $componentId = $this->form->budget_items[$index]['budget_component_id'];
+                    $component = BudgetComponent::find($componentId);
+
+                    if ($component) {
+                        $this->form->budget_items[$index]['unit'] = $component->unit;
+                    }
+                }
+            }
+        }
     }
 
     public function saveNewPartner(): void
