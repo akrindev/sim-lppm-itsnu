@@ -13,12 +13,17 @@ return new class extends Migration
     {
         Schema::create('proposal_partner', function (Blueprint $table) {
             $table->uuid('proposal_id');
-            $table->foreignId('partner_id')->constrained()->cascadeOnDelete();
+            $table->uuid('partner_id');
             $table->timestamps();
 
             $table->foreign('proposal_id')
                 ->references('id')
                 ->on('proposals')
+                ->cascadeOnDelete();
+
+            $table->foreign('partner_id')
+                ->references('id')
+                ->on('partners')
                 ->cascadeOnDelete();
 
             $table->primary(['proposal_id', 'partner_id']);

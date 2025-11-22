@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('community_services', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('partner_id')->nullable()->constrained('partners')->onDelete('set null')->comment('Mitra');
+            $table->uuid('partner_id')->nullable()->comment('Mitra');
             $table->text('partner_issue_summary')->nullable()->comment('Ringkasan Masalah Mitra');
             $table->text('solution_offered')->nullable()->comment('Solusi yang Ditawarkan');
             $table->timestamps();
+
+            $table->foreign('partner_id')->references('id')->on('partners')->onDelete('set null');
         });
     }
 

@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('budget_items', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('proposal_id')->constrained('proposals')->onDelete('cascade')->comment('Proposal');
+            $table->foreignId('budget_group_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('budget_component_id')->nullable()->constrained()->nullOnDelete();
             $table->string('group')->comment('Kelompok RAB (Honor/Peralatan/dll)');
             $table->string('component')->comment('Komponen');
             $table->text('item_description')->comment('Item / Deskripsi');

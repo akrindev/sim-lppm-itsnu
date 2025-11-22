@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('proposal_id')->constrained()->onDelete('cascade')->comment('Proposal');
             $table->text('summary_update')->nullable()->comment('Updated summary');
             $table->integer('reporting_year')->comment('Tahun pelaporan');
-            $table->enum('reporting_period', ['semester_1', 'semester_2', 'annual'])->comment('Periode pelaporan');
+            $table->enum('reporting_period', ['semester_1', 'semester_2', 'annual', 'final'])->comment('Periode pelaporan');
             $table->enum('status', ['draft', 'submitted', 'approved'])->default('draft')->comment('Status laporan');
             $table->foreignUuid('submitted_by')->nullable()->constrained('users')->comment('User who submitted');
             $table->timestamp('submitted_at')->nullable()->comment('Submission timestamp');

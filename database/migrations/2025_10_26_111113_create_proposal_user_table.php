@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignUuid('proposal_id')->constrained('proposals')->onDelete('cascade')->comment('Proposal');
             $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade')->comment('Anggota Tim');
             $table->enum('role', ['ketua', 'anggota'])->default('anggota')->comment('Peran dalam Tim');
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending')->comment('Status Persetujuan Anggota');
             $table->text('tasks')->nullable()->comment('Bidang Tugas');
             $table->timestamps();
         });

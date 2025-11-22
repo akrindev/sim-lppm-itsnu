@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('institution_id')->constrained('institutions')->onDelete('cascade')->comment('Institusi');
             $table->string('name')->comment('Nama Fakultas');
+            $table->string('code')->unique()->comment('Kode Fakultas (ex: saintek, soshum)');
             $table->timestamps();
         });
     }
