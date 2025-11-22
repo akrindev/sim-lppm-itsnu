@@ -19,20 +19,20 @@
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label required">Ringkasan Terkini</label>
-                <textarea wire:model="summaryUpdate" rows="8" class="form-control"
+                <textarea wire:model="form.summaryUpdate" rows="8" class="form-control"
                     placeholder="Masukkan ringkasan kemajuan penelitian..." @disabled(!$canEdit)></textarea>
-                @error('summaryUpdate')
+                @error('form.summaryUpdate')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
-                <input type="text" wire:model="keywordsInput" class="form-control"
+                <input type="text" wire:model="form.keywordsInput" class="form-control"
                     placeholder="Contoh: AI; Machine Learning; IoT" @disabled(!$canEdit) />
                 <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
                     Learning</small>
-                @error('keywordsInput')
+                @error('form.keywordsInput')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
@@ -40,20 +40,20 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label required">Tahun Pelaporan</label>
-                    <input type="number" wire:model="reportingYear" class="form-control" min="2020" max="2030"
-                        @disabled(!$canEdit) />
-                    @error('reportingYear')
+                    <input type="number" wire:model="form.reportingYear" class="form-control" min="2020"
+                        max="2030" @disabled(!$canEdit) />
+                    @error('form.reportingYear')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label required">Periode</label>
-                    <select wire:model="reportingPeriod" class="form-select" @disabled(!$canEdit)>
+                    <select wire:model="form.reportingPeriod" class="form-select" @disabled(!$canEdit)>
                         <option value="semester_1">Semester 1</option>
                         <option value="semester_2">Semester 2</option>
                         <option value="annual">Tahunan</option>
                     </select>
-                    @error('reportingPeriod')
+                    @error('form.reportingPeriod')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
@@ -790,4 +790,6 @@
             </x-slot:footer>
         </x-tabler.modal>
     @endteleport
+
+    <x-tabler.alert />
 </div>

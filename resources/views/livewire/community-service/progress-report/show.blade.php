@@ -729,4 +729,6 @@
             </x-slot:footer>
         </x-tabler.modal>
     @endteleport
+
+    <x-tabler.alert />
 </div>

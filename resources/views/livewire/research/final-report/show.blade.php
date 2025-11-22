@@ -260,7 +260,7 @@
                                         @else
                                             <span class="text-muted">
                                                 <x-lucide-file-x class="icon icon-sm" />
-                                                Belum Upload
+                                                Belum Upload / diupdate setelah submit
                                             </span>
                                         @endif
                                     </td>
