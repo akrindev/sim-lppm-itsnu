@@ -156,6 +156,10 @@ class Show extends Component
      */
     public function saveMandatoryOutput(int $proposalOutputId): void
     {
+        if (! $this->canEdit) {
+            abort(403);
+        }
+
         $this->form->saveMandatoryOutput($proposalOutputId);
         $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
         session()->flash('success', 'Data luaran wajib berhasil disimpan.');
@@ -166,6 +170,10 @@ class Show extends Component
      */
     public function saveAdditionalOutput(int $proposalOutputId): void
     {
+        if (! $this->canEdit) {
+            abort(403);
+        }
+
         $this->form->saveAdditionalOutput($proposalOutputId);
         $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
         session()->flash('success', 'Data luaran tambahan berhasil disimpan.');

@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
     // User Management Routes
     Route::middleware(['role:admin lppm'])->prefix('users')->name('users.')->group(function () {
         Route::get('/', UsersIndex::class)->name('index');
+        Route::get('import', \App\Livewire\Users\Import::class)->name('import');
         Route::get('create', UsersCreate::class)->name('create');
         Route::get('{user}', UsersShow::class)->name('show');
         Route::get('{user}/edit', UsersEdit::class)->name('edit');

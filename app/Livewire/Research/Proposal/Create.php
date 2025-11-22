@@ -40,7 +40,7 @@ class Create extends Component
      */
     public function mount(): void
     {
-        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
+        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
     }
 
     /**
@@ -64,7 +64,7 @@ class Create extends Component
             session()->flash('success', 'Proposal penelitian berhasil dibuat');
             $this->redirect(route('research.proposal.show', $proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal membuat proposal: ' . $e->getMessage());
         }
     }
 
@@ -157,13 +157,20 @@ class Create extends Component
                 'form.cluster_level1_id' => 'required|exists:science_clusters,id',
                 'form.summary' => 'required|string|min:100',
                 'form.author_tasks' => 'required',
+                'form.members' => 'required|array|min:1',
             ]),
             2 => $this->validate([
-                'form.macro_research_group_id' => 'nullable|exists:macro_research_groups,id',
-                'form.substance_file' => 'nullable|file|mimes:pdf|max:10240',
+                'form.macro_research_group_id' => 'required|exists:macro_research_groups,id',
+                'form.substance_file' => 'required|file|mimes:pdf|max:10240',
+                'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                    $hasWajib = collect($value)->contains('category', 'Wajib');
+                    if (!$hasWajib) {
+                        $fail('Harus ada setidaknya satu luaran dengan kategori Wajib.');
+                    }
+                }],
             ]),
             3 => $this->validate([
-                'form.budget_items' => 'nullable|array',
+                'form.budget_items' => 'required|array|min:1',
             ]),
             4 => $this->validate([
                 'form.partner_ids' => 'nullable|array',
@@ -230,15 +237,25 @@ class Create extends Component
         $item['total'] = $volume * $unitPrice;
     }
 
-    public function updatedFormBudgetItems(int $index, string $field): void
+    public function updated($property, $value): void
     {
-        // Auto-fill unit when budget_component_id is selected
-        if ($field === 'budget_component_id' && ! empty($this->form->budget_items[$index]['budget_component_id'])) {
-            $componentId = $this->form->budget_items[$index]['budget_component_id'];
-            $component = BudgetComponent::find($componentId);
+        // Handle budget items updates
+        if (Str::startsWith($property, 'form.budget_items.')) {
+            $parts = explode('.', $property);
+            // form.budget_items.0.budget_component_id
+            if (count($parts) === 4) {
+                $index = (int) $parts[2];
+                $field = $parts[3];
 
-            if ($component) {
-                $this->form->budget_items[$index]['unit'] = $component->unit;
+                // Auto-fill unit when budget_component_id is selected
+                if ($field === 'budget_component_id' && ! empty($this->form->budget_items[$index]['budget_component_id'])) {
+                    $componentId = $this->form->budget_items[$index]['budget_component_id'];
+                    $component = BudgetComponent::find($componentId);
+
+                    if ($component) {
+                        $this->form->budget_items[$index]['unit'] = $component->unit;
+                    }
+                }
             }
         }
     }

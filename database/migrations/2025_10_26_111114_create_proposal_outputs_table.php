@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignUuid('proposal_id')->constrained('proposals')->onDelete('cascade')->comment('Proposal');
             $table->integer('output_year')->comment('Tahun Luaran');
             $table->string('category')->comment('Kategori Luaran (Wajib/Tambahan)');
+            $table->string('group')->nullable()->comment('Group output, e.g., buku, artikel, dll.');
             $table->string('type')->comment('Jenis Luaran (Jurnal/Paten/dll)');
             $table->string('target_status')->comment('Status Target (Q1/Q2/Granted/dll)');
             $table->timestamps();

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('national_priorities', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('Prioritas Riset Nasional');
+            $table->text('description')->nullable()->comment('Deskripsi Prioritas Riset Nasional');
             $table->timestamps();
         });
     }

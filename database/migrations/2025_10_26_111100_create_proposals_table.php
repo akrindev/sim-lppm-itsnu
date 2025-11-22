@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ProposalStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -28,7 +29,7 @@ return new class extends Migration
             $table->decimal('sbk_value', 15, 2)->nullable()->comment('Nilai SBK');
             $table->integer('duration_in_years')->default(1)->comment('Lama Kegiatan (tahun)');
             $table->text('summary')->nullable()->comment('Ringkasan');
-            $table->enum('status', ['draft', 'submitted', 'reviewed', 'approved', 'rejected', 'completed'])->default('draft')->comment('Status Proposal');
+            $table->enum('status', ProposalStatus::values())->default(ProposalStatus::DRAFT)->comment('Status Proposal');
             $table->timestamps();
         });
     }

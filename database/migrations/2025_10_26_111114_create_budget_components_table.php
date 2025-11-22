@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('budget_group_id')->constrained()->cascadeOnDelete();
             $table->string('code', 10);
             $table->string('name');
+            $table->string('unit', 20)->comment('Satuan unit (pcs, pack, liter, etc)');
             $table->text('description')->nullable();
             $table->timestamps();
 

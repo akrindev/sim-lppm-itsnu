@@ -23,7 +23,6 @@ class DatabaseSeeder extends Seeder
             FocusAreaSeeder::class,
             NationalPrioritySeeder::class,
             KeywordSeeder::class,
-            PartnerSeeder::class,
             MacroResearchGroupSeeder::class,
             BudgetGroupSeeder::class,
             BudgetComponentSeeder::class,
@@ -38,10 +37,18 @@ class DatabaseSeeder extends Seeder
             TopicSeeder::class,        // depends on themes
 
             // 5. Users & Identities
-            UserSeeder::class,
-
-            // 6. Proposals & Related Data (depends on users and master data)
-            ProposalSeeder::class, // Creates proposals with research/community service + all related data
+            AdminUserSeeder::class,
         ]);
+
+        if (! app()->isProduction()) {
+            $this->call([
+                PartnerSeeder::class,
+                // 5. Users & Identities
+                UserSeeder::class,
+
+                // 6. Proposals & Related Data (depends on users and master data)
+                ProposalSeeder::class, // Creates proposals with research/community service + all related data
+            ]);
+        }
     }
 }

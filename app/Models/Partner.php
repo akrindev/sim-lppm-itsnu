@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,7 +13,17 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class Partner extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\PartnerFactory> */
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, HasUuids, InteractsWithMedia;
+
+    /**
+     * The type of the auto-incrementing ID's primary key.
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the ID is auto-incrementing.
+     */
+    public $incrementing = false;
 
     protected $fillable = [
         'name',

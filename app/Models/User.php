@@ -40,6 +40,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'email_verified_at',
     ];
 
     /**
@@ -109,7 +110,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 
@@ -117,8 +118,8 @@ class User extends Authenticatable
     public function profilePicture(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->identity()->profile_picture
-                ?? 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s=128&d=identicon',
+            get: fn($value) => $this->identity()->profile_picture
+                ?? 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?s=128&d=identicon',
         );
     }
 

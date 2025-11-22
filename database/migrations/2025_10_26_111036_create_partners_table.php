@@ -12,10 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('partners', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('name')->comment('Nama Mitra');
+            $table->string('email')->nullable();
+            $table->string('institution')->nullable();
+            $table->string('country')->nullable();
             $table->string('type')->comment('Tipe Mitra');
             $table->text('address')->nullable()->comment('Alamat Mitra');
+            $table->string('commitment_letter_file')->nullable();
             $table->timestamps();
         });
     }

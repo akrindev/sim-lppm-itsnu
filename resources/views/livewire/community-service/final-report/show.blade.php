@@ -252,7 +252,12 @@
                                                 <x-lucide-pencil class="icon" />
                                             </button>
                                         @else
-                                            <span class="text-muted">—</span>
+                                            <button type="button"
+                                                wire:click="editMandatoryOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
+                                                data-bs-target="#modalMandatoryOutput">
+                                                <x-lucide-eye class="icon" />
+                                            </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -375,7 +380,12 @@
                                                 <x-lucide-pencil class="icon" />
                                             </button>
                                         @else
-                                            <span class="text-muted">—</span>
+                                            <button type="button"
+                                                wire:click="editAdditionalOutput({{ $output->id }})"
+                                                class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
+                                                data-bs-target="#modalAdditionalOutput">
+                                                <x-lucide-eye class="icon" />
+                                            </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -422,8 +432,8 @@
 
     <!-- Modal: Mandatory Output -->
     @teleport('body')
-        <x-tabler.modal id="modalMandatoryOutput" title="Edit Luaran Wajib - Jurnal" size="xl" scrollable
-            wire:ignore.self onHide="closeMandatoryModal">
+        <x-tabler.modal id="modalMandatoryOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} Luaran Wajib - Jurnal"
+            size="xl" scrollable wire:ignore.self onHide="closeMandatoryModal">
 
             <x-slot:body>
                 @if ($errors->any())
@@ -453,7 +463,7 @@
                         <div class="col-md-6">
                             <label class="form-label required">Status Publikasi</label>
                             <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.status_type"
-                                class="form-select">
+                                class="form-select" @disabled(!$canEdit)>
                                 <option value="">Pilih Status</option>
                                 <option value="published">Published</option>
                                 <option value="accepted">Accepted</option>
@@ -469,7 +479,7 @@
                         <div class="col-md-6">
                             <label class="form-label required">Status Penulis</label>
                             <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.author_status"
-                                class="form-select">
+                                class="form-select" @disabled(!$canEdit)>
                                 <option value="">Pilih Status</option>
                                 <option value="first_author">First Author</option>
                                 <option value="co_author">Co-Author</option>
@@ -485,7 +495,7 @@
                             <label class="form-label required">Judul Jurnal</label>
                             <input type="text"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_title"
-                                class="form-control" placeholder="Masukkan judul jurnal" />
+                                class="form-control" placeholder="Masukkan judul jurnal" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.journal_title")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -495,7 +505,7 @@
                         <div class="col-md-6">
                             <label class="form-label">ISSN</label>
                             <input type="text" wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.issn"
-                                class="form-control" placeholder="1234-5678" />
+                                class="form-control" placeholder="1234-5678" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.issn")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -504,7 +514,7 @@
                             <label class="form-label">E-ISSN</label>
                             <input type="text"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.eissn"
-                                class="form-control" placeholder="1234-5678" />
+                                class="form-control" placeholder="1234-5678" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.eissn")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -515,7 +525,8 @@
                             <label class="form-label">Lembaga Pengindex</label>
                             <input type="text"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.indexing_body"
-                                class="form-control" placeholder="Scopus, WoS, Sinta, dll" />
+                                class="form-control" placeholder="Scopus, WoS, Sinta, dll"
+                                @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.indexing_body")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -526,7 +537,7 @@
                             <label class="form-label">URL Jurnal</label>
                             <input type="url"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_url"
-                                class="form-control" placeholder="https://" />
+                                class="form-control" placeholder="https://" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.journal_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -537,7 +548,7 @@
                             <label class="form-label required">Judul Artikel</label>
                             <input type="text"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_title"
-                                class="form-control" placeholder="Masukkan judul artikel" />
+                                class="form-control" placeholder="Masukkan judul artikel" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.article_title")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -548,7 +559,8 @@
                             <label class="form-label required">Tahun Terbit</label>
                             <input type="number"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.publication_year"
-                                class="form-control" min="2000" max="2030" /> @disabled(!$canEdit) />
+                                class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
+                            @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.publication_year")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -559,7 +571,7 @@
                             <label class="form-label">Volume</label>
                             <input type="text"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.volume"
-                                class="form-control" placeholder="Vol. 1" />
+                                class="form-control" placeholder="Vol. 1" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.volume")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -570,7 +582,7 @@
                             <label class="form-label">Nomor</label>
                             <input type="text"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.issue_number"
-                                class="form-control" placeholder="No. 1" />
+                                class="form-control" placeholder="No. 1" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.issue_number")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -582,11 +594,11 @@
                             <div class="input-group">
                                 <input type="number"
                                     wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.page_start"
-                                    class="form-control" placeholder="1" />
+                                    class="form-control" placeholder="1" @disabled(!$canEdit) />
                                 <span class="input-group-text">-</span>
                                 <input type="number"
                                     wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.page_end"
-                                    class="form-control" placeholder="10" />
+                                    class="form-control" placeholder="10" @disabled(!$canEdit) />
                             </div>
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.page_start")
                                 <small class="text-danger">{{ $message }}</small>
@@ -598,7 +610,7 @@
                             <label class="form-label">URL Artikel</label>
                             <input type="url"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_url"
-                                class="form-control" placeholder="https://" />
+                                class="form-control" placeholder="https://" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.article_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -608,7 +620,7 @@
                         <div class="col-md-6">
                             <label class="form-label">DOI Artikel</label>
                             <input type="text" wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.doi"
-                                class="form-control" placeholder="10.xxxx/xxxxx" />
+                                class="form-control" placeholder="10.xxxx/xxxxx" @disabled(!$canEdit) />
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.doi")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -618,7 +630,7 @@
                         <div class="col-md-12">
                             <label class="form-label">Dokumen Artikel (PDF)</label>
                             <input type="file" wire:model="tempMandatoryFiles.{{ $form->editingMandatoryId }}"
-                                class="form-control" accept=".pdf" />
+                                class="form-control" accept=".pdf" @disabled(!$canEdit) />
                             @error("tempMandatoryFiles.{$form->editingMandatoryId}")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -658,24 +670,26 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveMandatoryOutput({{ $form->editingMandatoryId }})"
-                    class="btn btn-primary" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="saveMandatoryOutput">
-                        <x-lucide-save class="icon" /> Simpan
-                    </span>
-                    <span wire:loading wire:target="saveMandatoryOutput">
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        Menyimpan...
-                    </span>
-                </button>
+                @if ($canEdit)
+                    <button type="button" wire:click="saveMandatoryOutput({{ $form->editingMandatoryId }})"
+                        class="btn btn-primary" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="saveMandatoryOutput">
+                            <x-lucide-save class="icon" /> Simpan
+                        </span>
+                        <span wire:loading wire:target="saveMandatoryOutput">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Menyimpan...
+                        </span>
+                    </button>
+                @endif
             </x-slot:footer>
         </x-tabler.modal>
     @endteleport
 
     <!-- Modal: Additional Output -->
     @teleport('body')
-        <x-tabler.modal id="modalAdditionalOutput" title="Edit Luaran Tambahan - Buku" size="lg" scrollable
-            wire:ignore.self onHide="closeAdditionalModal">
+        <x-tabler.modal id="modalAdditionalOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} Luaran Tambahan - Buku"
+            size="lg" scrollable wire:ignore.self onHide="closeAdditionalModal">
 
             <x-slot:body>
                 @if ($errors->any())
@@ -705,7 +719,7 @@
                         <div class="col-md-12">
                             <label class="form-label required">Status</label>
                             <select wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.status"
-                                class="form-select">
+                                class="form-select" @disabled(!$canEdit)>
                                 <option value="">Pilih Status</option>
                                 <option value="review">Review</option>
                                 <option value="editing">Editing</option>
@@ -721,7 +735,7 @@
                             <label class="form-label required">Judul Buku</label>
                             <input type="text"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.book_title"
-                                class="form-control" placeholder="Masukkan judul buku" />
+                                class="form-control" placeholder="Masukkan judul buku" @disabled(!$canEdit) />
                             @error("form.additionalOutputs.{$editingAdditionalId}.book_title")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -732,7 +746,7 @@
                             <label class="form-label required">Nama Penerbit</label>
                             <input type="text"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publisher_name"
-                                class="form-control" placeholder="Masukkan nama penerbit" />
+                                class="form-control" placeholder="Masukkan nama penerbit" @disabled(!$canEdit) />
                             @error("form.additionalOutputs.{$editingAdditionalId}.publisher_name")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -743,7 +757,7 @@
                             <label class="form-label">ISBN</label>
                             <input type="text"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.isbn"
-                                class="form-control" placeholder="978-xxx-xxx-xxx-x" />
+                                class="form-control" placeholder="978-xxx-xxx-xxx-x" @disabled(!$canEdit) />
                             @error("form.additionalOutputs.{$editingAdditionalId}.isbn")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -754,7 +768,8 @@
                             <label class="form-label">Tahun Terbit</label>
                             <input type="number"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publication_year"
-                                class="form-control" min="2000" max="2030" /> @disabled(!$canEdit) />
+                                class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
+                            @disabled(!$canEdit) />
                             @error("form.additionalOutputs.{$editingAdditionalId}.publication_year")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -765,7 +780,7 @@
                             <label class="form-label">Jumlah Halaman</label>
                             <input type="number"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.total_pages"
-                                class="form-control" placeholder="100" />
+                                class="form-control" placeholder="100" @disabled(!$canEdit) />
                             @error("form.additionalOutputs.{$editingAdditionalId}.total_pages")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -776,7 +791,7 @@
                             <label class="form-label">URL Web Penerbit</label>
                             <input type="url"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publisher_url"
-                                class="form-control" placeholder="https://" />
+                                class="form-control" placeholder="https://" @disabled(!$canEdit) />
                             @error("form.additionalOutputs.{$editingAdditionalId}.publisher_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -787,7 +802,7 @@
                             <label class="form-label">URL Buku</label>
                             <input type="url"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.book_url"
-                                class="form-control" placeholder="https://" />
+                                class="form-control" placeholder="https://" @disabled(!$canEdit) />
                             @error("form.additionalOutputs.{$editingAdditionalId}.book_url")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -797,7 +812,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Dokumen Buku/Draft</label>
                             <input type="file" wire:model="tempAdditionalFiles.{{ $form->editingAdditionalId }}"
-                                class="form-control" accept=".pdf" />
+                                class="form-control" accept=".pdf" @disabled(!$canEdit) />
                             @error("tempAdditionalFiles.{$form->editingAdditionalId}")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -832,7 +847,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Surat Keterangan Terbit</label>
                             <input type="file" wire:model="tempAdditionalCerts.{{ $form->editingAdditionalId }}"
-                                class="form-control" accept=".pdf" />
+                                class="form-control" accept=".pdf" @disabled(!$canEdit) />
                             @error("tempAdditionalCerts.{$form->editingAdditionalId}")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -872,16 +887,18 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     Tutup
                 </button>
-                <button type="button" wire:click="saveAdditionalOutput({{ $form->editingAdditionalId }})"
-                    class="btn btn-primary" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="saveAdditionalOutput">
-                        <x-lucide-save class="icon" /> Simpan
-                    </span>
-                    <span wire:loading wire:target="saveAdditionalOutput">
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        Menyimpan...
-                    </span>
-                </button>
+                @if ($canEdit)
+                    <button type="button" wire:click="saveAdditionalOutput({{ $form->editingAdditionalId }})"
+                        class="btn btn-primary" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="saveAdditionalOutput">
+                            <x-lucide-save class="icon" /> Simpan
+                        </span>
+                        <span wire:loading wire:target="saveAdditionalOutput">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Menyimpan...
+                        </span>
+                    </button>
+                @endif
             </x-slot:footer>
         </x-tabler.modal>
     @endteleport
