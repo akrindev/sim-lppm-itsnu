@@ -158,13 +158,20 @@ class Create extends Component
                 'form.cluster_level1_id' => 'required|exists:science_clusters,id',
                 'form.summary' => 'required|string|min:100',
                 'form.author_tasks' => 'required',
+                'form.members' => 'required|array|min:1',
             ]),
             2 => $this->validate([
                 'form.macro_research_group_id' => 'nullable|exists:macro_research_groups,id',
-                'form.substance_file' => 'nullable|file|mimes:pdf|max:10240',
+                'form.substance_file' => 'required|file|mimes:pdf|max:10240',
+                'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                    $hasWajib = collect($value)->contains('category', 'Wajib');
+                    if (! $hasWajib) {
+                        $fail('Harus ada setidaknya satu luaran dengan kategori Wajib.');
+                    }
+                }],
             ]),
             3 => $this->validate([
-                'form.budget_items' => 'nullable|array',
+                'form.budget_items' => 'required|array|min:1',
             ]),
             4 => $this->validate([
                 'form.partner_ids' => 'nullable|array',

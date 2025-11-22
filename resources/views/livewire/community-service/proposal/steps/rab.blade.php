@@ -1,10 +1,10 @@
 <!-- Section: RAB (Rencana Anggaran Biaya) -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="d-flex align-items-center">
-                <x-lucide-calculator class="me-3 icon" />
-                <h3 class="mb-0 card-title">Rencana Anggaran Biaya (RAB)</h3>
+                <x-lucide-calculator class="icon me-3" />
+                <h3 class="card-title mb-0">Rencana Anggaran Biaya (RAB)</h3>
             </div>
             <button type="button" wire:click="addBudgetItem" class="btn btn-primary btn-sm">
                 <x-lucide-plus class="icon" />
@@ -12,14 +12,21 @@
             </button>
         </div>
 
+        @error('form.budget_items')
+            <div class="alert alert-danger mb-3">
+                <x-lucide-alert-circle class="icon me-2" />
+                {{ $message }}
+            </div>
+        @enderror
+
         @if (empty($form->budget_items))
             <div class="alert alert-info">
-                <x-lucide-info class="me-2 icon" />
+                <x-lucide-info class="icon me-2" />
                 Belum ada item anggaran. Klik tombol "Tambah Item" untuk menambahkan.
             </div>
         @else
             <div class="table-responsive">
-                <table class="table table-bordered">
+                <table class="table-bordered table">
                     <thead>
                         <tr>
                             <th width="15%">Kelompok RAB</th>

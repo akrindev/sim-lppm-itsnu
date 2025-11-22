@@ -1,9 +1,9 @@
 <!-- Section: Substansi Usulan -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-book-open class="me-3 icon" />
-            <h3 class="mb-0 card-title">2.1 Substansi Usulan</h3>
+            <x-lucide-book-open class="icon me-3" />
+            <h3 class="card-title mb-0">2.1 Substansi Usulan</h3>
         </div>
 
         <div class="row g-4">
@@ -51,12 +51,12 @@
 </div>
 
 <!-- Section: Luaran Target Capaian -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="d-flex align-items-center">
-                <x-lucide-target class="me-3 icon" />
-                <h3 class="mb-0 card-title">2.2 Luaran Target Capaian</h3>
+                <x-lucide-target class="icon me-3" />
+                <h3 class="card-title mb-0">2.2 Luaran Target Capaian</h3>
             </div>
             <button type="button" wire:click="addOutput" class="btn btn-primary btn-sm">
                 <x-lucide-plus class="icon" />
@@ -64,14 +64,21 @@
             </button>
         </div>
 
+        @error('form.outputs')
+            <div class="alert alert-danger mb-3">
+                <x-lucide-alert-circle class="icon me-2" />
+                {{ $message }}
+            </div>
+        @enderror
+
         @if (empty($form->outputs))
             <div class="alert alert-info">
-                <x-lucide-info class="me-2 icon" />
+                <x-lucide-info class="icon me-2" />
                 Belum ada luaran target. Klik tombol "Tambah Luaran" untuk menambahkan.
             </div>
         @else
             <div class="table-responsive">
-                <table class="table table-bordered">
+                <table class="table-bordered table">
                     <thead>
                         <tr>
                             {{-- <th width="20%">Tahun</th> --}}

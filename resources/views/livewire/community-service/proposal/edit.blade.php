@@ -37,19 +37,20 @@
     <form wire:submit.prevent="save" novalidate>
         <!-- Step Content -->
         @if ($currentStep === 1)
-            @include('livewire.research.proposal.steps.identitas-usulan')
+            @include('livewire.community-service.proposal.steps.identitas-usulan')
         @elseif ($currentStep === 2)
-            @include('livewire.research.proposal.steps.substansi-usulan')
+            @include('livewire.community-service.proposal.steps.substansi-usulan')
         @elseif ($currentStep === 3)
-            @include('livewire.research.proposal.steps.rab')
+            @include('livewire.community-service.proposal.steps.rab')
         @elseif ($currentStep === 4)
-            @include('livewire.research.proposal.steps.dokumen-pendukung')
+            @include('livewire.community-service.proposal.steps.dokumen-pendukung')
         @elseif ($currentStep === 5)
-            @include('livewire.research.proposal.steps.konfirmasi')
+            @include('livewire.community-service.proposal.steps.konfirmasi')
         @endif
 
+        <x-tabler.alert />
         <!-- Navigation Buttons -->
-        <div class="d-flex justify-content-between gap-2 mt-3">
+        <div class="d-flex justify-content-between mt-3 gap-2">
             <div>
                 @if ($currentStep > 1)
                     <button type="button" wire:click="previousStep" class="btn btn-outline-secondary">
@@ -72,7 +73,7 @@
                     </button>
                 @else
                     <button type="submit" class="btn btn-success">
-                        <span class="me-2 spinner-border spinner-border-sm" wire:loading role="status"
+                        <span class="spinner-border spinner-border-sm me-2" wire:loading role="status"
                             aria-hidden="true"></span>
                         <x-lucide-save class="icon" />
                         <span wire:loading.remove>Simpan Proposal</span>
