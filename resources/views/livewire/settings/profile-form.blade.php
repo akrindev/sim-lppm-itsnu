@@ -21,17 +21,18 @@
 
     <div class="mt-1 row g-3">
         <div class="col-md">
-            <div class="form-label">NIDN/NIM <span class="text-danger">*</span></div>
+            <div class="form-label">NIDN/NUPTK <span class="text-danger">*</span></div>
             <input type="text" class="form-control @error('identity_id') is-invalid @enderror"
-                wire:model="identity_id" placeholder="Masukkan NIDN/NIM" />
+                wire:model="identity_id" placeholder="Masukkan NIDN/NUPTK" />
             @error('identity_id')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
-        <div class="col-md">
+        {{-- <div class="col-md">
             <div class="form-label">Tipe User <span class="text-danger">*</span></div>
             <div wire:ignore>
-                <select class="form-select @error('type') is-invalid @enderror" wire:model="type" x-data="tomSelect" placeholder="Pilih Tipe">
+                <select class="form-select @error('type') is-invalid @enderror" wire:model="type"
+                    x-data="tomSelect" placeholder="Pilih Tipe">
                     <option value="">Pilih Tipe</option>
                     <option value="dosen">Dosen</option>
                     <option value="mahasiswa">Mahasiswa</option>
@@ -40,7 +41,7 @@
             @error('type')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-        </div>
+        </div> --}}
         <div class="col-md">
             <div class="form-label">ID SINTA</div>
             <input type="text" class="form-control @error('sinta_id') is-invalid @enderror" wire:model="sinta_id"
@@ -84,8 +85,8 @@
         <div class="col-md">
             <div class="form-label">Institusi</div>
             <div wire:ignore>
-                <select class="form-select @error('institution_id') is-invalid @enderror" wire:model.live="institution_id"
-                    disabled x-data="tomSelect" placeholder="Pilih Institusi">
+                <select class="form-select @error('institution_id') is-invalid @enderror"
+                    wire:model.live="institution_id" disabled x-data="tomSelect" placeholder="Pilih Institusi">
                     <option value="">Pilih Institusi</option>
                     @foreach ($institutions as $institution)
                         <option value="{{ $institution['id'] }}">{{ $institution['name'] }}</option>
@@ -114,8 +115,8 @@
         <div class="col-md">
             <div class="form-label">Program Studi</div>
             <div wire:ignore>
-                <select class="form-select @error('study_program_id') is-invalid @enderror" wire:model="study_program_id"
-                    disabled x-data="tomSelect" placeholder="Pilih Program Studi">
+                <select class="form-select @error('study_program_id') is-invalid @enderror"
+                    wire:model="study_program_id" disabled x-data="tomSelect" placeholder="Pilih Program Studi">
                     <option value="">Pilih Program Studi</option>
                     @foreach ($studyPrograms as $program)
                         <option value="{{ $program['id'] }}">{{ $program['name'] }}</option>

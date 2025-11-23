@@ -41,7 +41,15 @@ class UserSeeder extends Seeder
         $roles = Role::all();
         $userIndex = 0;
 
+        // Roles created by AdminUserSeeder that should be skipped
+        $skipRoles = ['superadmin', 'admin lppm'];
+
         foreach ($roles as $role) {
+            // Skip roles already handled by AdminUserSeeder
+            if (in_array($role->name, $skipRoles)) {
+                continue;
+            }
+
             $count = $role->name === 'dosen' ? 5 : 1;
 
             for ($i = 0; $i < $count; $i++) {
@@ -49,35 +57,47 @@ class UserSeeder extends Seeder
                 $faculty = $faculties->get($userIndex % $faculties->count());
                 $userIndex++;
 
-                $user = \App\Models\User::factory()->create([
-                    'name' => str($role->name)->title().' User'.($count > 1 ? ' '.($i + 1) : ''),
-                    'email' => str($role->name)->slug().($count > 1 ? $i + 1 : '').'@email.com',
-                    'email_verified_at' => now(),
-                ]);
+                $email = str($role->name)->slug() . ($count > 1 ? $i + 1 : '') . '@email.com';
 
-                $type = in_array($role->name, ['mahasiswa', 'student']) ? 'mahasiswa' : 'dosen';
+                $user = \App\Models\User::firstOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => str($role->name)->title() . ' User' . ($count > 1 ? ' ' . ($i + 1) : ''),
+                        'email' => $email,
+                        'password' => bcrypt('password'),
+                        'email_verified_at' => now(),
+                    ]
+                );
 
-                $user->identity()->create([
-                    'identity_id' => $type === 'dosen'
-                        ? fake()->numerify('##########') // NIDN 10 digits
-                        : fake()->numerify('################'), // NIM 16 digits
-                    'sinta_id' => $type === 'dosen' ? fake()->optional(0.7)->numerify('####') : null,
-                    'type' => $type,
-                    'institution_id' => $institution->id,
-                    'study_program_id' => $studyProgram?->id,
-                    'faculty_id' => $faculty->id,
-                    'address' => 'Jl. Example No. '.rand(1, 100),
-                    'birthdate' => now()->subYears(rand(20, 40))->toDateString(),
-                    'birthplace' => fake()->city(),
-                    'profile_picture' => null,
-                ]);
+                // Only create identity if it doesn't exist
+                if (! $user->identity) {
+                    $type = in_array($role->name, ['mahasiswa', 'student']) ? 'mahasiswa' : 'dosen';
 
-                $user->assignRole($role->name);
+                    $user->identity()->create([
+                        'identity_id' => $type === 'dosen'
+                            ? fake()->numerify('##########') // NIDN 10 digits
+                            : fake()->numerify('################'), // NIM 16 digits
+                        'sinta_id' => $type === 'dosen' ? fake()->optional(0.7)->numerify('####') : null,
+                        'type' => $type,
+                        'institution_id' => $institution->id,
+                        'study_program_id' => $studyProgram?->id,
+                        'faculty_id' => $faculty->id,
+                        'address' => 'Jl. Example No. ' . rand(1, 100),
+                        'birthdate' => now()->subYears(rand(20, 40))->toDateString(),
+                        'birthplace' => fake()->city(),
+                        'profile_picture' => null,
+                    ]);
+                }
+
+                // Ensure role is assigned (safe to run multiple times)
+                if (! $user->hasRole($role->name)) {
+                    $user->assignRole($role->name);
+                }
             }
         }
 
         $this->command->info('Users seeded successfully!');
-        $this->command->info('Total users created: '.\App\Models\User::count());
-        $this->command->info('Faculties used: '.$faculties->pluck('name')->implode(', '));
+        $this->command->info('Total users created: ' . \App\Models\User::count());
+        $this->command->info('Faculties used: ' . $faculties->pluck('name')->implode(', '));
     }
 }

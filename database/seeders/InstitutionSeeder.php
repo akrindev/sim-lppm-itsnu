@@ -27,7 +27,7 @@ class InstitutionSeeder extends Seeder
         ];
 
         foreach ($institutions as $institution) {
-            \App\Models\Institution::create(['name' => $institution]);
+            \App\Models\Institution::firstOrCreate(['name' => $institution]);
         }
     }
 }

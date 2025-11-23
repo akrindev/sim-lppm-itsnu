@@ -82,8 +82,9 @@
                                             @if (in_array($option['value'], $selectedRoles)) checked @endif>
                                         <span class="form-selectgroup-label">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round" class="me-1 icon">
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="me-1 icon">
                                                 <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
                                                 <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
                                             </svg>
@@ -211,10 +212,10 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="faculty">
-                            Fakultas
+                            Fakultas <span class="text-danger">*</span>
                         </label>
                         <select id="faculty" class="form-select @error('faculty_id') is-invalid @enderror"
-                            wire:model.live="faculty_id" @disabled(empty($facultyOptions))>
+                            wire:model.live="faculty_id" @disabled(empty($facultyOptions)) required>
                             <option value="">Pilih fakultas...</option>
                             @foreach ($facultyOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
@@ -233,7 +234,7 @@
                         </label>
                         <select id="study-program"
                             class="form-select @error('study_program_id') is-invalid @enderror"
-                            wire:model="study_program_id" @disabled(empty($studyProgramOptions))>
+                            wire:model="study_program_id" @disabled(empty($studyProgramOptions)) required>
                             <option value="">Pilih program studi...</option>
                             @foreach ($studyProgramOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>

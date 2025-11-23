@@ -11,24 +11,39 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <div class="dropdown">
-                        <a href="#" class="btn-outline-primary btn dropdown-toggle" data-bs-toggle="dropdown">
+                    <div class="d-flex align-items-center gap-2 btn-list">
+                        <button type="button" class="btn btn-success" wire:click="exportResearch">
                             <svg xmlns="http://www.w3.org/2000/svg" class="me-2 icon" width="24" height="24"
                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
-                                <path d="M16 6v6l4 2" />
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                <path d="M9 12h6" />
+                                <path d="M9 15h6" />
+                                <path d="M9 18h2" />
                             </svg>
-                            Tahun: {{ $selectedYear }}
-                        </a>
-                        <div class="dropdown-menu">
-                            @foreach ($availableYears as $year)
-                                <a href="#" class="dropdown-item {{ $selectedYear == $year ? 'active' : '' }}"
-                                    wire:click="$set('selectedYear', {{ $year }})">
-                                    {{ $year }}
-                                </a>
-                            @endforeach
+                            Export Excel
+                        </button>
+                        <div class="dropdown">
+                            <a href="#" class="btn-outline-primary btn dropdown-toggle" data-bs-toggle="dropdown">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="me-2 icon" width="24" height="24"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+                                    <path d="M16 6v6l4 2" />
+                                </svg>
+                                Tahun: {{ $selectedYear }}
+                            </a>
+                            <div class="dropdown-menu">
+                                @foreach ($availableYears as $year)
+                                    <a href="#" class="dropdown-item {{ $selectedYear == $year ? 'active' : '' }}"
+                                        wire:click="$set('selectedYear', {{ $year }})">
+                                        {{ $year }}
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>

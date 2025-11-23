@@ -44,17 +44,18 @@ class ThemeSeeder extends Seeder
         foreach ($focusAreas as $focusArea) {
             if (isset($themesData[$focusArea->name])) {
                 foreach ($themesData[$focusArea->name] as $themeName) {
-                    \App\Models\Theme::create([
-                        'focus_area_id' => $focusArea->id,
-                        'name' => $themeName,
-                    ]);
+                    \App\Models\Theme::firstOrCreate(
+                        ['focus_area_id' => $focusArea->id, 'name' => $themeName],
+                        ['focus_area_id' => $focusArea->id, 'name' => $themeName]
+                    );
                 }
             } else {
                 // Create default themes for other focus areas
-                \App\Models\Theme::create([
-                    'focus_area_id' => $focusArea->id,
-                    'name' => 'General '.$focusArea->name,
-                ]);
+                $defaultThemeName = 'General ' . $focusArea->name;
+                \App\Models\Theme::firstOrCreate(
+                    ['focus_area_id' => $focusArea->id, 'name' => $defaultThemeName],
+                    ['focus_area_id' => $focusArea->id, 'name' => $defaultThemeName]
+                );
             }
         }
     }
