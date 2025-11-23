@@ -92,8 +92,16 @@ class Edit extends Component
             'sinta_id' => ['nullable', 'string', 'max:255'],
             'type' => ['required', Rule::in('dosen', 'mahasiswa')],
             'institution_id' => ['nullable', 'exists:institutions,id'],
-            'faculty_id' => ['nullable', 'exists:faculties,id'],
-            'study_program_id' => ['nullable', 'exists:study_programs,id'],
+            'faculty_id' => [
+                'required',
+                'exists:faculties,id',
+                Rule::exists('faculties', 'id')->where('institution_id', $this->institution_id),
+            ],
+            'study_program_id' => [
+                'required',
+                'exists:study_programs,id',
+                Rule::exists('study_programs', 'id')->where('faculty_id', $this->faculty_id),
+            ],
         ];
     }
 
@@ -188,7 +196,7 @@ class Edit extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn (Role $role) => [
+            ->map(fn(Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
             ])
@@ -206,7 +214,7 @@ class Edit extends Component
         return Institution::query()
             ->orderBy('name')
             ->get()
-            ->map(fn (Institution $institution) => [
+            ->map(fn(Institution $institution) => [
                 'value' => $institution->id,
                 'label' => $institution->name,
             ])
@@ -229,7 +237,7 @@ class Edit extends Component
             ->where('institution_id', $this->institution_id)
             ->orderBy('name')
             ->get()
-            ->map(fn (Faculty $faculty) => [
+            ->map(fn(Faculty $faculty) => [
                 'value' => $faculty->id,
                 'label' => $faculty->name,
             ])
@@ -252,7 +260,7 @@ class Edit extends Component
             ->where('faculty_id', $this->faculty_id)
             ->orderBy('name')
             ->get()
-            ->map(fn (\App\Models\StudyProgram $program) => [
+            ->map(fn(\App\Models\StudyProgram $program) => [
                 'value' => $program->id,
                 'label' => $program->name,
             ])

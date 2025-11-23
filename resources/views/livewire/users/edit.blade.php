@@ -182,10 +182,10 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="faculty">
-                            Fakultas
+                            Fakultas <span class="text-danger">*</span>
                         </label>
                         <select id="faculty" class="form-select @error('faculty_id') is-invalid @enderror"
-                            wire:model.live="faculty_id" @disabled(empty($facultyOptions))>
+                            wire:model.live="faculty_id" @disabled(empty($facultyOptions)) required>
                             <option value="">Pilih fakultas...</option>
                             @foreach ($facultyOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
@@ -200,11 +200,11 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="study-program">
-                            Program Studi <span class="text-muted">(opsional)</span>
+                            Program Studi <span class="text-danger">*</span>
                         </label>
                         <select id="study-program"
                             class="form-select @error('study_program_id') is-invalid @enderror"
-                            wire:model.defer="study_program_id" @disabled(empty($studyProgramOptions))>
+                            wire:model.defer="study_program_id" @disabled(empty($studyProgramOptions)) required>
                             <option value="">Pilih program studi...</option>
                             @foreach ($studyProgramOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
