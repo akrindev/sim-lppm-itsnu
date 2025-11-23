@@ -72,6 +72,7 @@ class TeamMembersForm extends Component
                 'institution' => $identity->institution?->name,
                 'study_program' => $identity->studyProgram?->name,
                 'identity_type' => $identity->type,
+                'sinta_id' => $identity->sinta_id,
             ];
         } else {
             $this->memberFound = false;
@@ -112,6 +113,7 @@ class TeamMembersForm extends Component
             'nidn' => $this->member_nidn,
             'tugas' => $this->member_tugas,
             'status' => 'pending',
+            'sinta_id' => $this->foundMember['sinta_id'] ?? null,
         ];
 
         $this->resetMemberForm();

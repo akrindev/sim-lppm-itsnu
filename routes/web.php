@@ -47,9 +47,14 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:admin lppm|rektor'])
         ->name('reports.research');
 
+    Route::get('laporan-luaran', \App\Livewire\Reports\OutputReports::class)
+        ->middleware(['role:admin lppm|rektor'])
+        ->name('reports.outputs');
+
     // User Management Routes
     Route::middleware(['role:admin lppm'])->prefix('users')->name('users.')->group(function () {
         Route::get('/', UsersIndex::class)->name('index');
+        Route::get('import', \App\Livewire\Users\Import::class)->name('import');
         Route::get('create', UsersCreate::class)->name('create');
         Route::get('{user}', UsersShow::class)->name('show');
         Route::get('{user}/edit', UsersEdit::class)->name('edit');
@@ -147,4 +152,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('role.switch');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

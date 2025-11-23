@@ -337,24 +337,7 @@ class Show extends Component
             abort(403);
         }
 
-        if (! $this->progressReport) {
-            session()->flash('error', 'Laporan belum dibuat. Silakan upload file substansi terlebih dahulu.');
-
-            return;
-        }
-
-        try {
-            // Ensure form has the progress report reference
-            $this->form->progressReport = $this->progressReport;
-
-            // Save via form
-            $this->form->saveMandatoryOutputWithFile($proposalOutputId);
-
-            session()->flash('success', 'Data luaran wajib berhasil disimpan.');
-            $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-        } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
-        }
+        $this->form->saveMandatoryOutput($proposalOutputId);
     }
 
     /**

@@ -29,10 +29,10 @@
     </div>
 
     <!-- Steps Indicator -->
-    <div class="mb-3 col-md-12">
+    <div class="col-md-12 mb-3">
         <div class="card">
             <div class="card-body">
-                <ul class="my-4 steps steps-green steps-counter">
+                <ul class="steps steps-green steps-counter my-4">
                     <li class="step-item" :class="{ 'active': currentStep === 1 }">
                         <a href="#" @click.prevent="currentStep = 1" class="text-decoration-none">Identitas
                             Usulan</a>
@@ -61,18 +61,18 @@
     <div class="col-md-12">
         <!-- Section 1: Identitas Usulan -->
         <div id="section-identitas" x-show="currentStep === 1">
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">1.1 Informasi Dasar</h3>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3 row">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-file-text class="me-2 icon" />Judul</label>
+                            <label class="form-label"><x-lucide-file-text class="icon me-2" />Judul</label>
                             <p class="text-reset">{{ $proposal->title }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-info class="me-2 icon" />Status</label>
+                            <label class="form-label"><x-lucide-info class="icon me-2" />Status</label>
                             <p>
                                 <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
                                     {{ $proposal->status->label() }}
@@ -81,72 +81,72 @@
                         </div>
                     </div>
 
-                    <div class="mb-3 row">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-user class="me-2 icon" />Author</label>
+                            <label class="form-label"><x-lucide-user class="icon me-2" />Author</label>
                             <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-mail class="me-2 icon" />Email</label>
+                            <label class="form-label"><x-lucide-mail class="icon me-2" />Email</label>
                             <p class="text-reset">{{ $proposal->submitter?->email }}</p>
                         </div>
                     </div>
 
-                    <div class="mb-3 row">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-clipboard-list class="me-2 icon" />Skema</label>
+                            <label class="form-label"><x-lucide-clipboard-list class="icon me-2" />Skema</label>
                             <p class="text-reset">{{ $proposal->communityServiceScheme?->name ?? '—' }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-calendar class="me-2 icon" />Durasi (Tahun)</label>
+                            <label class="form-label"><x-lucide-calendar class="icon me-2" />Durasi (Tahun)</label>
                             <p class="text-reset">{{ $proposal->duration_in_years ?? '—' }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">1.2 Informasi Dasar Proposal</h3>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3 row">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-focus class="me-2 icon" />Bidang Fokus</label>
+                            <label class="form-label"><x-lucide-focus class="icon me-2" />Bidang Fokus</label>
                             <p class="text-reset">{{ $proposal->focusArea?->name ?? '—' }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-tag class="me-2 icon" />Tema</label>
+                            <label class="form-label"><x-lucide-tag class="icon me-2" />Tema</label>
                             <p class="text-reset">{{ $proposal->theme?->name ?? '—' }}</p>
                         </div>
                     </div>
 
-                    <div class="mb-3 row">
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-hash class="me-2 icon" />Topik</label>
+                            <label class="form-label"><x-lucide-hash class="icon me-2" />Topik</label>
                             <p class="text-reset">{{ $proposal->topic?->name ?? '—' }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-star class="me-2 icon" />Prioritas Nasional</label>
+                            <label class="form-label"><x-lucide-star class="icon me-2" />Prioritas Nasional</label>
                             <p class="text-reset">{{ $proposal->nationalPriority?->name ?? '—' }}</p>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-dollar-sign class="me-2 icon" />Nilai SBK</label>
+                            <label class="form-label"><x-lucide-dollar-sign class="icon me-2" />Nilai SBK</label>
                             <p class="text-reset">{{ number_format($proposal->sbk_value, 2) ?? '—' }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">1.3 Klasifikasi Ilmu</h3>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3 row">
+                    <div class="row mb-3">
                         <div class="col-md-12">
                             <label class="form-label">Level 1</label>
                             <p class="text-reset">{{ $proposal->clusterLevel1?->name ?? '—' }}</p>
@@ -163,7 +163,7 @@
                 </div>
             </div>
 
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">1.4 Ringkasan</h3>
                 </div>
@@ -174,7 +174,7 @@
                 </div>
             </div>
 
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">1.5 Detail Pengabdian</h3>
                 </div>
@@ -203,7 +203,7 @@
 
         <!-- Section 2: Substansi Usulan -->
         <div id="section-substansi" x-show="currentStep === 2">
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">2.1 Kelompok Makro Riset</h3>
                 </div>
@@ -216,7 +216,7 @@
                 </div>
             </div>
 
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">2.2 File Substansi</h3>
                 </div>
@@ -250,7 +250,7 @@
             </div>
 
             {{-- Section 2.3.1: Luaran Wajib --}}
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">2.3.1 Luaran Wajib</h3>
                 </div>
@@ -263,7 +263,7 @@
                     </div>
                 @else
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
+                        <table class="table-bordered table-sm table">
                             <thead>
                                 <tr>
                                     <th>Tahun</th>
@@ -288,7 +288,7 @@
             </div>
 
             {{-- Section 2.3.2: Luaran Tambahan --}}
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">2.3.2 Luaran Tambahan</h3>
                 </div>
@@ -301,7 +301,7 @@
                     </div>
                 @else
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
+                        <table class="table-bordered table-sm table">
                             <thead>
                                 <tr>
                                     <th>Tahun</th>
@@ -328,7 +328,7 @@
 
         <!-- Section 3: RAB -->
         <div id="section-rab" x-show="currentStep === 3">
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">3.1 Rencana Anggaran Biaya (RAB)</h3>
                 </div>
@@ -336,7 +336,7 @@
                     <p class="text-muted">Belum ada item anggaran</p>
                 @else
                     <div class="table-responsive">
-                        <table class="card-table table table-bordered">
+                        <table class="card-table table-bordered table">
                             <thead>
                                 <tr>
                                     <th>Kelompok</th>
@@ -378,7 +378,7 @@
 
         <!-- Section 4: Dokumen Pendukung -->
         <div id="section-dokumen" x-show="currentStep === 4">
-            <div class="mb-3 card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h3 class="card-title">4.1 Mitra Kerjasama</h3>
                 </div>
@@ -387,7 +387,7 @@
                         <p class="text-muted">Belum ada mitra yang ditambahkan</p>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-vcenter">
+                            <table class="table-vcenter table">
                                 <thead>
                                     <tr>
                                         <th>Nama Mitra</th>
@@ -408,7 +408,7 @@
                                             <td>
                                                 @if ($partner->institution)
                                                     <div class="d-flex align-items-center">
-                                                        <x-lucide-building class="icon me-1 text-muted" />
+                                                        <x-lucide-building class="icon text-muted me-1" />
                                                         {{ $partner->institution }}
                                                     </div>
                                                 @else
@@ -419,7 +419,7 @@
                                                 @if ($partner->email)
                                                     <a href="mailto:{{ $partner->email }}" class="text-reset">
                                                         <div class="d-flex align-items-center">
-                                                            <x-lucide-mail class="icon me-1 text-muted" />
+                                                            <x-lucide-mail class="icon text-muted me-1" />
                                                             {{ $partner->email }}
                                                         </div>
                                                     </a>
@@ -430,7 +430,7 @@
                                             <td>
                                                 @if ($partner->country)
                                                     <div class="d-flex align-items-center">
-                                                        <x-lucide-map-pin class="icon me-1 text-muted" />
+                                                        <x-lucide-map-pin class="icon text-muted me-1" />
                                                         {{ $partner->country }}
                                                     </div>
                                                 @else
@@ -439,7 +439,8 @@
                                             </td>
                                             <td>
                                                 @if ($partner->address)
-                                                    <div class="text-truncate" style="max-width: 200px;" title="{{ $partner->address }}">
+                                                    <div class="text-truncate" style="max-width: 200px;"
+                                                        title="{{ $partner->address }}">
                                                         {{ $partner->address }}
                                                     </div>
                                                 @else
@@ -452,11 +453,9 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                @if ($partner->commitment_letter_file)
-                                                    <a href="{{ Storage::url($partner->commitment_letter_file) }}" 
-                                                       target="_blank" 
-                                                       onclick="setTimeout(() => window.location.reload(), 100)"
-                                                       class="btn btn-sm btn-primary">
+                                                @if ($partner->hasMedia('commitment_letter'))
+                                                    <a href="{{ $partner->getFirstMediaUrl('commitment_letter') }}"
+                                                        target="_blank" class="btn btn-sm btn-primary">
                                                         <x-lucide-download class="icon" />
                                                         Unduh
                                                     </a>
@@ -494,15 +493,15 @@
 
             <!-- Dekan Approval (Status: SUBMITTED) -->
             @if (auth()->user()->hasRole(['dekan', 'rektor']) && $proposal->status->value === 'submitted')
-                <div class="mb-3 card">
+                <div class="card mb-3">
                     <div class="card-header">
                         <h3 class="card-title">Persetujuan Dekan</h3>
                     </div>
                     <div class="card-body">
-                        <p class="mb-3 text-secondary">
+                        <p class="text-secondary mb-3">
                             Silakan tinjau proposal ini dan berikan keputusan Anda sebagai Dekan.
                         </p>
-                        <div class="gap-2 btn-list">
+                        <div class="btn-list gap-2">
                             <button type="button" class="btn btn-success" data-bs-toggle="modal"
                                 data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'approved')">
                                 <x-lucide-check class="icon" />
@@ -533,7 +532,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <!-- Status & Actions Card -->
-                    <div class="mb-3 h-100 card">
+                    <div class="h-100 card mb-3">
                         <div class="card-header">
                             <h3 class="card-title">Status & Aksi</h3>
                         </div>
@@ -557,7 +556,7 @@
                                 $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
                             @endphp
                             @if ($currentMember && $currentMember->pivot->status === 'pending')
-                                <div class="d-flex gap-2 mb-3">
+                                <div class="d-flex mb-3 gap-2">
                                     <button type="button" class="btn btn-success" data-bs-toggle="modal"
                                         data-bs-target="#acceptMemberModal">
                                         <x-lucide-check class="icon" />
@@ -583,9 +582,9 @@
                 </div>
                 <div class="col-md-4">
                     <!-- Timeline Card -->
-                    <div class="mb-3 h-100 card">
+                    <div class="h-100 card mb-3">
                         <div class="card-header">
-                            <h4 class="mb-0 card-title">Status Proposal</h4>
+                            <h4 class="card-title mb-0">Status Proposal</h4>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
@@ -601,16 +600,16 @@
                 </div>
                 <div class="col-md-4">
                     <!-- Review Status Card -->
-                    <div class="mb-3 h-100 card">
+                    <div class="h-100 card mb-3">
                         <div class="card-header">
-                            <h4 class="mb-0 card-title">Review Status</h4>
+                            <h4 class="card-title mb-0">Review Status</h4>
                         </div>
                         @php $reviewers = $proposal->reviewers; @endphp
                         @if ($reviewers->isEmpty())
                             <p class="text-muted">Belum ada reviewer yang ditugaskan</p>
                         @else
                             <div class="table-responsive">
-                                <table class="card-table table table-bordered table-sm">
+                                <table class="card-table table-bordered table-sm table">
                                     <thead>
                                         <tr>
                                             <th>Reviewer</th>
@@ -639,7 +638,7 @@
             </div>
 
             <!-- Status History Section -->
-            <div class="mt-4 mb-3 card">
+            <div class="card mb-3 mt-4">
                 <div class="card-header">
                     <h3 class="card-title">Riwayat Status</h3>
                 </div>
@@ -654,7 +653,8 @@
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div>
                                                 <strong>{{ $log->status_before?->label() ?? '—' }}</strong>
-                                                <x-lucide-arrow-right class="mx-2 icon" style="width: 1rem; height: 1rem;" />
+                                                <x-lucide-arrow-right class="icon mx-2"
+                                                    style="width: 1rem; height: 1rem;" />
                                                 <strong>{{ $log->status_after->label() }}</strong>
                                             </div>
                                             <small class="text-muted">{{ $log->at->format('d M Y H:i') }}</small>
@@ -699,7 +699,7 @@
             <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
                 <x-slot:body>
                     <div class="py-1 text-center">
-                        <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                        <x-lucide-alert-circle class="text-danger icon mb-2" style="width: 3rem; height: 3rem;" />
                         <h3>Hapus Proposal?</h3>
                         <div class="text-secondary">
                             Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
@@ -724,7 +724,7 @@
         <x-tabler.modal id="acceptMemberModal" title="Terima Undangan?" wire:ignore.self>
             <x-slot:body>
                 <div class="py-1 text-center">
-                    <x-lucide-check-circle class="mb-2 text-success icon" style="width: 3rem; height: 3rem;" />
+                    <x-lucide-check-circle class="text-success icon mb-2" style="width: 3rem; height: 3rem;" />
                     <h3>Terima Undangan?</h3>
                     <div class="text-secondary">
                         Apakah Anda yakin ingin menerima undangan sebagai anggota tim proposal ini?
@@ -736,7 +736,8 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal" onclick="setTimeout(() => window.location.reload(), 3000)">
+                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal"
+                    onclick="setTimeout(() => window.location.reload(), 3000)">
                     Ya, Terima
                 </button>
             </x-slot:footer>
@@ -748,7 +749,7 @@
         <x-tabler.modal id="rejectMemberModal" title="Tolak Undangan?" wire:ignore.self>
             <x-slot:body>
                 <div class="py-1 text-center">
-                    <x-lucide-x-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                    <x-lucide-x-circle class="text-danger icon mb-2" style="width: 3rem; height: 3rem;" />
                     <h3>Tolak Undangan?</h3>
                     <div class="text-secondary">
                         Apakah Anda yakin ingin menolak undangan sebagai anggota tim proposal ini?
@@ -760,7 +761,8 @@
                 <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
                     Batal
                 </button>
-                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal" onclick="setTimeout(() => window.location.reload(), 3000)">
+                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal"
+                    onclick="setTimeout(() => window.location.reload(), 3000)">
                     Ya, Tolak
                 </button>
             </x-slot:footer>
@@ -772,7 +774,7 @@
         <x-tabler.modal id="approvalModal" title="Keputusan Dekan" wire:ignore.self>
             <x-slot:body>
                 <div class="py-1 text-center">
-                    <x-lucide-check-circle class="mb-2 text-primary icon" style="width: 3rem; height: 3rem;" />
+                    <x-lucide-check-circle class="text-primary icon mb-2" style="width: 3rem; height: 3rem;" />
                     <h3>Konfirmasi Keputusan</h3>
                     <div class="text-secondary">
                         Apakah Anda yakin dengan keputusan ini?

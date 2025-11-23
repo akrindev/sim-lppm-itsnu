@@ -43,6 +43,24 @@ class MandatoryOutput extends Model implements HasMedia
         'article_url',
         'doi',
         'document_file',
+        // New fields
+        'book_title',
+        'isbn',
+        'authors',
+        'publisher',
+        'total_pages',
+        'hki_type',
+        'registration_number',
+        'inventors',
+        'product_name',
+        'description',
+        'readiness_level',
+        'implementation_location',
+        'media_name',
+        'media_url',
+        'publication_date',
+        'video_url',
+        'platform',
     ];
 
     /**

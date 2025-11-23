@@ -1,9 +1,9 @@
 <!-- Section: Substansi Usulan -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-book-open class="me-3 icon" />
-            <h3 class="mb-0 card-title">2.1 Substansi Usulan</h3>
+            <x-lucide-book-open class="icon me-3" />
+            <h3 class="card-title mb-0">2.1 Substansi Usulan</h3>
         </div>
 
         <div class="row g-4">
@@ -49,12 +49,12 @@
 </div>
 
 <!-- Section: Luaran Target Capaian -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="d-flex align-items-center">
-                <x-lucide-target class="me-3 icon" />
-                <h3 class="mb-0 card-title">2.2 Luaran Target Capaian</h3>
+                <x-lucide-target class="icon me-3" />
+                <h3 class="card-title mb-0">2.2 Luaran Target Capaian</h3>
             </div>
             <button type="button" wire:click="addOutput" class="btn btn-primary btn-sm">
                 <x-lucide-plus class="icon" />
@@ -62,14 +62,23 @@
             </button>
         </div>
 
+        @error('form.outputs')
+            <div class="alert alert-danger mb-3">
+                <div class="d-flex">
+                    <x-lucide-alert-circle class="icon me-2" />
+                    <div>{{ $message }}</div>
+                </div>
+            </div>
+        @enderror
+
         @if (empty($form->outputs))
             <div class="alert alert-info">
-                <x-lucide-info class="me-2 icon" />
+                <x-lucide-info class="icon me-2" />
                 Belum ada luaran target. Klik tombol "Tambah Luaran" untuk menambahkan.
             </div>
         @else
             <div class="table-responsive">
-                <table class="table table-bordered">
+                <table class="table-bordered table">
                     <thead>
                         <tr>
                             {{-- <th width="20%">Tahun</th> --}}
@@ -83,7 +92,18 @@
                     </thead>
                     <tbody>
                         @foreach ($form->outputs as $index => $output)
-                            <tr wire:key="output-{{ $index }}">
+                            <tr wire:key="output-{{ $index }}" x-data="{
+                                group: $wire.entangle('form.outputs.{{ $index }}.group'),
+                                types: {
+                                    'jurnal': ['Jurnal Nasional Terakreditasi', 'Jurnal Internasional', 'Jurnal Internasional Bereputasi'],
+                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional'],
+                                    'buku': ['Buku Ajar', 'Buku Referensi', 'Monograf'],
+                                    'hki': ['Paten', 'Paten Sederhana', 'Hak Cipta', 'Desain Industri', 'DTLST', 'PVT'],
+                                    'media': ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
+                                    'video': ['Video Kegiatan'],
+                                    'produk': ['Produk', 'Model', 'Purwarupa', 'TTG']
+                                }
+                            }">
                                 {{-- <td>
                                     <input type="number" wire:model="form.outputs.{{ $index }}.year"
                                         class="form-control form-control-sm" placeholder="2025" min="2020"
@@ -98,23 +118,24 @@
                                 </td>
 
                                 <td>
-                                    <select wire:model="form.outputs.{{ $index }}.group"
-                                        class="form-select-sm form-select">
+                                    <select x-model="group" class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
-                                        <option value="buku_cetak">Buku Cetak Hasil Penelitian</option>
-                                        <option value="buku_elektronik">Buku Elektronik Hasil Penelitian</option>
-                                        <option value="artikel_jurnal">Artikel di Jurnal</option>
-                                        <option value="naskah_akademik">Naskah Akademik</option>
-                                        <option value="hak_cipta">Hak Cipta</option>
+                                        <option value="jurnal">Jurnal</option>
+                                        <option value="prosiding">Prosiding</option>
+                                        <option value="buku">Buku</option>
+                                        <option value="hki">HKI</option>
+                                        <option value="media">Media Massa</option>
+                                        <option value="video">Video</option>
+                                        <option value="produk">Produk/TTG</option>
                                     </select>
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.type"
                                         class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
-                                        <option value="buku_referensi">Buku Referensi</option>
-                                        <option value="buku_ajar">Buku Ajar</option>
-                                        <option value="monograf">Monograf</option>
+                                        <template x-for="type in (types[group] || [])">
+                                            <option x-text="type" :value="type"></option>
+                                        </template>
                                     </select>
                                 </td>
                                 <td>
