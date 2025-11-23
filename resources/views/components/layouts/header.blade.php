@@ -159,10 +159,10 @@
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                        <a href="#" class="dropdown-item">Status</a>
+                        {{-- <a href="#" class="dropdown-item">Status</a>
                         <a href="{{ route('settings.profile') }}" class="dropdown-item">Profile</a>
                         <a href="#" class="dropdown-item">Feedback</a>
-                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div> --}}
                         <a href="{{ route('settings') }}" class="dropdown-item">Settings</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
