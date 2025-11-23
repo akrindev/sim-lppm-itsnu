@@ -47,6 +47,24 @@ trait ManagesOutputs
                 'page_end' => $output->page_end,
                 'article_url' => $output->article_url,
                 'doi' => $output->doi,
+                // New fields
+                'book_title' => $output->book_title,
+                'isbn' => $output->isbn,
+                'authors' => $output->authors,
+                'publisher' => $output->publisher,
+                'total_pages' => $output->total_pages,
+                'hki_type' => $output->hki_type,
+                'registration_number' => $output->registration_number,
+                'inventors' => $output->inventors,
+                'product_name' => $output->product_name,
+                'description' => $output->description,
+                'readiness_level' => $output->readiness_level,
+                'implementation_location' => $output->implementation_location,
+                'media_name' => $output->media_name,
+                'media_url' => $output->media_url,
+                'publication_date' => $output->publication_date,
+                'video_url' => $output->video_url,
+                'platform' => $output->platform,
             ];
         }
 
@@ -66,6 +84,25 @@ trait ManagesOutputs
                 'total_pages' => $output->total_pages,
                 'publisher_url' => $output->publisher_url,
                 'book_url' => $output->book_url,
+                // New fields
+                'journal_title' => $output->journal_title,
+                'issn' => $output->issn,
+                'eissn' => $output->eissn,
+                'volume' => $output->volume,
+                'issue_number' => $output->issue_number,
+                'doi' => $output->doi,
+                'hki_type' => $output->hki_type,
+                'registration_number' => $output->registration_number,
+                'inventors' => $output->inventors,
+                'product_name' => $output->product_name,
+                'description' => $output->description,
+                'readiness_level' => $output->readiness_level,
+                'implementation_location' => $output->implementation_location,
+                'media_name' => $output->media_name,
+                'media_url' => $output->media_url,
+                'publication_date' => $output->publication_date,
+                'video_url' => $output->video_url,
+                'platform' => $output->platform,
             ];
         }
     }
@@ -106,6 +143,24 @@ trait ManagesOutputs
             'page_end' => '',
             'article_url' => '',
             'doi' => '',
+            // New fields
+            'book_title' => '',
+            'isbn' => '',
+            'authors' => '',
+            'publisher' => '',
+            'total_pages' => '',
+            'hki_type' => '',
+            'registration_number' => '',
+            'inventors' => '',
+            'product_name' => '',
+            'description' => '',
+            'readiness_level' => '',
+            'implementation_location' => '',
+            'media_name' => '',
+            'media_url' => '',
+            'publication_date' => '',
+            'video_url' => '',
+            'platform' => '',
         ];
     }
 
@@ -124,6 +179,25 @@ trait ManagesOutputs
             'total_pages' => '',
             'publisher_url' => '',
             'book_url' => '',
+            // New fields
+            'journal_title' => '',
+            'issn' => '',
+            'eissn' => '',
+            'volume' => '',
+            'issue_number' => '',
+            'doi' => '',
+            'hki_type' => '',
+            'registration_number' => '',
+            'inventors' => '',
+            'product_name' => '',
+            'description' => '',
+            'readiness_level' => '',
+            'implementation_location' => '',
+            'media_name' => '',
+            'media_url' => '',
+            'publication_date' => '',
+            'video_url' => '',
+            'platform' => '',
         ];
     }
 

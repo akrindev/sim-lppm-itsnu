@@ -92,7 +92,18 @@
                     </thead>
                     <tbody>
                         @foreach ($form->outputs as $index => $output)
-                            <tr wire:key="output-{{ $index }}">
+                            <tr wire:key="output-{{ $index }}" x-data="{
+                                group: $wire.entangle('form.outputs.{{ $index }}.group'),
+                                types: {
+                                    'jurnal': ['Jurnal Nasional Terakreditasi', 'Jurnal Internasional', 'Jurnal Internasional Bereputasi'],
+                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional'],
+                                    'buku': ['Buku Ajar', 'Buku Referensi', 'Monograf'],
+                                    'hki': ['Paten', 'Paten Sederhana', 'Hak Cipta', 'Desain Industri', 'DTLST', 'PVT'],
+                                    'media': ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
+                                    'video': ['Video Kegiatan'],
+                                    'produk': ['Produk', 'Model', 'Purwarupa', 'TTG']
+                                }
+                            }">
                                 {{-- <td>
                                     <input type="number" wire:model="form.outputs.{{ $index }}.year"
                                         class="form-control form-control-sm" placeholder="2025" min="2020"
@@ -107,23 +118,24 @@
                                 </td>
 
                                 <td>
-                                    <select wire:model="form.outputs.{{ $index }}.group"
-                                        class="form-select-sm form-select">
+                                    <select x-model="group" class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
-                                        <option value="buku_cetak">Buku Cetak Hasil Penelitian</option>
-                                        <option value="buku_elektronik">Buku Elektronik Hasil Penelitian</option>
-                                        <option value="artikel_jurnal">Artikel di Jurnal</option>
-                                        <option value="naskah_akademik">Naskah Akademik</option>
-                                        <option value="hak_cipta">Hak Cipta</option>
+                                        <option value="jurnal">Jurnal</option>
+                                        <option value="prosiding">Prosiding</option>
+                                        <option value="buku">Buku</option>
+                                        <option value="hki">HKI</option>
+                                        <option value="media">Media Massa</option>
+                                        <option value="video">Video</option>
+                                        <option value="produk">Produk/TTG</option>
                                     </select>
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.type"
                                         class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
-                                        <option value="buku_referensi">Buku Referensi</option>
-                                        <option value="buku_ajar">Buku Ajar</option>
-                                        <option value="monograf">Monograf</option>
+                                        <template x-for="type in (types[group] || [])">
+                                            <option x-text="type" :value="type"></option>
+                                        </template>
                                     </select>
                                 </td>
                                 <td>

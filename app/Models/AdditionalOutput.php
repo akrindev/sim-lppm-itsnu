@@ -37,6 +37,25 @@ class AdditionalOutput extends Model implements HasMedia
         'book_url',
         'document_file',
         'publication_certificate',
+        // New fields
+        'journal_title',
+        'issn',
+        'eissn',
+        'volume',
+        'issue_number',
+        'doi',
+        'hki_type',
+        'registration_number',
+        'inventors',
+        'product_name',
+        'description',
+        'readiness_level',
+        'implementation_location',
+        'media_name',
+        'media_url',
+        'publication_date',
+        'video_url',
+        'platform',
     ];
 
     /**

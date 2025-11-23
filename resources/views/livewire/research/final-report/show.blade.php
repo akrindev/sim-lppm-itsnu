@@ -479,176 +479,221 @@
                 @endif
 
                 @if ($form->editingMandatoryId)
+                    @php
+                        $currentOutput = $proposal->outputs->find($form->editingMandatoryId);
+                        $outputType = $currentOutput?->type ?? '';
+                        $outputGroup = $currentOutput?->group ?? '';
+                    @endphp
+
                     <div class="row g-3">
-                        <!-- Status Type -->
+                        <!-- Common Fields -->
                         <div class="col-md-6">
-                            <label class="form-label required">Status Publikasi</label>
+                            <label class="form-label required">Status</label>
                             <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.status_type"
                                 class="form-select" @disabled(!$canEdit)>
                                 <option value="">Pilih Status</option>
-                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                                <option value="submitted">Submitted</option>
                                 <option value="accepted">Accepted</option>
-                                <option value="under_review">Under Review</option>
+                                <option value="published">Published</option>
                                 <option value="rejected">Rejected</option>
+                                <option value="granted">Granted (HKI)</option>
                             </select>
                             @error("form.mandatoryOutputs.{$form->editingMandatoryId}.status_type")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
 
-                        <!-- Author Status -->
-                        <div class="col-md-6">
-                            <label class="form-label required">Status Penulis</label>
-                            <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.author_status"
-                                class="form-select" @disabled(!$canEdit)>
-                                <option value="">Pilih Status</option>
-                                <option value="first_author">First Author</option>
-                                <option value="co_author">Co-Author</option>
-                                <option value="corresponding_author">Corresponding Author</option>
-                            </select>
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.author_status")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                        <!-- JURNAL/PROSIDING Fields -->
+                        @if (str_contains(strtolower($outputType), 'jurnal') ||
+                                str_contains(strtolower($outputGroup), 'jurnal') ||
+                                str_contains(strtolower($outputType), 'prosiding') ||
+                                str_contains(strtolower($outputGroup), 'prosiding'))
+                            <div class="col-md-6">
+                                <label class="form-label required">Status Penulis</label>
+                                <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.author_status"
+                                    class="form-select" @disabled(!$canEdit)>
+                                    <option value="">Pilih Status</option>
+                                    <option value="first_author">First Author</option>
+                                    <option value="co_author">Co-Author</option>
+                                    <option value="corresponding_author">Corresponding Author</option>
+                                </select>
+                                @error("form.mandatoryOutputs.{$form->editingMandatoryId}.author_status")
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
 
-                        <!-- Journal Title -->
-                        <div class="col-md-12">
-                            <label class="form-label required">Judul Jurnal</label>
-                            <input type="text"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_title"
-                                class="form-control" placeholder="Masukkan judul jurnal" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.journal_title")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                            <div class="col-md-12">
+                                <label class="form-label required">Judul
+                                    {{ str_contains(strtolower($outputType), 'prosiding') ? 'Prosiding' : 'Jurnal' }}</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_title"
+                                    class="form-control" placeholder="Masukkan judul" @disabled(!$canEdit) />
+                                @error("form.mandatoryOutputs.{$form->editingMandatoryId}.journal_title")
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
 
-                        <!-- ISSN / E-ISSN -->
-                        <div class="col-md-6">
-                            <label class="form-label">ISSN</label>
-                            <input type="text" wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.issn"
-                                class="form-control" placeholder="1234-5678" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.issn")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">E-ISSN</label>
-                            <input type="text"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.eissn"
-                                class="form-control" placeholder="1234-5678" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.eissn")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                            <div class="col-md-6">
+                                <label
+                                    class="form-label">{{ str_contains(strtolower($outputType), 'prosiding') ? 'ISBN' : 'ISSN' }}</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.issn"
+                                    class="form-control" placeholder="1234-5678" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label
+                                    class="form-label">E-{{ str_contains(strtolower($outputType), 'prosiding') ? 'ISBN' : 'ISSN' }}</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.eissn"
+                                    class="form-control" placeholder="1234-5678" @disabled(!$canEdit) />
+                            </div>
 
-                        <!-- Indexing Body -->
-                        <div class="col-md-6">
-                            <label class="form-label">Lembaga Pengindex</label>
-                            <input type="text"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.indexing_body"
-                                class="form-control" placeholder="Scopus, WoS, Sinta, dll"
-                                @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.indexing_body")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                            <div class="col-md-12">
+                                <label class="form-label required">Judul Artikel</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_title"
+                                    class="form-control" placeholder="Masukkan judul artikel"
+                                    @disabled(!$canEdit) />
+                            </div>
 
-                        <!-- Journal URL -->
-                        <div class="col-md-6">
-                            <label class="form-label">URL Jurnal</label>
-                            <input type="url"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_url"
-                                class="form-control" placeholder="https://" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.journal_url")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                            <div class="col-md-6">
+                                <label class="form-label">URL Publikasi</label>
+                                <input type="url"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.journal_url"
+                                    class="form-control" placeholder="https://" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">URL Artikel</label>
+                                <input type="url"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_url"
+                                    class="form-control" placeholder="https://" @disabled(!$canEdit) />
+                            </div>
+                        @endif
 
-                        <!-- Article Title -->
-                        <div class="col-md-12">
-                            <label class="form-label required">Judul Artikel</label>
-                            <input type="text"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_title"
-                                class="form-control" placeholder="Masukkan judul artikel" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.article_title")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                        <!-- BUKU Fields -->
+                        @if (str_contains(strtolower($outputType), 'buku') || str_contains(strtolower($outputGroup), 'buku'))
+                            <div class="col-md-12">
+                                <label class="form-label required">Judul Buku</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.book_title"
+                                    class="form-control" placeholder="Masukkan judul buku"
+                                    @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">ISBN</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.isbn"
+                                    class="form-control" placeholder="ISBN" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Penerbit</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.publisher"
+                                    class="form-control" placeholder="Nama Penerbit" @disabled(!$canEdit) />
+                            </div>
+                        @endif
 
-                        <!-- Publication Year -->
+                        <!-- HKI Fields -->
+                        @if (str_contains(strtolower($outputType), 'hki') ||
+                                str_contains(strtolower($outputType), 'paten') ||
+                                str_contains(strtolower($outputType), 'hak cipta') ||
+                                str_contains(strtolower($outputGroup), 'hki'))
+                            <div class="col-md-6">
+                                <label class="form-label required">Jenis HKI</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.hki_type"
+                                    class="form-control" placeholder="Paten, Hak Cipta, dll"
+                                    @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nomor Pendaftaran/Sertifikat</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.registration_number"
+                                    class="form-control" placeholder="Nomor" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Inventor</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.inventors"
+                                    class="form-control" placeholder="Nama Inventor" @disabled(!$canEdit) />
+                            </div>
+                        @endif
+
+                        <!-- MEDIA MASSA Fields -->
+                        @if (str_contains(strtolower($outputType), 'media') || str_contains(strtolower($outputGroup), 'media'))
+                            <div class="col-md-12">
+                                <label class="form-label required">Nama Media Massa</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.media_name"
+                                    class="form-control" placeholder="Kompas, Detik, dll" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label required">URL Berita</label>
+                                <input type="url"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.media_url"
+                                    class="form-control" placeholder="https://" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Tanggal Terbit</label>
+                                <input type="date"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.publication_date"
+                                    class="form-control" @disabled(!$canEdit) />
+                            </div>
+                        @endif
+
+                        <!-- VIDEO Fields -->
+                        @if (str_contains(strtolower($outputType), 'video') || str_contains(strtolower($outputGroup), 'video'))
+                            <div class="col-md-12">
+                                <label class="form-label required">URL Video</label>
+                                <input type="url"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.video_url"
+                                    class="form-control" placeholder="https://youtube.com/..."
+                                    @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Platform</label>
+                                <select wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.platform"
+                                    class="form-select" @disabled(!$canEdit)>
+                                    <option value="">Pilih Platform</option>
+                                    <option value="YouTube">YouTube</option>
+                                    <option value="Instagram">Instagram</option>
+                                    <option value="TikTok">TikTok</option>
+                                    <option value="Facebook">Facebook</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                        @endif
+
+                        <!-- PRODUK/TTG Fields -->
+                        @if (str_contains(strtolower($outputType), 'produk') ||
+                                str_contains(strtolower($outputType), 'ttg') ||
+                                str_contains(strtolower($outputGroup), 'produk'))
+                            <div class="col-md-12">
+                                <label class="form-label required">Nama Produk/TTG</label>
+                                <input type="text"
+                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.product_name"
+                                    class="form-control" placeholder="Masukkan nama produk/TTG"
+                                    @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Deskripsi Singkat</label>
+                                <textarea wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.description" class="form-control"
+                                    rows="3" placeholder="Deskripsi produk/TTG" @disabled(!$canEdit)></textarea>
+                            </div>
+                        @endif
+
+                        <!-- Common Year Field -->
                         <div class="col-md-3">
-                            <label class="form-label required">Tahun Terbit</label>
+                            <label class="form-label required">Tahun</label>
                             <input type="number"
                                 wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.publication_year"
                                 class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.publication_year")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Volume -->
-                        <div class="col-md-3">
-                            <label class="form-label">Volume</label>
-                            <input type="text"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.volume"
-                                class="form-control" placeholder="Vol. 1" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.volume")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Issue Number -->
-                        <div class="col-md-3">
-                            <label class="form-label">Nomor</label>
-                            <input type="text"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.issue_number"
-                                class="form-control" placeholder="No. 1" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.issue_number")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Pages -->
-                        <div class="col-md-3">
-                            <label class="form-label">Halaman</label>
-                            <div class="input-group">
-                                <input type="number"
-                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.page_start"
-                                    class="form-control" placeholder="1" @disabled(!$canEdit) />
-                                <span class="input-group-text">-</span>
-                                <input type="number"
-                                    wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.page_end"
-                                    class="form-control" placeholder="10" @disabled(!$canEdit) />
-                            </div>
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.page_start")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Article URL -->
-                        <div class="col-md-6">
-                            <label class="form-label">URL Artikel</label>
-                            <input type="url"
-                                wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.article_url"
-                                class="form-control" placeholder="https://" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.article_url")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- DOI -->
-                        <div class="col-md-6">
-                            <label class="form-label">DOI Artikel</label>
-                            <input type="text" wire:model="form.mandatoryOutputs.{{ $form->editingMandatoryId }}.doi"
-                                class="form-control" placeholder="10.xxxx/xxxxx" @disabled(!$canEdit) />
-                            @error("form.mandatoryOutputs.{$form->editingMandatoryId}.doi")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
                         </div>
 
                         <!-- File Upload -->
                         <div class="col-md-12">
-                            <label class="form-label">Dokumen Artikel (PDF)</label>
+                            <label class="form-label">Dokumen Bukti (PDF)</label>
                             <input type="file" wire:model="tempMandatoryFiles.{{ $form->editingMandatoryId }}"
                                 class="form-control" accept=".pdf" @disabled(!$canEdit) />
                             @error("tempMandatoryFiles.{$form->editingMandatoryId}")
@@ -671,7 +716,7 @@
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>
-                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                            <a href="{{ $media->getUrl() }}}" target="_blank"
                                                 class="btn btn-sm btn-primary">
                                                 <x-lucide-download class="icon" /> Download
                                             </a>
