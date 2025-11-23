@@ -25,7 +25,7 @@ class FocusAreaSeeder extends Seeder
         ];
 
         foreach ($focusAreas as $area) {
-            \App\Models\FocusArea::create(['name' => $area]);
+            \App\Models\FocusArea::firstOrCreate(['name' => $area]);
         }
     }
 }

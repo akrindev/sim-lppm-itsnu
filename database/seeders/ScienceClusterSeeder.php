@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ScienceClusterSeeder extends Seeder
 {
@@ -21,9 +20,6 @@ class ScienceClusterSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing data to ensure clean insert
-        DB::table('science_clusters')->delete();
-
         // Complete 3-level structure for all 12 Rumpun Ilmu
         $clusters = [
             // ========== LEVEL 1: 12 RUMPUN ILMU ==========
@@ -223,9 +219,10 @@ class ScienceClusterSeeder extends Seeder
             ['id' => 114, 'parent_id' => 46, 'level' => 3, 'name' => '1114 - Desain Komunikasi Visual'],
         ];
 
-        // Prepare data for batch insert without the explicit IDs
-        $insertData = array_map(function ($cluster) {
+        // Prepare data for upsert - include all fields needed
+        $upsertData = array_map(function ($cluster) {
             return [
+                'id' => $cluster['id'],
                 'name' => $cluster['name'],
                 'level' => $cluster['level'],
                 'parent_id' => $cluster['parent_id'],
@@ -234,13 +231,13 @@ class ScienceClusterSeeder extends Seeder
             ];
         }, $clusters);
 
-        // Batch insert all clusters
-        \App\Models\ScienceCluster::insert($insertData);
+        // Upsert all clusters - will update if exists (by id), insert if not
+        \App\Models\ScienceCluster::upsert($upsertData, ['id'], ['name', 'level', 'parent_id', 'updated_at']);
 
         $this->command->info('Science clusters seeded successfully!');
         $this->command->info('Level 1: 12 Rumpun Ilmu');
-        $this->command->info('Level 2: '.(count(array_filter($clusters, fn ($c) => $c['level'] == 2))).' Sub Rumpun');
-        $this->command->info('Level 3: '.(count(array_filter($clusters, fn ($c) => $c['level'] == 3))).' Bidang Ilmu Detail');
-        $this->command->info('Total: '.count($clusters).' clusters seeded');
+        $this->command->info('Level 2: ' . (count(array_filter($clusters, fn($c) => $c['level'] == 2))) . ' Sub Rumpun');
+        $this->command->info('Level 3: ' . (count(array_filter($clusters, fn($c) => $c['level'] == 3))) . ' Bidang Ilmu Detail');
+        $this->command->info('Total: ' . count($clusters) . ' clusters seeded');
     }
 }

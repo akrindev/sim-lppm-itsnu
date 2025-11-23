@@ -35,11 +35,14 @@ class StudyProgramSeeder extends Seeder
             ];
 
             foreach ($saintekPrograms as $program) {
-                \App\Models\StudyProgram::create([
-                    'faculty_id' => $saintek->id,
-                    'name' => $program['name'],
-                    'code' => $program['code'],
-                ]);
+                \App\Models\StudyProgram::firstOrCreate(
+                    ['code' => $program['code']],
+                    [
+                        'faculty_id' => $saintek->id,
+                        'name' => $program['name'],
+                        'code' => $program['code'],
+                    ]
+                );
             }
         }
 
@@ -51,11 +54,14 @@ class StudyProgramSeeder extends Seeder
             ];
 
             foreach ($dekabitaPrograms as $program) {
-                \App\Models\StudyProgram::create([
-                    'faculty_id' => $dekabita->id,
-                    'name' => $program['name'],
-                    'code' => $program['code'],
-                ]);
+                \App\Models\StudyProgram::firstOrCreate(
+                    ['code' => $program['code']],
+                    [
+                        'faculty_id' => $dekabita->id,
+                        'name' => $program['name'],
+                        'code' => $program['code'],
+                    ]
+                );
             }
         }
     }

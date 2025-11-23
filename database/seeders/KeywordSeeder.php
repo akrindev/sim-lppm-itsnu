@@ -47,7 +47,7 @@ class KeywordSeeder extends Seeder
         ];
 
         foreach ($keywords as $keyword) {
-            \App\Models\Keyword::create(['name' => $keyword]);
+            \App\Models\Keyword::firstOrCreate(['name' => $keyword]);
         }
     }
 }

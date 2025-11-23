@@ -33,13 +33,17 @@ class TopicSeeder extends Seeder
         ];
 
         foreach ($themes as $theme) {
-            // Create 2-3 topics per theme
-            $topicCount = rand(2, 3);
-            for ($i = 0; $i < $topicCount; $i++) {
-                \App\Models\Topic::create([
-                    'theme_id' => $theme->id,
-                    'name' => fake()->randomElement($topics),
-                ]);
+            // Only create topics if none exist for this theme
+            if ($theme->topics()->doesntExist()) {
+                // Create 2-3 topics per theme
+                $topicCount = rand(2, 3);
+                for ($i = 0; $i < $topicCount; $i++) {
+                    $topicName = fake()->randomElement($topics);
+                    \App\Models\Topic::firstOrCreate(
+                        ['theme_id' => $theme->id, 'name' => $topicName],
+                        ['theme_id' => $theme->id, 'name' => $topicName]
+                    );
+                }
             }
         }
     }

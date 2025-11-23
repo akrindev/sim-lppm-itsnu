@@ -20,11 +20,14 @@ class FacultySeeder extends Seeder
             ];
 
             foreach ($faculties as $faculty) {
-                \App\Models\Faculty::create([
-                    'institution_id' => $itsnu->id,
-                    'name' => $faculty['name'],
-                    'code' => $faculty['code'],
-                ]);
+                \App\Models\Faculty::firstOrCreate(
+                    ['code' => $faculty['code']],
+                    [
+                        'institution_id' => $itsnu->id,
+                        'name' => $faculty['name'],
+                        'code' => $faculty['code'],
+                    ]
+                );
             }
         }
     }

@@ -40,7 +40,7 @@ class MacroResearchGroupSeeder extends Seeder
         ];
 
         foreach ($groups as $group) {
-            MacroResearchGroup::create($group);
+            MacroResearchGroup::firstOrCreate(['name' => $group['name']], $group);
         }
     }
 }
