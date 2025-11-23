@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Exports\ResearchProposalExport;
 use App\Models\CommunityService;
 use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminDashboard extends Component
 {
@@ -38,6 +40,14 @@ class AdminDashboard extends Component
     public function updatedSelectedYear()
     {
         $this->loadAnalytics();
+    }
+
+    public function exportResearch()
+    {
+        return Excel::download(
+            new ResearchProposalExport($this->selectedYear),
+            "research-proposals-{$this->selectedYear}.xlsx"
+        );
     }
 
     private function getAvailableYears(): array
