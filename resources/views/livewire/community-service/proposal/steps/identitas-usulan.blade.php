@@ -1,9 +1,9 @@
 <!-- Section: Informasi Dasar -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-file-text class="me-3 icon" />
-            <h3 class="mb-0 card-title">1.1 Informasi Dasar Proposal</h3>
+            <x-lucide-file-text class="icon me-3" />
+            <h3 class="card-title mb-0">1.1 Informasi Dasar Proposal</h3>
         </div>
 
         <div class="row g-4">
@@ -90,11 +90,11 @@
 </div>
 
 <!-- Section: Klasifikasi Ilmu -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-dna class="me-3 icon" />
-            <h3 class="mb-0 card-title">1.2 Klasifikasi Ilmu (Klaster Sains)</h3>
+            <x-lucide-dna class="icon me-3" />
+            <h3 class="card-title mb-0">1.2 Klasifikasi Ilmu (Klaster Sains)</h3>
         </div>
 
         <div class="row g-4">
@@ -163,11 +163,11 @@
 </div>
 
 <!-- Section: Ringkasan -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-file-text class="me-3 icon" />
-            <h3 class="mb-0 card-title">1.3 Ringkasan Proposal</h3>
+            <x-lucide-file-text class="icon me-3" />
+            <h3 class="card-title mb-0">1.3 Ringkasan Proposal</h3>
         </div>
 
         <div class="mb-3">
@@ -182,54 +182,12 @@
     </div>
 </div>
 
-<!-- Section: Detail Penelitian -->
-<div class="mb-3 card">
-    <div class="card-body">
-        <div class="d-flex align-items-center mb-4">
-            <x-lucide-microscope class="me-3 icon" />
-            <h3 class="mb-0 card-title">Detail Penelitian</h3>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="final_tkt_target">Target TKT Final</label>
-            <input id="final_tkt_target" type="text"
-                class="form-control @error('form.final_tkt_target') is-invalid @enderror"
-                wire:model="form.final_tkt_target" placeholder="Contoh: TKT 5, TKT 6, dsb">
-            @error('form.final_tkt_target')
-                <div class="d-block invalid-feedback">{{ $message }}</div>
-            @enderror
-            <small class="text-muted">Tingkat Kesiapan Teknologi (TKT) yang ditargetkan</small>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="background">Latar Belakang</label>
-            <textarea id="background" class="form-control @error('form.background') is-invalid @enderror"
-                wire:model="form.background" rows="5"
-                placeholder="Jelaskan latar belakang penelitian (minimal 200 karakter)"></textarea>
-            @error('form.background')
-                <div class="d-block invalid-feedback">{{ $message }}</div>
-            @enderror
-            <small class="text-muted">Minimum 200 karakter</small>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="methodology">Metodologi</label>
-            <textarea id="methodology" class="form-control @error('form.methodology') is-invalid @enderror"
-                wire:model="form.methodology" rows="5" placeholder="Jelaskan metodologi penelitian (minimal 200 karakter)"></textarea>
-            @error('form.methodology')
-                <div class="d-block invalid-feedback">{{ $message }}</div>
-            @enderror
-            <small class="text-muted">Minimum 200 karakter</small>
-        </div>
-    </div>
-</div>
-
 <!-- Section: Ketua Tasks -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-user-check class="me-3 icon" />
-            <h3 class="mb-0 card-title">Tugas Ketua Peneliti</h3>
+            <x-lucide-user-check class="icon me-3" />
+            <h3 class="card-title mb-0">Tugas Ketua Peneliti</h3>
         </div>
 
         <div class="mb-3">
@@ -255,11 +213,11 @@
 </div>
 
 <!-- Section: Anggota -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-users class="me-3 icon" />
-            <h3 class="mb-0 card-title">Anggota Peneliti</h3>
+            <x-lucide-users class="icon me-3" />
+            <h3 class="card-title mb-0">Anggota Peneliti</h3>
         </div>
 
         <livewire:forms.team-members-form :members="$form->members" modal-title="Tambah Anggota Peneliti"
