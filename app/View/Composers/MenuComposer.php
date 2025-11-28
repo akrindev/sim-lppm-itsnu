@@ -225,12 +225,25 @@ class MenuComposer
             )));
         }
 
+        // Check if any child route is active
+        $hasActiveChild = false;
+        if ($children) {
+            foreach ($children as $child) {
+                $childRouteName = $child['route'] ?? null;
+                // Use wildcard pattern to match child routes (e.g., research.proposal.* matches research.proposal.index, research.proposal.create, etc.)
+                if ($childRouteName && request()->routeIs($childRouteName . '*')) {
+                    $hasActiveChild = true;
+                    break;
+                }
+            }
+        }
+
         $formatted = [
             'type' => isset($item['children']) && count($children ?? []) > 0 ? 'dropdown' : 'link',
             'title' => $item['title'],
             'href' => $this->resolveHref($item),
             'icon' => $item['icon'] ?? null,
-            'active' => $this->isActive($item, $routeName),
+            'active' => $this->isActive($item, $routeName) || $hasActiveChild,
         ];
 
         if ($children) {
@@ -259,6 +272,7 @@ class MenuComposer
             'href' => $this->resolveHref($item),
             'prefix_icon' => $item['icon'] ?? null,
             'prefix_icon_class' => 'icon icon-2 icon-inline me-1',
+            'route' => $routeName, // Store route name for active state checking
         ];
     }
 
