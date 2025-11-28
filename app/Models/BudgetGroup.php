@@ -15,7 +15,20 @@ class BudgetGroup extends Model
         'code',
         'name',
         'description',
+        'percentage',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'percentage' => 'decimal:2',
+        ];
+    }
 
     /**
      * Get all components for this budget group.
