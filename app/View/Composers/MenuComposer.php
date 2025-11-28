@@ -186,6 +186,16 @@ class MenuComposer
                         'icon' => 'layers',
                         'route' => 'settings.master-data',
                     ],
+                    [
+                        'title' => 'Jadwal Proposal',
+                        'icon' => 'calendar-time',
+                        'route' => 'settings.proposal-schedule',
+                    ],
+                    [
+                        'title' => 'Template Proposal',
+                        'icon' => 'file-download',
+                        'route' => 'settings.proposal-template',
+                    ],
                 ],
             ],
         ];

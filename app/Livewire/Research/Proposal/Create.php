@@ -41,6 +41,20 @@ class Create extends Component
     public function mount(): void
     {
         $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
+
+        $startDate = \App\Models\Setting::where('key', 'research_proposal_start_date')->value('value');
+        $endDate = \App\Models\Setting::where('key', 'research_proposal_end_date')->value('value');
+
+        if ($startDate && $endDate) {
+            $now = now();
+            $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+            $end = \Carbon\Carbon::parse($endDate)->endOfDay();
+
+            if (! $now->between($start, $end)) {
+                session()->flash('error', 'Masa pengajuan proposal penelitian telah berakhir atau belum dimulai.');
+                $this->redirect(route('research.proposal.index'));
+            }
+        }
     }
 
     /**

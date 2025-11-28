@@ -129,6 +129,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:admin lppm'])->group(function () {
         Route::get('settings/master-data', MasterData::class)->name('settings.master-data');
+        Route::get('settings/proposal-schedule', \App\Livewire\Settings\ProposalSchedule::class)->name('settings.proposal-schedule');
+        Route::get('settings/proposal-template', \App\Livewire\Settings\ProposalTemplate::class)->name('settings.proposal-template');
     });
 
     Route::get('settings/two-factor', TwoFactor::class)

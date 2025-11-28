@@ -3,10 +3,24 @@
 <x-slot:pageSubtitle>Kelola proposal pengabdian Anda dengan fitur lengkap.</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
-        <a href="{{ route('community-service.proposal.create') }}" wire:navigate class="btn btn-primary">
-            <x-lucide-plus class="icon" />
-            Usulan Pengabdian Baru
-        </a>
+        @php
+            $startDate = \App\Models\Setting::where('key', 'community_service_proposal_start_date')->value('value');
+            $endDate = \App\Models\Setting::where('key', 'community_service_proposal_end_date')->value('value');
+            $isWithinSchedule = false;
+            if ($startDate && $endDate) {
+                $now = now();
+                $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+                $end = \Carbon\Carbon::parse($endDate)->endOfDay();
+                $isWithinSchedule = $now->between($start, $end);
+            }
+        @endphp
+
+        @if ($isWithinSchedule)
+            <a href="{{ route('community-service.proposal.create') }}" wire:navigate class="btn btn-primary">
+                <x-lucide-plus class="icon" />
+                Usulan Pengabdian Baru
+            </a>
+        @endif
     </div>
 </x-slot:pageActions>
 
@@ -16,17 +30,17 @@
     <div class="mb-3">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link @if($roleFilter === 'ketua') active @endif" 
-                        wire:click="$set('roleFilter', 'ketua')"
-                        role="tab" aria-selected="@if($roleFilter === 'ketua') true @else false @endif">
+                <button class="nav-link @if ($roleFilter === 'ketua') active @endif"
+                    wire:click="$set('roleFilter', 'ketua')" role="tab"
+                    aria-selected="@if ($roleFilter === 'ketua') true @else false @endif">
                     <x-lucide-crown class="icon me-2" />
                     Sebagai Ketua
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link @if($roleFilter === 'anggota') active @endif" 
-                        wire:click="$set('roleFilter', 'anggota')"
-                        role="tab" aria-selected="@if($roleFilter === 'anggota') true @else false @endif">
+                <button class="nav-link @if ($roleFilter === 'anggota') active @endif"
+                    wire:click="$set('roleFilter', 'anggota')" role="tab"
+                    aria-selected="@if ($roleFilter === 'anggota') true @else false @endif">
                     <x-lucide-users class="icon me-2" />
                     Sebagai Anggota
                 </button>
@@ -34,7 +48,7 @@
         </ul>
     </div>
 
-    <div class="mb-3 row">
+    <div class="row mb-3">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -73,7 +87,7 @@
     </div>
 
     <!-- Status Stats -->
-    <div class="mb-3 row row-deck row-cards">
+    <div class="row row-deck row-cards mb-3">
         <div class="col-sm-6 col-lg-2">
             <div class="card">
                 <div class="card-body">
@@ -151,11 +165,11 @@
     <!-- Proposals Table -->
     <div class="card">
         <div class="table-responsive">
-            <table class="card-table table table-vcenter">
+            <table class="card-table table-vcenter table">
                 <thead>
                     <tr>
                         <th>
-                            <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('title')">
+                            <button type="button" class="btn btn-link p-0" wire:click="setSortBy('title')">
                                 Judul
                                 @if ($sortBy === 'title')
                                     <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
@@ -165,7 +179,7 @@
                         </th>
                         <th>Author</th>
                         <th>
-                            <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('status')">
+                            <button type="button" class="btn btn-link p-0" wire:click="setSortBy('status')">
                                 Status
                                 @if ($sortBy === 'status')
                                     <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
@@ -175,7 +189,7 @@
                         </th>
                         <th>Bidang Fokus</th>
                         <th>
-                            <button type="button" class="p-0 btn btn-link" wire:click="setSortBy('created_at')">
+                            <button type="button" class="btn btn-link p-0" wire:click="setSortBy('created_at')">
                                 Tanggal Dibuat
                                 @if ($sortBy === 'created_at')
                                     <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
@@ -212,7 +226,7 @@
                                 </small>
                             </td>
                             <td>
-                                <div class="flex-nowrap btn-list">
+                                <div class="btn-list flex-nowrap">
                                     <a href="{{ route('community-service.proposal.show', $proposal) }}"
                                         class="btn btn-icon btn-ghost-primary" wire:navigate title="Lihat">
                                         <x-lucide-eye class="icon" />

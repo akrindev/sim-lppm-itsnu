@@ -39,7 +39,21 @@ class Create extends Component
      */
     public function mount(): void
     {
-        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
+        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
+
+        $startDate = \App\Models\Setting::where('key', 'community_service_proposal_start_date')->value('value');
+        $endDate = \App\Models\Setting::where('key', 'community_service_proposal_end_date')->value('value');
+
+        if ($startDate && $endDate) {
+            $now = now();
+            $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+            $end = \Carbon\Carbon::parse($endDate)->endOfDay();
+
+            if (! $now->between($start, $end)) {
+                session()->flash('error', 'Masa pengajuan proposal pengabdian masyarakat telah berakhir atau belum dimulai.');
+                $this->redirect(route('community-service.proposal.index'));
+            }
+        }
     }
 
     /**
@@ -72,7 +86,7 @@ class Create extends Component
             session()->flash('success', 'Proposal pengabdian masyarakat berhasil dibuat');
             $this->redirect(route('community-service.proposal.show', $proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal membuat proposal: ' . $e->getMessage());
         }
     }
 
