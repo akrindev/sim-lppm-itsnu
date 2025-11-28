@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
@@ -162,18 +163,11 @@ class Edit extends Component
 
     /**
      * Render the component view.
+     * All public properties and computed properties are automatically available in the view.
      */
     public function render(): View
     {
-        $user = $this->user;
-
-        return view('livewire.users.edit', [
-            'user' => $user,
-            'roleOptions' => $this->roleOptions(),
-            'institutionOptions' => $this->institutionOptions(),
-            'facultyOptions' => $this->facultyOptions(),
-            'studyProgramOptions' => $this->studyProgramOptions(),
-        ]);
+        return view('livewire.users.edit');
     }
 
     /**
@@ -188,10 +182,12 @@ class Edit extends Component
 
     /**
      * Retrieve role options for the selection control.
+     * Cached computed property that returns available roles.
      *
      * @return array<int, array<string, string>>
      */
-    protected function roleOptions(): array
+    #[Computed]
+    public function roleOptions(): array
     {
         return Role::query()
             ->orderBy('name')
@@ -206,10 +202,12 @@ class Edit extends Component
 
     /**
      * Retrieve institution options for the selection control.
+     * Cached computed property that returns all available institutions.
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function institutionOptions(): array
+    #[Computed]
+    public function institutionOptions(): array
     {
         return Institution::query()
             ->orderBy('name')
@@ -224,15 +222,20 @@ class Edit extends Component
 
     /**
      * Retrieve faculty options for the current institution.
+     * Reactive computed property that automatically updates when institution_id changes.
+     * Returns empty array when no institution is selected.
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function facultyOptions(): array
+    #[Computed]
+    public function facultyOptions(): array
     {
+        // Return empty array if no institution is selected
         if (! $this->institution_id) {
             return [];
         }
 
+        // Fetch faculties belonging to the selected institution
         return Faculty::query()
             ->where('institution_id', $this->institution_id)
             ->orderBy('name')
@@ -247,15 +250,20 @@ class Edit extends Component
 
     /**
      * Retrieve study program options for the current faculty.
+     * Reactive computed property that automatically updates when faculty_id changes.
+     * Returns empty array when no faculty is selected.
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function studyProgramOptions(): array
+    #[Computed]
+    public function studyProgramOptions(): array
     {
+        // Return empty array if no faculty is selected
         if (! $this->faculty_id) {
             return [];
         }
 
+        // Fetch study programs belonging to the selected faculty
         return \App\Models\StudyProgram::query()
             ->where('faculty_id', $this->faculty_id)
             ->orderBy('name')

@@ -3,7 +3,7 @@
     <x-slot:pageTitle>Edit Pengguna</x-slot:pageTitle>
     <x-slot:pageSubtitle>Perbarui profil pengguna dan penetapan peran.</x-slot:pageSubtitle>
     <x-slot:pageActions>
-        <a href="{{ route('users.show', $user) }}" class="btn-outline-secondary btn" wire:navigate>
+        <a href="{{ route('users.show', $this->user) }}" class="btn-outline-secondary btn" wire:navigate>
             Lihat profil
         </a>
     </x-slot:pageActions>
@@ -44,7 +44,7 @@
                             Peran <span class="text-muted">(opsional)</span>
                         </label>
                         <div class="form-selectgroup @error('selectedRoles') is-invalid @enderror">
-                            @foreach ($roleOptions as $option)
+                            @foreach ($this->roleOptions as $option)
                                 <label class="form-selectgroup-item">
                                     <input type="checkbox" name="role" value="{{ $option['value'] }}"
                                         class="form-selectgroup-input" wire:model.defer="selectedRoles"
@@ -52,7 +52,7 @@
                                     <span class="form-selectgroup-label">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="me-1 icon">
+                                            stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
                                             <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
                                             <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
                                         </svg>
@@ -163,7 +163,7 @@
                             Institusi
                         </label>
                         <span class="text-muted">
-                            {{ $institution_name ?? 'Tidak ada institusi yang dipilih' }}
+                            {{ $this->institution_name ?? 'Tidak ada institusi yang dipilih' }}
                         </span>
                         {{-- <select id="institution"
                             class="form-select disabled form-disabled @error('institution_id') is-invalid @enderror"
@@ -185,9 +185,9 @@
                             Fakultas <span class="text-danger">*</span>
                         </label>
                         <select id="faculty" class="form-select @error('faculty_id') is-invalid @enderror"
-                            wire:model.live="faculty_id" @disabled(empty($facultyOptions)) required>
+                            wire:model.live="faculty_id" @disabled(empty($this->facultyOptions)) required>
                             <option value="">Pilih fakultas...</option>
-                            @foreach ($facultyOptions as $option)
+                            @foreach ($this->facultyOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
                             @endforeach
                         </select>
@@ -204,9 +204,9 @@
                         </label>
                         <select id="study-program"
                             class="form-select @error('study_program_id') is-invalid @enderror"
-                            wire:model.defer="study_program_id" @disabled(empty($studyProgramOptions)) required>
+                            wire:model.defer="study_program_id" @disabled(empty($this->studyProgramOptions)) required>
                             <option value="">Pilih program studi...</option>
-                            @foreach ($studyProgramOptions as $option)
+                            @foreach ($this->studyProgramOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
                             @endforeach
                         </select>
@@ -224,9 +224,9 @@
                             <span class="form-check-label">Tandai email sebagai terverifikasi</span>
                         </label>
                         @error('emailVerified')
-                            <div class="mt-1 text-danger small">{{ $message }}</div>
+                            <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
-                        <p class="mt-2 text-secondary">
+                        <p class="text-secondary mt-2">
                             Alihkan untuk mengatur status verifikasi secara manual.</p>
                     </div>
                 </div>
@@ -235,11 +235,11 @@
 
         <div class="d-flex align-items-center justify-content-between card-footer" x-data="{ show: false }"
             x-on:user-updated.window="console.log('updated');show = true; setTimeout(() => show = false, 5000);">
-            <a href="{{ route('users.show', $user) }}" class="btn btn-link" wire:navigate>
+            <a href="{{ route('users.show', $this->user) }}" class="btn btn-link" wire:navigate>
                 Batal
             </a>
             <div x-show="show" class="text-green fw-bold">
-                <x-lucide-check-circle class="me-1 icon" />
+                <x-lucide-check-circle class="icon me-1" />
                 Pengguna telah diperbarui.
             </div>
             <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
