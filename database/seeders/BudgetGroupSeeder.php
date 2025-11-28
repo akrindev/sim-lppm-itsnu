@@ -12,8 +12,9 @@ class BudgetGroupSeeder extends Seeder
      *
      * Based on BIMA Kemdikbud RAB Components 2024-2025
      * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2025
+     * Source: Kemdiktisaintek (Kementerian Pendidikan Tinggi, Sains, dan Teknologi)
      *
-     * Budget Percentage Limits:
+     * Budget Percentage Limits (Total must = 100%):
      * - Honor/Upah: Max 10%
      * - Teknologi & Inovasi (Bahan/Peralatan): Min 50%
      * - Pelatihan: Max 20%
@@ -26,27 +27,32 @@ class BudgetGroupSeeder extends Seeder
             [
                 'code' => 'HONOR',
                 'name' => 'Upah dan Jasa (Honor)',
-                'description' => 'Honorarium peneliti, asisten, operator, tenaga ahli, dan jasa pihak ketiga (Maksimal 10% dari total anggaran)',
+                'description' => 'Honorarium peneliti, asisten, operator, tenaga ahli, dan jasa pihak ketiga',
+                'percentage' => 10.00, // Maksimal 10% dari total anggaran
             ],
             [
                 'code' => 'TEKNOLOGI',
                 'name' => 'Teknologi dan Inovasi',
-                'description' => 'Bahan habis pakai, bahan penelitian, alat laboratorium, peralatan pendukung, dan pengembangan teknologi (Minimal 50% dari total anggaran)',
+                'description' => 'Bahan habis pakai, bahan penelitian, alat laboratorium, peralatan pendukung, dan pengembangan teknologi',
+                'percentage' => 50.00, // Minimal 50% dari total anggaran (dialokasikan sebagai baseline)
             ],
             [
                 'code' => 'PELATIHAN',
                 'name' => 'Biaya Pelatihan',
-                'description' => 'Pelatihan, workshop, penyuluhan, atau capacity building dalam rangka program penelitian/pengabdian (Maksimal 20%)',
+                'description' => 'Pelatihan, workshop, penyuluhan, atau capacity building dalam rangka program penelitian/pengabdian',
+                'percentage' => 20.00, // Maksimal 20%
             ],
             [
                 'code' => 'PERJALANAN',
                 'name' => 'Biaya Perjalanan',
-                'description' => 'Transportasi, akomodasi, dan konsumsi untuk pelaksanaan kegiatan di lokasi penelitian/pengabdian dan koordinasi dengan mitra (Maksimal 15%)',
+                'description' => 'Transportasi, akomodasi, dan konsumsi untuk pelaksanaan kegiatan di lokasi penelitian/pengabdian dan koordinasi dengan mitra',
+                'percentage' => 15.00, // Maksimal 15%
             ],
             [
                 'code' => 'LAINNYA',
                 'name' => 'Biaya Lainnya',
-                'description' => 'Publikasi hasil, seminar, pelaporan, dokumentasi, dan kebutuhan administrasi penunjang lainnya (Maksimal 5%)',
+                'description' => 'Publikasi hasil, seminar, pelaporan, dokumentasi, dan kebutuhan administrasi penunjang lainnya',
+                'percentage' => 5.00, // Maksimal 5%
             ],
         ];
 

@@ -27,7 +27,16 @@
 
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label" for="substance_file">Unggah Substansi Laporan (PDF)</label>
+                    <label class="form-label d-flex justify-content-between align-items-center" for="substance_file">
+                        <span>Unggah Substansi Laporan (PDF)</span>
+                        @if ($this->templateUrl)
+                            <a href="{{ $this->templateUrl }}" target="_blank" class="text-primary text-decoration-none"
+                                style="font-size: 0.875rem;">
+                                <x-lucide-download class="icon me-1" style="width: 1rem; height: 1rem;" />
+                                Unduh Template
+                            </a>
+                        @endif
+                    </label>
                     <input id="substance_file" type="file"
                         class="form-control @error('form.substance_file') is-invalid @enderror"
                         wire:model="form.substance_file" accept=".pdf">

@@ -4,10 +4,24 @@
 <x-slot:pageActions>
     @unless (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
         <div class="btn-list">
-            <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
-                <x-lucide-plus class="icon" />
-                Usulan Penelitian Baru
-            </a>
+            @php
+                $startDate = \App\Models\Setting::where('key', 'research_proposal_start_date')->value('value');
+                $endDate = \App\Models\Setting::where('key', 'research_proposal_end_date')->value('value');
+                $isWithinSchedule = false;
+                if ($startDate && $endDate) {
+                    $now = now();
+                    $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+                    $end = \Carbon\Carbon::parse($endDate)->endOfDay();
+                    $isWithinSchedule = $now->between($start, $end);
+                }
+            @endphp
+
+            @if ($isWithinSchedule)
+                <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
+                    <x-lucide-plus class="icon" />
+                    Usulan Penelitian Baru
+                </a>
+            @endif
         </div>
     @endunless
 </x-slot:pageActions>
@@ -21,17 +35,17 @@
         <div class="mb-3">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link @if($roleFilter === 'ketua') active @endif" 
-                            wire:click="$set('roleFilter', 'ketua')"
-                            role="tab" aria-selected="@if($roleFilter === 'ketua') true @else false @endif">
+                    <button class="nav-link @if ($roleFilter === 'ketua') active @endif"
+                        wire:click="$set('roleFilter', 'ketua')" role="tab"
+                        aria-selected="@if ($roleFilter === 'ketua') true @else false @endif">
                         <x-lucide-crown class="icon me-2" />
                         Sebagai Ketua
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link @if($roleFilter === 'anggota') active @endif" 
-                            wire:click="$set('roleFilter', 'anggota')"
-                            role="tab" aria-selected="@if($roleFilter === 'anggota') true @else false @endif">
+                    <button class="nav-link @if ($roleFilter === 'anggota') active @endif"
+                        wire:click="$set('roleFilter', 'anggota')" role="tab"
+                        aria-selected="@if ($roleFilter === 'anggota') true @else false @endif">
                         <x-lucide-users class="icon me-2" />
                         Sebagai Anggota
                     </button>
@@ -40,7 +54,7 @@
         </div>
     @endunless
 
-    <div class="mb-3 row">
+    <div class="row mb-3">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -86,7 +100,7 @@
     <!-- Proposals Table -->
     <div class="card">
         <div class="table-responsive">
-            <table class="card-table table table-vcenter">
+            <table class="card-table table-vcenter table">
                 <thead>
                     <tr>
                         <th>Judul</th>
@@ -129,7 +143,7 @@
                                 </small>
                             </td>
                             <td>
-                                <div class="flex-nowrap btn-list">
+                                <div class="btn-list flex-nowrap">
                                     <a href="{{ route('research.proposal.show', $proposal) }}"
                                         class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
                                         <x-lucide-eye class="icon" />
@@ -176,7 +190,7 @@
         <x-tabler.modal id="deleteProposalModal" title="Hapus Proposal?" wire:ignore.self>
             <x-slot:body>
                 <div class="py-4 text-center">
-                    <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                    <x-lucide-alert-circle class="text-danger icon mb-2" style="width: 3rem; height: 3rem;" />
                     <h3>Hapus Proposal?</h3>
                     <div class="text-secondary">
                         Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.

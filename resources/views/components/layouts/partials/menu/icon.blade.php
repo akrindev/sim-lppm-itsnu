@@ -188,6 +188,37 @@
             </svg>
             SVG;
         },
+        'award' => static function (string $class): string {
+            return <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{$class}">
+                <path d="M12 9m-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0" />
+                <path d="M12 15l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.889" />
+                <path d="M6.802 12l-3.4 5.89l3.598 -.233l1.598 3.232l3.4 -5.889" />
+            </svg>
+            SVG;
+        },
+        'calendar-time' => static function (string $class): string {
+            return <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{$class}">
+                <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+                <path d="M18 18m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                <path d="M15 3v4" />
+                <path d="M7 3v4" />
+                <path d="M3 11h16" />
+                <path d="M18 16.496v1.504l1 1" />
+            </svg>
+            SVG;
+        },
+        'file-download' => static function (string $class): string {
+            return <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{$class}">
+                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                <path d="M12 17v-6" />
+                <path d="M9.5 14.5l2.5 2.5l2.5 -2.5" />
+            </svg>
+            SVG;
+        },
     ];
 
     $renderer =

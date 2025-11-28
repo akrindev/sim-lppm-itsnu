@@ -87,6 +87,9 @@ class ProposalForm extends Form
     #[Validate('nullable|array')]
     public array $budget_items = [];
 
+    // Budget validation errors
+    public array $budgetValidationErrors = [];
+
     // Step 4: Dokumen Pendukung (Partners)
     #[Validate('nullable|array')]
     public array $partner_ids = [];
@@ -570,6 +573,10 @@ class ProposalForm extends Form
     private function attachBudgetItems(Proposal $proposal): void
     {
         if (! empty($this->budget_items)) {
+            // Validate budget before saving
+            $this->validateBudgetGroupPercentages();
+            $this->validateBudgetCap($this->getProposalType());
+
             foreach ($this->budget_items as $item) {
                 $proposal->budgetItems()->create([
                     'budget_group_id' => $item['budget_group_id'] ?? null,
@@ -590,5 +597,126 @@ class ProposalForm extends Form
         if (! empty($this->partner_ids)) {
             $proposal->partners()->sync($this->partner_ids);
         }
+    }
+
+    /**
+     * Validate budget items against budget group percentage limits.
+     * Percentages are calculated based on the budget cap, not the total budget entered.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validateBudgetGroupPercentages(): void
+    {
+        if (empty($this->budget_items)) {
+            return;
+        }
+
+        // Get proposal type to determine which budget cap to use
+        $proposalType = $this->getProposalType();
+        $currentYear = (int) date('Y');
+
+        // Get budget cap for current year and proposal type
+        $budgetCap = \App\Models\BudgetCap::getCapForYear($currentYear, $proposalType);
+
+        if ($budgetCap === null || $budgetCap <= 0) {
+            // No budget cap set, cannot validate percentages
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'budget_items' => [
+                    sprintf(
+                        'Batas anggaran untuk %s tahun %s belum diatur. Silakan hubungi Admin LPPM.',
+                        $proposalType === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat',
+                        $currentYear
+                    ),
+                ],
+            ]);
+        }
+
+        // Group budget items by budget_group_id and check percentages
+        $budgetGroups = \App\Models\BudgetGroup::whereNotNull('percentage')->get();
+        $errors = [];
+
+        foreach ($budgetGroups as $group) {
+            // Calculate total spent in this group
+            $groupTotal = collect($this->budget_items)
+                ->where('budget_group_id', $group->id)
+                ->sum(fn ($item) => (float) ($item['total'] ?? 0));
+
+            // Calculate percentage used BASED ON BUDGET CAP
+            $percentageUsed = ($groupTotal / $budgetCap) * 100;
+            $allowedPercentage = (float) $group->percentage;
+
+            // Check if percentage exceeds limit
+            if ($percentageUsed > $allowedPercentage) {
+                $errors[] = sprintf(
+                    'Kelompok anggaran "%s" melebihi batas %s%%. Saat ini: %s%% (Rp %s dari batas anggaran Rp %s)',
+                    $group->name,
+                    number_format($allowedPercentage, 2),
+                    number_format($percentageUsed, 2),
+                    number_format($groupTotal, 0, ',', '.'),
+                    number_format($budgetCap, 0, ',', '.')
+                );
+            }
+        }
+
+        if (! empty($errors)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'budget_items' => $errors,
+            ]);
+        }
+    }
+
+    /**
+     * Validate total budget against year-based budget cap.
+     *
+     * @param  string  $proposalType  'research' or 'community_service'
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validateBudgetCap(string $proposalType): void
+    {
+        if (empty($this->budget_items)) {
+            return;
+        }
+
+        // Calculate total budget
+        $totalBudget = collect($this->budget_items)->sum(fn ($item) => (float) ($item['total'] ?? 0));
+
+        if ($totalBudget <= 0) {
+            return;
+        }
+
+        // Get current year
+        $currentYear = (int) date('Y');
+
+        // Get budget cap for current year and proposal type
+        $budgetCap = \App\Models\BudgetCap::getCapForYear($currentYear, $proposalType);
+
+        if ($budgetCap === null) {
+            // No cap set, allow any amount
+            return;
+        }
+
+        if ($totalBudget > $budgetCap) {
+            $typeLabel = $proposalType === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat';
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'budget_items' => [
+                    sprintf(
+                        'Total anggaran melebihi batas maksimal untuk %s tahun %s. Batas: Rp %s, Total saat ini: Rp %s',
+                        $typeLabel,
+                        $currentYear,
+                        number_format($budgetCap, 0, ',', '.'),
+                        number_format($totalBudget, 0, ',', '.')
+                    ),
+                ],
+            ]);
+        }
+    }
+
+    /**
+     * Get proposal type from the current form state.
+     */
+    private function getProposalType(): string
+    {
+        return $this->research_scheme_id ? 'research' : 'community_service';
     }
 }

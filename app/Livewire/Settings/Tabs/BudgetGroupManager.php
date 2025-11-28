@@ -19,6 +19,9 @@ class BudgetGroupManager extends Component
 
     public ?string $description = null;
 
+    #[Validate('nullable|numeric|min:0|max:100')]
+    public ?string $percentage = null;
+
     public ?int $editingId = null;
 
     public string $modalTitle = 'Kelompok Anggaran';
@@ -36,7 +39,7 @@ class BudgetGroupManager extends Component
 
     public function create(): void
     {
-        $this->reset(['code', 'name', 'description', 'editingId']);
+        $this->reset(['code', 'name', 'description', 'percentage', 'editingId']);
         $this->modalTitle = 'Tambah Kelompok Anggaran';
     }
 
@@ -44,10 +47,20 @@ class BudgetGroupManager extends Component
     {
         $this->validate();
 
+        // Check if total percentages exceed 100%
+        $totalPercentage = $this->calculateTotalPercentage();
+
+        if ($totalPercentage > 100) {
+            $this->addError('percentage', 'Total persentase semua kelompok anggaran tidak boleh melebihi 100%. Saat ini: '.number_format($totalPercentage, 2).'%');
+
+            return;
+        }
+
         $data = [
             'code' => $this->code,
             'name' => $this->name,
             'description' => $this->description,
+            'percentage' => $this->percentage ? (float) $this->percentage : null,
         ];
 
         if ($this->editingId) {
@@ -60,7 +73,7 @@ class BudgetGroupManager extends Component
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-group']);
-        $this->reset(['code', 'name', 'description', 'editingId']);
+        $this->reset(['code', 'name', 'description', 'percentage', 'editingId']);
     }
 
     public function edit(BudgetGroup $budgetGroup): void
@@ -69,6 +82,7 @@ class BudgetGroupManager extends Component
         $this->code = $budgetGroup->code;
         $this->name = $budgetGroup->name;
         $this->description = $budgetGroup->description;
+        $this->percentage = $budgetGroup->percentage ? (string) $budgetGroup->percentage : null;
         $this->modalTitle = 'Edit Kelompok Anggaran';
     }
 
@@ -82,7 +96,7 @@ class BudgetGroupManager extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['code', 'name', 'description', 'editingId']);
+        $this->reset(['code', 'name', 'description', 'percentage', 'editingId']);
     }
 
     public function handleConfirmDeleteAction(): void
@@ -104,5 +118,25 @@ class BudgetGroupManager extends Component
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = $name;
+    }
+
+    /**
+     * Calculate total percentage across all budget groups.
+     * Excludes the currently editing group to allow percentage updates.
+     */
+    private function calculateTotalPercentage(): float
+    {
+        $total = BudgetGroup::when($this->editingId, function ($query) {
+            $query->where('id', '!=', $this->editingId);
+        })
+            ->whereNotNull('percentage')
+            ->sum('percentage');
+
+        // Add current percentage being set
+        if ($this->percentage) {
+            $total += (float) $this->percentage;
+        }
+
+        return (float) $total;
     }
 }

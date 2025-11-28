@@ -51,10 +51,10 @@ class Edit extends Component
         }
 
         // Set author name
-        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
+        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
 
         // Generate a unique, stable component ID for this instance
-        $this->componentId = 'lwc-'.Str::random(10);
+        $this->componentId = 'lwc-' . Str::random(10);
 
         // Load proposal data into form
         $this->form->setProposal($proposal);
@@ -83,7 +83,7 @@ class Edit extends Component
 
             $this->redirect(route('community-service.proposal.show', $this->form->proposal), navigate: true);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal memperbarui proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal memperbarui proposal: ' . $e->getMessage());
         }
     }
 
@@ -139,6 +139,16 @@ class Edit extends Component
     public function budgetComponents()
     {
         return BudgetComponent::with('budgetGroup')->get();
+    }
+
+    #[Computed]
+    public function templateUrl()
+    {
+        $setting = \App\Models\Setting::where('key', 'community_service_proposal_template')->first();
+        if ($setting && $setting->hasMedia('template')) {
+            return $setting->getFirstMedia('template')->getUrl();
+        }
+        return null;
     }
 
     public function nextStep(): void
