@@ -12,6 +12,70 @@
             </button>
         </div>
 
+        <!-- Budget Group Information Alert (BIMA Kemdikbud Standards) -->
+        <div class="alert alert-info mb-3" role="alert">
+            <div class="d-flex">
+                <div>
+                    <x-lucide-info class="icon alert-icon" />
+                </div>
+                <div>
+                    <h4 class="alert-title">Batasan Persentase Kelompok Anggaran</h4>
+                    <div class="text-muted">
+                        Pastikan alokasi anggaran sesuai dengan batasan berikut:
+                    </div>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($this->budgetGroups->whereNotNull('percentage') as $group)
+                            <li>
+                                <strong>{{ $group->name }}</strong>:
+                                @if ($group->code === 'TEKNOLOGI')
+                                    <x-tabler.badge color="success">
+                                        Minimal {{ number_format($group->percentage, 0) }}%
+                                    </x-tabler.badge>
+                                @else
+                                    <x-tabler.badge color="warning">
+                                        Maksimal {{ number_format($group->percentage, 0) }}%
+                                    </x-tabler.badge>
+                                @endif
+                                <small class="text-muted"> - {{ $group->description }}</small>
+                            </li>
+                        @endforeach
+                    </ul>
+                    @php
+                        $currentYear = date('Y');
+                        $budgetCap = \App\Models\BudgetCap::where('year', $currentYear)->first();
+                        $researchCap = $budgetCap?->research_budget_cap;
+                    @endphp
+                    @if ($researchCap)
+                        <div class="border-top mt-2 pt-2">
+                            <strong>Batas Maksimal Anggaran Penelitian {{ $currentYear }}:</strong>
+                            <x-tabler.badge color="danger">
+                                Rp {{ number_format($researchCap, 0, ',', '.') }}
+                            </x-tabler.badge>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Validation Feedback -->
+        @if (!empty($budgetValidationErrors))
+            <div class="alert alert-danger" role="alert">
+                <div class="d-flex">
+                    <div>
+                        <x-lucide-alert-circle class="icon alert-icon" />
+                    </div>
+                    <div>
+                        <h4 class="alert-title">Peringatan: Alokasi Anggaran Melebihi Batas</h4>
+                        <ul class="mb-0">
+                            @foreach ($budgetValidationErrors as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @error('form.budget_items')
             <div class="alert alert-danger mb-3">
                 <div class="d-flex">
@@ -100,7 +164,8 @@
                                         readonly disabled>
                                 </td>
                                 <td>
-                                    <input type="number" wire:model.live="form.budget_items.{{ $index }}.volume"
+                                    <input type="number"
+                                        wire:model.live="form.budget_items.{{ $index }}.volume"
                                         wire:change="calculateTotal({{ $index }})"
                                         class="form-control form-control-sm" placeholder="0" min="0"
                                         step="0.01">

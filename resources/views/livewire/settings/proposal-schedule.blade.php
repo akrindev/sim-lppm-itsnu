@@ -26,6 +26,67 @@
                                     </div>
                                 @endif
 
+                                <!-- Current Year Budget Cap Information -->
+                                @php
+                                    $currentYear = date('Y');
+                                @endphp
+                                @if ($this->currentYearBudgetCap)
+                                    <div class="alert alert-info mb-4" role="alert">
+                                        <div class="d-flex">
+                                            <div>
+                                                <x-lucide-info class="icon alert-icon" />
+                                            </div>
+                                            <div>
+                                                <h4 class="alert-title">Batasan Anggaran Tahun {{ $currentYear }}</h4>
+                                                <div class="text-muted mb-2">
+                                                    Berikut adalah batasan maksimal anggaran proposal untuk tahun ini:
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @if ($this->currentYearBudgetCap->research_budget_cap)
+                                                        <div>
+                                                            <strong>Penelitian:</strong>
+                                                            <x-tabler.badge color="success" class="ms-1">
+                                                                Rp
+                                                                {{ number_format($this->currentYearBudgetCap->research_budget_cap, 0, ',', '.') }}
+                                                            </x-tabler.badge>
+                                                        </div>
+                                                    @endif
+                                                    @if ($this->currentYearBudgetCap->community_service_budget_cap)
+                                                        <div>
+                                                            <strong>Pengabdian Masyarakat:</strong>
+                                                            <x-tabler.badge color="primary" class="ms-1">
+                                                                Rp
+                                                                {{ number_format($this->currentYearBudgetCap->community_service_budget_cap, 0, ',', '.') }}
+                                                            </x-tabler.badge>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <small class="text-muted d-block mt-2">
+                                                    <x-lucide-info class="icon icon-sm me-1" />
+                                                    Untuk mengubah batasan anggaran, silakan akses <strong>Settings →
+                                                        Master Data → Batas Anggaran Tahunan</strong>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning mb-4" role="alert">
+                                        <div class="d-flex">
+                                            <div>
+                                                <x-lucide-alert-triangle class="icon alert-icon" />
+                                            </div>
+                                            <div>
+                                                <h4 class="alert-title">Belum Ada Batasan Anggaran</h4>
+                                                <div class="text-muted">
+                                                    Batasan anggaran untuk tahun {{ $currentYear }} belum diatur.
+                                                    Silakan akses <strong>Settings → Master Data → Batas Anggaran
+                                                        Tahunan</strong> untuk mengatur batasan anggaran.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h4 class="mb-3">Penelitian</h4>

@@ -35,12 +35,15 @@ class Create extends Component
 
     public string $author_name = '';
 
+    // Real-time budget validation errors
+    public array $budgetValidationErrors = [];
+
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
+        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
 
         $startDate = \App\Models\Setting::where('key', 'research_proposal_start_date')->value('value');
         $endDate = \App\Models\Setting::where('key', 'research_proposal_end_date')->value('value');
@@ -78,7 +81,7 @@ class Create extends Component
             session()->flash('success', 'Proposal penelitian berhasil dibuat');
             $this->redirect(route('research.proposal.show', $proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: ' . $e->getMessage());
+            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
         }
     }
 
@@ -149,6 +152,7 @@ class Create extends Component
         if ($setting && $setting->hasMedia('template')) {
             return $setting->getFirstMedia('template')->getUrl();
         }
+
         return null;
     }
 
@@ -188,13 +192,33 @@ class Create extends Component
                 'form.substance_file' => 'required|file|mimes:pdf|max:10240',
                 'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
                     $hasWajib = collect($value)->contains('category', 'Wajib');
-                    if (!$hasWajib) {
+                    if (! $hasWajib) {
                         $fail('Harus ada setidaknya satu luaran dengan kategori Wajib.');
                     }
                 }],
             ]),
             3 => $this->validate([
-                'form.budget_items' => 'required|array|min:1',
+                'form.budget_items' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                    // Validate budget group percentages
+                    try {
+                        $this->form->validateBudgetGroupPercentages();
+                    } catch (\Illuminate\Validation\ValidationException $e) {
+                        $errors = $e->errors()['budget_items'] ?? [];
+                        foreach ($errors as $error) {
+                            $fail($error);
+                        }
+                    }
+
+                    // Validate year-based budget cap
+                    try {
+                        $this->form->validateBudgetCap('research');
+                    } catch (\Illuminate\Validation\ValidationException $e) {
+                        $errors = $e->errors()['budget_items'] ?? [];
+                        foreach ($errors as $error) {
+                            $fail($error);
+                        }
+                    }
+                }],
             ]),
             4 => $this->validate([
                 'form.partner_ids' => 'nullable|array',
@@ -212,6 +236,11 @@ class Create extends Component
             ]),
             default => null,
         };
+
+        // Clear budget validation errors after successful validation
+        if ($this->currentStep === 3) {
+            $this->budgetValidationErrors = [];
+        }
     }
 
     public function addOutput(): void
@@ -259,6 +288,9 @@ class Create extends Component
         $volume = floatval($item['volume'] ?? 0);
         $unitPrice = floatval($item['unit_price'] ?? 0);
         $item['total'] = $volume * $unitPrice;
+
+        // Validate budget in real-time
+        $this->validateBudgetRealtime();
     }
 
     public function updated($property, $value): void
@@ -279,6 +311,11 @@ class Create extends Component
                     if ($component) {
                         $this->form->budget_items[$index]['unit'] = $component->unit;
                     }
+                }
+
+                // Validate budget in real-time whenever budget items change
+                if (in_array($field, ['budget_group_id', 'volume', 'unit_price', 'total'])) {
+                    $this->validateBudgetRealtime();
                 }
             }
         }
@@ -334,5 +371,68 @@ class Create extends Component
     public function render(): View
     {
         return view('livewire.research.proposal.create');
+    }
+
+    /**
+     * Validate budget in real-time and display errors without blocking.
+     * This provides immediate feedback to users as they add/edit budget items.
+     * Percentages are calculated based on the budget cap, not the total entered.
+     */
+    private function validateBudgetRealtime(): void
+    {
+        $this->budgetValidationErrors = [];
+
+        if (empty($this->form->budget_items)) {
+            return;
+        }
+
+        // Get budget cap for current year
+        $currentYear = (int) date('Y');
+        $budgetCap = \App\Models\BudgetCap::getCapForYear($currentYear, 'research');
+
+        if ($budgetCap === null || $budgetCap <= 0) {
+            $this->budgetValidationErrors[] = sprintf(
+                'Batas anggaran untuk Penelitian tahun %s belum diatur.',
+                $currentYear
+            );
+
+            return;
+        }
+
+        // Check budget group percentages (based on budget cap)
+        $budgetGroups = BudgetGroup::whereNotNull('percentage')->get();
+
+        foreach ($budgetGroups as $group) {
+            $groupTotal = collect($this->form->budget_items)
+                ->where('budget_group_id', $group->id)
+                ->sum(fn ($item) => (float) ($item['total'] ?? 0));
+
+            // Calculate percentage based on BUDGET CAP, not total entered
+            $percentageUsed = ($groupTotal / $budgetCap) * 100;
+            $allowedPercentage = (float) $group->percentage;
+
+            if ($percentageUsed > $allowedPercentage) {
+                $this->budgetValidationErrors[] = sprintf(
+                    '%s melebihi batas maksimal %s%%. Saat ini: %s%% (Rp %s dari batas anggaran Rp %s)',
+                    $group->name,
+                    number_format($allowedPercentage, 0),
+                    number_format($percentageUsed, 2),
+                    number_format($groupTotal, 0, ',', '.'),
+                    number_format($budgetCap, 0, ',', '.')
+                );
+            }
+        }
+
+        // Check year-based budget cap (total cannot exceed cap)
+        $totalBudget = collect($this->form->budget_items)->sum(fn ($item) => (float) ($item['total'] ?? 0));
+
+        if ($totalBudget > $budgetCap) {
+            $this->budgetValidationErrors[] = sprintf(
+                'Total anggaran melebihi batas maksimal untuk Penelitian tahun %s. Batas: Rp %s, Total saat ini: Rp %s',
+                $currentYear,
+                number_format($budgetCap, 0, ',', '.'),
+                number_format($totalBudget, 0, ',', '.')
+            );
+        }
     }
 }

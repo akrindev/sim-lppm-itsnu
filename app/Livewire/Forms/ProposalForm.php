@@ -601,6 +601,7 @@ class ProposalForm extends Form
 
     /**
      * Validate budget items against budget group percentage limits.
+     * Percentages are calculated based on the budget cap, not the total budget entered.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -610,11 +611,24 @@ class ProposalForm extends Form
             return;
         }
 
-        // Calculate total budget across all items
-        $totalBudget = collect($this->budget_items)->sum('total');
+        // Get proposal type to determine which budget cap to use
+        $proposalType = $this->getProposalType();
+        $currentYear = (int) date('Y');
 
-        if ($totalBudget <= 0) {
-            return;
+        // Get budget cap for current year and proposal type
+        $budgetCap = \App\Models\BudgetCap::getCapForYear($currentYear, $proposalType);
+
+        if ($budgetCap === null || $budgetCap <= 0) {
+            // No budget cap set, cannot validate percentages
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'budget_items' => [
+                    sprintf(
+                        'Batas anggaran untuk %s tahun %s belum diatur. Silakan hubungi Admin LPPM.',
+                        $proposalType === 'research' ? 'Penelitian' : 'Pengabdian Masyarakat',
+                        $currentYear
+                    ),
+                ],
+            ]);
         }
 
         // Group budget items by budget_group_id and check percentages
@@ -625,20 +639,21 @@ class ProposalForm extends Form
             // Calculate total spent in this group
             $groupTotal = collect($this->budget_items)
                 ->where('budget_group_id', $group->id)
-                ->sum('total');
+                ->sum(fn ($item) => (float) ($item['total'] ?? 0));
 
-            // Calculate percentage used
-            $percentageUsed = ($groupTotal / $totalBudget) * 100;
+            // Calculate percentage used BASED ON BUDGET CAP
+            $percentageUsed = ($groupTotal / $budgetCap) * 100;
             $allowedPercentage = (float) $group->percentage;
 
+            // Check if percentage exceeds limit
             if ($percentageUsed > $allowedPercentage) {
                 $errors[] = sprintf(
-                    'Kelompok anggaran "%s" melebihi batas %s%%. Saat ini: %s%% (Rp %s dari total Rp %s)',
+                    'Kelompok anggaran "%s" melebihi batas %s%%. Saat ini: %s%% (Rp %s dari batas anggaran Rp %s)',
                     $group->name,
                     number_format($allowedPercentage, 2),
                     number_format($percentageUsed, 2),
                     number_format($groupTotal, 0, ',', '.'),
-                    number_format($totalBudget, 0, ',', '.')
+                    number_format($budgetCap, 0, ',', '.')
                 );
             }
         }
@@ -664,7 +679,7 @@ class ProposalForm extends Form
         }
 
         // Calculate total budget
-        $totalBudget = collect($this->budget_items)->sum('total');
+        $totalBudget = collect($this->budget_items)->sum(fn ($item) => (float) ($item['total'] ?? 0));
 
         if ($totalBudget <= 0) {
             return;
