@@ -144,6 +144,16 @@ class Create extends Component
         return BudgetComponent::with('budgetGroup')->get();
     }
 
+    #[Computed]
+    public function templateUrl()
+    {
+        $setting = \App\Models\Setting::where('key', 'community_service_proposal_template')->first();
+        if ($setting && $setting->hasMedia('template')) {
+            return $setting->getFirstMedia('template')->getUrl();
+        }
+        return null;
+    }
+
     public function nextStep(): void
     {
         $this->validateCurrentStep();
