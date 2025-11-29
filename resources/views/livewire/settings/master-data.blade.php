@@ -40,6 +40,11 @@
                             <x-lucide-atom class="icon me-2" />
                             Klaster Sains
                         </button>
+                        <button wire:click="setActiveTab('tkt')"
+                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'tkt' ? 'active' : '' }}">
+                            <x-lucide-ruler class="icon me-2" />
+                            TKT
+                        </button>
                     </div>
                     <h4 class="subheader mt-4">Struktur Akademik</h4>
                     <div class="list-group list-group-transparent">
@@ -165,6 +170,10 @@
                     @elseif ($activeTab === 'budget-caps')
                         <div>
                             <livewire:settings.tabs.budget-cap-manager />
+                        </div>
+                    @elseif ($activeTab === 'tkt')
+                        <div>
+                            <livewire:settings.tabs.tkt-manager />
                         </div>
                     @endif
                 </div>

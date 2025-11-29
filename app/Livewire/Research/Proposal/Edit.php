@@ -13,6 +13,7 @@ use App\Models\Proposal;
 use App\Models\ResearchScheme;
 use App\Models\ScienceCluster;
 use App\Models\Theme;
+use App\Models\TktLevel;
 use App\Models\Topic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -68,6 +69,12 @@ class Edit extends Component
     public function updateMembers(array $members): void
     {
         $this->form->members = $members;
+    }
+
+    #[On('tkt-calculated')]
+    public function updateTktResults(array $results): void
+    {
+        $this->form->tkt_results = $results;
     }
 
     /**
@@ -146,6 +153,12 @@ class Edit extends Component
     public function budgetComponents()
     {
         return BudgetComponent::with('budgetGroup')->get();
+    }
+
+    #[Computed]
+    public function tktTypes()
+    {
+        return TktLevel::select('type')->distinct()->pluck('type');
     }
 
     #[Computed]
@@ -296,7 +309,7 @@ class Edit extends Component
                 ->addMedia($this->form->new_partner_commitment_file->getRealPath())
                 ->usingName($this->form->new_partner_commitment_file->getClientOriginalName())
                 ->usingFileName($this->form->new_partner_commitment_file->hashName())
-                ->withCustomProperties(['uploaded_by' => auth()->id()])
+                ->withCustomProperties(['uploaded_by' => Auth::id()])
                 ->toMediaCollection('commitment_letter');
         }
 
