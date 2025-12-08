@@ -1,9 +1,9 @@
 <!-- Section: Informasi Dasar -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-file-text class="me-3 icon" />
-            <h3 class="mb-0 card-title">1.1 Informasi Dasar Proposal</h3>
+            <x-lucide-file-text class="icon me-3" />
+            <h3 class="card-title mb-0">1.1 Informasi Dasar Proposal</h3>
         </div>
 
         <div class="row g-4">
@@ -111,11 +111,11 @@
 </div>
 
 <!-- Section: Rumpun Ilmu -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-dna class="me-3 icon" />
-            <h3 class="mb-0 card-title">1.2 Rumpun Ilmu</h3>
+            <x-lucide-dna class="icon me-3" />
+            <h3 class="card-title mb-0">1.2 Rumpun Ilmu</h3>
         </div>
 
         <div class="row g-4">
@@ -183,11 +183,11 @@
 </div>
 
 <!-- Section: Ringkasan -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-file-text class="me-3 icon" />
-            <h3 class="mb-0 card-title">1.3 Ringkasan Proposal</h3>
+            <x-lucide-file-text class="icon me-3" />
+            <h3 class="card-title mb-0">1.3 Ringkasan Proposal</h3>
         </div>
 
         <div class="mb-3">
@@ -203,22 +203,54 @@
 </div>
 
 <!-- Section: Detail Penelitian -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-microscope class="me-3 icon" />
-            <h3 class="mb-0 card-title">Detail Penelitian</h3>
+            <x-lucide-microscope class="icon me-3" />
+            <h3 class="card-title mb-0">Detail Penelitian</h3>
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="final_tkt_target">Target TKT Final</label>
-            <input id="final_tkt_target" type="text"
-                class="form-control @error('form.final_tkt_target') is-invalid @enderror"
-                wire:model="form.final_tkt_target" placeholder="Contoh: TKT 5, TKT 6, dsb">
-            @error('form.final_tkt_target')
+            <label class="form-label" for="tkt_type">Kategori TKT <span class="text-danger">*</span></label>
+            <select id="tkt_type" class="form-select @error('form.tkt_type') is-invalid @enderror"
+                wire:model.live="form.tkt_type" required>
+                <option value="">-- Pilih Kategori TKT --</option>
+                @foreach ($this->tktTypes as $type)
+                    <option value="{{ $type }}">{{ $type }}</option>
+                @endforeach
+            </select>
+            @error('form.tkt_type')
                 <div class="d-block invalid-feedback">{{ $message }}</div>
             @enderror
-            <small class="text-muted">Tingkat Kesiapan Teknologi (TKT) yang ditargetkan</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Pengukuran TKT</label>
+            <div class="d-flex align-items-center gap-3">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                    data-bs-target="#tkt-measurement-modal"
+                    wire:click="$dispatch('tkt-type-selected', { tktType: '{{ $form->tkt_type }}', existingScores: @js($form->tkt_indicator_scores) })"
+                    @if (!$form->tkt_type) disabled @endif>
+                    <x-lucide-ruler class="icon me-2" />
+                    Ukur TKT Saat Ini
+                </button>
+
+                @if (!empty($form->tkt_results))
+                    @php
+                        $currentTkt = 0;
+                        foreach ($form->tkt_results as $levelId => $data) {
+                            if ($data['percentage'] >= 80) {
+                                $currentTkt = max($currentTkt, $data['level']);
+                            }
+                        }
+                    @endphp
+                    <div class="badge bg-success fs-3">
+                        TKT Saat Ini: Level {{ $currentTkt }}
+                    </div>
+                @endif
+            </div>
+            <small class="text-muted d-block mt-1">Pilih kategori terlebih dahulu, lalu klik tombol untuk mengukur
+                TKT.</small>
         </div>
 
         {{-- <div class="mb-3">
@@ -245,11 +277,11 @@
 </div>
 
 <!-- Section: Ketua Tasks -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-user-check class="me-3 icon" />
-            <h3 class="mb-0 card-title">Tugas Ketua Peneliti</h3>
+            <x-lucide-user-check class="icon me-3" />
+            <h3 class="card-title mb-0">Tugas Ketua Peneliti</h3>
         </div>
 
         <div class="mb-3">
@@ -275,14 +307,16 @@
 </div>
 
 <!-- Section: Anggota -->
-<div class="mb-3 card">
+<div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-users class="me-3 icon" />
-            <h3 class="mb-0 card-title">Anggota Peneliti</h3>
+            <x-lucide-users class="icon me-3" />
+            <h3 class="card-title mb-0">Anggota Peneliti</h3>
         </div>
 
         <livewire:forms.team-members-form :members="$form->members" modal-title="Tambah Anggota Peneliti"
             member-label="Anggota Peneliti" />
     </div>
 </div>
+
+<livewire:research.proposal.components.tkt-measurement />
