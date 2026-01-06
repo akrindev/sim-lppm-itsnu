@@ -162,10 +162,14 @@ class ResearchSeeder extends Seeder
 
                     // Create related data
                     // Mandatory outputs (Luaran Wajib)
-                    \App\Models\ProposalOutput::factory(rand(1, 2))->create([
+                    \App\Models\ProposalOutput::factory()->create([
                         'proposal_id' => $proposal->id,
                         'category' => 'Wajib',
-                        'output_year' => rand(1, $proposal->duration_in_years),
+                        'type' => $proposal->researchScheme->strata === 'Terapan' 
+                            ? 'Purwarupa/Prototipe TRL 4-6' 
+                            : 'Jurnal Nasional Terakreditasi (Sinta 1-2)',
+                        'target_status' => 'Accepted/Published',
+                        'output_year' => $proposal->duration_in_years,
                     ]);
 
                     // Additional outputs (Luaran Tambahan)

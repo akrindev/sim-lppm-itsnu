@@ -17,40 +17,36 @@ class NationalPrioritySeeder extends Seeder
     {
         $priorities = [
             [
-                'name' => 'Pangan',
-                'description' => 'Riset ketahanan pangan dan pertanian: Padi, Jagung, Kedelai, Hortikultura, Peternakan, Pengolahan Pangan',
-            ],
-            [
-                'name' => 'Energi',
-                'description' => 'Riset energi baru dan terbarukan: Bahan Bakar Bersih, Teknologi Kelistrikan EBT, Konversi Energi, Biofuel',
+                'name' => 'Keamanan',
+                'description' => 'Sektor strategis untuk keamanan nasional dan ketertiban masyarakat',
             ],
             [
                 'name' => 'Kesehatan',
-                'description' => 'Riset kesehatan dan obat: Vaksin Nasional, OHT, Insulin, Paracetamol, Implan Tulang & Gigi, Alat Kesehatan, Bioteknologi Medis',
+                'description' => 'Sektor strategis untuk kemandirian obat, vaksin, dan alat kesehatan',
             ],
             [
-                'name' => 'Transportasi',
-                'description' => 'Riset sistem transportasi: Mobil Listrik Nasional, Pesawat N219 Amphibi, Kapal Nasional, Sistem Transportasi Modern',
+                'name' => 'Energi',
+                'description' => 'Sektor strategis untuk kemandirian energi dan energi baru terbarukan',
             ],
             [
-                'name' => 'Rekayasa Keteknikan',
-                'description' => 'Riset engineering dan teknologi: Produk Manufaktur, Material Maju, Teknologi Tinggi, Industri Nasional',
+                'name' => 'Maritim',
+                'description' => 'Sektor strategis untuk ekonomi biru dan kedaulatan laut',
             ],
             [
-                'name' => 'Pertahanan dan Keamanan',
-                'description' => 'Riset pertahanan dan keamanan: Sistem Pertahanan, Alutsista, Cybersecurity, Keamanan Strategis',
+                'name' => 'Pertahanan',
+                'description' => 'Sektor strategis untuk kedaulatan wilayah dan alutsista',
             ],
             [
-                'name' => 'Kemaritiman',
-                'description' => 'Riset kelautan dan perikanan: Sektor Kelautan, Perikanan, Monitoring Kelautan, Teknologi Pulau-Pulau Kecil',
+                'name' => 'Manufaktur',
+                'description' => 'Sektor strategis untuk industri pengolahan dan hilirisasi',
             ],
             [
-                'name' => 'Sosial-Humaniora-Pendidikan-Seni-Budaya',
-                'description' => 'Riset sosial dan budaya: Riset Sosial, Hukum, Humaniora, Pendidikan SDM Unggul, Pelestarian Seni & Budaya',
+                'name' => 'Keadilan Sosial',
+                'description' => 'Sektor strategis untuk kesejahteraan masyarakat dan pemerataan pembangunan',
             ],
             [
-                'name' => 'Multidisiplin dan Lintas Sektoral',
-                'description' => 'Riset multidisiplin: Perubahan Iklim, Mitigasi Bencana, Sumber Daya Air, Stunting, Isu Multidisiplin Lainnya',
+                'name' => 'Digitalisasi Industri',
+                'description' => 'Sektor strategis untuk transformasi digital, AI, dan Industri 4.0',
             ],
         ];
 

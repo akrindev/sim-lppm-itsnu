@@ -10,8 +10,8 @@ class BudgetGroupSeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * Based on BIMA Kemdikbud RAB Components 2024-2025
-     * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2025
+     * Based on BIMA Kemdiktisaintek RAB Components 2026
+     * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2026
      * Source: Kemdiktisaintek (Kementerian Pendidikan Tinggi, Sains, dan Teknologi)
      *
      * Budget Percentage Limits (Total must = 100%):

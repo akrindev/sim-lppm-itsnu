@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             // 2. Master Data (No Dependencies)
             InstitutionSeeder::class,
             ResearchSchemeSeeder::class,
+            TktSeeder::class,
             FocusAreaSeeder::class,
             NationalPrioritySeeder::class,
             KeywordSeeder::class,

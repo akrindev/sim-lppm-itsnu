@@ -164,18 +164,40 @@ class CommunityServiceSeeder extends Seeder
 
                     // Create related data for PKM
                     // Mandatory outputs (Luaran Wajib)
-                    \App\Models\ProposalOutput::factory(rand(1, 2))->create([
+                    \App\Models\ProposalOutput::factory()->create([
                         'proposal_id' => $proposal->id,
                         'category' => 'Wajib',
+                        'type' => 'Video Kegiatan (Youtube/Media Sosial)',
+                        'target_status' => 'Uploaded',
                         'output_year' => rand(1, $proposal->duration_in_years),
                     ]);
 
-                    // Additional outputs (Luaran Tambahan)
-                    \App\Models\ProposalOutput::factory(rand(0, 2))->create([
+                    \App\Models\ProposalOutput::factory()->create([
                         'proposal_id' => $proposal->id,
-                        'category' => 'Tambahan',
+                        'category' => 'Wajib',
+                        'type' => 'Publikasi Media Massa (Cetak/Elektronik)',
+                        'target_status' => 'Published',
                         'output_year' => rand(1, $proposal->duration_in_years),
                     ]);
+
+                    \App\Models\ProposalOutput::factory()->create([
+                        'proposal_id' => $proposal->id,
+                        'category' => 'Wajib',
+                        'type' => 'Jurnal Pengabdian Masyarakat (Sinta 1-6)',
+                        'target_status' => 'Accepted/Published',
+                        'output_year' => $proposal->duration_in_years,
+                    ]);
+
+                    // Additional outputs (Luaran Tambahan)
+                    if (rand(0, 1)) {
+                        \App\Models\ProposalOutput::factory()->create([
+                            'proposal_id' => $proposal->id,
+                            'category' => 'Tambahan',
+                            'type' => 'HKI Hak Cipta (Modul/Panduan)',
+                            'target_status' => 'Registered',
+                            'output_year' => rand(1, $proposal->duration_in_years),
+                        ]);
+                    }
 
                     \App\Models\BudgetItem::factory(rand(4, 7))->create([
                         'proposal_id' => $proposal->id,

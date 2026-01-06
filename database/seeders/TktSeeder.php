@@ -203,15 +203,15 @@ class TktSeeder extends Seeder
             [
                 'type' => 'Sosial Humaniora dan Pendidikan',
                 'levels' => [
-                    [
-                        'level' => 1,
-                        'description' => 'Prinsip dasar riset sosial humaniora telah diteliti',
-                        'indicators' => [
-                            ['code' => '1.1', 'indicator' => 'Masalah sosial/humaniora telah diidentifikasi'],
-                            ['code' => '1.2', 'indicator' => 'Studi literatur terkait masalah telah dilakukan'],
-                        ]
-                    ],
-                    // ...
+                    ['level' => 1, 'description' => 'Prinsip dasar riset soshum telah diteliti', 'indicators' => [['code' => '1.1', 'indicator' => 'Identifikasi masalah sosial/humaniora'], ['code' => '1.2', 'indicator' => 'Studi literatur awal']]],
+                    ['level' => 2, 'description' => 'Formulasi konsep riset dan hipotesis', 'indicators' => [['code' => '2.1', 'indicator' => 'Desain metodologi penelitian'], ['code' => '2.2', 'indicator' => 'Identifikasi variabel riset']]],
+                    ['level' => 3, 'description' => 'Pembuktian konsep secara analitis dan eksperimental', 'indicators' => [['code' => '3.1', 'indicator' => 'Pengumpulan data awal/pilot study'], ['code' => '3.2', 'indicator' => 'Validasi instrumen riset']]],
+                    ['level' => 4, 'description' => 'Validasi model dalam lingkungan simulasi', 'indicators' => [['code' => '4.1', 'indicator' => 'Analisis data awal'], ['code' => '4.2', 'indicator' => 'Uji reliabilitas model di skala kecil']]],
+                    ['level' => 5, 'description' => 'Validasi model dalam lingkungan yang relevan', 'indicators' => [['code' => '5.1', 'indicator' => 'Uji coba model pada kelompok sasaran terbatas'], ['code' => '5.2', 'indicator' => 'Review ahli terhadap model/prototipe sosial']]],
+                    ['level' => 6, 'description' => 'Demonstrasi model dalam lingkungan yang relevan', 'indicators' => [['code' => '6.1', 'indicator' => 'Implementasi model pada komunitas mitra'], ['code' => '6.2', 'indicator' => 'Evaluasi dampak awal model']]],
+                    ['level' => 7, 'description' => 'Demonstrasi model dalam lingkungan operasional', 'indicators' => [['code' => '7.1', 'indicator' => 'Diseminasi hasil riset kepada stakeholder'], ['code' => '7.2', 'indicator' => 'Uji efektivitas model secara luas']]],
+                    ['level' => 8, 'description' => 'Model lengkap dan memenuhi syarat (Final)', 'indicators' => [['code' => '8.1', 'indicator' => 'Sertifikasi/Haki model atau karya'], ['code' => '8.2', 'indicator' => 'Rekomendasi kebijakan telah disusun']]],
+                    ['level' => 9, 'description' => 'Model benar-benar teruji melalui keberhasilan pengoperasian', 'indicators' => [['code' => '9.1', 'indicator' => 'Model diadopsi secara formal oleh institusi/pemerintah'], ['code' => '9.2', 'indicator' => 'Evaluasi dampak jangka panjang']]],
                 ]
             ]
         ];
