@@ -201,7 +201,7 @@ class MenuComposer
         ];
 
         return array_values(array_filter(array_map(
-            fn(array $item) => $this->formatItem($item, $user),
+            fn (array $item) => $this->formatItem($item, $user),
             $items,
         )));
     }
@@ -220,7 +220,7 @@ class MenuComposer
         $children = null;
         if (isset($item['children']) && is_array($item['children'])) {
             $children = array_values(array_filter(array_map(
-                fn(array $child) => $this->formatDropdownItem($child, $user),
+                fn (array $child) => $this->formatDropdownItem($child, $user),
                 $item['children'],
             )));
         }
@@ -229,9 +229,7 @@ class MenuComposer
         $hasActiveChild = false;
         if ($children) {
             foreach ($children as $child) {
-                $childRouteName = $child['route'] ?? null;
-                // Use wildcard pattern to match child routes (e.g., research.proposal.* matches research.proposal.index, research.proposal.create, etc.)
-                if ($childRouteName && request()->routeIs($childRouteName . '*')) {
+                if ($child['active'] ?? false) {
                     $hasActiveChild = true;
                     break;
                 }
@@ -272,7 +270,8 @@ class MenuComposer
             'href' => $this->resolveHref($item),
             'prefix_icon' => $item['icon'] ?? null,
             'prefix_icon_class' => 'icon icon-2 icon-inline me-1',
-            'route' => $routeName, // Store route name for active state checking
+            'route' => $routeName,
+            'active' => $this->isActive($item, $routeName),
         ];
     }
 
@@ -299,11 +298,24 @@ class MenuComposer
 
     protected function isActive(array $item, ?string $routeName): bool
     {
-        $patterns = $item['active'] ?? array_filter([$routeName]);
+        $patterns = (array) ($item['active'] ?? array_filter([$routeName]));
 
         foreach ($patterns as $pattern) {
-            if ($pattern && request()->routeIs($pattern)) {
+            if (empty($pattern)) {
+                continue;
+            }
+
+            if (request()->routeIs($pattern)) {
                 return true;
+            }
+
+            // For index routes, also check all other actions in the same resource
+            if (str_ends_with($pattern, '.index')) {
+                $resourceRoute = substr($pattern, 0, -6);
+
+                if (request()->routeIs($resourceRoute . '.*')) {
+                    return true;
+                }
             }
         }
 

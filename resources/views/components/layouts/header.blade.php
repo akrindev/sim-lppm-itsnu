@@ -190,7 +190,7 @@
 
                                         @if ($isDropdown)
                                             <li class="nav-item dropdown{{ $isActive ? ' active' : '' }}">
-                                                <a class="nav-link dropdown-toggle" href="#"
+                                                <a class="nav-link dropdown-toggle{{ $isActive ? ' active' : '' }}" href="#"
                                                     data-bs-toggle="dropdown"
                                                     data-bs-auto-close="{{ $menuItem['dropdown']['auto_close'] ?? 'outside' }}"
                                                     role="button" aria-expanded="false">
@@ -218,7 +218,7 @@
                                             </li>
                                         @else
                                             <li class="nav-item{{ $isActive ? ' active' : '' }}">
-                                                <a class="nav-link" href="{{ $menuItem['href'] ?? '#' }}"
+                                                <a class="nav-link{{ $isActive ? ' active' : '' }}" href="{{ $menuItem['href'] ?? '#' }}"
                                                     wire:navigate>
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
                                                         @if (!empty($menuItem['icon']))

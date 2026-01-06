@@ -1,10 +1,11 @@
 @php
     $itemType = $item['type'] ?? 'link';
+    $isActive = $item['active'] ?? false;
 @endphp
 
 @if ($itemType === 'dropend')
     <div class="dropend">
-        <a class="{{ $item['toggle_class'] ?? 'dropdown-item dropdown-toggle' }}"
+        <a class="{{ $item['toggle_class'] ?? 'dropdown-item dropdown-toggle' }}{{ $isActive ? ' active' : '' }}"
             href="{{ $item['href'] ?? '#' }}"
             data-bs-toggle="{{ $item['toggle']['data-bs-toggle'] ?? 'dropdown' }}"
             data-bs-auto-close="{{ $item['toggle']['data-bs-auto-close'] ?? 'outside' }}"
@@ -19,7 +20,7 @@
         </div>
     </div>
 @else
-    <a class="{{ $item['class'] ?? 'dropdown-item' }}" href="{{ $item['href'] ?? '#' }}"
+    <a class="{{ $item['class'] ?? 'dropdown-item' }}{{ $isActive ? ' active' : '' }}" href="{{ $item['href'] ?? '#' }}"
         wire:navigate
         @foreach (($item['attributes'] ?? []) as $attribute => $value)
             {{ $attribute }}="{{ $value }}"
