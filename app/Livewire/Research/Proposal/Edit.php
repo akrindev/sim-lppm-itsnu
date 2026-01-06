@@ -71,10 +71,14 @@ class Edit extends Component
         $this->form->members = $members;
     }
 
+    /**
+     * Handle TKT calculation results from TktMeasurement component
+     */
     #[On('tkt-calculated')]
-    public function updateTktResults(array $results): void
+    public function updateTktResults(array $levelResults, array $indicatorScores): void
     {
-        $this->form->tkt_results = $results;
+        $this->form->tkt_results = $levelResults;
+        $this->form->tkt_indicator_scores = $indicatorScores;
     }
 
     /**

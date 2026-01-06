@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Models\CommunityService;
 use App\Models\Proposal;
+use App\Models\ResearchScheme;
 use App\Models\Research;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -499,7 +500,7 @@ class ProposalForm extends Form
     public function rules(): array
     {
         // Determine if this is a Research or CommunityService proposal
-        $isResearch = $this->proposal && $this->proposal->detailable_type === Research::class;
+        $isResearch = ($this->proposal && $this->proposal->detailable_type === Research::class) || $this->research_scheme_id;
         $isCommunityService = $this->proposal && $this->proposal->detailable_type === CommunityService::class;
 
         $rules = [
@@ -535,6 +536,41 @@ class ProposalForm extends Form
         // $rules['state_of_the_art'] = 'nullable|string|min:200';
         // $rules['tkt_type'] = 'nullable|string|max:255';
         // $rules['roadmap_data'] = 'nullable|array';
+
+        $rules['tkt_results'] = ['nullable', 'array', function ($attribute, $value, $fail) {
+            if (empty($value)) return;
+
+            // 1. Calculate achieved level
+            $achievedLevel = 0;
+            // Get level models to map IDs to integer levels
+            $levels = \App\Models\TktLevel::whereIn('id', array_keys($value))->get();
+
+            foreach ($levels as $level) {
+                $data = $value[$level->id] ?? null;
+                // Check if passed (percentage >= 80)
+                if ($data && isset($data['percentage']) && $data['percentage'] >= 80) {
+                    $achievedLevel = max($achievedLevel, $level->level);
+                }
+            }
+
+            // 2. Get required range for the scheme if selected
+            if ($this->research_scheme_id) {
+                $scheme = ResearchScheme::find($this->research_scheme_id);
+                if ($scheme && $scheme->strata) {
+                    $range = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata($scheme->strata);
+
+                    // If range exists (not PKM), validate
+                    if ($range) {
+                        [$min, $max] = $range;
+
+                        // Check if achieved level is within range
+                        if ($achievedLevel < $min || $achievedLevel > $max) {
+                            $fail("TKT Saat Ini (Level $achievedLevel) tidak sesuai dengan Skema $scheme->strata (Target: Level $min - $max).");
+                        }
+                    }
+                }
+            }
+        }];
         // } elseif ($isCommunityService) {
         // For CommunityService, background and methodology can be null or shorter
         // $rules['background'] = 'nullable|string|min:50';

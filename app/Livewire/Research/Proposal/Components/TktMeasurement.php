@@ -13,6 +13,7 @@ use Livewire\Component;
 class TktMeasurement extends Component
 {
     public $tktType;
+    public $strata; // Research scheme strata: Dasar, Terapan, Pengembangan, PKM
     public $levels = [];
 
     // Stores individual indicator scores: [indicator_id => score]
@@ -40,8 +41,9 @@ class TktMeasurement extends Component
      * Handle tkt-type-selected event from parent component
      */
     #[On('tkt-type-selected')]
-    public function handleTypeSelected($tktType, $existingScores = [])
+    public function handleTypeSelected($tktType, $existingScores = [], $strata = null)
     {
+        $this->strata = $strata;
         $this->loadLevels($tktType);
 
         if (!empty($existingScores)) {
@@ -117,6 +119,49 @@ class TktMeasurement extends Component
     }
 
     /**
+     * Get target TKT range for a given strata
+     * Returns [min, max] or null for PKM
+     */
+    public static function getTktRangeForStrata(?string $strata): ?array
+    {
+        return match ($strata) {
+            'Dasar' => [1, 3],
+            'Terapan' => [4, 6],
+            'Pengembangan' => [7, 9],
+            default => null, // PKM or unknown
+        };
+    }
+
+    /**
+     * Get the highest achieved (passed) TKT level
+     */
+    public function getAchievedTktLevel(): int
+    {
+        $achieved = 0;
+        foreach ($this->levels as $level) {
+            if ($this->isLevelPassed($level->id)) {
+                $achieved = max($achieved, $level->level);
+            } else {
+                // Stop at first non-passed level (progressive)
+                break;
+            }
+        }
+        return $achieved;
+    }
+
+    /**
+     * Check if achieved TKT is within target range for the strata
+     */
+    public function isTktWithinTarget(): ?bool
+    {
+        $range = self::getTktRangeForStrata($this->strata);
+        if (!$range) return null; // N/A for PKM
+
+        $achieved = $this->getAchievedTktLevel();
+        return $achieved >= $range[0] && $achieved <= $range[1];
+    }
+
+    /**
      * Check if a level is locked (Previous level not passed)
      */
     public function isLevelLocked($level)
@@ -181,8 +226,9 @@ class TktMeasurement extends Component
 
             // Only save levels that have some progress or are passed
             // Or maybe save all? Let's save all for completeness
+            // Only store 'percentage' - the level number is already in the tkt_levels table
+            // The pivot table research_tkt_level only has: research_id, tkt_level_id, percentage
             $levelResults[$level->id] = [
-                'level' => $level->level,
                 'percentage' => $average,
             ];
         }

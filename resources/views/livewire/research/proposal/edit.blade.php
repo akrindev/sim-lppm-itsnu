@@ -87,5 +87,3 @@
         </div>
     </form>
 </div>
-
-<livewire:research.proposal.components.tkt-measurement />

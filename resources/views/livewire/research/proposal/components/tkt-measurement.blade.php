@@ -3,6 +3,46 @@
         <x-tabler.modal id="tkt-measurement-modal" title="Pengukuran TKT {{ $tktType ? '(' . $tktType . ')' : '' }}"
             size="xl">
             <x-slot:body>
+                {{-- Target TKT Range Info Card --}}
+                @if ($strata)
+                    @php
+                        $targetRange = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata(
+                            $strata,
+                        );
+                        $achievedTkt = $this->getAchievedTktLevel();
+                        $isWithinTarget = $this->isTktWithinTarget();
+                    @endphp
+                    <div
+                        class="alert {{ $isWithinTarget === true ? 'alert-success' : ($isWithinTarget === false ? 'alert-warning' : 'alert-secondary') }} mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Skema {{ $strata }}</strong>
+                                @if ($targetRange)
+                                    <span class="ms-2">Target TKT: <strong>Level {{ $targetRange[0] }} -
+                                            {{ $targetRange[1] }}</strong></span>
+                                @else
+                                    <span class="text-muted ms-2">(TKT tidak diperlukan untuk PKM)</span>
+                                @endif
+                            </div>
+                            <div class="text-end">
+                                <span class="text-muted me-2">TKT Tercapai:</span>
+                                <x-tabler.badge class="fs-4" :color="$isWithinTarget === true
+                                    ? 'success'
+                                    : ($isWithinTarget === false
+                                        ? 'warning'
+                                        : 'secondary')">
+                                    Level {{ $achievedTkt }}
+                                </x-tabler.badge>
+                                @if ($isWithinTarget === true)
+                                    <i class="ti ti-check text-success ms-1"></i>
+                                @elseif ($isWithinTarget === false)
+                                    <i class="ti ti-alert-triangle text-warning ms-1"></i>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="row" x-data="{ activeLevel: 1 }"
                     @@switch-level.window="activeLevel = $event.detail.level">
                     <!-- Level Tabs -->
@@ -21,11 +61,11 @@
                                     <div class="d-flex w-100 justify-content-between align-items-center">
                                         <h6 class="mb-1">Level {{ $level->level }}</h6>
                                         @if ($isPassed)
-                                            <span class="badge bg-success">Pass</span>
+                                            <x-tabler.badge color="success">Pass</x-tabler.badge>
                                         @elseif($isLocked)
-                                            <span class="badge bg-secondary"><i class="ti ti-lock"></i></span>
+                                            <x-tabler.badge color="secondary"><i class="ti ti-lock"></i></x-tabler.badge>
                                         @else
-                                            <span class="badge bg-warning">{{ $average }}%</span>
+                                            <x-tabler.badge color="warning">{{ $average }}%</x-tabler.badge>
                                         @endif
                                     </div>
                                     <small class="d-block text-truncate mb-1">{{ $level->description }}</small>
@@ -34,7 +74,8 @@
                                     <div class="progress mt-2" style="height: 4px;">
                                         <div class="progress-bar {{ $average >= 80 ? 'bg-success' : 'bg-warning' }}"
                                             role="progressbar" style="width: {{ $average }}%"
-                                            aria-valuenow="{{ $average }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                            aria-valuenow="{{ $average }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
                                     </div>
                                 </button>
                             @endforeach

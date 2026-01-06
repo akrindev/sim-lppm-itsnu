@@ -182,8 +182,46 @@
                 <div class="card-body">
                     @php $research = $proposal->detailable; @endphp
                     <div class="mb-3">
+                        <label class="form-label">TKT Saat Ini (Terukur)</label>
+                        @php
+                            $currentTkt = 0;
+                            if ($research && $research->tktLevels->isNotEmpty()) {
+                                foreach ($research->tktLevels as $level) {
+                                    if ($level->pivot->percentage >= 80) {
+                                        $currentTkt = max($currentTkt, $level->level);
+                                    }
+                                }
+                            }
+                        @endphp
+                        <p>
+                            @if ($currentTkt > 0)
+                                <span class="badge bg-green text-white">Level {{ $currentTkt }}</span>
+                            @else
+                                <span class="text-muted">Belum diukur / Level 0</span>
+                            @endif
+                        </p>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Target TKT Final</label>
-                        <p class="text-reset">{{ $research?->final_tkt_target ?? '—' }}</p>
+                        @php
+                            $targetTktLabel = null;
+                            if ($proposal->researchScheme && $proposal->researchScheme->strata) {
+                                $range = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata(
+                                    $proposal->researchScheme->strata,
+                                );
+                                if ($range) {
+                                    $targetTktLabel = "Level {$range[0]} - {$range[1]}";
+                                }
+                            }
+                        @endphp
+
+                        @if ($targetTktLabel)
+                            <div>
+                                <x-tabler.badge color="primary">{{ $targetTktLabel }}</x-tabler.badge>
+                            </div>
+                        @else
+                            <p class="text-reset">—</p>
+                        @endif
                     </div>
                 </div>
             </div>

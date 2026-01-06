@@ -226,10 +226,28 @@
 
         <div class="mb-3">
             <label class="form-label">Pengukuran TKT</label>
+            @php
+                // Get strata from selected research scheme
+                $selectedScheme = $form->research_scheme_id
+                    ? \App\Models\ResearchScheme::find($form->research_scheme_id)
+                    : null;
+                $schemeStrata = $selectedScheme?->strata;
+                $targetRange = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata(
+                    $schemeStrata,
+                );
+            @endphp
+
+            @if ($schemeStrata && $targetRange)
+                <div class="alert alert-info mb-2 py-2">
+                    <small>Skema <strong>{{ $schemeStrata }}</strong> membutuhkan TKT Level
+                        <strong>{{ $targetRange[0] }} - {{ $targetRange[1] }}</strong></small>
+                </div>
+            @endif
+
             <div class="d-flex align-items-center gap-3">
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
                     data-bs-target="#tkt-measurement-modal"
-                    wire:click="$dispatch('tkt-type-selected', { tktType: '{{ $form->tkt_type }}', existingScores: @js($form->tkt_indicator_scores) })"
+                    wire:click="$dispatch('tkt-type-selected', { tktType: '{{ $form->tkt_type }}', existingScores: @js($form->tkt_indicator_scores), strata: '{{ $schemeStrata }}' })"
                     @if (!$form->tkt_type) disabled @endif>
                     <x-lucide-ruler class="icon me-2" />
                     Ukur TKT Saat Ini
@@ -238,15 +256,32 @@
                 @if (!empty($form->tkt_results))
                     @php
                         $currentTkt = 0;
+                        // Get level numbers from TktLevel model using the level_id keys
+                        // since 'level' is no longer stored in tkt_results
                         foreach ($form->tkt_results as $levelId => $data) {
-                            if ($data['percentage'] >= 80) {
-                                $currentTkt = max($currentTkt, $data['level']);
+                            if (($data['percentage'] ?? 0) >= 80) {
+                                $tktLevel = \App\Models\TktLevel::find($levelId);
+                                if ($tktLevel) {
+                                    $currentTkt = max($currentTkt, $tktLevel->level);
+                                }
                             }
                         }
+                        $isWithinTarget = $targetRange
+                            ? $currentTkt >= $targetRange[0] && $currentTkt <= $targetRange[1]
+                            : null;
                     @endphp
-                    <div class="badge bg-success fs-3">
+                    <x-tabler.badge class="fs-3" :color="$isWithinTarget === true
+                        ? 'success'
+                        : ($isWithinTarget === false
+                            ? 'warning'
+                            : 'secondary')">
                         TKT Saat Ini: Level {{ $currentTkt }}
-                    </div>
+                        @if ($isWithinTarget === true)
+                            <i class="ti ti-check ms-1"></i>
+                        @elseif ($isWithinTarget === false)
+                            <i class="ti ti-alert-triangle ms-1"></i>
+                        @endif
+                    </x-tabler.badge>
                 @endif
             </div>
             <small class="text-muted d-block mt-1">Pilih kategori terlebih dahulu, lalu klik tombol untuk mengukur
