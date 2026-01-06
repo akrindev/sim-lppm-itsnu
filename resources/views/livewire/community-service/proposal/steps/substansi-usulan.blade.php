@@ -88,10 +88,14 @@
         @else
             <div class="table-responsive">
                 <table class="table-bordered table">
+                    @php
+                        $duration = (int) ($form->duration_in_years ?? 1);
+                        $startYear = (int) ($form->start_year ?? date('Y'));
+                    @endphp
                     <thead>
                         <tr>
-                            {{-- <th width="20%">Tahun</th> --}}
-                            <th width="20%">Jenis</th>
+                            <th style="width: 100px;">Tahun Ke-</th>
+                            <th width="15%">Jenis</th>
                             <th width="20%">Kategori Luaran</th>
                             <th width="20%">Luaran</th>
                             <th width="15%">Status</th>
@@ -115,9 +119,13 @@
                                 }
                             }">
                                 <td>
-                                    <input type="number" wire:model="form.outputs.{{ $index }}.year"
-                                        class="form-control form-control-sm" placeholder="2025" min="2020"
-                                        max="2040">
+                                    <select wire:model="form.outputs.{{ $index }}.year"
+                                        class="form-select form-select-sm">
+                                        @for ($y = 1; $y <= $duration; $y++)
+                                            <option value="{{ $y }}">{{ $y }}
+                                                ({{ $startYear + $y - 1 }})</option>
+                                        @endfor
+                                    </select>
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.category"

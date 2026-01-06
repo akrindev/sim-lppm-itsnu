@@ -23,8 +23,15 @@
                         <td>{{ $form->title }}</td>
                     </tr>
                     <tr>
-                        <td><strong>Durasi</strong></td>
-                        <td>{{ $form->duration_in_years }} Tahun</td>
+                        <td><strong>Periode Pelaksanaan</strong></td>
+                        <td>
+                            @if ($form->start_year && $form->duration_in_years)
+                                {{ $form->start_year }} - {{ (int) $form->start_year + (int) $form->duration_in_years - 1 }}
+                                ({{ $form->duration_in_years }} Tahun)
+                            @else
+                                {{ $form->duration_in_years }} Tahun
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <td><strong>Bidang Fokus</strong></td>
@@ -127,21 +134,66 @@
                 @if (empty($form->budget_items))
                     <p class="text-muted">Belum ada item anggaran</p>
                 @else
+                    @php
+                        $budgetItems = collect($form->budget_items);
+                        $budgetByYear = $budgetItems->groupBy('year');
+                        $duration = (int) ($form->duration_in_years ?? 1);
+                        $startYear = (int) ($form->start_year ?? date('Y'));
+                    @endphp
+
+                    {{-- Year Summary Cards for Multi-Year Proposals --}}
+                    @if ($duration > 1)
+                        <div class="row g-2 mb-3">
+                            @for ($y = 1; $y <= $duration; $y++)
+                                @php
+                                    $yearTotal = $budgetByYear->get($y, collect())->sum('total');
+                                    $actualYear = $startYear + $y - 1;
+                                @endphp
+                                <div class="col-auto">
+                                    <div class="card card-sm">
+                                        <div class="card-body py-2 px-3">
+                                            <div class="text-muted small">Tahun {{ $y }} ({{ $actualYear }})</div>
+                                            <div class="fw-bold">Rp {{ number_format($yearTotal, 0, ',', '.') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endfor
+                            <div class="col-auto">
+                                <div class="card card-sm bg-primary-lt">
+                                    <div class="card-body py-2 px-3">
+                                        <div class="text-muted small">Total Keseluruhan</div>
+                                        <div class="fw-bold">Rp {{ number_format($budgetItems->sum('total'), 0, ',', '.') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-sm">
                             <thead>
                                 <tr>
+                                    @if ($duration > 1)
+                                        <th style="width: 80px;">Tahun Ke-</th>
+                                    @endif
                                     <th>Kelompok</th>
                                     <th>Komponen</th>
                                     <th>Item</th>
                                     <th>Volume</th>
-                                    <th>Harga Satuan</th>
-                                    <th>Total</th>
+                                    <th class="text-end">Harga Satuan</th>
+                                    <th class="text-end">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($form->budget_items as $item)
+                                    @php
+                                        $itemYear = $item['year'] ?? 1;
+                                        $displayYear = $startYear + $itemYear - 1;
+                                    @endphp
                                     <tr>
+                                        @if ($duration > 1)
+                                            <td class="text-center">{{ $itemYear }} ({{ $displayYear }})</td>
+                                        @endif
                                         <td>
                                             @if (!empty($item['budget_group_id']))
                                                 {{ $this->budgetGroups->find($item['budget_group_id'])?->name ?? $item['group'] ?? '-' }}
@@ -158,16 +210,15 @@
                                         </td>
                                         <td>{{ $item['item'] ?? '-' }}</td>
                                         <td>{{ $item['volume'] ?? 0 }} {{ $item['unit'] ?? '' }}</td>
-                                        <td>Rp {{ number_format($item['unit_price'] ?? 0, 2, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($item['total'] ?? 0, 2, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format($item['unit_price'] ?? 0, 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format($item['total'] ?? 0, 0, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <th colspan="5" class="text-end">Total Anggaran:</th>
-                                    <th>Rp {{ number_format(collect($form->budget_items)->sum('total'), 2, ',', '.') }}
-                                    </th>
+                                <tr class="table-light">
+                                    <th colspan="{{ $duration > 1 ? 6 : 5 }}" class="text-end">Total Anggaran:</th>
+                                    <th class="text-end">Rp {{ number_format($budgetItems->sum('total'), 0, ',', '.') }}</th>
                                 </tr>
                             </tfoot>
                         </table>

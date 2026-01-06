@@ -41,6 +41,7 @@ class Proposal extends Model
         'cluster_level3_id',
         'sbk_value',
         'duration_in_years',
+        'start_year',
         'summary',
         'status',
     ];

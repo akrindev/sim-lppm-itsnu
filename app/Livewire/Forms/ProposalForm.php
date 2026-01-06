@@ -4,10 +4,10 @@ namespace App\Livewire\Forms;
 
 use App\Models\CommunityService;
 use App\Models\Proposal;
-use App\Models\ResearchScheme;
 use App\Models\Research;
-use Illuminate\Support\Facades\DB;
+use App\Models\ResearchScheme;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -46,11 +46,16 @@ class ProposalForm extends Form
     #[Validate('required|integer|min:1|max:10')]
     public string $duration_in_years = '1';
 
+    #[Validate('required|integer|min:2020|max:2050')]
+    public string $start_year = '';
+
     #[Validate('required|string|min:100')]
     public string $summary = '';
 
     public string $tkt_type = '';
+
     public array $tkt_results = []; // [level_id => ['percentage' => 100]]
+
     public array $tkt_indicator_scores = []; // [indicator_id => score]
 
     public string $background = '';
@@ -137,6 +142,7 @@ class ProposalForm extends Form
         $this->cluster_level3_id = $proposal->cluster_level3_id ?? '';
         $this->sbk_value = (string) $proposal->sbk_value;
         $this->duration_in_years = (string) $proposal->duration_in_years;
+        $this->start_year = (string) ($proposal->start_year ?? date('Y'));
         $this->summary = $proposal->summary;
 
         // Load detailable-specific fields based on type
@@ -225,6 +231,7 @@ class ProposalForm extends Form
         // Load budget items
         $this->budget_items = $proposal->budgetItems->map(function ($item) {
             return [
+                'year' => $item->year ?? 1,
                 'budget_group_id' => $item->budget_group_id,
                 'budget_component_id' => $item->budget_component_id,
                 'group' => $item->group,
@@ -301,6 +308,7 @@ class ProposalForm extends Form
             'cluster_level3_id' => $this->cluster_level3_id ?: null,
             'sbk_value' => ! empty($this->sbk_value) ? $this->sbk_value : null,
             'duration_in_years' => (int) $this->duration_in_years,
+            'start_year' => (int) $this->start_year,
             'summary' => $this->summary,
             'status' => 'draft',
         ]);
@@ -311,12 +319,12 @@ class ProposalForm extends Form
         $this->attachPartners($proposal);
 
         // Attach TKT Levels
-        if (!empty($this->tkt_results)) {
+        if (! empty($this->tkt_results)) {
             $research->tktLevels()->sync($this->tkt_results);
         }
 
         // Attach TKT Indicators
-        if (!empty($this->tkt_indicator_scores)) {
+        if (! empty($this->tkt_indicator_scores)) {
             $indicatorSyncData = [];
             foreach ($this->tkt_indicator_scores as $indicatorId => $score) {
                 $indicatorSyncData[$indicatorId] = ['score' => $score];
@@ -367,6 +375,7 @@ class ProposalForm extends Form
             'cluster_level3_id' => $this->cluster_level3_id ?: null,
             'sbk_value' => ! empty($this->sbk_value) ? $this->sbk_value : null,
             'duration_in_years' => (int) $this->duration_in_years,
+            'start_year' => (int) $this->start_year,
             'summary' => $this->summary,
             'status' => 'draft',
         ]);
@@ -414,12 +423,12 @@ class ProposalForm extends Form
                     }
 
                     // Sync TKT Levels
-                    if (!empty($this->tkt_results)) {
+                    if (! empty($this->tkt_results)) {
                         $detailable->tktLevels()->sync($this->tkt_results);
                     }
 
                     // Sync TKT Indicators
-                    if (!empty($this->tkt_indicator_scores)) {
+                    if (! empty($this->tkt_indicator_scores)) {
                         $indicatorSyncData = [];
                         foreach ($this->tkt_indicator_scores as $indicatorId => $score) {
                             $indicatorSyncData[$indicatorId] = ['score' => $score];
@@ -443,7 +452,7 @@ class ProposalForm extends Form
                             ->addMedia($this->substance_file->getRealPath())
                             ->usingName($this->substance_file->getClientOriginalName())
                             ->usingFileName($this->substance_file->hashName())
-                            ->withCustomProperties(['uploaded_by' => auth()->id()])
+                            ->withCustomProperties(['uploaded_by' => Auth::id()])
                             ->toMediaCollection('substance_file');
                     }
                 }
@@ -462,6 +471,7 @@ class ProposalForm extends Form
                 'cluster_level3_id' => $this->cluster_level3_id ?: null,
                 'sbk_value' => ! empty($this->sbk_value) ? $this->sbk_value : null,
                 'duration_in_years' => (int) $this->duration_in_years,
+                'start_year' => (int) $this->start_year,
                 'summary' => $this->summary,
             ]);
 
@@ -515,6 +525,7 @@ class ProposalForm extends Form
             'cluster_level3_id' => 'nullable|exists:science_clusters,id',
             'sbk_value' => 'nullable|numeric|min:0',
             'duration_in_years' => 'required|integer|min:1|max:10',
+            'start_year' => 'required|integer|min:2020|max:2050',
             'summary' => 'required|string|min:100',
         ];
 
@@ -538,7 +549,9 @@ class ProposalForm extends Form
         // $rules['roadmap_data'] = 'nullable|array';
 
         $rules['tkt_results'] = ['nullable', 'array', function ($attribute, $value, $fail) {
-            if (empty($value)) return;
+            if (empty($value)) {
+                return;
+            }
 
             // 1. Calculate achieved level
             $achievedLevel = 0;
@@ -657,6 +670,7 @@ class ProposalForm extends Form
 
             foreach ($this->budget_items as $item) {
                 $proposal->budgetItems()->create([
+                    'year' => $item['year'] ?? 1,
                     'budget_group_id' => $item['budget_group_id'] ?? null,
                     'budget_component_id' => $item['budget_component_id'] ?? null,
                     'group' => $item['group'] ?? '',

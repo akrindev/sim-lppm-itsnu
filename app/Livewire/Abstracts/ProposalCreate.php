@@ -190,6 +190,7 @@ abstract class ProposalCreate extends Component
                 'form.cluster_level3_id' => 'nullable|exists:science_clusters,id',
                 'form.sbk_value' => 'nullable|numeric|min:0',
                 'form.duration_in_years' => 'required|integer|min:1|max:10',
+                'form.start_year' => 'required|integer|min:2020|max:2050',
                 'form.summary' => 'required|string|min:100',
             ],
             2 => $this->getStep2Rules(),

@@ -18,16 +18,35 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label" for="start_year">Tahun Mulai <span class="text-danger">*</span></label>
+                    <input id="start_year" type="number"
+                        class="form-control @error('form.start_year') is-invalid @enderror"
+                        wire:model.live="form.start_year" min="{{ date('Y') - 1 }}" max="{{ date('Y') + 5 }}"
+                        placeholder="{{ date('Y') }}" required>
+                    @error('form.start_year')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="col-md-3">
                 <div class="mb-3">
                     <label class="form-label" for="duration_in_years">Durasi (Tahun) <span
                             class="text-danger">*</span></label>
                     <input id="duration_in_years" type="number"
                         class="form-control @error('form.duration_in_years') is-invalid @enderror"
-                        wire:model="form.duration_in_years" min="1" max="10" value="1" required>
+                        wire:model.live="form.duration_in_years" min="1" max="10" value="1" required>
                     @error('form.duration_in_years')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
+                    @if ($form->start_year && $form->duration_in_years)
+                        <small class="text-muted">
+                            Periode: {{ $form->start_year }} -
+                            {{ (int) $form->start_year + (int) $form->duration_in_years - 1 }}
+                        </small>
+                    @endif
                 </div>
             </div>
 

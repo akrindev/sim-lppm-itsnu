@@ -24,7 +24,7 @@ trait WithProposalWizard
 
     public function addOutput(): void
     {
-        $this->outputs[] = [
+        $this->form->outputs[] = [
             'year' => 1,
             'category' => 'Wajib',
             'group' => '',
@@ -36,13 +36,14 @@ trait WithProposalWizard
 
     public function removeOutput(int $index): void
     {
-        unset($this->outputs[$index]);
-        $this->outputs = array_values($this->outputs);
+        unset($this->form->outputs[$index]);
+        $this->form->outputs = array_values($this->form->outputs);
     }
 
     public function addBudgetItem(): void
     {
-        $this->budget_items[] = [
+        $this->form->budget_items[] = [
+            'year' => 1,
             'budget_group_id' => '',
             'budget_component_id' => '',
             'group' => '',
@@ -57,15 +58,15 @@ trait WithProposalWizard
 
     public function removeBudgetItem(int $index): void
     {
-        unset($this->budget_items[$index]);
-        $this->budget_items = array_values($this->budget_items);
+        unset($this->form->budget_items[$index]);
+        $this->form->budget_items = array_values($this->form->budget_items);
     }
 
     public function calculateTotal(int $index): void
     {
-        $volume = (float) ($this->budget_items[$index]['volume'] ?? 0);
-        $price = (float) ($this->budget_items[$index]['unit_price'] ?? 0);
-        $this->budget_items[$index]['total'] = $volume * $price;
+        $volume = (float) ($this->form->budget_items[$index]['volume'] ?? 0);
+        $price = (float) ($this->form->budget_items[$index]['unit_price'] ?? 0);
+        $this->form->budget_items[$index]['total'] = $volume * $price;
     }
 
     public function saveNewPartner(): void

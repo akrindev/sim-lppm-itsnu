@@ -1,4 +1,19 @@
 <!-- Section: RAB (Rencana Anggaran Biaya) -->
+@php
+    $startYear = (int) ($form->start_year ?: date('Y'));
+    $duration = (int) ($form->duration_in_years ?: 1);
+    $currentYear = date('Y');
+    $budgetCap = \App\Models\BudgetCap::where('year', $currentYear)->first();
+    $communityCap = $budgetCap?->community_service_budget_cap;
+
+    // Calculate totals per group for percentage visualization
+    $totalBudget = collect($form->budget_items)->sum(fn($item) => (float) ($item['total'] ?? 0));
+    $groupTotals = collect($form->budget_items)->groupBy('budget_group_id')->map(fn($items) => $items->sum(fn($item) => (float) ($item['total'] ?? 0)));
+
+    // Calculate totals per year
+    $yearTotals = collect($form->budget_items)->groupBy('year')->map(fn($items) => $items->sum(fn($item) => (float) ($item['total'] ?? 0)))->toArray();
+@endphp
+
 <div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-4">
@@ -18,33 +33,54 @@
                 <div>
                     <x-lucide-info class="icon alert-icon" />
                 </div>
-                <div>
+                <div class="w-100">
                     <h4 class="alert-title">Batasan Persentase Kelompok Anggaran</h4>
                     <div class="text-muted">
                         Pastikan alokasi anggaran sesuai dengan batasan berikut:
                     </div>
                     <ul class="mb-0 mt-2">
                         @foreach ($this->budgetGroups->whereNotNull('percentage') as $group)
-                            <li>
-                                <strong>{{ $group->name }}</strong>:
-                                @if ($group->code === 'TEKNOLOGI')
-                                    <x-tabler.badge color="success">
-                                        Minimal {{ number_format($group->percentage, 0) }}%
-                                    </x-tabler.badge>
-                                @else
-                                    <x-tabler.badge color="warning">
-                                        Maksimal {{ number_format($group->percentage, 0) }}%
-                                    </x-tabler.badge>
+                            @php
+                                $groupTotal = $groupTotals[$group->id] ?? 0;
+                                $percentageUsed = $communityCap > 0 ? ($groupTotal / $communityCap) * 100 : 0;
+                                $allowedPercentage = (float) $group->percentage;
+                                $isOver = $percentageUsed > $allowedPercentage;
+                                $isMinimum = $group->code === 'TEKNOLOGI';
+                                $isBelowMinimum = $isMinimum && $percentageUsed < $allowedPercentage;
+                            @endphp
+                            <li class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ $group->name }}</strong>:
+                                        @if ($isMinimum)
+                                            <x-tabler.badge color="success">
+                                                Minimal {{ number_format($allowedPercentage, 0) }}%
+                                            </x-tabler.badge>
+                                        @else
+                                            <x-tabler.badge color="warning">
+                                                Maksimal {{ number_format($allowedPercentage, 0) }}%
+                                            </x-tabler.badge>
+                                        @endif
+                                        <small class="text-muted"> - {{ $group->description }}</small>
+                                    </div>
+                                    @if ($totalBudget > 0)
+                                        <span class="badge {{ $isOver || $isBelowMinimum ? 'bg-danger' : 'bg-success' }}">
+                                            {{ number_format($percentageUsed, 1) }}%
+                                            (Rp {{ number_format($groupTotal, 0, ',', '.') }})
+                                        </span>
+                                    @endif
+                                </div>
+                                @if ($communityCap > 0 && $totalBudget > 0)
+                                    <div class="progress mt-1" style="height: 6px;">
+                                        <div class="progress-bar {{ $isOver || $isBelowMinimum ? 'bg-danger' : 'bg-success' }}"
+                                            role="progressbar"
+                                            style="width: {{ min($percentageUsed, 100) }}%">
+                                        </div>
+                                    </div>
                                 @endif
-                                <small class="text-muted"> - {{ $group->description }}</small>
                             </li>
                         @endforeach
                     </ul>
-                    @php
-                        $currentYear = date('Y');
-                        $budgetCap = \App\Models\BudgetCap::where('year', $currentYear)->first();
-                        $communityCap = $budgetCap?->community_service_budget_cap;
-                    @endphp
                     @if ($communityCap)
                         <div class="border-top mt-2 pt-2">
                             <strong>Batas Maksimal Anggaran Pengabdian {{ $currentYear }}:</strong>
@@ -56,6 +92,30 @@
                 </div>
             </div>
         </div>
+
+        <!-- Year Summary Cards (for multi-year proposals) -->
+        @if ($duration > 1 && !empty($form->budget_items))
+            <div class="row g-3 mb-3">
+                @for ($y = 1; $y <= $duration; $y++)
+                    @php
+                        $yearTotal = $yearTotals[$y] ?? 0;
+                    @endphp
+                    <div class="col-md-{{ 12 / min($duration, 4) }}">
+                        <div class="card card-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <span class="bg-primary text-white stamp me-3">{{ $y }}</span>
+                                    <div>
+                                        <div class="text-muted small">Tahun {{ $y }} ({{ $startYear + $y - 1 }})</div>
+                                        <div class="h4 mb-0">Rp {{ number_format($yearTotal, 0, ',', '.') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endfor
+            </div>
+        @endif
 
         <!-- Real-time Validation Feedback -->
         @if (!empty($budgetValidationErrors))
@@ -78,8 +138,10 @@
 
         @error('form.budget_items')
             <div class="alert alert-danger mb-3">
-                <x-lucide-alert-circle class="icon me-2" />
-                {{ $message }}
+                <div class="d-flex">
+                    <x-lucide-alert-circle class="icon me-2" />
+                    <div>{{ $message }}</div>
+                </div>
             </div>
         @enderror
 
@@ -93,11 +155,12 @@
                 <table class="table-bordered table">
                     <thead>
                         <tr>
-                            <th width="15%">Kelompok RAB</th>
-                            <th width="15%">Komponen</th>
-                            <th width="20%">Item</th>
-                            <th width="10%">Satuan</th>
-                            <th width="10%">Volume</th>
+                            <th width="8%">Tahun Ke-</th>
+                            <th width="13%">Kelompok RAB</th>
+                            <th width="13%">Komponen</th>
+                            <th width="18%">Item</th>
+                            <th width="8%">Satuan</th>
+                            <th width="8%">Volume</th>
                             <th width="12%">Harga Satuan</th>
                             <th width="13%">Total</th>
                             <th width="5%">Aksi</th>
@@ -132,6 +195,14 @@
                                     }
                                 }
                             }">
+                                <td>
+                                    <select wire:model="form.budget_items.{{ $index }}.year"
+                                        class="form-select-sm form-select">
+                                        @for ($y = 1; $y <= $duration; $y++)
+                                            <option value="{{ $y }}">{{ $y }} ({{ $startYear + $y - 1 }})</option>
+                                        @endfor
+                                    </select>
+                                </td>
                                 <td>
                                     <select wire:model.live="form.budget_items.{{ $index }}.budget_group_id"
                                         x-model="selectedGroup" class="form-select-sm form-select">
@@ -190,10 +261,10 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="6" class="text-end"><strong>Total Anggaran:</strong></td>
+                            <td colspan="7" class="text-end"><strong>Total Anggaran:</strong></td>
                             <td colspan="2">
                                 <strong>Rp
-                                    {{ number_format(collect($form->budget_items)->sum(function ($item) {return (float) ($item['total'] ?? 0);}),2,',','.') }}</strong>
+                                    {{ number_format($totalBudget, 2, ',', '.') }}</strong>
                             </td>
                         </tr>
                     </tfoot>
