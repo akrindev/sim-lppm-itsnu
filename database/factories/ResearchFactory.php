@@ -17,17 +17,20 @@ class ResearchFactory extends Factory
     public function definition(): array
     {
         return [
-            'final_tkt_target' => fake()->numberBetween(1, 9),
+            'macro_research_group_id' => \App\Models\MacroResearchGroup::inRandomOrder()->first()?->id,
+            'tkt_type' => fake()->randomElement([
+                'Farmasi/Obat',
+                'Kesehatan - Alat Kesehatan',
+                'Kesehatan - Produk Vaksin/Hayati',
+                'Pertanian/Perikanan/Peternakan',
+                'Seni',
+                'Software',
+                'Sosial Humaniora dan Pendidikan',
+                'Umum',
+            ]),
             'background' => fake()->paragraphs(3, true),
             'state_of_the_art' => fake()->paragraphs(2, true),
-            'methodology' => fake()->randomElement([
-                'Kuantitatif',
-                'Kualitatif',
-                'Mixed Method',
-                'Eksperimen',
-                'Studi Kasus',
-                'Research and Development',
-            ]),
+            'methodology' => fake()->paragraphs(2, true),
             'roadmap_data' => [
                 'year_1' => fake()->sentence(10),
                 'year_2' => fake()->sentence(10),
