@@ -13,7 +13,9 @@ use Livewire\Component;
 class TktMeasurement extends Component
 {
     public $tktType;
+
     public $strata; // Research scheme strata: Dasar, Terapan, Pengembangan, PKM
+
     public $levels = [];
 
     // Stores individual indicator scores: [indicator_id => score]
@@ -31,7 +33,7 @@ class TktMeasurement extends Component
             $this->loadLevels($tktType);
         }
 
-        if (!empty($initialScores)) {
+        if (! empty($initialScores)) {
             $this->indicatorScores = $initialScores;
             $this->calculateAllAverages();
         }
@@ -46,7 +48,7 @@ class TktMeasurement extends Component
         $this->strata = $strata;
         $this->loadLevels($tktType);
 
-        if (!empty($existingScores)) {
+        if (! empty($existingScores)) {
             $this->indicatorScores = $existingScores;
             $this->calculateAllAverages();
         }
@@ -68,7 +70,7 @@ class TktMeasurement extends Component
             foreach ($this->levels as $level) {
                 foreach ($level->indicators as $indicator) {
                     // Default to 0 if not set
-                    if (!isset($this->indicatorScores[$indicator->id])) {
+                    if (! isset($this->indicatorScores[$indicator->id])) {
                         $this->indicatorScores[$indicator->id] = 0;
                     }
                 }
@@ -84,10 +86,14 @@ class TktMeasurement extends Component
     public function calculateLevelAverage($levelId)
     {
         $level = $this->levels->firstWhere('id', $levelId);
-        if (!$level) return 0;
+        if (! $level) {
+            return 0;
+        }
 
         $totalIndicators = $level->indicators->count();
-        if ($totalIndicators === 0) return 0;
+        if ($totalIndicators === 0) {
+            return 0;
+        }
 
         $totalScore = 0;
         foreach ($level->indicators as $indicator) {
@@ -146,6 +152,7 @@ class TktMeasurement extends Component
                 break;
             }
         }
+
         return $achieved;
     }
 
@@ -155,9 +162,12 @@ class TktMeasurement extends Component
     public function isTktWithinTarget(): ?bool
     {
         $range = self::getTktRangeForStrata($this->strata);
-        if (!$range) return null; // N/A for PKM
+        if (! $range) {
+            return null;
+        } // N/A for PKM
 
         $achieved = $this->getAchievedTktLevel();
+
         return $achieved >= $range[0] && $achieved <= $range[1];
     }
 
@@ -167,14 +177,18 @@ class TktMeasurement extends Component
     public function isLevelLocked($level)
     {
         // Level 1 is never locked
-        if ($level->level == 1) return false;
+        if ($level->level == 1) {
+            return false;
+        }
 
         // Find previous level
         $prevLevel = $this->levels->firstWhere('level', $level->level - 1);
-        if (!$prevLevel) return false; // Should not happen if data is correct
+        if (! $prevLevel) {
+            return false;
+        } // Should not happen if data is correct
 
         // Locked if previous level is not passed
-        return !$this->isLevelPassed($prevLevel->id);
+        return ! $this->isLevelPassed($prevLevel->id);
     }
 
     /**
@@ -204,7 +218,7 @@ class TktMeasurement extends Component
             // Find next level
             $nextLevel = $this->levels->firstWhere('level', $currentLevel->level + 1);
 
-            if ($nextLevel && !$this->isLevelLocked($nextLevel)) {
+            if ($nextLevel && ! $this->isLevelLocked($nextLevel)) {
                 // Dispatch event to switch tab
                 $this->dispatch('switch-level', level: $nextLevel->level);
             }
@@ -224,13 +238,13 @@ class TktMeasurement extends Component
         foreach ($this->levels as $level) {
             $average = $this->levelAverages[$level->id] ?? 0;
 
-            // Only save levels that have some progress or are passed
-            // Or maybe save all? Let's save all for completeness
-            // Only store 'percentage' - the level number is already in the tkt_levels table
-            // The pivot table research_tkt_level only has: research_id, tkt_level_id, percentage
-            $levelResults[$level->id] = [
-                'percentage' => $average,
-            ];
+            // Only include levels with actual progress (percentage > 0)
+            // This prevents showing badge when no meaningful TKT data exists
+            if ($average > 0) {
+                $levelResults[$level->id] = [
+                    'percentage' => $average,
+                ];
+            }
         }
 
         // Dispatch event to parent component with both level summaries and detailed indicator scores

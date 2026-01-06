@@ -9,8 +9,8 @@ class ResearchSchemeSeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * Based on BIMA Kemdikbud 2024-2025
-     * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2025
+     * Based on BIMA Kemdiktisaintek 2026
+     * Reference: Buku Panduan Penelitian dan Pengabdian kepada Masyarakat 2026
      */
     public function run(): void
     {
@@ -19,68 +19,73 @@ class ResearchSchemeSeeder extends Seeder
             [
                 'name' => 'Penelitian Dosen Pemula (PDP)',
                 'strata' => 'Dasar',
-                'description' => 'Untuk dosen pemula dengan pengalaman riset terbatas',
+                'description' => 'Membina dan mengarahkan dosen pemula dalam penelitian',
             ],
             [
-                'name' => 'Penelitian Dosen Pemula Afirmasi (PDP Afirmasi)',
+                'name' => 'Penelitian Pascasarjana - Tesis Magister (PTM)',
                 'strata' => 'Dasar',
-                'description' => 'PDP dengan afirmasi untuk daerah tertentu',
+                'description' => 'Meningkatkan produktivitas mahasiswa S2 melalui penelitian tesis',
             ],
             [
-                'name' => 'Penelitian Pascasarjana (PPS)',
+                'name' => 'Penelitian Pascasarjana - Disertasi Doktor (PDD)',
                 'strata' => 'Dasar',
-                'description' => 'Penelitian untuk mahasiswa S2/S3 dengan dosen pembimbing',
+                'description' => 'Meningkatkan produktivitas mahasiswa S3 melalui penelitian disertasi',
             ],
             [
-                'name' => 'Penelitian Fundamental (PF)',
+                'name' => 'Penelitian Fundamental',
                 'strata' => 'Dasar',
-                'description' => 'Penelitian fundamental tingkat lanjut',
+                'description' => 'Penelitian untuk pengembangan ilmu pengetahuan dan teknologi',
             ],
             [
-                'name' => 'Program Magister Menuju Dokter Sarjana Unggul (PMDSU)',
+                'name' => 'Penelitian Kerja Sama antar Perguruan Tinggi (PKPT)',
                 'strata' => 'Dasar',
-                'description' => 'Program fast-track S2 ke S3',
-            ],
-            [
-                'name' => 'Penelitian Kerja Sama Dalam Negeri (PKDN)',
-                'strata' => 'Dasar',
-                'description' => 'Kolaborasi antar PT dalam negeri',
-            ],
-            [
-                'name' => 'Kolaborasi Penelitian Strategis (KATALIS)',
-                'strata' => 'Dasar',
-                'description' => 'Kolaborasi strategis lintas klaster',
+                'description' => 'Kerja sama penelitian antara perguruan tinggi pengirim dan mitra',
             ],
 
             // PENELITIAN TERAPAN
             [
-                'name' => 'Penelitian Terapan (PT)',
+                'name' => 'Penelitian Terapan - Luaran Prototipe',
                 'strata' => 'Terapan',
-                'description' => 'Penelitian dengan aplikasi praktis',
+                'description' => 'Penelitian yang menghasilkan prototipe teknologi atau produk',
+            ],
+            [
+                'name' => 'Penelitian Terapan - Luaran Model',
+                'strata' => 'Terapan',
+                'description' => 'Penelitian yang menghasilkan model, kebijakan, atau karya seni',
             ],
 
             // PENGABDIAN KEPADA MASYARAKAT
             [
-                'name' => 'Pemberdayaan Wilayah (PW)',
+                'name' => 'Pemberdayaan Berbasis Masyarakat (PBM)',
                 'strata' => 'PKM',
-                'description' => 'Pemberdayaan masyarakat berbasis wilayah',
+                'description' => 'Pemberdayaan kelompok masyarakat dalam pemecahan masalah',
             ],
             [
-                'name' => 'Pemberdayaan Desa Binaan (PDB)',
+                'name' => 'Pemberdayaan Berbasis Kewirausahaan (PBK)',
                 'strata' => 'PKM',
-                'description' => 'Pemberdayaan desa binaan perguruan tinggi',
+                'description' => 'Pemberdayaan kewirausahaan melalui UPUD atau kelompok usaha',
+            ],
+            [
+                'name' => 'Pemberdayaan Berbasis Wilayah - Pemberdayaan Desa Binaan (PDB)',
+                'strata' => 'PKM',
+                'description' => 'Pemberdayaan desa binaan secara berkelanjutan',
+            ],
+            [
+                'name' => 'Pemberdayaan Berbasis Wilayah - Pemberdayaan Wilayah (PW)',
+                'strata' => 'PKM',
+                'description' => 'Pemberdayaan wilayah melalui aplikasi ipteks',
             ],
 
-            // INTERNAL SCHEMES (Optional - for institutional use)
+            // INTERNAL SCHEMES
             [
                 'name' => 'Penelitian Internal ITSNU',
                 'strata' => 'Dasar',
-                'description' => 'Penelitian yang didanai oleh ITSNU',
+                'description' => 'Penelitian yang didanai secara internal oleh ITSNU',
             ],
             [
                 'name' => 'Pengabdian Internal ITSNU',
                 'strata' => 'PKM',
-                'description' => 'Pengabdian yang didanai oleh ITSNU',
+                'description' => 'Pengabdian yang didanai secara internal oleh ITSNU',
             ],
         ];
 

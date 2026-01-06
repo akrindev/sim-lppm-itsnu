@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             // 2. Master Data (No Dependencies)
             InstitutionSeeder::class,
             ResearchSchemeSeeder::class,
+            TktSeeder::class,
             FocusAreaSeeder::class,
             NationalPrioritySeeder::class,
             KeywordSeeder::class,
@@ -48,6 +49,7 @@ class DatabaseSeeder extends Seeder
 
                 // 6. Proposals & Related Data (depends on users and master data)
                 ProposalSeeder::class, // Creates proposals with research/community service + all related data
+                DailyNoteSeeder::class,
             ]);
         }
     }

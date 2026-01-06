@@ -29,13 +29,39 @@ class ProposalFactory extends Factory
             'theme_id' => \App\Models\Theme::inRandomOrder()->first()?->id ?? \App\Models\Theme::factory(),
             'topic_id' => \App\Models\Topic::inRandomOrder()->first()?->id ?? \App\Models\Topic::factory(),
             'national_priority_id' => \App\Models\NationalPriority::inRandomOrder()->first()?->id ?? \App\Models\NationalPriority::factory(),
-            'cluster_level1_id' => \App\Models\ScienceCluster::where('level', 1)->inRandomOrder()->first()?->id ?? \App\Models\ScienceCluster::factory(),
-            'cluster_level2_id' => \App\Models\ScienceCluster::where('level', 2)->inRandomOrder()->first()?->id ?? \App\Models\ScienceCluster::factory()->level2(),
-            'cluster_level3_id' => \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first()?->id ?? \App\Models\ScienceCluster::factory()->level3(),
+            'cluster_level1_id' => null,
+            'cluster_level2_id' => null,
+            'cluster_level3_id' => null,
             'sbk_value' => fake()->randomFloat(2, 5000000, 50000000),
             'duration_in_years' => fake()->numberBetween(1, 3),
+            'start_year' => (int) date('Y'),
             'summary' => fake()->paragraphs(3, true),
-            'status' => fake()->randomElement(['draft', 'submitted', 'reviewed', 'approved', 'rejected', 'completed']),
+            'status' => fake()->randomElement(\App\Enums\ProposalStatus::values()),
         ];
+    }
+
+    /**
+     * Configure the model factory.
+     */
+    public function configure(): static
+    {
+        return $this->afterMaking(function (\App\Models\Proposal $proposal) {
+            if (! $proposal->cluster_level3_id) {
+                $cluster3 = \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first();
+                if ($cluster3) {
+                    $proposal->cluster_level3_id = $cluster3->id;
+                    $proposal->cluster_level2_id = $cluster3->parent_id;
+                    
+                    $cluster2 = \App\Models\ScienceCluster::find($cluster3->parent_id);
+                    if ($cluster2) {
+                        $proposal->cluster_level1_id = $cluster2->parent_id;
+                    }
+                } else {
+                    // Fallback to level 1 if no level 3 found
+                    $cluster1 = \App\Models\ScienceCluster::where('level', 1)->inRandomOrder()->first();
+                    $proposal->cluster_level1_id = $cluster1?->id;
+                }
+            }
+        });
     }
 }

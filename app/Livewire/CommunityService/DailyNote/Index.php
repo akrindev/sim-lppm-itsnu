@@ -2,12 +2,36 @@
 
 namespace App\Livewire\CommunityService\DailyNote;
 
-use Livewire\Component;
+use App\Enums\ProposalStatus;
+use App\Livewire\Abstracts\ReportIndex;
 
-class Index extends Component
+class Index extends ReportIndex
 {
-    public function render()
+    protected function getDetailableType(): string
     {
-        return view('livewire.community-service.daily-note.index');
+        return 'App\Models\CommunityService';
+    }
+
+    protected function getStatusFilter(): array
+    {
+        return [
+            ProposalStatus::APPROVED,
+            ProposalStatus::COMPLETED,
+            ProposalStatus::UNDER_REVIEW,
+            ProposalStatus::REVIEWED,
+        ];
+    }
+
+    protected function getViewName(): string
+    {
+        return 'livewire.community-service.daily-note.index';
+    }
+
+    protected function getRelations(): array
+    {
+        return [
+            'submitter.identity',
+            'focusArea',
+        ];
     }
 }

@@ -2,12 +2,38 @@
 
 namespace App\Livewire\Research\DailyNote;
 
-use Livewire\Component;
+use App\Enums\ProposalStatus;
+use App\Livewire\Abstracts\ReportIndex;
 
-class Index extends Component
+class Index extends ReportIndex
 {
-    public function render()
+    protected function getDetailableType(): string
     {
-        return view('livewire.research.daily-note.index');
+        return 'App\Models\Research';
+    }
+
+    protected function getStatusFilter(): array
+    {
+        // Only show approved or completed proposals for logbook
+        return [
+            ProposalStatus::APPROVED,
+            ProposalStatus::COMPLETED,
+            ProposalStatus::UNDER_REVIEW,
+            ProposalStatus::REVIEWED,
+        ];
+    }
+
+    protected function getViewName(): string
+    {
+        return 'livewire.research.daily-note.index';
+    }
+
+    protected function getRelations(): array
+    {
+        return [
+            'submitter.identity',
+            'researchScheme',
+            'focusArea',
+        ];
     }
 }

@@ -91,6 +91,11 @@ class CommunityServiceSeeder extends Seeder
                     $focusArea = $focusAreas->random();
                     $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
 
+                    // Select a valid hierarchical science cluster
+                    $cluster3 = \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first();
+                    $cluster2 = $cluster3 ? \App\Models\ScienceCluster::find($cluster3->parent_id) : null;
+                    $cluster1 = $cluster2 ? \App\Models\ScienceCluster::find($cluster2->parent_id) : null;
+
                     // Select or create partner
                     $partner = $partners->isNotEmpty()
                         ? $partners->random()
@@ -114,8 +119,12 @@ class CommunityServiceSeeder extends Seeder
                         'research_scheme_id' => $researchSchemes->random()->id,
                         'focus_area_id' => $focusArea->id,
                         'theme_id' => $theme->id,
+                        'cluster_level1_id' => $cluster1?->id,
+                        'cluster_level2_id' => $cluster2?->id,
+                        'cluster_level3_id' => $cluster3?->id,
                         'status' => $statusEnum,
                         'duration_in_years' => rand(1, 2),
+                        'start_year' => (int) date('Y'),
                         'sbk_value' => rand(20, 150) * 1000000, // 20-150 juta
                         'summary' => fake()->paragraph(3),
                     ]);
@@ -155,21 +164,49 @@ class CommunityServiceSeeder extends Seeder
 
                     // Create related data for PKM
                     // Mandatory outputs (Luaran Wajib)
-                    \App\Models\ProposalOutput::factory(rand(1, 2))->create([
+                    \App\Models\ProposalOutput::factory()->create([
                         'proposal_id' => $proposal->id,
                         'category' => 'Wajib',
-                        'output_year' => rand(1, 2),
+                        'type' => 'Video Kegiatan (Youtube/Media Sosial)',
+                        'target_status' => 'Uploaded',
+                        'output_year' => rand(1, $proposal->duration_in_years),
+                    ]);
+
+                    \App\Models\ProposalOutput::factory()->create([
+                        'proposal_id' => $proposal->id,
+                        'category' => 'Wajib',
+                        'type' => 'Publikasi Media Massa (Cetak/Elektronik)',
+                        'target_status' => 'Published',
+                        'output_year' => rand(1, $proposal->duration_in_years),
+                    ]);
+
+                    \App\Models\ProposalOutput::factory()->create([
+                        'proposal_id' => $proposal->id,
+                        'category' => 'Wajib',
+                        'type' => 'Jurnal Pengabdian Masyarakat (Sinta 1-6)',
+                        'target_status' => 'Accepted/Published',
+                        'output_year' => $proposal->duration_in_years,
                     ]);
 
                     // Additional outputs (Luaran Tambahan)
-                    \App\Models\ProposalOutput::factory(rand(0, 2))->create([
-                        'proposal_id' => $proposal->id,
-                        'category' => 'Tambahan',
-                        'output_year' => rand(1, 2),
-                    ]);
+                    if (rand(0, 1)) {
+                        \App\Models\ProposalOutput::factory()->create([
+                            'proposal_id' => $proposal->id,
+                            'category' => 'Tambahan',
+                            'type' => 'HKI Hak Cipta (Modul/Panduan)',
+                            'target_status' => 'Registered',
+                            'output_year' => rand(1, $proposal->duration_in_years),
+                        ]);
+                    }
 
-                    \App\Models\BudgetItem::factory(rand(4, 7))->create(['proposal_id' => $proposal->id]);
-                    \App\Models\ActivitySchedule::factory(rand(8, 15))->create(['proposal_id' => $proposal->id]);
+                    \App\Models\BudgetItem::factory(rand(4, 7))->create([
+                        'proposal_id' => $proposal->id,
+                        'year' => rand(1, $proposal->duration_in_years),
+                    ]);
+                    \App\Models\ActivitySchedule::factory(rand(8, 15))->create([
+                        'proposal_id' => $proposal->id,
+                        'year' => rand(1, $proposal->duration_in_years),
+                    ]);
 
                     // Create reviewers for UNDER_REVIEW and REVIEWED statuses
                     if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED])) {

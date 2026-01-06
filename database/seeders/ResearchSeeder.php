@@ -94,6 +94,11 @@ class ResearchSeeder extends Seeder
                     $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
                     $topic = $topics->where('theme_id', $theme->id)->first() ?? $topics->random();
 
+                    // Select a valid hierarchical science cluster
+                    $cluster3 = \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first();
+                    $cluster2 = $cluster3 ? \App\Models\ScienceCluster::find($cluster3->parent_id) : null;
+                    $cluster1 = $cluster2 ? \App\Models\ScienceCluster::find($cluster2->parent_id) : null;
+
                     // Create Research detail first
                     $research = Research::factory()->create();
 
@@ -112,9 +117,12 @@ class ResearchSeeder extends Seeder
                         'theme_id' => $theme->id,
                         'topic_id' => $topic->id,
                         'national_priority_id' => $nationalPriorities->isNotEmpty() ? $nationalPriorities->random()->id : null,
-                        'cluster_level1_id' => $scienceClusters->isNotEmpty() ? $scienceClusters->random()->id : null,
+                        'cluster_level1_id' => $cluster1?->id,
+                        'cluster_level2_id' => $cluster2?->id,
+                        'cluster_level3_id' => $cluster3?->id,
                         'status' => $statusEnum,
                         'duration_in_years' => rand(1, 3),
+                        'start_year' => (int) date('Y'),
                         'sbk_value' => rand(50, 300) * 1000000, // 50-300 juta
                         'summary' => fake()->paragraph(3),
                     ]);
@@ -154,21 +162,31 @@ class ResearchSeeder extends Seeder
 
                     // Create related data
                     // Mandatory outputs (Luaran Wajib)
-                    \App\Models\ProposalOutput::factory(rand(1, 2))->create([
+                    \App\Models\ProposalOutput::factory()->create([
                         'proposal_id' => $proposal->id,
                         'category' => 'Wajib',
-                        'output_year' => rand(1, 3),
+                        'type' => $proposal->researchScheme->strata === 'Terapan' 
+                            ? 'Purwarupa/Prototipe TRL 4-6' 
+                            : 'Jurnal Nasional Terakreditasi (Sinta 1-2)',
+                        'target_status' => 'Accepted/Published',
+                        'output_year' => $proposal->duration_in_years,
                     ]);
 
                     // Additional outputs (Luaran Tambahan)
                     \App\Models\ProposalOutput::factory(rand(1, 2))->create([
                         'proposal_id' => $proposal->id,
                         'category' => 'Tambahan',
-                        'output_year' => rand(1, 3),
+                        'output_year' => rand(1, $proposal->duration_in_years),
                     ]);
 
-                    \App\Models\BudgetItem::factory(rand(5, 8))->create(['proposal_id' => $proposal->id]);
-                    \App\Models\ActivitySchedule::factory(rand(6, 12))->create(['proposal_id' => $proposal->id]);
+                    \App\Models\BudgetItem::factory(rand(5, 8))->create([
+                        'proposal_id' => $proposal->id,
+                        'year' => rand(1, $proposal->duration_in_years),
+                    ]);
+                    \App\Models\ActivitySchedule::factory(rand(6, 12))->create([
+                        'proposal_id' => $proposal->id,
+                        'year' => rand(1, $proposal->duration_in_years),
+                    ]);
 
                     // Create research stages with team members as person in charge
                     if ($availableMembers->isNotEmpty()) {

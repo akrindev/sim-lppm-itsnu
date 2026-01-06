@@ -88,10 +88,14 @@
         @else
             <div class="table-responsive">
                 <table class="table-bordered table">
+                    @php
+                        $duration = (int) ($form->duration_in_years ?? 1);
+                        $startYear = (int) ($form->start_year ?? date('Y'));
+                    @endphp
                     <thead>
                         <tr>
-                            {{-- <th width="20%">Tahun</th> --}}
-                            <th width="20%">Jenis</th>
+                            <th style="width: 100px;">Tahun Ke-</th>
+                            <th width="15%">Jenis</th>
                             <th width="20%">Kategori Luaran</th>
                             <th width="20%">Luaran</th>
                             <th width="15%">Status</th>
@@ -104,20 +108,24 @@
                             <tr wire:key="output-{{ $index }}" x-data="{
                                 group: $wire.entangle('form.outputs.{{ $index }}.group'),
                                 types: {
-                                    'jurnal': ['Jurnal Nasional Terakreditasi', 'Jurnal Nasional', 'Jurnal Internasional', 'Jurnal Internasional Bereputasi'],
+                                    'jurnal': ['Jurnal Pengabdian Masyarakat (Sinta 1-6)', 'Jurnal Nasional', 'Jurnal Internasional'],
                                     'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional'],
-                                    'media': ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
-                                    'video': ['Video Kegiatan'],
-                                    'hki': ['Hak Cipta', 'Paten', 'Paten Sederhana', 'Desain Industri', 'Merek', 'DTLST'],
-                                    'produk': ['Produk', 'Jasa', 'Sistem', 'Model', 'TTG', 'Purwarupa'],
-                                    'buku': ['Buku Pedoman', 'Modul Pelatihan', 'Buku Ajar', 'Buku Referensi', 'Monograf'],
+                                    'media': ['Publikasi Media Massa (Cetak/Elektronik)', 'Media Massa Nasional', 'Media Massa Lokal'],
+                                    'video': ['Video Kegiatan (Youtube/Media Sosial)'],
+                                    'hki': ['HKI Hak Cipta (Modul/Panduan)', 'Paten/Paten Sederhana', 'Merek'],
+                                    'produk': ['Produk/Sistem', 'TTG', 'Purwarupa', 'Model/Pola Pembinaan'],
+                                    'buku': ['Buku Pedoman', 'Modul Pelatihan', 'Buku Ajar'],
                                     'pemberdayaan': ['Peningkatan Omzet', 'Peningkatan Kualitas', 'Peningkatan Kuantitas', 'Peningkatan Keterampilan']
                                 }
                             }">
                                 <td>
-                                    <input type="number" wire:model="form.outputs.{{ $index }}.year"
-                                        class="form-control form-control-sm" placeholder="2025" min="2020"
-                                        max="2040">
+                                    <select wire:model="form.outputs.{{ $index }}.year"
+                                        class="form-select form-select-sm">
+                                        @for ($y = 1; $y <= $duration; $y++)
+                                            <option value="{{ $y }}">{{ $y }}
+                                                ({{ $startYear + $y - 1 }})</option>
+                                        @endfor
+                                    </select>
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.category"

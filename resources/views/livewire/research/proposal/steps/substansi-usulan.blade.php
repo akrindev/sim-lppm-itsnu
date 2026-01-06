@@ -90,9 +90,9 @@
                 <table class="table-bordered table">
                     <thead>
                         <tr>
-                            {{-- <th width="20%">Tahun</th> --}}
-                            <th width="20%">Jenis</th>
-                            <th width="20%">Kategori Luaran</th>
+                            <th width="10%">Tahun Ke-</th>
+                            <th width="12%">Jenis</th>
+                            <th width="18%">Kategori Luaran</th>
                             <th width="20%">Luaran</th>
                             <th width="15%">Status</th>
                             <th width="20%">Keterangan</th>
@@ -101,23 +101,35 @@
                     </thead>
                     <tbody>
                         @foreach ($form->outputs as $index => $output)
+                            @php
+                                $startYear = (int) ($form->start_year ?: date('Y'));
+                                $duration = (int) ($form->duration_in_years ?: 1);
+                            @endphp
                             <tr wire:key="output-{{ $index }}" x-data="{
                                 group: $wire.entangle('form.outputs.{{ $index }}.group'),
                                 types: {
-                                    'jurnal': ['Jurnal Nasional Terakreditasi', 'Jurnal Internasional', 'Jurnal Internasional Bereputasi'],
-                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional'],
+                                    'jurnal': [
+                                        'Jurnal Nasional Terakreditasi (Sinta 1-2)', 
+                                        'Jurnal Nasional Terakreditasi (Sinta 3-6)', 
+                                        'Jurnal Internasional', 
+                                        'Jurnal Internasional Bereputasi'
+                                    ],
+                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional Terindeks'],
                                     'buku': ['Buku Ajar', 'Buku Referensi', 'Monograf'],
-                                    'hki': ['Paten', 'Paten Sederhana', 'Hak Cipta', 'Desain Industri', 'DTLST', 'PVT'],
+                                    'hki': ['Paten/Paten Sederhana', 'Hak Cipta', 'Merek', 'Desain Industri'],
                                     'media': ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
                                     'video': ['Video Kegiatan'],
-                                    'produk': ['Produk', 'Model', 'Purwarupa', 'TTG']
+                                    'produk': ['Purwarupa/Prototipe TRL 4-6', 'Model/Purwarupa Sosial', 'TTG', 'Produk/Sistem']
                                 }
                             }">
-                                {{-- <td>
-                                    <input type="number" wire:model="form.outputs.{{ $index }}.year"
-                                        class="form-control form-control-sm" placeholder="2025" min="2020"
-                                        max="2040">
-                                </td> --}}
+                                <td>
+                                    <select wire:model="form.outputs.{{ $index }}.year"
+                                        class="form-select-sm form-select">
+                                        @for ($y = 1; $y <= $duration; $y++)
+                                            <option value="{{ $y }}">{{ $y }} ({{ $startYear + $y - 1 }})</option>
+                                        @endfor
+                                    </select>
+                                </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.category"
                                         class="form-select-sm form-select">

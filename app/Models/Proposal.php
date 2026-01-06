@@ -41,6 +41,7 @@ class Proposal extends Model
         'cluster_level3_id',
         'sbk_value',
         'duration_in_years',
+        'start_year',
         'summary',
         'status',
     ];
@@ -219,6 +220,14 @@ class Proposal extends Model
     public function progressReports(): HasMany
     {
         return $this->hasMany(ProgressReport::class);
+    }
+
+    /**
+     * Get all daily notes for the proposal.
+     */
+    public function dailyNotes(): HasMany
+    {
+        return $this->hasMany(DailyNote::class);
     }
 
     /**

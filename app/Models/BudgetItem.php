@@ -13,6 +13,7 @@ class BudgetItem extends Model
 
     protected $fillable = [
         'proposal_id',
+        'year',
         'budget_group_id',
         'budget_component_id',
         'group',

@@ -12,16 +12,17 @@ class FocusAreaSeeder extends Seeder
     public function run(): void
     {
         $focusAreas = [
-            'Teknologi Informasi dan Komunikasi',
-            'Energi Terbarukan',
-            'Ketahanan Pangan',
-            'Kesehatan dan Obat',
-            'Transportasi',
-            'Pertahanan dan Keamanan',
-            'Material Maju',
-            'Kemaritiman',
+            'Keamanan',
+            'Kesehatan',
+            'Energi',
+            'Maritim',
+            'Pertahanan',
+            'Manufaktur',
+            'Keadilan Sosial',
+            'Digitalisasi Industri',
+            'Teknologi Informasi dan Komunikasi (ICT)',
             'Kebencanaan',
-            'Sosial Humaniora',
+            'Kecerdasan Buatan (AI)',
         ];
 
         foreach ($focusAreas as $area) {

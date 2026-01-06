@@ -26,26 +26,80 @@
 
 <div>
 
-    <!-- Role-based Tabs -->
-    <div class="mb-3">
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link @if ($roleFilter === 'ketua') active @endif"
-                    wire:click="$set('roleFilter', 'ketua')" role="tab"
-                    aria-selected="@if ($roleFilter === 'ketua') true @else false @endif">
-                    <x-lucide-crown class="icon me-2" />
-                    Sebagai Ketua
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link @if ($roleFilter === 'anggota') active @endif"
-                    wire:click="$set('roleFilter', 'anggota')" role="tab"
-                    aria-selected="@if ($roleFilter === 'anggota') true @else false @endif">
-                    <x-lucide-users class="icon me-2" />
-                    Sebagai Anggota
-                </button>
-            </li>
-        </ul>
+    <!-- Status Stats -->
+    <div class="row row-cards row-deck mb-3">
+        <div class="col-sm-6 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-truncate">
+                        <h3 class="card-title">
+                            {{ $this->statusStats['total'] }}
+                        </h3>
+                        <div class="text-secondary">Total</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-truncate">
+                        <h3 class="card-title">
+                            {{ $this->statusStats['by_status']['draft'] ?? 0 }}
+                        </h3>
+                        <div class="text-secondary">Draft</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-truncate">
+                        <h3 class="card-title">
+                            {{ $this->statusStats['by_status']['submitted'] ?? 0 }}
+                        </h3>
+                        <div class="text-secondary">Diajukan</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-truncate">
+                        <h3 class="card-title">
+                            {{ $this->statusStats['by_status']['approved'] ?? 0 }}
+                        </h3>
+                        <div class="text-secondary">Disetujui</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-truncate">
+                        <h3 class="card-title">
+                            {{ $this->statusStats['by_status']['rejected'] ?? 0 }}
+                        </h3>
+                        <div class="text-secondary">Ditolak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-truncate">
+                        <h3 class="card-title">
+                            {{ $this->statusStats['by_status']['completed'] ?? 0 }}
+                        </h3>
+                        <div class="text-secondary">Selesai</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mb-3">
@@ -63,13 +117,9 @@
                         <!-- Status Filter -->
                         <div class="col-md-3">
                             <select class="form-select" wire:model.live="statusFilter">
-                                <option value="all">Semua Status</option>
-                                <option value="draft">Draft</option>
-                                <option value="submitted">Diajukan</option>
-                                <option value="under_review">Dalam Review</option>
-                                <option value="approved">Disetujui</option>
-                                <option value="rejected">Ditolak</option>
-                                <option value="completed">Selesai</option>
+                                @foreach (\App\Enums\ProposalStatus::filterOptions() as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -86,129 +136,29 @@
         </div>
     </div>
 
-    <!-- Status Stats -->
-    <div class="row row-deck row-cards mb-3">
-        <div class="col-sm-6 col-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-truncate">
-                        <h3 class="card-title">
-                            {{ $statusStats['all'] }}
-                        </h3>
-                        <div class="text-secondary">Total</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-truncate">
-                        <h3 class="card-title">
-                            {{ $statusStats['draft'] }}
-                        </h3>
-                        <div class="text-secondary">Draft</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-truncate">
-                        <h3 class="card-title">
-                            {{ $statusStats['submitted'] }}
-                        </h3>
-                        <div class="text-secondary">Diajukan</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-truncate">
-                        <h3 class="card-title">
-                            {{ $statusStats['approved'] }}
-                        </h3>
-                        <div class="text-secondary">Disetujui</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-truncate">
-                        <h3 class="card-title">
-                            {{ $statusStats['rejected'] }}
-                        </h3>
-                        <div class="text-secondary">Ditolak</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-truncate">
-                        <h3 class="card-title">
-                            {{ $statusStats['completed'] }}
-                        </h3>
-                        <div class="text-secondary">Selesai</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Proposals Table -->
     <div class="card">
         <div class="table-responsive">
             <table class="card-table table-vcenter table">
                 <thead>
                     <tr>
-                        <th>
-                            <button type="button" class="btn btn-link p-0" wire:click="setSortBy('title')">
-                                Judul
-                                @if ($sortBy === 'title')
-                                    <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
-                                        class="icon" />
-                                @endif
-                            </button>
-                        </th>
+                        <th>Judul</th>
                         <th>Author</th>
-                        <th>
-                            <button type="button" class="btn btn-link p-0" wire:click="setSortBy('status')">
-                                Status
-                                @if ($sortBy === 'status')
-                                    <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
-                                        class="icon" />
-                                @endif
-                            </button>
-                        </th>
+                        <th>Status</th>
                         <th>Bidang Fokus</th>
-                        <th>
-                            <button type="button" class="btn btn-link p-0" wire:click="setSortBy('created_at')">
-                                Tanggal Dibuat
-                                @if ($sortBy === 'created_at')
-                                    <x-lucide-{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}
-                                        class="icon" />
-                                @endif
-                            </button>
-                        </th>
+                        <th>Tanggal Dibuat</th>
                         <th class="w-1">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($proposals as $proposal)
+                    @forelse ($this->proposals as $proposal)
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td style="max-width: 250px;">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
                             </td>
                             <td>
-                                <div>{{ $proposal->submitter?->name }}</div>
-                                <small class="text-secondary">{{ $proposal->submitter?->email }}</small>
+                                <div>{{ $proposal->submitter->name }}</div>
+                                <small class="text-secondary">{{ $proposal->submitter->email }}</small>
                             </td>
                             <td>
                                 <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
@@ -221,8 +171,13 @@
                                 </x-tabler.badge>
                             </td>
                             <td>
+                                <x-tabler.badge variant="outline">
+                                    {{ $proposal->focusArea->name ?? '—' }}
+                                </x-tabler.badge>
+                            </td>
+                            <td>
                                 <small class="text-secondary">
-                                    {{ $proposal->created_at?->format('d M Y') }}
+                                    {{ $proposal->created_at->format('d M Y') }}
                                 </small>
                             </td>
                             <td>
@@ -239,9 +194,8 @@
                                     @endif
                                     @if ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id())
                                         <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
-                                            wire:click="deleteProposal({{ $proposal->id }})"
-                                            wire:confirm="Yakin ingin menghapus proposal ini?">
-                                            <x-lucide-trash-2 class="icon" />
+                                            wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
+                                            <x-lucide-trash class="icon" />
                                         </button>
                                     @endif
                                 </div>
@@ -249,7 +203,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-8 text-center">
+                            <td colspan="6" class="py-8 text-center">
                                 <div class="mb-3">
                                     <x-lucide-inbox class="text-secondary icon icon-lg" />
                                 </div>
@@ -261,10 +215,19 @@
             </table>
         </div>
 
-        @if ($proposals->hasPages())
+        @if ($this->proposals->hasPages())
             <div class="d-flex align-items-center card-footer">
-                {{ $proposals->links() }}
+                {{ $this->proposals->links() }}
             </div>
         @endif
     </div>
+
+    <!-- Delete Proposal Confirmation Modal -->
+    @if ($confirmingDeleteProposalId)
+        <x-tabler.modal-confirmation id="deleteProposalModal" title="Hapus Proposal?"
+            message="Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan."
+            confirm-text="Ya, Hapus Proposal" cancel-text="Batal" variant="danger" icon="trash"
+            component-id="{{ $this->id }}" component-id="deleteProposalModal"
+            on-confirm="deleteProposal('{{ $confirmingDeleteProposalId }}')" on-cancel="cancelDeleteProposal" />
+    @endif
 </div>

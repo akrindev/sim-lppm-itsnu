@@ -2,152 +2,32 @@
 
 namespace App\Livewire\Research\Proposal;
 
-use App\Livewire\Actions\DekanApprovalAction;
-use App\Livewire\Forms\ProposalForm;
-use App\Models\Proposal;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
-use Livewire\Component;
+use App\Livewire\Abstracts\ProposalShow;
 
-#[Layout('components.layouts.app')]
-#[Title('Detail Proposal Penelitian')]
-class Show extends Component
+class Show extends ProposalShow
 {
-    public ProposalForm $form;
-
-    public string $approvalDecision = '';
-
-    public string $approvalNotes = '';
-
-    /**
-     * Mount the component with proposal.
-     */
-    public function mount(Proposal $proposal): void
+    protected function getProposalType(): string
     {
-        // if is community service proposal, redirect to community service show page
-        if ($proposal->detailable instanceof \App\Models\CommunityService) {
-            $this->redirect(route('community-service.proposal.show', $proposal->id), navigate: true);
-        }
-
-        // Eager load all required relationships for the show page
-        $proposal->load([
-            'submitter',
-            'focusArea',
-            'researchScheme',
-            'theme',
-            'topic',
-            'nationalPriority',
-            'teamMembers',
-            'statusLogs' => fn ($query) => $query->orderBy('at', 'desc')->with('user'),
-        ]);
-
-        $this->form->setProposal($proposal);
+        return 'research';
     }
 
-    /**
-     * Delete the proposal
-     */
-    public function delete(): void
+    protected function getIndexRoute(): string
     {
-        // Check authorization - user can only delete their own proposals
-        if ($this->form->proposal->submitter_id !== Auth::user()->id) {
-            session()->flash('error', 'Anda tidak memiliki akses untuk menghapus proposal ini');
-
-            return;
-        }
-
-        try {
-            $this->form->delete();
-            session()->flash('success', 'Proposal penelitian berhasil dihapus');
-            $this->redirect(route('research.proposal.index'));
-        } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menghapus proposal: '.$e->getMessage());
-        }
+        return 'research.proposal.index';
     }
 
-    public function render(): View
+    protected function getEditRoute(string $proposalId): string
     {
-        return view('livewire.research.proposal.show', [
-            'proposal' => $this->form->proposal,
-        ]);
+        return route('research.proposal.edit', $proposalId);
     }
 
-    /**
-     * Accept proposal team member invitation.
-     */
-    public function acceptMember(): void
+    protected function getReviewRoute(string $proposalId): string
     {
-        $user = request()->user();
-        $proposal = $this->form->proposal;
-        if ($proposal->teamMembers->contains($user)) {
-            $proposal->teamMembers()->updateExistingPivot($user->id, ['status' => 'accepted']);
-            session()->flash('success', 'Anda telah menerima undangan sebagai anggota tim proposal ini');
-            $this->dispatch('close-modal', modalId: 'acceptMemberModal');
-            $this->dispatch('memberAccepted');
-            $this->dispatch('$refresh');
-            $this->form->setProposal($proposal->fresh());
-        }
+        return route('research.proposal.review', $proposalId);
     }
 
-    /**
-     * Reject proposal team member invitation.
-     */
-    public function rejectMember(): void
+    protected function getViewName(): string
     {
-        $user = request()->user();
-        $proposal = $this->form->proposal;
-        if ($proposal->teamMembers->contains($user)) {
-            $proposal->teamMembers()->updateExistingPivot($user->id, ['status' => 'rejected']);
-            session()->flash('success', 'Anda telah menolak undangan sebagai anggota tim proposal ini');
-            $this->dispatch('close-modal', modalId: 'rejectMemberModal');
-            $this->dispatch('memberRejected');
-            $this->form->setProposal($proposal->fresh());
-        }
-    }
-
-    /**
-     * Process Dekan approval.
-     */
-    public function processApproval(): void
-    {
-        if (! $this->approvalDecision) {
-            session()->flash('error', 'Keputusan approval harus dipilih');
-
-            return;
-        }
-
-        $proposal = $this->form->proposal;
-
-        // Execute approval action
-        $action = app(DekanApprovalAction::class);
-        $result = $action->execute($proposal, $this->approvalDecision, $this->approvalNotes);
-
-        if ($result['success']) {
-            session()->flash('success', $result['message']);
-            $this->dispatch('close-modal', modalId: 'approvalModal');
-            $this->cancelApproval();
-            $this->form->setProposal($proposal->fresh());
-        } else {
-            session()->flash('error', $result['message']);
-        }
-    }
-
-    /**
-     * Cancel approval and reset form.
-     */
-    public function cancelApproval(): void
-    {
-        $this->approvalDecision = '';
-        $this->approvalNotes = '';
-    }
-
-    /**
-     * Submit Dekan decision (alias for processApproval).
-     */
-    public function submitDekanDecision(): void
-    {
-        $this->processApproval();
+        return 'livewire.research.proposal.show';
     }
 }
