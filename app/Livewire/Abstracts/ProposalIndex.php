@@ -15,11 +15,11 @@ abstract class ProposalIndex extends Component
 
     public string $confirmingDeleteProposalId = '';
 
-    protected ProposalService $proposalService;
+    private ?ProposalService $proposalService = null;
 
-    public function mount(): void
+    private function proposalService(): ProposalService
     {
-        $this->proposalService = app(ProposalService::class);
+        return $this->proposalService ??= app(ProposalService::class);
     }
 
     abstract protected function getProposalType(): string;
@@ -33,7 +33,7 @@ abstract class ProposalIndex extends Component
     #[Computed]
     public function proposals()
     {
-        return $this->proposalService->getProposalsWithFilters([
+        return $this->proposalService()->getProposalsWithFilters([
             'search' => $this->search,
             'status' => $this->statusFilter,
             'year' => $this->yearFilter,
@@ -45,7 +45,7 @@ abstract class ProposalIndex extends Component
     #[Computed]
     public function statusStats()
     {
-        return $this->proposalService->getProposalStatistics([
+        return $this->proposalService()->getProposalStatistics([
             'type' => $this->getProposalType(),
         ]);
     }
@@ -59,7 +59,7 @@ abstract class ProposalIndex extends Component
     #[Computed]
     public function availableYears()
     {
-        return $this->proposalService->getAvailableYears(
+        return $this->proposalService()->getAvailableYears(
             $this->getProposalType()
         );
     }

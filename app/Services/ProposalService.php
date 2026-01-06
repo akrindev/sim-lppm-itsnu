@@ -178,8 +178,8 @@ class ProposalService
         $userId = (string) Auth::id();
 
         match ($role) {
-            'submitter' => $query->where('submitter_id', $userId),
-            'team_member' => $query->whereHas('teamMembers', function ($q) use ($userId) {
+            'submitter', 'ketua' => $query->where('submitter_id', $userId),
+            'team_member', 'anggota' => $query->whereHas('teamMembers', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             }),
             'reviewer' => $query->whereHas('reviewers', function ($q) use ($userId) {
