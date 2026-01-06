@@ -4,8 +4,10 @@ namespace App\Livewire\Forms;
 
 use App\Models\CommunityService;
 use App\Models\Proposal;
+use App\Models\ResearchScheme;
 use App\Models\Research;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -47,7 +49,9 @@ class ProposalForm extends Form
     #[Validate('required|string|min:100')]
     public string $summary = '';
 
-    public string $final_tkt_target = '';
+    public string $tkt_type = '';
+    public array $tkt_results = []; // [level_id => ['percentage' => 100]]
+    public array $tkt_indicator_scores = []; // [indicator_id => score]
 
     public string $background = '';
 
@@ -142,7 +146,16 @@ class ProposalForm extends Form
             if ($detailable instanceof Research) {
                 // Research-specific fields
                 $this->macro_research_group_id = (string) ($detailable->macro_research_group_id ?? '');
-                $this->final_tkt_target = $detailable->final_tkt_target ?? '';
+                $this->macro_research_group_id = (string) ($detailable->macro_research_group_id ?? '');
+                $this->tkt_type = $detailable->tkt_type ?? '';
+                // Load TKT results from pivot
+                $this->tkt_results = $detailable->tktLevels->mapWithKeys(function ($level) {
+                    return [$level->id => ['percentage' => $level->pivot->percentage]];
+                })->toArray();
+                // Load TKT indicator scores
+                $this->tkt_indicator_scores = $detailable->tktIndicators->mapWithKeys(function ($indicator) {
+                    return [$indicator->id => $indicator->pivot->score];
+                })->toArray();
                 $this->background = $detailable->background ?? '';
                 $this->state_of_the_art = $detailable->state_of_the_art ?? '';
                 $this->methodology = $detailable->methodology ?? '';
@@ -163,7 +176,9 @@ class ProposalForm extends Form
                 $this->methodology = $detailable->methodology ?? '';
 
                 // Research fields should be empty for CommunityService
-                $this->final_tkt_target = '';
+                $this->tkt_type = '';
+                $this->tkt_results = [];
+                $this->tkt_indicator_scores = [];
                 $this->state_of_the_art = '';
                 $this->roadmap_data = [];
             }
@@ -254,7 +269,7 @@ class ProposalForm extends Form
 
         $research = Research::create([
             'macro_research_group_id' => $this->macro_research_group_id ?: null,
-            'final_tkt_target' => $this->final_tkt_target ?: null,
+            'tkt_type' => $this->tkt_type ?: null,
             'background' => $this->background ?: null,
             'state_of_the_art' => $this->state_of_the_art ?: null,
             'methodology' => $this->methodology ?: null,
@@ -294,6 +309,20 @@ class ProposalForm extends Form
         $this->attachOutputs($proposal);
         $this->attachBudgetItems($proposal);
         $this->attachPartners($proposal);
+
+        // Attach TKT Levels
+        if (!empty($this->tkt_results)) {
+            $research->tktLevels()->sync($this->tkt_results);
+        }
+
+        // Attach TKT Indicators
+        if (!empty($this->tkt_indicator_scores)) {
+            $indicatorSyncData = [];
+            foreach ($this->tkt_indicator_scores as $indicatorId => $score) {
+                $indicatorSyncData[$indicatorId] = ['score' => $score];
+            }
+            $research->tktIndicators()->sync($indicatorSyncData);
+        }
 
         return $proposal;
     }
@@ -366,7 +395,7 @@ class ProposalForm extends Form
                     // Update Research-specific fields
                     $detailable->update([
                         'macro_research_group_id' => $this->macro_research_group_id ?: null,
-                        'final_tkt_target' => $this->final_tkt_target ?: null,
+                        'tkt_type' => $this->tkt_type ?: null,
                         'background' => $this->background,
                         'state_of_the_art' => $this->state_of_the_art ?: null,
                         'methodology' => $this->methodology,
@@ -380,8 +409,22 @@ class ProposalForm extends Form
                             ->addMedia($this->substance_file->getRealPath())
                             ->usingName($this->substance_file->getClientOriginalName())
                             ->usingFileName($this->substance_file->hashName())
-                            ->withCustomProperties(['uploaded_by' => auth()->id()])
+                            ->withCustomProperties(['uploaded_by' => Auth::id()])
                             ->toMediaCollection('substance_file');
+                    }
+
+                    // Sync TKT Levels
+                    if (!empty($this->tkt_results)) {
+                        $detailable->tktLevels()->sync($this->tkt_results);
+                    }
+
+                    // Sync TKT Indicators
+                    if (!empty($this->tkt_indicator_scores)) {
+                        $indicatorSyncData = [];
+                        foreach ($this->tkt_indicator_scores as $indicatorId => $score) {
+                            $indicatorSyncData[$indicatorId] = ['score' => $score];
+                        }
+                        $detailable->tktIndicators()->sync($indicatorSyncData);
                     }
                 } elseif ($detailable instanceof CommunityService) {
                     // Update CommunityService-specific fields
@@ -457,7 +500,7 @@ class ProposalForm extends Form
     public function rules(): array
     {
         // Determine if this is a Research or CommunityService proposal
-        $isResearch = $this->proposal && $this->proposal->detailable_type === Research::class;
+        $isResearch = ($this->proposal && $this->proposal->detailable_type === Research::class) || $this->research_scheme_id;
         $isCommunityService = $this->proposal && $this->proposal->detailable_type === CommunityService::class;
 
         $rules = [
@@ -491,8 +534,43 @@ class ProposalForm extends Form
         // $rules['background'] = 'nullable|string|min:200';
         // $rules['methodology'] = 'nullable|string|min:200';
         // $rules['state_of_the_art'] = 'nullable|string|min:200';
-        // $rules['final_tkt_target'] = 'nullable|string|max:255';
+        // $rules['tkt_type'] = 'nullable|string|max:255';
         // $rules['roadmap_data'] = 'nullable|array';
+
+        $rules['tkt_results'] = ['nullable', 'array', function ($attribute, $value, $fail) {
+            if (empty($value)) return;
+
+            // 1. Calculate achieved level
+            $achievedLevel = 0;
+            // Get level models to map IDs to integer levels
+            $levels = \App\Models\TktLevel::whereIn('id', array_keys($value))->get();
+
+            foreach ($levels as $level) {
+                $data = $value[$level->id] ?? null;
+                // Check if passed (percentage >= 80)
+                if ($data && isset($data['percentage']) && $data['percentage'] >= 80) {
+                    $achievedLevel = max($achievedLevel, $level->level);
+                }
+            }
+
+            // 2. Get required range for the scheme if selected
+            if ($this->research_scheme_id) {
+                $scheme = ResearchScheme::find($this->research_scheme_id);
+                if ($scheme && $scheme->strata) {
+                    $range = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata($scheme->strata);
+
+                    // If range exists (not PKM), validate
+                    if ($range) {
+                        [$min, $max] = $range;
+
+                        // Check if achieved level is within range
+                        if ($achievedLevel < $min || $achievedLevel > $max) {
+                            $fail("TKT Saat Ini (Level $achievedLevel) tidak sesuai dengan Skema $scheme->strata (Target: Level $min - $max).");
+                        }
+                    }
+                }
+            }
+        }];
         // } elseif ($isCommunityService) {
         // For CommunityService, background and methodology can be null or shorter
         // $rules['background'] = 'nullable|string|min:50';
@@ -639,7 +717,7 @@ class ProposalForm extends Form
             // Calculate total spent in this group
             $groupTotal = collect($this->budget_items)
                 ->where('budget_group_id', $group->id)
-                ->sum(fn ($item) => (float) ($item['total'] ?? 0));
+                ->sum(fn($item) => (float) ($item['total'] ?? 0));
 
             // Calculate percentage used BASED ON BUDGET CAP
             $percentageUsed = ($groupTotal / $budgetCap) * 100;
@@ -679,7 +757,7 @@ class ProposalForm extends Form
         }
 
         // Calculate total budget
-        $totalBudget = collect($this->budget_items)->sum(fn ($item) => (float) ($item['total'] ?? 0));
+        $totalBudget = collect($this->budget_items)->sum(fn($item) => (float) ($item['total'] ?? 0));
 
         if ($totalBudget <= 0) {
             return;

@@ -12,6 +12,7 @@ use App\Models\Partner;
 use App\Models\ResearchScheme;
 use App\Models\ScienceCluster;
 use App\Models\Theme;
+use App\Models\TktLevel;
 use App\Models\Topic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -43,7 +44,7 @@ class Create extends Component
      */
     public function mount(): void
     {
-        $this->author_name = Str::title(Auth::user()->name.' ('.Auth::user()->identity->identity_id.')');
+        $this->author_name = Str::title(Auth::user()->name . ' (' . Auth::user()->identity->identity_id . ')');
 
         $startDate = \App\Models\Setting::where('key', 'research_proposal_start_date')->value('value');
         $endDate = \App\Models\Setting::where('key', 'research_proposal_end_date')->value('value');
@@ -69,6 +70,13 @@ class Create extends Component
         $this->form->members = $members;
     }
 
+    #[On('tkt-calculated')]
+    public function updateTktResults(array $levelResults, array $indicatorScores): void
+    {
+        $this->form->tkt_results = $levelResults;
+        $this->form->tkt_indicator_scores = $indicatorScores;
+    }
+
     /**
      * Save the proposal using the form object
      */
@@ -81,7 +89,7 @@ class Create extends Component
             session()->flash('success', 'Proposal penelitian berhasil dibuat');
             $this->redirect(route('research.proposal.show', $proposal));
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat proposal: '.$e->getMessage());
+            session()->flash('error', 'Gagal membuat proposal: ' . $e->getMessage());
         }
     }
 
@@ -143,6 +151,12 @@ class Create extends Component
     public function budgetComponents()
     {
         return BudgetComponent::with('budgetGroup')->get();
+    }
+
+    #[Computed]
+    public function tktTypes()
+    {
+        return TktLevel::select('type')->distinct()->pluck('type');
     }
 
     #[Computed]
@@ -347,7 +361,7 @@ class Create extends Component
                 ->addMedia($this->form->new_partner_commitment_file->getRealPath())
                 ->usingName($this->form->new_partner_commitment_file->getClientOriginalName())
                 ->usingFileName($this->form->new_partner_commitment_file->hashName())
-                ->withCustomProperties(['uploaded_by' => auth()->id()])
+                ->withCustomProperties(['uploaded_by' => Auth::id()])
                 ->toMediaCollection('commitment_letter');
         }
 
@@ -405,7 +419,7 @@ class Create extends Component
         foreach ($budgetGroups as $group) {
             $groupTotal = collect($this->form->budget_items)
                 ->where('budget_group_id', $group->id)
-                ->sum(fn ($item) => (float) ($item['total'] ?? 0));
+                ->sum(fn($item) => (float) ($item['total'] ?? 0));
 
             // Calculate percentage based on BUDGET CAP, not total entered
             $percentageUsed = ($groupTotal / $budgetCap) * 100;
@@ -424,7 +438,7 @@ class Create extends Component
         }
 
         // Check year-based budget cap (total cannot exceed cap)
-        $totalBudget = collect($this->form->budget_items)->sum(fn ($item) => (float) ($item['total'] ?? 0));
+        $totalBudget = collect($this->form->budget_items)->sum(fn($item) => (float) ($item['total'] ?? 0));
 
         if ($totalBudget > $budgetCap) {
             $this->budgetValidationErrors[] = sprintf(
