@@ -2,28 +2,26 @@
 <x-slot:pageTitle>Daftar Penelitian</x-slot:pageTitle>
 <x-slot:pageSubtitle>Kelola proposal penelitian Anda dengan fitur lengkap.</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    @unless (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
-        <div class="btn-list">
-            @php
-                $startDate = \App\Models\Setting::where('key', 'research_proposal_start_date')->value('value');
-                $endDate = \App\Models\Setting::where('key', 'research_proposal_end_date')->value('value');
-                $isWithinSchedule = false;
-                if ($startDate && $endDate) {
-                    $now = now();
-                    $start = \Carbon\Carbon::parse($startDate)->startOfDay();
-                    $end = \Carbon\Carbon::parse($endDate)->endOfDay();
-                    $isWithinSchedule = $now->between($start, $end);
-                }
-            @endphp
+    <div class="btn-list">
+        @php
+            $startDate = \App\Models\Setting::where('key', 'research_proposal_start_date')->value('value');
+            $endDate = \App\Models\Setting::where('key', 'research_proposal_end_date')->value('value');
+            $isWithinSchedule = false;
+            if ($startDate && $endDate) {
+                $now = now();
+                $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+                $end = \Carbon\Carbon::parse($endDate)->endOfDay();
+                $isWithinSchedule = $now->between($start, $end);
+            }
+        @endphp
 
-            @if ($isWithinSchedule)
-                <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
-                    <x-lucide-plus class="icon" />
-                    Usulan Penelitian Baru
-                </a>
-            @endif
-        </div>
-    @endunless
+        @if ($isWithinSchedule)
+            <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
+                <x-lucide-plus class="icon" />
+                Usulan Penelitian Baru
+            </a>
+        @endif
+    </div>
 </x-slot:pageActions>
 
 
@@ -96,123 +94,94 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Proposals Table -->
-    <div class="card">
-        <div class="table-responsive">
-            <table class="card-table table-vcenter table">
-                <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>Author</th>
-                        {{-- <th>Skema</th> --}}
-                        <th>Bidang Fokus</th>
-                        <th>Status</th>
-                        <th>Tanggal Dibuat</th>
-                        <th class="w-1">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($this->proposals as $proposal)
-                        <tr wire:key="proposal-{{ $proposal->id }}">
-                            <td class="text-wrap">
-                                <div class="text-reset fw-bold">{{ $proposal->title }}</div>
-                            </td>
-                            <td>
-                                <div>{{ $proposal->submitter?->name }}</div>
-                                <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
-                            </td>
-                            {{-- <td>
-                                <div class="bg-blue-lt badge-outline badge">
-                                    {{ $proposal->researchScheme?->name ?? '—' }}
-                                </div>
-                            </td> --}}
-                            <td>
-                                <x-tabler.badge variant="outline">
-                                    {{ $proposal->focusArea?->name ?? '—' }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
-                                <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
-                                    {{ $proposal->status->label() }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
-                                <small class="text-secondary">
-                                    {{ $proposal->created_at?->format('d M Y') }}
-                                </small>
-                            </td>
-                            <td>
-                                <div class="btn-list flex-nowrap">
-                                    <a href="{{ route('research.proposal.show', $proposal) }}"
-                                        class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
-                                        <x-lucide-eye class="icon" />
-                                    </a>
-                                    {{-- @if ($proposal->status === 'draft')
-                                        <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
-                                            <x-lucide-pencil class="icon" />
-                                        </a>
-                                    @endif --}}
-                                    @if (auth()->user()->hasRole('admin lppm') && $proposal->status !== 'completed')
-                                        <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
-                                            data-bs-toggle="modal" data-bs-target="#deleteProposalModal"
-                                            wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
-                                            <x-lucide-trash-2 class="icon" />
-                                        </button>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
+        <!-- Proposals Table -->
+        <div class="card">
+            <div class="table-responsive">
+                <table class="card-table table-vcenter table">
+                    <thead>
                         <tr>
-                            <td colspan="7" class="py-8 text-center">
-                                <div class="mb-3">
-                                    <x-lucide-inbox class="text-secondary icon icon-lg" />
-                                </div>
-                                <p class="text-secondary">Tidak ada data penelitian yang ditemukan.</p>
-                            </td>
+                            <th>Judul</th>
+                            <th>Author</th>
+                            <th>Bidang Fokus</th>
+                            <th>Status</th>
+                            <th>Tanggal Diajukan</th>
+                            <th class="w-1">Aksi</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse ($this->proposals as $proposal)
+                            <tr wire:key="proposal-{{ $proposal->id }}">
+                                <td class="text-wrap">
+                                    <div class="text-reset fw-bold">{{ $proposal->title }}</div>
+                                </td>
+                                <td>
+                                    <div>{{ $proposal->submitter->name }}</div>
+                                    <small
+                                        class="text-secondary">{{ $proposal->submitter->identity->identity_id }}</small>
+                                </td>
+                                <td>
+                                    <x-tabler.badge variant="outline">
+                                        {{ $proposal->focusArea?->name ?? '—' }}
+                                    </x-tabler.badge>
+                                </td>
+                                <td>
+                                    <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
+                                        {{ $proposal->status->label() }}
+                                    </x-tabler.badge>
+                                </td>
+                                <td>
+                                    <small class="text-secondary">
+                                        {{ $proposal->created_at?->format('d M Y') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-list flex-nowrap">
+                                        <a href="{{ route('research.proposal.show', $proposal) }}"
+                                            class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
+                                            <x-lucide-eye class="icon" />
+                                        </a>
+                                        @if ($proposal->status === 'draft')
+                                            <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
+                                                <x-lucide-pencil class="icon" />
+                                            </a>
+                                        @endif
+                                        @if (auth()->user()->hasRole('admin lppm') && $proposal->status !== 'completed')
+                                            <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
+                                                wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
+                                                <x-lucide-trash-2 class="icon" />
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="py-8 text-center">
+                                    <div class="mb-3">
+                                        <x-lucide-inbox class="text-secondary icon icon-lg" />
+                                    </div>
+                                    <p class="text-secondary">Tidak ada data penelitian yang ditemukan.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if ($this->proposals->hasPages())
+                <div class="d-flex align-items-center card-footer">
+                    {{ $this->proposals->links() }}
+                </div>
+            @endif
         </div>
 
-        @if ($this->proposals->hasPages())
-            <div class="d-flex align-items-center card-footer">
-                {{ $this->proposals->links() }}
-            </div>
+        <!-- Delete Proposal Confirmation Modal -->
+        @if ($confirmingDeleteProposalId)
+            <x-tabler.modal-confirmation id="deleteProposalModal" title="Hapus Proposal?"
+                message="Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan."
+                confirm-text="Ya, Hapus Proposal" cancel-text="Batal" variant="danger" icon="trash"
+                component-id="{{ $this->id }}" component-id="deleteProposalModal"
+                on-confirm="deleteProposal('{{ $confirmingDeleteProposalId }}')" on-cancel="cancelDeleteProposal" />
         @endif
     </div>
-
-
-    <!-- Delete Proposal Confirmation Modal -->
-    @teleport('body')
-        <x-tabler.modal id="deleteProposalModal" title="Hapus Proposal?" wire:ignore.self>
-            <x-slot:body>
-                <div class="py-4 text-center">
-                    <x-lucide-alert-circle class="text-danger icon mb-2" style="width: 3rem; height: 3rem;" />
-                    <h3>Hapus Proposal?</h3>
-                    <div class="text-secondary">
-                        Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
-                    </div>
-                </div>
-            </x-slot:body>
-
-            <x-slot:footer>
-                <div class="w-100">
-                    <div class="row">
-                        <div class="col"><button type="button" class="w-100 btn btn-white" data-bs-dismiss="modal"
-                                wire:click="cancelDeleteProposal">
-                                Batal
-                            </button></div>
-                        <div class="col"><button type="button"
-                                wire:click="deleteProposal('{{ $confirmingDeleteProposalId }}')"
-                                class="w-100 btn btn-danger" data-bs-dismiss="modal">
-                                Ya, Hapus Proposal
-                            </button></div>
-                    </div>
-                </div>
-            </x-slot:footer>
-        </x-tabler.modal>
-    @endteleport
 </div>

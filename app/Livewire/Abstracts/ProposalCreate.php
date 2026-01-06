@@ -7,10 +7,10 @@ use App\Livewire\Traits\WithProposalWizard;
 use App\Livewire\Traits\WithStepWizard;
 use App\Services\BudgetValidationService;
 use App\Services\MasterDataService;
-use App\Services\NotificationService;
 use App\Services\ProposalService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 abstract class ProposalCreate extends Component
@@ -26,21 +26,8 @@ abstract class ProposalCreate extends Component
 
     public array $budgetValidationErrors = [];
 
-    protected MasterDataService $masterDataService;
-
-    protected ProposalService $proposalService;
-
-    protected BudgetValidationService $budgetValidationService;
-
-    protected NotificationService $notificationService;
-
     public function mount(?string $proposalId = null): void
     {
-        $this->masterDataService = app(MasterDataService::class);
-        $this->proposalService = app(ProposalService::class);
-        $this->budgetValidationService = app(BudgetValidationService::class);
-        $this->notificationService = app(NotificationService::class);
-
         $this->author_name = Auth::user()->name;
 
         if ($proposalId) {
@@ -83,21 +70,30 @@ abstract class ProposalCreate extends Component
         $this->form->tkt_results = $tktResults;
     }
 
+    #[On('tkt-calculated')]
+    public function onTktCalculated(array $levelResults, array $indicatorScores): void
+    {
+        // Only update level results with levels that have actual progress (percentage > 0)
+        $filteredResults = array_filter($levelResults, fn ($data) => ($data['percentage'] ?? 0) > 0);
+        $this->form->tkt_results = $filteredResults;
+        $this->form->tkt_indicator_scores = $indicatorScores;
+    }
+
     public function save(): void
     {
         $this->form->validate();
 
-        $this->budgetValidationService->validateBudgetGroupPercentages(
+        app(BudgetValidationService::class)->validateBudgetGroupPercentages(
             $this->form->budget_items,
             $this->getProposalType()
         );
 
-        $this->budgetValidationService->validateBudgetCap(
+        app(BudgetValidationService::class)->validateBudgetCap(
             $this->form->budget_items,
             $this->getProposalType()
         );
 
-        $proposal = $this->proposalService->createProposal(
+        $proposal = app(ProposalService::class)->createProposal(
             $this->form,
             $this->getProposalType()
         );
@@ -108,73 +104,73 @@ abstract class ProposalCreate extends Component
     #[Computed]
     public function schemes()
     {
-        return $this->masterDataService->schemes();
+        return app(MasterDataService::class)->schemes();
     }
 
     #[Computed]
     public function focusAreas()
     {
-        return $this->masterDataService->focusAreas();
+        return app(MasterDataService::class)->focusAreas();
     }
 
     #[Computed]
     public function themes()
     {
-        return $this->masterDataService->themes();
+        return app(MasterDataService::class)->themes();
     }
 
     #[Computed]
     public function topics()
     {
-        return $this->masterDataService->topics();
+        return app(MasterDataService::class)->topics();
     }
 
     #[Computed]
     public function nationalPriorities()
     {
-        return $this->masterDataService->nationalPriorities();
+        return app(MasterDataService::class)->nationalPriorities();
     }
 
     #[Computed]
     public function scienceClusters()
     {
-        return $this->masterDataService->scienceClusters();
+        return app(MasterDataService::class)->scienceClusters();
     }
 
     #[Computed]
     public function macroResearchGroups()
     {
-        return $this->masterDataService->macroResearchGroups();
+        return app(MasterDataService::class)->macroResearchGroups();
     }
 
     #[Computed]
     public function partners()
     {
-        return $this->masterDataService->partners();
+        return app(MasterDataService::class)->partners();
     }
 
     #[Computed]
     public function budgetGroups()
     {
-        return $this->masterDataService->budgetGroups();
+        return app(MasterDataService::class)->budgetGroups();
     }
 
     #[Computed]
     public function budgetComponents()
     {
-        return $this->masterDataService->budgetComponents();
+        return app(MasterDataService::class)->budgetComponents();
     }
 
     #[Computed]
     public function tktTypes()
     {
-        return $this->masterDataService->tktTypes();
+        return app(MasterDataService::class)->tktTypes();
     }
 
     #[Computed]
     public function templateUrl()
     {
-        return $this->masterDataService->getTemplateUrl($this->getProposalType());
+        return app(MasterDataService::class)->getTemplateUrl($this->getProposalType());
     }
 
     protected function getStepValidationRules(int $step): array
