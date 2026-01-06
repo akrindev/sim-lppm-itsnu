@@ -8,6 +8,10 @@ use App\Livewire\CommunityService\Proposal\Create as CommunityServiceProposalCre
 use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
 use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalIndex;
 use App\Livewire\CommunityService\Proposal\Show as CommunityServiceProposalShow;
+use App\Livewire\CommunityService\Proposal\CreateNew as CommunityServiceProposalCreateNew;
+use App\Livewire\CommunityService\Proposal\EditNew as CommunityServiceProposalEditNew;
+use App\Livewire\CommunityService\Proposal\IndexNew as CommunityServiceProposalIndexNew;
+use App\Livewire\CommunityService\Proposal\ShowNew as CommunityServiceProposalShowNew;
 use App\Livewire\CommunityService\ProposalRevision\Index as CommunityServiceProposalRevisionIndex;
 use App\Livewire\CommunityService\ProposalRevision\Show as CommunityServiceProposalRevisionShow;
 use App\Livewire\Dashboard;
@@ -67,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proposal/create', ResearchProposalCreate::class)->name('proposal.create');
         Route::get('proposal/{proposal}', ResearchProposalShow::class)->name('proposal.show');
         Route::get('proposal/{proposal}/edit', ResearchProposalEdit::class)->name('proposal.edit');
+
         Route::get('proposal-revision', ResearchProposalRevisionIndex::class)->name('proposal-revision.index');
         Route::get('proposal-revision/{proposal}', ResearchProposalRevisionShow::class)->name('proposal-revision.show');
         Route::get('progress-report', ResearchProgressReportIndex::class)->name('progress-report.index');
