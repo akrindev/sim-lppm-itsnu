@@ -116,13 +116,16 @@ abstract class ProposalCreate extends Component
     #[Computed]
     public function themes()
     {
-        return app(MasterDataService::class)->themes();
+        return app(MasterDataService::class)->themes($this->form->focus_area_id ?: null);
     }
 
     #[Computed]
     public function topics()
     {
-        return app(MasterDataService::class)->topics();
+        return app(MasterDataService::class)->topics(
+            $this->form->focus_area_id ?: null,
+            $this->form->theme_id ?: null
+        );
     }
 
     #[Computed]
@@ -135,6 +138,24 @@ abstract class ProposalCreate extends Component
     public function scienceClusters()
     {
         return app(MasterDataService::class)->scienceClusters();
+    }
+
+    #[Computed]
+    public function clusterLevel1Options()
+    {
+        return $this->scienceClusters->whereNull('parent_id');
+    }
+
+    #[Computed]
+    public function clusterLevel2Options()
+    {
+        return $this->scienceClusters->where('parent_id', $this->form->cluster_level1_id);
+    }
+
+    #[Computed]
+    public function clusterLevel3Options()
+    {
+        return $this->scienceClusters->where('parent_id', $this->form->cluster_level2_id);
     }
 
     #[Computed]

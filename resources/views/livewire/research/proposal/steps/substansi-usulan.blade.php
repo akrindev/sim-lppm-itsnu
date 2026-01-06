@@ -108,13 +108,18 @@
                             <tr wire:key="output-{{ $index }}" x-data="{
                                 group: $wire.entangle('form.outputs.{{ $index }}.group'),
                                 types: {
-                                    'jurnal': ['Jurnal Nasional Terakreditasi', 'Jurnal Internasional', 'Jurnal Internasional Bereputasi'],
-                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional'],
+                                    'jurnal': [
+                                        'Jurnal Nasional Terakreditasi (Sinta 1-2)', 
+                                        'Jurnal Nasional Terakreditasi (Sinta 3-6)', 
+                                        'Jurnal Internasional', 
+                                        'Jurnal Internasional Bereputasi'
+                                    ],
+                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional Terindeks'],
                                     'buku': ['Buku Ajar', 'Buku Referensi', 'Monograf'],
-                                    'hki': ['Paten', 'Paten Sederhana', 'Hak Cipta', 'Desain Industri', 'DTLST', 'PVT'],
+                                    'hki': ['Paten/Paten Sederhana', 'Hak Cipta', 'Merek', 'Desain Industri'],
                                     'media': ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
                                     'video': ['Video Kegiatan'],
-                                    'produk': ['Produk', 'Model', 'Purwarupa', 'TTG']
+                                    'produk': ['Purwarupa/Prototipe TRL 4-6', 'Model/Purwarupa Sosial', 'TTG', 'Produk/Sistem']
                                 }
                             }">
                                 <td>

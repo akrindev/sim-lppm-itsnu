@@ -108,13 +108,13 @@
                             <tr wire:key="output-{{ $index }}" x-data="{
                                 group: $wire.entangle('form.outputs.{{ $index }}.group'),
                                 types: {
-                                    'jurnal': ['Jurnal Nasional Terakreditasi', 'Jurnal Nasional', 'Jurnal Internasional', 'Jurnal Internasional Bereputasi'],
+                                    'jurnal': ['Jurnal Pengabdian Masyarakat (Sinta 1-6)', 'Jurnal Nasional', 'Jurnal Internasional'],
                                     'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional'],
-                                    'media': ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
-                                    'video': ['Video Kegiatan'],
-                                    'hki': ['Hak Cipta', 'Paten', 'Paten Sederhana', 'Desain Industri', 'Merek', 'DTLST'],
-                                    'produk': ['Produk', 'Jasa', 'Sistem', 'Model', 'TTG', 'Purwarupa'],
-                                    'buku': ['Buku Pedoman', 'Modul Pelatihan', 'Buku Ajar', 'Buku Referensi', 'Monograf'],
+                                    'media': ['Publikasi Media Massa (Cetak/Elektronik)', 'Media Massa Nasional', 'Media Massa Lokal'],
+                                    'video': ['Video Kegiatan (Youtube/Media Sosial)'],
+                                    'hki': ['HKI Hak Cipta (Modul/Panduan)', 'Paten/Paten Sederhana', 'Merek'],
+                                    'produk': ['Produk/Sistem', 'TTG', 'Purwarupa', 'Model/Pola Pembinaan'],
+                                    'buku': ['Buku Pedoman', 'Modul Pelatihan', 'Buku Ajar'],
                                     'pemberdayaan': ['Peningkatan Omzet', 'Peningkatan Kualitas', 'Peningkatan Kuantitas', 'Peningkatan Keterampilan']
                                 }
                             }">

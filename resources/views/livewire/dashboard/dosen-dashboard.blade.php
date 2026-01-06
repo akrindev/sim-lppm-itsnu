@@ -113,20 +113,9 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if ($research->status->value === 'approved')
-                                                    <x-tabler.badge color="success">Disetujui</x-tabler.badge>
-                                                @elseif($research->status->value === 'rejected')
-                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
-                                                @elseif($research->status->value === 'submitted')
-                                                    <x-tabler.badge color="warning">Menunggu Review</x-tabler.badge>
-                                                @elseif($research->status->value === 'reviewed')
-                                                    <x-tabler.badge color="info">Sudah Direview</x-tabler.badge>
-                                                @elseif($research->status->value === 'completed')
-                                                    <x-tabler.badge color="success">Selesai</x-tabler.badge>
-                                                @else
-                                                    <x-tabler.badge
-                                                        color="secondary">{{ $research->status->label() }}</x-tabler.badge>
-                                                @endif
+                                                <x-tabler.badge :color="$research->status->color()">
+                                                    {{ $research->status->label() }}
+                                                </x-tabler.badge>
                                             </td>
                                             <td class="text-muted">
                                                 {{ $research->created_at->format('d/m/Y H:i') }}
@@ -169,20 +158,9 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if ($communityService->status->value === 'approved')
-                                                    <x-tabler.badge color="success">Disetujui</x-tabler.badge>
-                                                @elseif($communityService->status->value === 'rejected')
-                                                    <x-tabler.badge color="danger">Ditolak</x-tabler.badge>
-                                                @elseif($communityService->status->value === 'submitted')
-                                                    <x-tabler.badge color="warning">Menunggu Review</x-tabler.badge>
-                                                @elseif($communityService->status->value === 'reviewed')
-                                                    <x-tabler.badge color="info">Sudah Direview</x-tabler.badge>
-                                                @elseif($communityService->status->value === 'completed')
-                                                    <x-tabler.badge color="success">Selesai</x-tabler.badge>
-                                                @else
-                                                    <x-tabler.badge
-                                                        color="secondary">{{ $communityService->status->label() }}</x-tabler.badge>
-                                                @endif
+                                                <x-tabler.badge :color="$communityService->status->color()">
+                                                    {{ $communityService->status->label() }}
+                                                </x-tabler.badge>
                                             </td>
                                             <td class="text-muted">
                                                 {{ $communityService->created_at->format('d/m/Y H:i') }}

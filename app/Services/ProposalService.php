@@ -66,7 +66,14 @@ class ProposalService
         }
 
         if (isset($filters['year']) && $filters['year'] !== '') {
-            $query->whereYear('created_at', $filters['year']);
+            $year = $filters['year'];
+            $query->where(function ($q) use ($year) {
+                $q->where('start_year', $year)
+                    ->orWhere(function ($sq) use ($year) {
+                        $sq->whereNull('start_year')
+                            ->whereYear('created_at', $year);
+                    });
+            });
         }
 
         if (isset($filters['role']) && $filters['role'] !== '') {
@@ -112,8 +119,7 @@ class ProposalService
     public function getAvailableYears(string $type): array
     {
         return $this->getBaseProposalQuery($type)
-            ->selectRaw('YEAR(created_at) as year')
-            ->groupBy('year')
+            ->selectRaw('DISTINCT IFNULL(start_year, YEAR(created_at)) as year')
             ->orderByDesc('year')
             ->pluck('year')
             ->toArray();
