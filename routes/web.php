@@ -1,31 +1,9 @@
 <?php
 
 use App\Http\Controllers\RoleSwitcherController;
-use App\Livewire\CommunityService\DailyNote\Index as CommunityServiceDailyNoteIndex;
-use App\Livewire\CommunityService\FinalReport\Index as CommunityServiceFinalReportIndex;
-use App\Livewire\CommunityService\ProgressReport\Index as CommunityServiceProgressReportIndex;
-use App\Livewire\CommunityService\Proposal\Create as CommunityServiceProposalCreate;
-use App\Livewire\CommunityService\Proposal\Edit as CommunityServiceProposalEdit;
-use App\Livewire\CommunityService\Proposal\Index as CommunityServiceProposalIndex;
-use App\Livewire\CommunityService\Proposal\Show as CommunityServiceProposalShow;
-use App\Livewire\CommunityService\Proposal\CreateNew as CommunityServiceProposalCreateNew;
-use App\Livewire\CommunityService\Proposal\EditNew as CommunityServiceProposalEditNew;
-use App\Livewire\CommunityService\Proposal\IndexNew as CommunityServiceProposalIndexNew;
-use App\Livewire\CommunityService\Proposal\ShowNew as CommunityServiceProposalShowNew;
-use App\Livewire\CommunityService\ProposalRevision\Index as CommunityServiceProposalRevisionIndex;
-use App\Livewire\CommunityService\ProposalRevision\Show as CommunityServiceProposalRevisionShow;
 use App\Livewire\Dashboard;
 use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
 use App\Livewire\Notifications\NotificationCenter;
-use App\Livewire\Research\DailyNote\Index as ResearchDailyNoteIndex;
-use App\Livewire\Research\FinalReport\Index as ResearchFinalReportIndex;
-use App\Livewire\Research\ProgressReport\Index as ResearchProgressReportIndex;
-use App\Livewire\Research\Proposal\Create as ResearchProposalCreate;
-use App\Livewire\Research\Proposal\Edit as ResearchProposalEdit;
-use App\Livewire\Research\Proposal\Index as ResearchProposalIndex;
-use App\Livewire\Research\Proposal\Show as ResearchProposalShow;
-use App\Livewire\Research\ProposalRevision\Index as ResearchProposalRevisionIndex;
-use App\Livewire\Research\ProposalRevision\Show as ResearchProposalRevisionShow;
 use App\Livewire\Review\CommunityService as ReviewCommunityService;
 use App\Livewire\Review\Research as ReviewResearch;
 use App\Livewire\Settings\Appearance;
@@ -66,40 +44,49 @@ Route::middleware(['auth'])->group(function () {
 
     // Research Routes
     Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('research')->name('research.')->group(function () {
-        Route::get('/', ResearchProposalIndex::class)->name('proposal.index');
+        Route::get('/', \App\Livewire\Research\Proposal\Index::class)->name('proposal.index');
 
-        Route::get('proposal/create', ResearchProposalCreate::class)->name('proposal.create');
-        Route::get('proposal/{proposal}', ResearchProposalShow::class)->name('proposal.show');
-        Route::get('proposal/{proposal}/edit', ResearchProposalEdit::class)->name('proposal.edit');
+        Route::get('proposal/create', \App\Livewire\Research\Proposal\Create::class)->name('proposal.create');
+        Route::get('proposal/{proposal}', \App\Livewire\Research\Proposal\Show::class)->name('proposal.show');
+        Route::get('proposal/{proposal}/edit', \App\Livewire\Research\Proposal\Edit::class)->name('proposal.edit');
 
-        Route::get('proposal-revision', ResearchProposalRevisionIndex::class)->name('proposal-revision.index');
-        Route::get('proposal-revision/{proposal}', ResearchProposalRevisionShow::class)->name('proposal-revision.show');
-        Route::get('progress-report', ResearchProgressReportIndex::class)->name('progress-report.index');
+        Route::get('proposal-revision', \App\Livewire\Research\ProposalRevision\Index::class)->name('proposal-revision.index');
+        Route::get('proposal-revision/{proposal}', \App\Livewire\Research\ProposalRevision\Show::class)->name('proposal-revision.show');
+        
+        Route::get('progress-report', \App\Livewire\Research\ProgressReport\Index::class)->name('progress-report.index');
         Route::get('progress-report/{proposal}', \App\Livewire\Reports\Show::class)
             ->name('progress-report.show')
             ->defaults('type', 'research-progress');
-        Route::get('final-report', ResearchFinalReportIndex::class)->name('final-report.index');
+            
+        Route::get('final-report', \App\Livewire\Research\FinalReport\Index::class)->name('final-report.index');
         Route::get('final-report/{proposal}', \App\Livewire\Research\FinalReport\Show::class)
             ->name('final-report.show');
-        Route::get('daily-note', ResearchDailyNoteIndex::class)->name('daily-note.index');
+            
+        Route::get('daily-note', \App\Livewire\Research\DailyNote\Index::class)->name('daily-note.index');
+        Route::get('daily-note/{proposal}', \App\Livewire\Research\DailyNote\Show::class)->name('daily-note.show');
     });
 
     // Community Service Routes
     Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('community-service')->name('community-service.')->group(function () {
-        Route::get('/', CommunityServiceProposalIndex::class)->name('proposal.index');
-        Route::get('proposal/create', CommunityServiceProposalCreate::class)->name('proposal.create');
-        Route::get('proposal/{proposal}', CommunityServiceProposalShow::class)->name('proposal.show');
-        Route::get('proposal/{proposal}/edit', CommunityServiceProposalEdit::class)->name('proposal.edit');
-        Route::get('proposal-revision', CommunityServiceProposalRevisionIndex::class)->name('proposal-revision.index');
-        Route::get('proposal-revision/{proposal}', CommunityServiceProposalRevisionShow::class)->name('proposal-revision.show');
-        Route::get('progress-report', CommunityServiceProgressReportIndex::class)->name('progress-report.index');
+        Route::get('/', \App\Livewire\CommunityService\Proposal\Index::class)->name('proposal.index');
+        Route::get('proposal/create', \App\Livewire\CommunityService\Proposal\Create::class)->name('proposal.create');
+        Route::get('proposal/{proposal}', \App\Livewire\CommunityService\Proposal\Show::class)->name('proposal.show');
+        Route::get('proposal/{proposal}/edit', \App\Livewire\CommunityService\Proposal\Edit::class)->name('proposal.edit');
+        
+        Route::get('proposal-revision', \App\Livewire\CommunityService\ProposalRevision\Index::class)->name('proposal-revision.index');
+        Route::get('proposal-revision/{proposal}', \App\Livewire\CommunityService\ProposalRevision\Show::class)->name('proposal-revision.show');
+        
+        Route::get('progress-report', \App\Livewire\CommunityService\ProgressReport\Index::class)->name('progress-report.index');
         Route::get('progress-report/{proposal}', \App\Livewire\Reports\Show::class)
             ->name('progress-report.show')
             ->defaults('type', 'community-service-progress');
-        Route::get('final-report', CommunityServiceFinalReportIndex::class)->name('final-report.index');
+            
+        Route::get('final-report', \App\Livewire\CommunityService\FinalReport\Index::class)->name('final-report.index');
         Route::get('final-report/{proposal}', \App\Livewire\CommunityService\FinalReport\Show::class)
             ->name('final-report.show');
-        Route::get('daily-note', CommunityServiceDailyNoteIndex::class)->name('daily-note.index');
+            
+        Route::get('daily-note', \App\Livewire\CommunityService\DailyNote\Index::class)->name('daily-note.index');
+        Route::get('daily-note/{proposal}', \App\Livewire\CommunityService\DailyNote\Show::class)->name('daily-note.show');
     });
 
     // Dekan Routes

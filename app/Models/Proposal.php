@@ -223,6 +223,14 @@ class Proposal extends Model
     }
 
     /**
+     * Get all daily notes for the proposal.
+     */
+    public function dailyNotes(): HasMany
+    {
+        return $this->hasMany(DailyNote::class);
+    }
+
+    /**
      * Get all status change logs for the proposal.
      */
     public function statusLogs(): HasMany
