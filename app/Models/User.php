@@ -78,6 +78,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all review assignments for the user.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProposalReviewer::class, 'user_id');
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>

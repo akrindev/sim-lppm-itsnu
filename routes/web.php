@@ -26,11 +26,11 @@ Route::get('dashboard', Dashboard::class)
 
 Route::middleware(['auth'])->group(function () {
     Route::view('laporan-penelitian', 'reports.research')
-        ->middleware(['role:admin lppm|rektor'])
+        ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.research');
 
     Route::get('laporan-luaran', \App\Livewire\Reports\OutputReports::class)
-        ->middleware(['role:admin lppm|rektor'])
+        ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.outputs');
 
     // User Management Routes
@@ -92,12 +92,14 @@ Route::middleware(['auth'])->group(function () {
     // Dekan Routes
     Route::middleware(['role:dekan'])->prefix('dekan')->name('dekan.')->group(function () {
         Route::get('proposals', DekanProposalIndex::class)->name('proposals.index');
+        Route::get('riwayat-persetujuan', \App\Livewire\Dekan\ApprovalHistory::class)->name('approval-history');
     });
 
     // Review Routes
     Route::middleware(['role:reviewer'])->prefix('review')->name('review.')->group(function () {
         Route::get('research', ReviewResearch::class)->name('research');
         Route::get('community-service', ReviewCommunityService::class)->name('community-service');
+        Route::get('riwayat-review', \App\Livewire\Review\ReviewHistory::class)->name('review-history');
     });
 
     // Kepala LPPM Routes
@@ -109,6 +111,8 @@ Route::middleware(['auth'])->group(function () {
     // Admin LPPM Routes
     Route::middleware(['role:admin lppm'])->prefix('admin-lppm')->name('admin-lppm.')->group(function () {
         Route::get('penugasan-reviewer', \App\Livewire\AdminLppm\ReviewerAssignment::class)->name('assign-reviewers');
+        Route::get('beban-kerja-reviewer', \App\Livewire\AdminLppm\ReviewerWorkload::class)->name('reviewer-workload');
+        Route::get('monitoring-review', \App\Livewire\AdminLppm\ReviewMonitoring::class)->name('review-monitoring');
     });
 
     Route::get('settings', SettingsIndex::class)

@@ -67,7 +67,7 @@ trait WithApproval
         $proposal = $this->getProposal();
 
         $this->validate([
-            'approvalDecision' => 'required|in:approved,need_fix',
+            'approvalDecision' => 'required|in:approved,need_fix,rejected',
             'approvalNotes' => 'nullable|string',
         ]);
 
@@ -75,6 +75,7 @@ trait WithApproval
             $newStatus = match ($this->approvalDecision) {
                 'approved' => ProposalStatus::APPROVED,
                 'need_fix' => ProposalStatus::NEED_ASSIGNMENT,
+                'rejected' => ProposalStatus::REJECTED,
             };
 
             if (! $proposal->status->canTransitionTo($newStatus)) {

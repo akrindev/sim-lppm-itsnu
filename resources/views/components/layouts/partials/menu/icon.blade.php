@@ -219,6 +219,42 @@
             </svg>
             SVG;
         },
+        'upload' => static function (string $class): string {
+            return <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{$class}">
+                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                <path d="M7 9l5 -5l5 5" />
+                <path d="M12 4l0 12" />
+            </svg>
+            SVG;
+        },
+        'history' => static function (string $class): string {
+            return <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{$class}">
+                <path d="M12 8l0 4l2 2" />
+                <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" />
+            </svg>
+            SVG;
+        },
+        'chart-bar' => static function (string $class): string {
+            return <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{$class}">
+                <path d="M3 12l3 0" />
+                <path d="M12 3l0 18" />
+                <path d="M18 12l3 0" />
+                <path d="M3 18l18 0" />
+                <path d="M3 6l18 0" />
+            </svg>
+            SVG;
+        },
+        'eye' => static function (string $class): string {
+            return <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{$class}">
+                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+            </svg>
+            SVG;
+        },
     ];
 
     $renderer =

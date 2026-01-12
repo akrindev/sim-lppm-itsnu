@@ -1,6 +1,6 @@
 <x-slot:title>Persetujuan Dekan</x-slot:title>
-<x-slot:pageTitle>Persetujuan Proposal</x-slot:pageTitle>
-<x-slot:pageSubtitle>Kelola persetujuan proposal penelitian dan pengabdian yang telah diajukan.</x-slot:pageSubtitle>
+<x-slot:pageTitle>Persetujuan Proposal @if($this->facultyName) - {{ $this->facultyName }} @endif</x-slot:pageTitle>
+<x-slot:pageSubtitle>Kelola persetujuan proposal penelitian dan pengabdian yang telah diajukan di fakultas Anda.</x-slot:pageSubtitle>
 
 <div>
     <x-tabler.alert />

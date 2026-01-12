@@ -11,8 +11,23 @@ class MasterData extends Component
 {
     use WithPagination;
 
+    #[Url(as: 'group')]
+    public string $group = 'academic-content';
+
     #[Url(as: 'tab')]
-    public string $activeTab = 'focus-areas';
+    public string $activeTab = '';
+
+    public function mount(): void
+    {
+        if (empty($this->activeTab)) {
+            $this->activeTab = match ($this->group) {
+                'academic-structure' => 'study-programs',
+                'budget' => 'budget-groups',
+                'partnership' => 'partners',
+                default => 'focus-areas',
+            };
+        }
+    }
 
     public function setActiveTab(string $tab): void
     {
@@ -28,6 +43,15 @@ class MasterData extends Component
 
     public function render()
     {
-        return view('livewire.settings.master-data');
+        $title = match ($this->group) {
+            'academic-structure' => 'Struktur Akademik',
+            'budget' => 'Anggaran & RAB',
+            'partnership' => 'Kemitraan & Prioritas',
+            default => 'Master Data',
+        };
+
+        return view('livewire.settings.master-data', [
+            'pageTitle' => $title,
+        ]);
     }
 }

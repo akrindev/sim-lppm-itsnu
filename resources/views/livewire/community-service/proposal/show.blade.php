@@ -578,6 +578,16 @@
                                 <x-lucide-check class="icon" />
                                 Setujui Proposal
                             </button>
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'need_fix')">
+                                <x-lucide-alert-triangle class="icon" />
+                                Perlu Perbaikan
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'rejected')">
+                                <x-lucide-x class="icon" />
+                                Tolak Proposal
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -844,11 +854,25 @@
     @teleport('body')
         <x-tabler.modal id="approvalModal" title="Keputusan Dekan" wire:ignore.self>
             <x-slot:body>
-                <div class="py-1 text-center">
-                    <x-lucide-check-circle class="text-primary icon mb-2" style="width: 3rem; height: 3rem;" />
-                    <h3>Konfirmasi Keputusan</h3>
-                    <div class="text-secondary">
-                        Apakah Anda yakin dengan keputusan ini?
+                <div class="py-1">
+                    <div class="text-center mb-3">
+                        @if($approvalDecision === 'approved')
+                            <x-lucide-check-circle class="text-success icon mb-2" style="width: 3rem; height: 3rem;" />
+                            <h3>Setujui Proposal?</h3>
+                        @elseif($approvalDecision === 'need_fix')
+                            <x-lucide-alert-triangle class="text-warning icon mb-2" style="width: 3rem; height: 3rem;" />
+                            <h3>Perlu Perbaikan?</h3>
+                        @elseif($approvalDecision === 'rejected')
+                            <x-lucide-x-circle class="text-danger icon mb-2" style="width: 3rem; height: 3rem;" />
+                            <h3>Tolak Proposal?</h3>
+                        @endif
+                        <div class="text-secondary">
+                            Apakah Anda yakin dengan keputusan ini?
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Catatan (Opsional)</label>
+                        <textarea class="form-control" wire:model="approvalNotes" rows="3" placeholder="Masukkan catatan atau alasan jika ada..."></textarea>
                     </div>
                 </div>
             </x-slot:body>

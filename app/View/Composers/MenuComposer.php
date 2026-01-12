@@ -25,11 +25,11 @@ class MenuComposer
                 'icon' => 'home',
                 'route' => 'dashboard',
             ],
-            // Dosen menu
+            // Dosen menu (+ dekan for monitoring their faculty proposals)
             [
                 'title' => 'Penelitian',
                 'icon' => 'puzzle',
-                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor'],
+                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan'],
                 'children' => [
                     [
                         'title' => 'Usulan',
@@ -61,7 +61,7 @@ class MenuComposer
             [
                 'title' => 'Pengabdian',
                 'icon' => 'gift',
-                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor'],
+                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan'],
                 'children' => [
                     [
                         'title' => 'Usulan',
@@ -105,6 +105,12 @@ class MenuComposer
                 'route' => 'dekan.proposals.index',
                 'roles' => ['dekan'],
             ],
+            [
+                'title' => 'Riwayat Persetujuan',
+                'icon' => 'history',
+                'route' => 'dekan.approval-history',
+                'roles' => ['dekan'],
+            ],
             // Kepala LPPM menus
             [
                 'title' => 'Persetujuan Awal',
@@ -118,12 +124,28 @@ class MenuComposer
                 'route' => 'kepala-lppm.final-decision',
                 'roles' => ['kepala lppm', 'rektor'],
             ],
-            // Admin LPPM - Reviewer Assignment
+            // Admin LPPM - Reviewer Management Group
             [
-                'title' => 'Penugasan Reviewer',
+                'title' => 'Reviewer',
                 'icon' => 'user-check',
-                'route' => 'admin-lppm.assign-reviewers',
                 'roles' => ['admin lppm'],
+                'children' => [
+                    [
+                        'title' => 'Penugasan Reviewer',
+                        'icon' => 'user-plus',
+                        'route' => 'admin-lppm.assign-reviewers',
+                    ],
+                    [
+                        'title' => 'Beban Kerja Reviewer',
+                        'icon' => 'chart-bar',
+                        'route' => 'admin-lppm.reviewer-workload',
+                    ],
+                    [
+                        'title' => 'Monitoring Review',
+                        'icon' => 'eye',
+                        'route' => 'admin-lppm.review-monitoring',
+                    ],
+                ],
             ],
             // Reviewer menu
             [
@@ -138,11 +160,17 @@ class MenuComposer
                 'route' => 'review.community-service',
                 'roles' => ['reviewer'],
             ],
-            // Laporan - Reports menu
+            [
+                'title' => 'Riwayat Review',
+                'icon' => 'history',
+                'route' => 'review.review-history',
+                'roles' => ['reviewer'],
+            ],
+            // Laporan - Reports menu (+ kepala lppm for decision-making)
             [
                 'title' => 'Laporan',
                 'icon' => 'file-analytics',
-                'roles' => ['admin lppm', 'rektor'],
+                'roles' => ['admin lppm', 'rektor', 'kepala lppm'],
                 'children' => [
                     [
                         'title' => 'Laporan Penelitian',
@@ -172,6 +200,11 @@ class MenuComposer
                         'icon' => 'user-plus',
                         'route' => 'users.create',
                     ],
+                    [
+                        'title' => 'Import Pengguna',
+                        'icon' => 'upload',
+                        'route' => 'users.import',
+                    ],
                 ],
             ],
             // settings:
@@ -185,6 +218,29 @@ class MenuComposer
                         'title' => 'Master Data',
                         'icon' => 'layers',
                         'route' => 'settings.master-data',
+                        'params' => ['group' => 'academic-content'],
+                        'active' => ['group=academic-content'],
+                    ],
+                    [
+                        'title' => 'Struktur Akademik',
+                        'icon' => 'building-2',
+                        'route' => 'settings.master-data',
+                        'params' => ['group' => 'academic-structure'],
+                        'active' => ['group=academic-structure'],
+                    ],
+                    [
+                        'title' => 'Anggaran & RAB',
+                        'icon' => 'archive',
+                        'route' => 'settings.master-data',
+                        'params' => ['group' => 'budget'],
+                        'active' => ['group=budget'],
+                    ],
+                    [
+                        'title' => 'Kemitraan',
+                        'icon' => 'users',
+                        'route' => 'settings.master-data',
+                        'params' => ['group' => 'partnership'],
+                        'active' => ['group=partnership'],
                     ],
                     [
                         'title' => 'Jadwal Proposal',
@@ -264,23 +320,40 @@ class MenuComposer
         }
 
         $routeName = $item['route'] ?? null;
+        $params = $item['params'] ?? [];
 
-        return [
+        $children = null;
+        if (isset($item['children']) && is_array($item['children'])) {
+            $children = array_values(array_filter(array_map(
+                fn (array $child) => $this->formatDropdownItem($child, $user),
+                $item['children'],
+            )));
+        }
+
+        $formatted = [
             'label' => $item['title'],
             'href' => $this->resolveHref($item),
             'prefix_icon' => $item['icon'] ?? null,
             'prefix_icon_class' => 'icon icon-2 icon-inline me-1',
             'route' => $routeName,
+            'params' => $params,
             'active' => $this->isActive($item, $routeName),
         ];
+
+        if ($children) {
+            $formatted['children'] = $children;
+        }
+
+        return $formatted;
     }
 
     protected function resolveHref(array $item): string
     {
         $routeName = $item['route'] ?? null;
+        $params = $item['params'] ?? [];
 
         if ($routeName && Route::has($routeName)) {
-            return route($routeName);
+            return route($routeName, $params);
         }
 
         $href = $item['href'] ?? null;
@@ -302,6 +375,22 @@ class MenuComposer
 
         foreach ($patterns as $pattern) {
             if (empty($pattern)) {
+                continue;
+            }
+
+            // Check for query parameter matches (e.g. group=academic-structure)
+            if (str_contains($pattern, '=')) {
+                [$key, $value] = explode('=', $pattern);
+                $queryVal = request()->query($key);
+                
+                // Handle default values if query param is missing
+                if ($queryVal === null && $key === 'group' && $value === 'academic-content') {
+                    return true;
+                }
+
+                if ($queryVal === $value) {
+                    return true;
+                }
                 continue;
             }
 

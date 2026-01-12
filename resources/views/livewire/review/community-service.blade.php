@@ -5,11 +5,61 @@
 <div>
     <x-tabler.alert />
 
+    <!-- Statistics Cards -->
+    <div class="row row-deck row-cards mb-3">
+        <div class="col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="subheader">Total Tugas Review</div>
+                    </div>
+                    <div class="d-flex align-items-baseline">
+                        <div class="h1 mb-0 me-2">{{ $this->statusStats['all'] }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="subheader">Menunggu Review</div>
+                    </div>
+                    <div class="d-flex align-items-baseline">
+                        <div class="h1 mb-0 me-2">{{ $this->statusStats['pending'] }}</div>
+                        <div class="me-auto">
+                            <span class="text-warning d-inline-flex align-items-center lh-1">
+                                <x-lucide-clock class="icon icon-sm" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="subheader">Selesai Direview</div>
+                    </div>
+                    <div class="d-flex align-items-baseline">
+                        <div class="h1 mb-0 me-2">{{ $this->statusStats['completed'] }}</div>
+                        <div class="me-auto">
+                            <span class="text-success d-inline-flex align-items-center lh-1">
+                                <x-lucide-check-circle class="icon icon-sm" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filters -->
     <div class="mb-3 card">
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <label class="form-label" for="search">
                         <x-lucide-search class="me-2 icon" />
                         Cari Proposal
@@ -17,7 +67,18 @@
                     <input type="text" id="search" class="form-control"
                         placeholder="Cari berdasarkan judul atau nama author..." wire:model.live="search">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="form-label" for="status">
+                        <x-lucide-filter class="me-2 icon" />
+                        Status Review
+                    </label>
+                    <select id="status" class="form-select" wire:model.live="statusFilter">
+                        <option value="all">Semua Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Selesai</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label" for="year">
                         <x-lucide-calendar class="me-2 icon" />
                         Tahun
@@ -30,7 +91,7 @@
                     </select>
                 </div>
             </div>
-            @if (!empty($search) || !empty($selectedYear))
+            @if (!empty($search) || !empty($selectedYear) || $statusFilter !== 'all')
                 <div class="mt-3">
                     <button type="button" class="btn-outline-secondary btn btn-sm" wire:click="resetFilters">
                         <x-lucide-x class="me-1 icon" />
