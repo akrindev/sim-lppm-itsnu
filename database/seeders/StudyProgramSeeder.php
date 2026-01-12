@@ -11,36 +11,31 @@ class StudyProgramSeeder extends Seeder
      */
     public function run(): void
     {
-        // based on FacultySeeder
+        $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first()
+            ?? \App\Models\Institution::first();
+
+        if (! $institution) {
+            return;
+        }
+
         $saintek = \App\Models\Faculty::where('code', 'SAINTEK')->first();
         $dekabita = \App\Models\Faculty::where('code', 'DEKABITA')->first();
 
-        // saintek study programs
-        // - Informatika
-        // - Teknologi Informasi
-        // - Fisika
-        // - Teknik Industri
-
-        // dekabita study programs
-        // - Kriya Batik
-        // - Administrasi Perkantoran
-        // - Akuntansi
-
         if ($saintek) {
             $saintekPrograms = [
-                ['name' => 'Informatika', 'code' => 'IF'],
-                ['name' => 'Teknologi Informasi', 'code' => 'TI'],
-                ['name' => 'Fisika', 'code' => 'FIS'],
-                ['name' => 'Teknik Industri', 'code' => 'TIU'],
+                'S1 Informatika',
+                'S1 Teknologi Informasi',
+                'S1 Fisika',
+                'S1 Teknik Industri',
             ];
 
-            foreach ($saintekPrograms as $program) {
-                \App\Models\StudyProgram::firstOrCreate(
-                    ['code' => $program['code']],
+            foreach ($saintekPrograms as $programName) {
+                \App\Models\StudyProgram::updateOrCreate(
+                    ['name' => $programName, 'institution_id' => $institution->id],
                     [
                         'faculty_id' => $saintek->id,
-                        'name' => $program['name'],
-                        'code' => $program['code'],
+                        'name' => $programName,
+                        'institution_id' => $institution->id,
                     ]
                 );
             }
@@ -48,18 +43,18 @@ class StudyProgramSeeder extends Seeder
 
         if ($dekabita) {
             $dekabitaPrograms = [
-                ['name' => 'Kriya Batik', 'code' => 'KB'],
-                ['name' => 'Administrasi Perkantoran', 'code' => 'AP'],
-                ['name' => 'Akuntansi', 'code' => 'AK'],
+                'D3 Akuntansi',
+                'D3 Administrasi Perkantoran',
+                'D3 Kriya Batik',
             ];
 
-            foreach ($dekabitaPrograms as $program) {
-                \App\Models\StudyProgram::firstOrCreate(
-                    ['code' => $program['code']],
+            foreach ($dekabitaPrograms as $programName) {
+                \App\Models\StudyProgram::updateOrCreate(
+                    ['name' => $programName, 'institution_id' => $institution->id],
                     [
                         'faculty_id' => $dekabita->id,
-                        'name' => $program['name'],
-                        'code' => $program['code'],
+                        'name' => $programName,
+                        'institution_id' => $institution->id,
                     ]
                 );
             }

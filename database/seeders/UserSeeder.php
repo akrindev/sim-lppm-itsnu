@@ -14,8 +14,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Get institutions and study programs
-        $itsnu = \App\Models\Institution::where('name', 'like', '%ITSNU%')->first();
-        $institution = $itsnu ?? \App\Models\Institution::first();
+        $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first()
+            ?? \App\Models\Institution::first();
         $studyProgram = \App\Models\StudyProgram::first();
 
         if (! $institution) {
@@ -31,8 +31,8 @@ class UserSeeder extends Seeder
         if ($faculties->isEmpty()) {
             $faculty = \App\Models\Faculty::create([
                 'institution_id' => $institution->id,
-                'name' => 'Fakultas Teknik',
-                'code' => 'FT',
+                'name' => 'Fakultas Sains dan Teknologi',
+                'code' => 'SAINTEK',
             ]);
             $faculties = collect([$faculty]);
         }
@@ -56,6 +56,9 @@ class UserSeeder extends Seeder
                 // Distribute users across faculties (cycling through available faculties)
                 $faculty = $faculties->get($userIndex % $faculties->count());
                 $userIndex++;
+
+                // Get a random study program from this faculty
+                $studyProgram = \App\Models\StudyProgram::where('faculty_id', $faculty->id)->inRandomOrder()->first();
 
                 $email = str($role->name)->slug() . ($count > 1 ? $i + 1 : '') . '@email.com';
 

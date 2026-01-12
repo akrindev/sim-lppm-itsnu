@@ -14,8 +14,8 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         // Get institution
-        $itsnu = \App\Models\Institution::where('name', 'like', '%ITSNU%')->first();
-        $institution = $itsnu ?? \App\Models\Institution::first();
+        $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first()
+            ?? \App\Models\Institution::first();
 
         if (! $institution) {
             $this->command->warn('Tidak ada institusi yang ditemukan. Silakan jalankan InstitutionSeeder terlebih dahulu.');
