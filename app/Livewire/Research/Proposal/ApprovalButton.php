@@ -64,7 +64,7 @@ class ApprovalButton extends Component
 
         $proposal = $this->proposal;
         $action = new ApproveProposalAction;
-        $result = $action->execute($proposal, 'approved');
+        $result = $action->execute($proposal, 'completed');
 
         if ($result['success']) {
             $this->dispatch('success', message: $result['message']);

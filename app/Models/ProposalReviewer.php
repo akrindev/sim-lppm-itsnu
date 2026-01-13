@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ReviewStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProposalReviewer extends Model
 {
@@ -53,6 +54,43 @@ class ProposalReviewer extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get all review logs (history) for this reviewer assignment.
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(ReviewLog::class)->orderBy('round', 'desc');
+    }
+
+    /**
+     * Get the latest completed review log.
+     */
+    public function latestLog()
+    {
+        return $this->logs()->completed()->first();
+    }
+
+    /**
+     * Get the review log for a specific round.
+     */
+    public function logForRound(int $round): ?ReviewLog
+    {
+        return $this->logs()->forRound($round)->first();
+    }
+
+    /**
+     * Get the previous round's review log.
+     */
+    public function previousRoundLog(): ?ReviewLog
+    {
+        $currentRound = $this->round ?? 1;
+        if ($currentRound <= 1) {
+            return null;
+        }
+
+        return $this->logs()->forRound($currentRound - 1)->first();
     }
 
     /**

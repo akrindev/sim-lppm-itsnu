@@ -97,16 +97,18 @@ class KepalaLppmFinalDecision extends Component
             return;
         }
 
-        if (! in_array($this->decision, ['completed', 'revision_needed'])) {
+        if (! in_array($this->decision, ['completed', 'revision_needed', 'rejected'])) {
             session()->flash('error', 'Keputusan tidak valid');
 
             return;
         }
 
         try {
-            $newStatus = $this->decision === 'completed'
-                ? ProposalStatus::COMPLETED
-                : ProposalStatus::REVISION_NEEDED;
+            $newStatus = match ($this->decision) {
+                'completed' => ProposalStatus::COMPLETED,
+                'rejected' => ProposalStatus::REJECTED,
+                'revision_needed' => ProposalStatus::REVISION_NEEDED,
+            };
 
             // Validate transition
             if (! $proposal->status->canTransitionTo($newStatus)) {
@@ -131,9 +133,11 @@ class KepalaLppmFinalDecision extends Component
             // Send notifications
             $this->sendNotifications($proposal, $this->decision, $user);
 
-            $message = $this->decision === 'completed'
-                ? 'Proposal berhasil disetujui dan selesai.'
-                : 'Proposal memerlukan perbaikan dan dikembalikan ke pengusul.';
+            $message = match ($this->decision) {
+                'completed' => 'Proposal berhasil disetujui dan selesai.',
+                'rejected' => 'Proposal telah ditolak.',
+                'revision_needed' => 'Proposal memerlukan perbaikan dan dikembalikan ke pengusul.',
+            };
 
             session()->flash('success', $message);
             $this->dispatch('close-final-decision-modal');

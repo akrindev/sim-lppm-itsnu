@@ -32,7 +32,7 @@ class Index extends Component
     {
         $user = Auth::user();
 
-        $query = Proposal::where('detailable_type', 'App\Models\Research');
+        $query = Proposal::where('detailable_type', \App\Models\Research::class);
 
         // Eager load relationships
         $query->with([
@@ -47,12 +47,14 @@ class Index extends Component
 
         // where submitter is current user
         if ($user->hasRole('dosen')) {
-            $query->where('submitter_id', $user->id)
-                ->where(function ($q) {
-                    $q->whereHas('reviewers', function ($sq) {
-                        $sq->where('recommendation', 'revision_needed');
+            $query->where(function ($q) use ($user) {
+                $q->where('submitter_id', $user->id)
+                    ->where(function ($sq) {
+                        $sq->whereHas('reviewers', function ($ssq) {
+                            $ssq->where('recommendation', 'revision_needed');
+                        })->orWhere('status', ProposalStatus::REVISION_NEEDED);
                     });
-                })->orWhere('status', ProposalStatus::REVISION_NEEDED);
+            });
         } elseif ($user->hasRole('reviewer')) {
             $query->whereHas('reviewers', function ($q) use ($user) {
                 $q->where('user_id', $user->id)
@@ -92,7 +94,7 @@ class Index extends Component
     {
         $user = Auth::user();
 
-        $query = Proposal::where('detailable_type', 'App\Models\Research');
+        $query = Proposal::where('detailable_type', \App\Models\Research::class);
 
         if ($user->hasRole('dosen')) {
             $query->where('submitter_id', $user->id)

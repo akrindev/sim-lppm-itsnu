@@ -4,6 +4,7 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use App\Models\ReviewLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -151,6 +152,36 @@ class ReviewerForm extends Component
         return $this->myReview?->days_remaining;
     }
 
+    /**
+     * Get previous round logs for the current reviewer (for showing history during re-review).
+     */
+    #[Computed]
+    public function previousRoundLogs()
+    {
+        $review = $this->myReview;
+        if (! $review) {
+            return collect();
+        }
+
+        return ReviewLog::where('proposal_reviewer_id', $review->id)
+            ->orderBy('round', 'desc')
+            ->get();
+    }
+
+    /**
+     * Get all review logs for this proposal (for showing complete history).
+     */
+    #[Computed]
+    public function allReviewLogs()
+    {
+        return ReviewLog::forProposal($this->proposalId)
+            ->with('user')
+            ->orderBy('round', 'desc')
+            ->orderBy('completed_at', 'desc')
+            ->get()
+            ->groupBy('round');
+    }
+
     public function toggleForm(): void
     {
         $this->showForm = ! $this->showForm;
@@ -180,6 +211,18 @@ class ReviewerForm extends Component
                 // Complete the review with new method
                 $review->complete($this->reviewNotes, $this->recommendation);
 
+                // Create review log for history tracking
+                ReviewLog::create([
+                    'proposal_reviewer_id' => $review->id,
+                    'proposal_id' => $review->proposal_id,
+                    'user_id' => $review->user_id,
+                    'round' => $review->round ?? 1,
+                    'review_notes' => $this->reviewNotes,
+                    'recommendation' => $this->recommendation,
+                    'started_at' => $review->started_at,
+                    'completed_at' => $review->completed_at ?? now(),
+                ]);
+
                 // Refresh the proposal and review from DB to get updated data
                 $proposal = $this->proposal->fresh(['reviewers']);
 
@@ -193,9 +236,13 @@ class ReviewerForm extends Component
             });
 
             $message = $this->needsReReview ? 'Review ulang berhasil disubmit' : 'Review berhasil disubmit';
-            $this->dispatch('success', message: $message);
 
+            // Close the form after successful submission
+            $this->showForm = false;
+
+            // Flash message and dispatch event
             session()->flash('success', $message);
+            $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
             $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }

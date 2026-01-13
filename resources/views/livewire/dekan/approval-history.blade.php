@@ -21,7 +21,9 @@
                             <td class="text-nowrap">{{ $log->at->format('d M Y H:i') }}</td>
                             <td>
                                 <div class="fw-bold">{{ $log->proposal?->title }}</div>
-                                <div class="small text-secondary">{{ $log->proposal?->submitter?->name }}</div>
+                                <div class="small text-secondary">
+                                    {{ $log->proposal?->submitter?->name }} &middot; {{ $log->proposal?->focusArea?->name ?? '—' }}
+                                </div>
                             </td>
                             <td>
                                 @php

@@ -73,14 +73,17 @@ class ResearchSeeder extends Seeder
         // Flatten titles array
         $flatTitles = array_reduce($researchTitles, fn ($carry, $category) => array_merge($carry, $category), []);
 
-        // Valid initial statuses (exclude REJECTED, REVISION_NEEDED, NEED_ASSIGNMENT)
+        // Valid initial statuses
         $validStatuses = [
             ProposalStatus::DRAFT,
             ProposalStatus::SUBMITTED,
             ProposalStatus::APPROVED,
+            ProposalStatus::WAITING_REVIEWER,
             ProposalStatus::UNDER_REVIEW,
             ProposalStatus::REVIEWED,
+            ProposalStatus::REVISION_NEEDED,
             ProposalStatus::COMPLETED,
+            ProposalStatus::REJECTED,
         ];
         $titleIndex = 0;
 
@@ -127,14 +130,8 @@ class ResearchSeeder extends Seeder
                         'summary' => fake()->paragraph(3),
                     ]);
 
-                    // Create ProposalStatusLog entry for initial status
-                    ProposalStatusLog::create([
-                        'proposal_id' => $proposal->id,
-                        'user_id' => $submitter->id,
-                        'status_before' => ProposalStatus::DRAFT,
-                        'status_after' => $statusEnum,
-                        'at' => $proposal->created_at,
-                    ]);
+                    // Create comprehensive status log history based on final status
+                    $this->createStatusLogHistory($proposal, $statusEnum, $submitter, $dosenUsers);
 
                     // Attach keywords (3-5 per proposal)
                     if ($keywords->isNotEmpty()) {
@@ -196,24 +193,62 @@ class ResearchSeeder extends Seeder
                         ]);
                     }
 
-                    // Create reviewers for UNDER_REVIEW and REVIEWED statuses
-                    if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED])) {
+                    // Create reviewers based on proposal status
+                    if (in_array($statusEnum, [
+                        ProposalStatus::UNDER_REVIEW,
+                        ProposalStatus::REVIEWED,
+                        ProposalStatus::REVISION_NEEDED,
+                        ProposalStatus::COMPLETED,
+                    ])) {
                         $excludedIds = $availableMembers->pluck('id')->push($submitter->id)->toArray();
                         $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
 
                         if ($potentialReviewers->isNotEmpty()) {
                             $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
+                            $isMultiRound = in_array($statusEnum, [ProposalStatus::COMPLETED]) && fake()->boolean(30); // 30% chance of multi-round
+                            $round = $isMultiRound ? rand(2, 3) : 1;
+
+                            $assignedAt = $proposal->created_at->addDays(3);
+                            $deadlineAt = $assignedAt->copy()->addDays(14);
 
                             foreach ($reviewers as $reviewer) {
-                                \App\Models\ProposalReviewer::create([
-                                    'proposal_id' => $proposal->id,
-                                    'user_id' => $reviewer->id,
-                                    'status' => $statusEnum === ProposalStatus::REVIEWED ? 'completed' : 'reviewing',
-                                    'review_notes' => $statusEnum === ProposalStatus::REVIEWED ? fake()->paragraph() : null,
-                                    'recommendation' => $statusEnum === ProposalStatus::REVIEWED
-                                        ? fake()->randomElement(['approved', 'revision_needed'])
-                                        : null,
-                                ]);
+                                // Determine reviewer status based on proposal status
+                                if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW])) {
+                                    // Under review: reviewers are pending
+                                    \App\Models\ProposalReviewer::create([
+                                        'proposal_id' => $proposal->id,
+                                        'user_id' => $reviewer->id,
+                                        'status' => 'pending',
+                                        'review_notes' => null,
+                                        'recommendation' => null,
+                                        'round' => 1,
+                                        'assigned_at' => $assignedAt,
+                                        'deadline_at' => $deadlineAt,
+                                    ]);
+                                } elseif (in_array($statusEnum, [ProposalStatus::REVIEWED, ProposalStatus::COMPLETED, ProposalStatus::REVISION_NEEDED])) {
+                                    // Reviewed: reviewers completed
+                                    $startedAt = $assignedAt->copy()->addDays(rand(1, 7));
+                                    $completedAt = $startedAt->copy()->addDays(rand(3, 10));
+
+                                    // For multi-round, simulate revision cycle
+                                    if ($round > 1) {
+                                        $revisionCompletedAt = $completedAt->copy()->addDays(rand(7, 14));
+                                        $completedAt = $revisionCompletedAt->copy()->addDays(rand(3, 7));
+                                    }
+
+                                    \App\Models\ProposalReviewer::create([
+                                        'proposal_id' => $proposal->id,
+                                        'user_id' => $reviewer->id,
+                                        'status' => 'completed',
+                                        'review_notes' => fake()->paragraph(5),
+                                        'recommendation' => fake()->randomElement(['approved', 'revision_needed', 'rejected']),
+                                        'round' => $round,
+                                        'assigned_at' => $assignedAt,
+                                        'deadline_at' => $deadlineAt,
+                                        'started_at' => $startedAt,
+                                        'completed_at' => $completedAt,
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -225,5 +260,89 @@ class ResearchSeeder extends Seeder
 
         $totalResearchProposals = Proposal::where('detailable_type', Research::class)->count();
         $this->command->info("Total proposal penelitian berhasil dibuat: {$totalResearchProposals}");
+    }
+
+    /**
+     * Create comprehensive status log history based on final status
+     */
+    protected function createStatusLogHistory(
+        Proposal $proposal,
+        ProposalStatus $finalStatus,
+        User $submitter,
+        \Illuminate\Database\Eloquent\Collection $dosenUsers
+    ): void {
+        $logs = [];
+        $baseTime = $proposal->created_at->copy();
+
+        // Get users for different roles
+        $dekan = $dosenUsers->firstWhere('id', '!=', $submitter->id) ?? $dosenUsers->first();
+        $kepalaLppm = $dosenUsers->random(1)->first();
+        $adminLppm = $dosenUsers->random(1)->first();
+
+        // Define transition paths based on final status
+        $transitions = match ($finalStatus) {
+            ProposalStatus::DRAFT => [],
+            ProposalStatus::SUBMITTED => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+            ],
+            ProposalStatus::APPROVED => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+            ],
+            ProposalStatus::WAITING_REVIEWER => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
+            ],
+            ProposalStatus::UNDER_REVIEW => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
+                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
+            ],
+            ProposalStatus::REVIEWED => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
+                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
+                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4], // Auto-transition
+            ],
+            ProposalStatus::REVISION_NEEDED => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
+                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
+                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4],
+                ['from' => ProposalStatus::REVIEWED, 'to' => ProposalStatus::REVISION_NEEDED, 'user' => $kepalaLppm, 'offset' => 5],
+            ],
+            ProposalStatus::COMPLETED => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
+                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
+                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4],
+                ['from' => ProposalStatus::REVIEWED, 'to' => ProposalStatus::COMPLETED, 'user' => $kepalaLppm, 'offset' => 5],
+            ],
+            ProposalStatus::REJECTED => [
+                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::REJECTED, 'user' => $dekan, 'offset' => 1],
+            ],
+        };
+
+        // Create logs with appropriate timestamps
+        foreach ($transitions as $transition) {
+            $transitionTime = $baseTime->copy()->addDays($transition['offset']);
+
+            // For auto-transitions (user is null), use admin LPPM
+            $userId = $transition['user']?->id ?? $adminLppm->id;
+
+            ProposalStatusLog::create([
+                'proposal_id' => $proposal->id,
+                'user_id' => $userId,
+                'status_before' => $transition['from'],
+                'status_after' => $transition['to'],
+                'at' => $transitionTime,
+            ]);
+        }
     }
 }
