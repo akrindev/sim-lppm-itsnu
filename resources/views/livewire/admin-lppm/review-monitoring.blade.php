@@ -47,7 +47,7 @@
                                 @else
                                     <div class="avatar-list avatar-list-stacked mb-2">
                                         @foreach ($proposal->reviewers as $reviewer)
-                                            <span class="avatar avatar-xs rounded" title="{{ $reviewer->user?->name }}: {{ $reviewer->status }}">
+                                            <span class="avatar avatar-xs rounded" title="{{ $reviewer->user?->name }}: {{ $reviewer->status->label() }}">
                                                 {{ $reviewer->user?->initials() }}
                                             </span>
                                         @endforeach
@@ -55,7 +55,7 @@
                                     <div class="small">
                                         @foreach ($proposal->reviewers as $reviewer)
                                             <div class="d-flex align-items-center mb-1">
-                                                @if ($reviewer->status === 'completed')
+                                                @if ($reviewer->isCompleted())
                                                     <x-lucide-check-circle class="icon icon-sm text-success me-1" />
                                                 @else
                                                     <x-lucide-clock class="icon icon-sm text-warning me-1" />
@@ -69,7 +69,7 @@
                             <td>
                                 @php
                                     $totalRev = $proposal->reviewers->count();
-                                    $doneRev = $proposal->reviewers->where('status', 'completed')->count();
+                                    $doneRev = $proposal->reviewers->filter(fn($r) => $r->isCompleted())->count();
                                     $percentage = $totalRev > 0 ? round(($doneRev / $totalRev) * 100) : 0;
                                 @endphp
                                 <div class="d-flex align-items-center">

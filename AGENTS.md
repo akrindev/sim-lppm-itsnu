@@ -41,34 +41,142 @@ Research & Community Service Management System for Institut Teknologi dan Sains 
 - **Authorization:** Use Spatie `hasRole()`/`can()`. Use Policies for complex logic.
 - **Scoping:** `Dekan` role is faculty-scoped; `Dosen` is own-proposal scoped.
 
-## 6. Business Workflow & Transitions
-- **Team:** All invited members must `accepted` before submission. Rejection -> `NEED_ASSIGNMENT`.
-- **Approval Flow:** `Dosen` (Draft) -> `Dekan` (Approve) -> `Kepala LPPM` (Initial) -> `Reviewers` -> `Kepala LPPM` (Final).
-- **Status Enum:** `ProposalStatus` contains logic for `canTransitionTo()`, `label()`, and `color()`.
-- **Reviews:** Proposal becomes `REVIEWED` only when ALL assigned reviewers complete their evaluations.
+## 6. Proposal Workflow & Status Transitions
 
-## 7. UI & Frontend Conventions
+### 6.1 ProposalStatus Enum (`app/Enums/ProposalStatus.php`)
+| Status | Label (ID) | Description |
+|--------|------------|-------------|
+| `DRAFT` | Draft | Proposal sedang disusun |
+| `SUBMITTED` | Diajukan | Menunggu persetujuan Dekan |
+| `NEED_ASSIGNMENT` | Perlu Persetujuan Anggota | Anggota tim belum menerima undangan |
+| `APPROVED` | Disetujui Dekan | Menunggu persetujuan Kepala LPPM |
+| `WAITING_REVIEWER` | Menunggu Penugasan Reviewer | Admin LPPM perlu menugaskan reviewer |
+| `UNDER_REVIEW` | Sedang Direview | Reviewer sedang melakukan review |
+| `REVIEWED` | Review Selesai | Semua reviewer selesai, menunggu keputusan |
+| `REVISION_NEEDED` | Perlu Revisi | Proposal dikembalikan untuk perbaikan |
+| `COMPLETED` | Selesai | Proposal disetujui (terminal) |
+| `REJECTED` | Ditolak | Proposal ditolak (terminal) |
+
+### 6.2 Complete Workflow Diagram
+```
+DRAFT
+  ↓ (Dosen submits, all team members accepted)
+SUBMITTED
+  ↓ (Dekan approves)          ← NEED_ASSIGNMENT (if team member rejects)
+APPROVED
+  ↓ (Kepala LPPM approves)
+WAITING_REVIEWER
+  ↓ (Admin LPPM assigns reviewer)
+UNDER_REVIEW
+  ↓ (All reviewers complete)
+REVIEWED
+  ├── COMPLETED (Kepala LPPM approves) ← TERMINAL
+  ├── REJECTED (Kepala LPPM rejects)   ← TERMINAL
+  └── REVISION_NEEDED
+        ↓ (Dosen revises & resubmits)
+        SUBMITTED
+          ↓ [Full cycle repeats]
+          ↓ [If has existing reviewers: RequestReReviewAction triggered]
+```
+
+### 6.3 Team Member Flow
+- All invited members must `accepted` before submission
+- If any member rejects → Status changes to `NEED_ASSIGNMENT`
+- Dosen can reinvite or remove rejected members
+
+## 7. Reviewer Workflow & Management
+
+### 7.1 ReviewStatus Enum (`app/Enums/ReviewStatus.php`)
+| Status | Label (ID) | Description |
+|--------|------------|-------------|
+| `PENDING` | Menunggu Review | Review belum dimulai |
+| `IN_PROGRESS` | Sedang Direview | Reviewer membuka form review |
+| `COMPLETED` | Review Selesai | Review telah disubmit |
+| `RE_REVIEW_REQUESTED` | Perlu Review Ulang | Proposal direvisi, perlu review ulang |
+
+### 7.2 ProposalReviewer Model Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| `proposal_id` | UUID | FK to proposals |
+| `user_id` | UUID | FK to users (reviewer) |
+| `status` | ReviewStatus | Current review status |
+| `review_notes` | text | Reviewer's feedback |
+| `recommendation` | enum | `approved`, `rejected`, `revision_needed` |
+| `round` | int | Review cycle number (1, 2, 3...) |
+| `assigned_at` | datetime | When reviewer was assigned |
+| `deadline_at` | datetime | Review deadline |
+| `started_at` | datetime | When reviewer opened form |
+| `completed_at` | datetime | When review was submitted |
+
+### 7.3 Reviewer Assignment Flow
+1. **Admin LPPM** assigns reviewers when status = `WAITING_REVIEWER`
+2. First assignment → Status transitions to `UNDER_REVIEW`
+3. Default deadline: 14 days from assignment
+4. Reviewer receives `ReviewerAssigned` notification
+
+### 7.4 Review Completion Flow
+1. Reviewer opens proposal → `started_at` set, status → `IN_PROGRESS`
+2. Reviewer submits review with notes + recommendation
+3. Status → `COMPLETED`, `completed_at` set
+4. When ALL reviewers complete → Proposal status → `REVIEWED`
+5. Kepala LPPM makes final decision
+
+### 7.5 Re-Review Workflow (After Revision)
+When proposal is resubmitted after `REVISION_NEEDED`:
+1. `RequestReReviewAction` is triggered
+2. All existing reviewers' status → `RE_REVIEW_REQUESTED`
+3. `round` is incremented (e.g., 1 → 2)
+4. `review_notes` and `recommendation` are cleared
+5. New deadline set (14 days)
+6. Reviewers receive `ProposalRevised` notification
+
+### 7.6 Key Reviewer Actions (`app/Livewire/Actions/`)
+| Action | Purpose |
+|--------|---------|
+| `AssignReviewersAction` | Admin assigns reviewer to proposal |
+| `CompleteReviewAction` | Reviewer submits their review |
+| `RequestReReviewAction` | Triggers re-review after revision |
+
+### 7.7 Reviewer Dashboard Features
+- **Stats:** Assigned, Completed, Pending, Re-Review counts
+- **Overdue Reviews:** Past deadline, not completed
+- **Due Soon:** Within 3 days of deadline
+- **Re-Review Needed:** Proposals with `RE_REVIEW_REQUESTED` status
+
+### 7.8 Reviewer Routes (`routes/web.php`)
+```php
+Route::middleware(['role:reviewer'])->prefix('review')->name('review.')->group(function () {
+    Route::get('research', ReviewResearch::class)->name('research');
+    Route::get('community-service', ReviewCommunityService::class)->name('community-service');
+    Route::get('riwayat-review', ReviewHistory::class)->name('review-history');
+});
+```
+
+## 8. UI & Frontend Conventions
 - **Language:** Indonesian for UI labels/messages; English for code and database identifiers.
 - **Components:** Check `resources/views/components/tabler/` and `flux:*` before writing custom HTML.
 - **Layouts:** Use `x-slot:title`, `x-slot:pageTitle`, `x-slot:pageActions` for standard pages.
 - **Tom Select:** Add `x-data="tomSelect"` to `<select>` elements for searchable dropdowns.
 
-## 8. 7 System Roles (database/seeders/RoleSeeder.php)
-1. `superadmin`: IT / Developers
-2. `admin lppm`: Operational, assigns reviewers
-3. `kepala lppm`: LPPM Director, final decisions
-4. `dekan`: Faculty Deans, initial approval
-5. `dosen`: Lecturers, creators
-6. `reviewer`: Expert evaluators
-7. `rektor`: University Rector, strategic oversight
+## 9. System Roles (database/seeders/RoleSeeder.php)
+| Role | Description | Key Permissions |
+|------|-------------|-----------------|
+| `superadmin` | IT / Developers | Full access |
+| `admin lppm` | Operational staff | Assign reviewers, monitor progress |
+| `kepala lppm` | LPPM Director | Initial & final approval decisions |
+| `dekan` | Faculty Deans | First-level approval |
+| `dosen` | Lecturers | Create & submit proposals |
+| `reviewer` | Expert evaluators | Review assigned proposals |
+| `rektor` | University Rector | Strategic oversight |
 
-## 9. Domain Vocabulary
+## 10. Domain Vocabulary
 - **Penelitian**: Research
 - **PKM**: Community Service (Pengabdian Masyarakat)
 - **TKT**: Technology Readiness Level (0-9)
 - **SBK**: Output-based budget standard (Satuan Biaya Keluaran)
+- **Putaran/Round**: Review cycle number after revisions
 
-## 10. IDE & Agent Configuration
+## 11. IDE & Agent Configuration
 - **Cursor Rules:** Follow `.cursor/rules/laravel-boost.mdc` for boost-specific patterns.
 - **Copilot:** Reference `.github/copilot-instructions.md` for quickstart patterns.
 - **MCP Tools:**
@@ -76,8 +184,10 @@ Research & Community Service Management System for Institut Teknologi dan Sains 
     - `Laravel Boost`: Use `search-docs` for version-specific Laravel/Livewire help.
     - `Tinker`: Use for executing PHP or debugging Eloquent models.
 
-## 11. Verification Checklist
+## 12. Verification Checklist
 - [ ] Code formatted with `vendor/bin/pint --dirty`.
 - [ ] Explicit return types added to all new methods.
 - [ ] Livewire components have a single root element.
 - [ ] N+1 queries checked with `with()`.
+- [ ] Status transitions validated with `canTransitionTo()`.
+- [ ] Reviewer actions set proper timestamps (assigned_at, completed_at).

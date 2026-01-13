@@ -111,7 +111,7 @@
                                         {{ ucfirst(str_replace('_', ' ', $latestReport->reporting_period)) }}
                                         <br>
                                         <x-tabler.badge :color="$latestReport->status === 'approved' ? 'success' : ($latestReport->status === 'submitted' ? 'info' : 'secondary')" class="mt-1">
-                                            {{ ucfirst($latestReport->status) }}
+                                            {{ ucfirst((string) $latestReport->status) }}
                                         </x-tabler.badge>
                                     </small>
                                 @else

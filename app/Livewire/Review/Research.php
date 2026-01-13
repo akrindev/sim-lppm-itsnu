@@ -96,10 +96,13 @@ class Research extends Component
         return [
             'all' => (clone $baseQuery)->count(),
             'pending' => (clone $baseQuery)->whereHas('reviewers', function ($q) {
-                $q->where('user_id', Auth::id())->where('status', 'pending');
+                $q->where('user_id', Auth::id())->where('status', \App\Enums\ReviewStatus::PENDING);
             })->count(),
             'completed' => (clone $baseQuery)->whereHas('reviewers', function ($q) {
-                $q->where('user_id', Auth::id())->where('status', 'completed');
+                $q->where('user_id', Auth::id())->where('status', \App\Enums\ReviewStatus::COMPLETED);
+            })->count(),
+            're_review' => (clone $baseQuery)->whereHas('reviewers', function ($q) {
+                $q->where('user_id', Auth::id())->where('status', \App\Enums\ReviewStatus::RE_REVIEW_REQUESTED);
             })->count(),
         ];
     }

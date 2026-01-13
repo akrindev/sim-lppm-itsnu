@@ -23,7 +23,7 @@
     </div>
 </x-slot:pageActions>
 
-<div class="row" x-data="{ currentStep: 1 }">
+<div class="row" x-data="{ currentStep: {{ auth()->user()->hasRole('reviewer') ? 5 : 1 }} }">
     <div class="col-md-12">
         <x-tabler.alert />
     </div>
@@ -49,8 +49,8 @@
                             Pendukung</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 5 }">
-                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Workflow &
-                            Aksi</a>
+                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Review &
+                            Riwayat</a>
                     </li>
                 </ul>
             </div>
@@ -736,8 +736,8 @@
                                             <tr>
                                                 <td>{{ $reviewer->user?->name ?? '-' }}</td>
                                                 <td>
-                                                    <x-tabler.badge :color="$reviewer->status === 'completed' ? 'success' : 'warning'">
-                                                        {{ ucfirst($reviewer->status) }}
+                                                    <x-tabler.badge :color="$reviewer->status->color()">
+                                                        {{ $reviewer->status->label() }}
                                                     </x-tabler.badge>
                                                 </td>
                                                 <td>{{ $reviewer->updated_at?->format('d M Y H:i') ?? '-' }}</td>

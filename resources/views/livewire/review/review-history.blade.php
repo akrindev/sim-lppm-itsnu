@@ -35,13 +35,13 @@
                                     $color = match($review->recommendation) {
                                         'approved' => 'success',
                                         'rejected' => 'danger',
-                                        'revision' => 'warning',
+                                        'revision_needed' => 'warning',
                                         default => 'secondary'
                                     };
                                     $label = match($review->recommendation) {
                                         'approved' => 'Disetujui',
                                         'rejected' => 'Ditolak',
-                                        'revision' => 'Revisi',
+                                        'revision_needed' => 'Revisi',
                                         default => $review->recommendation
                                     };
                                 @endphp

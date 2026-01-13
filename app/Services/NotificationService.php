@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\DailySummaryReport;
 use App\Notifications\DekanApprovalDecision;
 use App\Notifications\FinalDecisionMade;
+use App\Notifications\ProposalRevised;
 use App\Notifications\ProposalSubmitted;
 use App\Notifications\ReviewCompleted;
 use App\Notifications\ReviewerAssigned;
@@ -93,6 +94,15 @@ class NotificationService
     {
         $notification = new FinalDecisionMade($proposal, $decision, $kepalaLppm);
         $this->sendToMany($recipients, $notification);
+    }
+
+    /**
+     * Send Proposal Revised notification (for re-review)
+     */
+    public function notifyProposalRevised($proposal, User $recipient, int $round, bool $isAdmin = false): void
+    {
+        $notification = new ProposalRevised($proposal, $round, $isAdmin);
+        $this->send($recipient, $notification);
     }
 
     /**

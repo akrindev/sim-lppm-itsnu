@@ -29,9 +29,28 @@ class ReviewerForm extends Component
 
         // Load existing review data if available
         $myReview = $this->myReview;
-        if ($myReview && $myReview->status === 'completed') {
+        if ($myReview && $myReview->isCompleted()) {
             $this->reviewNotes = $myReview->review_notes ?? '';
             $this->recommendation = $myReview->recommendation ?? '';
+        }
+
+        // Mark as started when form is mounted (if reviewer is viewing)
+        $this->markReviewAsStarted();
+
+        // If review is in progress, show the form by default
+        if ($this->myReview && $this->myReview->isInProgress()) {
+            $this->showForm = true;
+        }
+    }
+
+    /**
+     * Mark the review as started when reviewer first opens the form
+     */
+    protected function markReviewAsStarted(): void
+    {
+        $review = $this->myReview;
+        if ($review && $review->isPending()) {
+            $review->markAsStarted();
         }
     }
 
@@ -39,7 +58,7 @@ class ReviewerForm extends Component
     public function proposal()
     {
         return Proposal::with([
-            'reviewers.user',
+            'reviewers.user.identity',
         ])->find($this->proposalId);
     }
 
@@ -64,11 +83,27 @@ class ReviewerForm extends Component
     }
 
     #[Computed]
+    public function needsAction(): bool
+    {
+        return $this->myReview !== null && (
+            $this->myReview->requiresAction() || $this->myReview->isInProgress()
+        );
+    }
+
+    #[Computed]
     public function hasReviewed(): bool
     {
         $review = $this->myReview;
 
-        return $review && $review->status === 'completed';
+        return $review && $review->isCompleted();
+    }
+
+    #[Computed]
+    public function needsReReview(): bool
+    {
+        $review = $this->myReview;
+
+        return $review && $review->isReReviewRequested();
     }
 
     #[Computed]
@@ -84,12 +119,46 @@ class ReviewerForm extends Component
             return false;
         }
 
-        return $review->status === 'completed';
+        // Jika proposal sudah final, tidak bisa edit
+        if ($this->proposal->status->isFinal()) {
+            return false;
+        }
+
+        return $review->isCompleted();
+    }
+
+    #[Computed]
+    public function reviewRound(): int
+    {
+        return $this->myReview?->round ?? 1;
+    }
+
+    #[Computed]
+    public function deadline()
+    {
+        return $this->myReview?->deadline_at;
+    }
+
+    #[Computed]
+    public function isOverdue(): bool
+    {
+        return $this->myReview?->isOverdue() ?? false;
+    }
+
+    #[Computed]
+    public function daysRemaining(): ?int
+    {
+        return $this->myReview?->days_remaining;
     }
 
     public function toggleForm(): void
     {
         $this->showForm = ! $this->showForm;
+
+        // Mark as started when form is opened
+        if ($this->showForm) {
+            $this->markReviewAsStarted();
+        }
     }
 
     public function submitReview(): void
@@ -108,26 +177,26 @@ class ReviewerForm extends Component
             DB::transaction(function (): void {
                 $review = $this->myReview;
 
-                // Allow updating review even after submission
-                $review->update([
-                    'status' => 'completed',
-                    'review_notes' => $this->reviewNotes,
-                    'recommendation' => $this->recommendation,
-                ]);
+                // Complete the review with new method
+                $review->complete($this->reviewNotes, $this->recommendation);
 
-                // Check if all reviews are completed
-                $allCompleted = $this->proposal->allReviewsCompleted();
+                // Refresh the proposal and review from DB to get updated data
+                $proposal = $this->proposal->fresh(['reviewers']);
+
+                // Check if all reviews are completed using fresh data
+                $allCompleted = $proposal->allReviewsCompleted();
 
                 if ($allCompleted) {
                     // Update proposal status to reviewed
-                    $this->proposal->update(['status' => ProposalStatus::REVIEWED]);
+                    $proposal->update(['status' => ProposalStatus::REVIEWED]);
                 }
             });
 
-            $review = $this->myReview;
-            $message = $review->wasRecentlyCreated ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
+            $message = $this->needsReReview ? 'Review ulang berhasil disubmit' : 'Review berhasil disubmit';
             $this->dispatch('success', message: $message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
+
+            session()->flash('success', $message);
         } catch (\Exception $e) {
             $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }

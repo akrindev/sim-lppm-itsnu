@@ -140,7 +140,7 @@
                                             </td>
                                             <td>
                                                 <x-tabler.badge :color="$output->status_type === 'published' ? 'success' : 'warning'">
-                                                    {{ ucfirst($output->status_type ?? 'Draft') }}
+                                                    {{ ucfirst((string) ($output->status_type ?? 'Draft')) }}
                                                 </x-tabler.badge>
                                             </td>
                                             <td>
@@ -209,7 +209,7 @@
                                             </td>
                                             <td>
                                                 <x-tabler.badge :color="$output->status === 'published' ? 'success' : 'warning'">
-                                                    {{ ucfirst($output->status ?? 'Draft') }}
+                                                    {{ ucfirst((string) ($output->status ?? 'Draft')) }}
                                                 </x-tabler.badge>
                                             </td>
                                             <td>
@@ -269,7 +269,7 @@
                             <label class="form-label">Status</label>
                             <div>
                                 <x-tabler.badge :color="$mandatoryOutput->status_type === 'published' ? 'success' : 'warning'">
-                                    {{ ucfirst($mandatoryOutput->status_type ?? 'Draft') }}
+                                    {{ ucfirst((string) ($mandatoryOutput->status_type ?? 'Draft')) }}
                                 </x-tabler.badge>
                             </div>
                         </div>
@@ -390,7 +390,7 @@
                             <label class="form-label">Status</label>
                             <div>
                                 <x-tabler.badge :color="$additionalOutput->status === 'published' ? 'success' : 'warning'">
-                                    {{ ucfirst($additionalOutput->status ?? 'Draft') }}
+                                    {{ ucfirst((string) ($additionalOutput->status ?? 'Draft')) }}
                                 </x-tabler.badge>
                             </div>
                         </div>

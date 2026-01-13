@@ -266,7 +266,7 @@ class Proposal extends Model
         }
 
         $completedReviews = $this->reviewers()
-            ->where('status', 'completed')
+            ->where('status', \App\Enums\ReviewStatus::COMPLETED)
             ->count();
 
         return $totalReviewers === $completedReviews;
@@ -287,7 +287,10 @@ class Proposal extends Model
     public function pendingReviewers()
     {
         return $this->reviewers()
-            ->where('status', 'pending');
+            ->whereIn('status', [
+                \App\Enums\ReviewStatus::PENDING,
+                \App\Enums\ReviewStatus::RE_REVIEW_REQUESTED,
+            ]);
     }
 
     /**
@@ -306,7 +309,7 @@ class Proposal extends Model
     public function getPendingReviewers()
     {
         return $this->reviewers()
-            ->where('status', '!=', 'completed')
+            ->where('status', '!=', \App\Enums\ReviewStatus::COMPLETED)
             ->get();
     }
 
@@ -317,7 +320,7 @@ class Proposal extends Model
     {
         $totalReviewers = $this->reviewers()->count();
         $completedReviewers = $this->reviewers()
-            ->where('status', 'completed')
+            ->where('status', \App\Enums\ReviewStatus::COMPLETED)
             ->count();
 
         return $totalReviewers > 0 && $totalReviewers === $completedReviewers;
