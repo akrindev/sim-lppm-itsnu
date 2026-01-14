@@ -24,6 +24,8 @@ abstract class ProposalCreate extends Component
 
     public int $currentStep = 1;
 
+    public int $fileInputIteration = 0;
+
     public string $author_name = '';
 
     public array $budgetValidationErrors = [];
@@ -80,6 +82,10 @@ abstract class ProposalCreate extends Component
             'form.author_tasks' => 'Tugas Ketua',
             'form.tkt_type' => 'Jenis TKT',
             'form.macro_research_group_id' => 'Kelompok Makro Riset',
+            'form.substance_file' => 'Substansi Usulan (PDF)',
+            'form.outputs' => 'Luaran Target Capaian',
+            'form.budget_items' => 'RAB',
+            'form.partner_ids' => 'Mitra',
         ];
     }
 
@@ -194,6 +200,10 @@ abstract class ProposalCreate extends Component
             );
             $this->form->proposal = $proposal;
         }
+
+        // Force clear file input and reset iteration to clear frontend state
+        $this->form->substance_file = null;
+        $this->fileInputIteration++;
 
         session()->flash('success', 'Draft proposal berhasil disimpan.');
     }

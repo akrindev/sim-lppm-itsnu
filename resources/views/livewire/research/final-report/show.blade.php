@@ -760,7 +760,7 @@
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
                                                 <small class="text-muted">File yang sudah diunggah:</small><br>
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>
@@ -953,7 +953,7 @@
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
                                                 <small class="text-muted">File yang sudah diunggah:</small><br>
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>
@@ -988,7 +988,7 @@
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
                                                 <small class="text-muted">File yang sudah diunggah:</small><br>
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>

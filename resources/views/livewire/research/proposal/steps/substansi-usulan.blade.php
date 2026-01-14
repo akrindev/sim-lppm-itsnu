@@ -10,15 +10,17 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label" for="macro_research_group">Kelompok Makro Riset</label>
-                    <select id="macro_research_group"
-                        class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
-                        wire:model="form.macro_research_group_id" x-data="tomSelect"
-                        placeholder="Pilih kelompok makro riset">
-                        <option value="">-- Pilih Kelompok Makro Riset --</option>
-                        @foreach ($this->macroResearchGroups as $group)
-                            <option value="{{ $group->id }}">{{ $group->name }}</option>
-                        @endforeach
-                    </select>
+                    <div wire:ignore>
+                        <select id="macro_research_group"
+                            class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
+                            wire:model="form.macro_research_group_id" x-data="tomSelect"
+                            placeholder="Pilih kelompok makro riset">
+                            <option value="">-- Pilih Kelompok Makro Riset --</option>
+                            @foreach ($this->macroResearchGroups as $group)
+                                <option value="{{ $group->id }}">{{ $group->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     @error('form.macro_research_group_id')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -38,6 +40,7 @@
                         @endif
                     </label>
                     <input id="substance_file" type="file"
+                        wire:key="substance-file-{{ $fileInputIteration }}"
                         class="form-control @error('form.substance_file') is-invalid @enderror"
                         wire:model="form.substance_file" accept=".pdf">
                     @error('form.substance_file')
@@ -53,10 +56,10 @@
                     @elseif ($form->proposal && $form->proposal->detailable && $form->proposal->detailable->getFirstMediaUrl('substance_file'))
                         <div class="mt-2">
                             <x-lucide-file-check class="text-success icon" />
-                            <a href="{{ $form->proposal->detailable->getFirstMediaUrl('substance_file') }}" target="_blank"
-                                class="text-decoration-none">
-                                {{ $form->proposal->detailable->getFirstMedia('substance_file')->file_name }}
-                            </a>
+                        <a href="{{ $form->proposal->detailable->getFirstMediaUrl('substance_file') }}" target="_blank"
+                            class="text-decoration-none">
+                            {{ $form->proposal->detailable->getFirstMedia('substance_file')->name }}
+                        </a>
                         </div>
                     @endif
                 </div>
@@ -97,17 +100,34 @@
             @php
                 $outputTypes = [
                     'jurnal' => [
-                        'Jurnal Nasional Terakreditasi (Sinta 1-2)',
-                        'Jurnal Nasional Terakreditasi (Sinta 3-6)',
-                        'Jurnal Internasional',
-                        'Jurnal Internasional Bereputasi',
+                        'Jurnal Int. Bereputasi (Q1-Q2)',
+                        'Jurnal Int. Bereputasi (Q3-Q4)',
+                        'Jurnal Internasional (Terindeks)',
+                        'Jurnal Nas. Terakreditasi (Sinta 1-2)',
+                        'Jurnal Nas. Terakreditasi (Sinta 3-6)',
                     ],
-                    'prosiding' => ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional Terindeks'],
-                    'buku' => ['Buku Ajar', 'Buku Referensi', 'Monograf'],
-                    'hki' => ['Paten/Paten Sederhana', 'Hak Cipta', 'Merek', 'Desain Industri'],
-                    'media' => ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
-                    'video' => ['Video Kegiatan'],
-                    'produk' => ['Purwarupa/Prototipe TRL 4-6', 'Model/Purwarupa Sosial', 'TTG', 'Produk/Sistem'],
+                    'prosiding' => [
+                        'Prosiding Sem. Int. Terindeks (Scopus/WoS)',
+                        'Prosiding Seminar Nasional',
+                    ],
+                    'buku' => [
+                        'Buku Referensi (ISBN)',
+                        'Buku Monograf (ISBN)',
+                        'Chapter dalam Buku Internasional',
+                    ],
+                    'hki' => [
+                        'Paten (Granted/Terdaftar)',
+                        'Paten Sederhana (Granted/Terdaftar)',
+                        'Hak Cipta',
+                        'Desain Industri',
+                        'PVT',
+                        'DTLST',
+                    ],
+                    'lainnya' => [
+                        'Naskah Kebijakan (Policy Brief)',
+                        'Visiting Lecturer',
+                        'Keynote Speaker',
+                    ],
                 ];
             @endphp
             <div class="table-responsive">
@@ -155,9 +175,7 @@
                                         <option value="prosiding">Prosiding</option>
                                         <option value="buku">Buku</option>
                                         <option value="hki">HKI</option>
-                                        <option value="media">Media Massa</option>
-                                        <option value="video">Video</option>
-                                        <option value="produk">Produk/TTG</option>
+                                        <option value="lainnya">Lainnya</option>
                                     </select>
                                 </td>
                                 <td>

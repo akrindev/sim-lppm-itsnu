@@ -786,7 +786,7 @@
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
                                                 <small class="text-muted">File yang sudah diunggah:</small><br>
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>
@@ -1026,7 +1026,7 @@
                                         <div class="d-flex align-items-center">
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill text-truncate">
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                             </div>
                                             <a href="{{ $media->getUrl() }}" target="_blank"
                                                 class="btn btn-sm btn-primary">
@@ -1049,7 +1049,7 @@
                                         <div class="d-flex align-items-center">
                                             <x-lucide-award class="text-info icon me-2" />
                                             <div class="flex-fill text-truncate">
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                             </div>
                                             <a href="{{ $media->getUrl() }}" target="_blank"
                                                 class="btn btn-sm btn-info">

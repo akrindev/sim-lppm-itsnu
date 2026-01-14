@@ -291,6 +291,9 @@ class ProposalForm extends Form
                 ->usingFileName($this->substance_file->hashName())
                 ->withCustomProperties(['uploaded_by' => $submitterId])
                 ->toMediaCollection('substance_file');
+            
+            // Reset to prevent "UnableToRetrieveMetadata" error on subsequent validations
+            $this->substance_file = null;
         }
 
         $proposal = Proposal::create([
@@ -359,6 +362,9 @@ class ProposalForm extends Form
                 ->usingFileName($this->substance_file->hashName())
                 ->withCustomProperties(['uploaded_by' => $submitterId])
                 ->toMediaCollection('substance_file');
+
+            // Reset to prevent "UnableToRetrieveMetadata" error on subsequent validations
+            $this->substance_file = null;
         }
 
         $proposal = Proposal::create([
@@ -421,6 +427,9 @@ class ProposalForm extends Form
                             ->usingFileName($this->substance_file->hashName())
                             ->withCustomProperties(['uploaded_by' => Auth::id()])
                             ->toMediaCollection('substance_file');
+
+                        // Reset to prevent "UnableToRetrieveMetadata" error on subsequent validations
+                        $this->substance_file = null;
                     }
                     // IMPORTANT: If $this->substance_file is null, we do NOTHING.
                     // This preserves the existing file in the media collection.
@@ -456,6 +465,9 @@ class ProposalForm extends Form
                             ->usingFileName($this->substance_file->hashName())
                             ->withCustomProperties(['uploaded_by' => Auth::id()])
                             ->toMediaCollection('substance_file');
+
+                        // Reset to prevent "UnableToRetrieveMetadata" error on subsequent validations
+                        $this->substance_file = null;
                     }
                 }
             }

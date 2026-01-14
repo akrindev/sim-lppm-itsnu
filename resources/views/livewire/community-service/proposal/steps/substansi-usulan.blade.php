@@ -40,6 +40,7 @@
                         @endif
                     </label>
                     <input id="substance_file" type="file"
+                        wire:key="substance-file-{{ $fileInputIteration }}"
                         class="form-control @error('form.substance_file') is-invalid @enderror"
                         wire:model="form.substance_file" accept=".pdf">
                     @error('form.substance_file')
@@ -51,6 +52,14 @@
                         <div class="mt-2">
                             <x-lucide-file-check class="text-success icon" />
                             File terpilih: {{ $form->substance_file->getClientOriginalName() }}
+                        </div>
+                    @elseif ($form->proposal && $form->proposal->detailable && $form->proposal->detailable->getFirstMediaUrl('substance_file'))
+                        <div class="mt-2">
+                            <x-lucide-file-check class="text-success icon" />
+                            <a href="{{ $form->proposal->detailable->getFirstMediaUrl('substance_file') }}" target="_blank"
+                                class="text-decoration-none">
+                                {{ $form->proposal->detailable->getFirstMedia('substance_file')->name }}
+                            </a>
                         </div>
                     @endif
                 </div>
@@ -108,14 +117,32 @@
                             <tr wire:key="output-{{ $index }}" x-data="{
                                 group: $wire.entangle('form.outputs.{{ $index }}.group'),
                                 types: {
-                                    'jurnal': ['Jurnal Pengabdian Masyarakat (Sinta 1-6)', 'Jurnal Nasional', 'Jurnal Internasional'],
-                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional'],
-                                    'media': ['Publikasi Media Massa (Cetak/Elektronik)', 'Media Massa Nasional', 'Media Massa Lokal'],
-                                    'video': ['Video Kegiatan (Youtube/Media Sosial)'],
-                                    'hki': ['HKI Hak Cipta (Modul/Panduan)', 'Paten/Paten Sederhana', 'Merek'],
-                                    'produk': ['Produk/Sistem', 'TTG', 'Purwarupa', 'Model/Pola Pembinaan'],
-                                    'buku': ['Buku Pedoman', 'Modul Pelatihan', 'Buku Ajar'],
-                                    'pemberdayaan': ['Peningkatan Omzet', 'Peningkatan Kualitas', 'Peningkatan Kuantitas', 'Peningkatan Keterampilan']
+                                    'pemberdayaan': [
+                                        'Peningkatan Omzet (Rp/%)',
+                                        'Peningkatan Kualitas (Sertifikasi/PIRT)',
+                                        'Perbaikan Tata Kelola/Manajemen',
+                                        'Peningkatan Kompetensi SDM'
+                                    ],
+                                    'jurnal': [
+                                        'Jurnal PKM (Sinta 1-6)',
+                                        'Jurnal PKM (Ber-ISSN/Non-Sinta)'
+                                    ],
+                                    'media': [
+                                        'Media Massa Nasional (Cetak/Elektronik)',
+                                        'Media Massa Lokal (Cetak/Elektronik)'
+                                    ],
+                                    'video': [
+                                        'Video Kegiatan (Publikasi Youtube/Medsos)'
+                                    ],
+                                    'produk': [
+                                        'Teknologi Tepat Guna (TTG)',
+                                        'Model/Sistem/Rekayasa Sosial',
+                                        'Produk Tersertifikasi'
+                                    ],
+                                    'hki_buku': [
+                                        'Hak Cipta (Modul/Panduan)',
+                                        'Buku Pedoman/Panduan Penerapan'
+                                    ]
                                 }
                             }">
                                 <td>
@@ -138,14 +165,12 @@
                                 <td>
                                     <select x-model="group" class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
+                                        <option value="pemberdayaan">Pemberdayaan</option>
                                         <option value="jurnal">Jurnal</option>
-                                        <option value="prosiding">Prosiding</option>
                                         <option value="media">Media Massa</option>
                                         <option value="video">Video</option>
-                                        <option value="hki">HKI</option>
-                                        <option value="produk">Produk/Jasa</option>
-                                        <option value="buku">Buku/Modul</option>
-                                        <option value="pemberdayaan">Pemberdayaan Mitra</option>
+                                        <option value="produk">Produk/TTG</option>
+                                        <option value="hki_buku">HKI/Buku</option>
                                     </select>
                                 </td>
                                 <td>
