@@ -16,10 +16,7 @@ class Index extends ReportIndex
     {
         // Only show approved or completed proposals for logbook
         return [
-            ProposalStatus::APPROVED,
             ProposalStatus::COMPLETED,
-            ProposalStatus::UNDER_REVIEW,
-            ProposalStatus::REVIEWED,
         ];
     }
 

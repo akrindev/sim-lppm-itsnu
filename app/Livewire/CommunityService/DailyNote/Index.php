@@ -15,10 +15,7 @@ class Index extends ReportIndex
     protected function getStatusFilter(): array
     {
         return [
-            ProposalStatus::APPROVED,
             ProposalStatus::COMPLETED,
-            ProposalStatus::UNDER_REVIEW,
-            ProposalStatus::REVIEWED,
         ];
     }
 

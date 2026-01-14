@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Show extends Component
 {
@@ -15,7 +16,7 @@ class Show extends Component
 
     public Proposal $proposal;
 
-    #[Validate('required|date')]
+    #[Validate('required|date|before_or_equal:today')]
     public string $activity_date = '';
 
     #[Validate('required|string|min:10')]
@@ -27,7 +28,8 @@ class Show extends Component
     #[Validate('nullable|string')]
     public string $notes = '';
 
-    public $evidence;
+    #[Validate(['evidence.*' => 'file|max:5120'])] // 5MB max per file
+    public $evidence = [];
 
     public ?string $editingId = null;
 
@@ -47,6 +49,13 @@ class Show extends Component
 
         return $proposal->submitter_id === $userId ||
             $proposal->teamMembers()->where('user_id', $userId)->exists();
+    }
+
+    public function create(): void
+    {
+        $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);
+        $this->activity_date = date('Y-m-d');
+        $this->dispatch('open-modal', modalId: 'daily-note-modal');
     }
 
     public function save(): void
@@ -69,45 +78,73 @@ class Show extends Component
         }
 
         if ($this->evidence) {
-            $note->clearMediaCollection('evidence');
-            $note->addMedia($this->evidence->getRealPath())
-                ->usingFileName($this->evidence->hashName())
-                ->toMediaCollection('evidence');
+            foreach ($this->evidence as $file) {
+                $note->addMedia($file->getRealPath())
+                    ->usingFileName($file->hashName())
+                    ->toMediaCollection('evidence');
+            }
         }
 
         $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);
         $this->activity_date = date('Y-m-d');
         $this->dispatch('note-saved');
-        session()->flash('message', 'Catatan harian berhasil disimpan.');
+        $this->dispatch('close-modal', modalId: 'daily-note-modal');
+        session()->flash('success', 'Catatan harian berhasil disimpan.');
     }
 
     public function edit(string $id): void
     {
         $note = DailyNote::findOrFail($id);
+        
+        if($note->proposal_id !== $this->proposal->id) {
+             abort(403);
+        }
+
         $this->editingId = $id;
         $this->activity_date = $note->activity_date->format('Y-m-d');
         $this->activity_description = $note->activity_description;
         $this->progress_percentage = $note->progress_percentage;
         $this->notes = $note->notes ?? '';
+        
+        $this->dispatch('open-modal', modalId: 'daily-note-modal');
     }
 
     public function delete(string $id): void
     {
         $note = DailyNote::findOrFail($id);
+        if($note->proposal_id !== $this->proposal->id) {
+             abort(403);
+        }
         $note->delete();
-        session()->flash('message', 'Catatan harian berhasil dihapus.');
+        session()->flash('success', 'Catatan harian berhasil dihapus.');
+    }
+
+    public function deleteEvidence(string $mediaId): void
+    {
+        $media = Media::findOrFail($mediaId);
+        
+        // Check if the media belongs to a note in this proposal
+        $note = DailyNote::find($media->model_id);
+        
+        if ($note && $note->proposal_id === $this->proposal->id) {
+            $media->delete();
+            session()->flash('success', 'File bukti berhasil dihapus.');
+        } else {
+            abort(403);
+        }
     }
 
     public function cancelEdit(): void
     {
         $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);
         $this->activity_date = date('Y-m-d');
+        $this->dispatch('close-modal', modalId: 'daily-note-modal');
     }
 
     public function render()
     {
         return view('livewire.community-service.daily-note.show', [
-            'notes_list' => $this->proposal->dailyNotes()->latest('activity_date')->get(),
+            'notes_list' => $this->proposal->dailyNotes()->with('media')->latest('activity_date')->get(),
         ]);
     }
 }
