@@ -413,7 +413,6 @@ class ProposalForm extends Form
 
                     // Update substance file ONLY if a new file is uploaded
                     if ($this->substance_file && ! is_string($this->substance_file)) {
-                        $detailable->clearMediaCollection('substance_file');
                         $detailable
                             ->addMedia($this->substance_file->getRealPath())
                             ->usingName($this->substance_file->getClientOriginalName())
@@ -449,7 +448,6 @@ class ProposalForm extends Form
 
                     // Update substance file ONLY if a new file is uploaded
                     if ($this->substance_file && ! is_string($this->substance_file)) {
-                        $detailable->clearMediaCollection('substance_file');
                         $detailable
                             ->addMedia($this->substance_file->getRealPath())
                             ->usingName($this->substance_file->getClientOriginalName())
