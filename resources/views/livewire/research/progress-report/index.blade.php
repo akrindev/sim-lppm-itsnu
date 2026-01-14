@@ -15,7 +15,7 @@
                     <button class="nav-link @if ($roleFilter === 'ketua') active @endif"
                         wire:click="$set('roleFilter', 'ketua')" role="tab"
                         aria-selected="@if ($roleFilter === 'ketua') true @else false @endif">
-                        <x-lucide-crown class="me-2 icon" />
+                        <x-lucide-crown class="icon me-2" />
                         Sebagai Ketua
                     </button>
                 </li>
@@ -23,7 +23,7 @@
                     <button class="nav-link @if ($roleFilter === 'anggota') active @endif"
                         wire:click="$set('roleFilter', 'anggota')" role="tab"
                         aria-selected="@if ($roleFilter === 'anggota') true @else false @endif">
-                        <x-lucide-users class="me-2 icon" />
+                        <x-lucide-users class="icon me-2" />
                         Sebagai Anggota
                     </button>
                 </li>
@@ -32,7 +32,7 @@
     @endif
 
     <!-- Search & Filter Section -->
-    <div class="mb-3 row">
+    <div class="row mb-3">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -70,12 +70,12 @@
     <!-- Proposals Table -->
     <div class="card">
         <div class="table-responsive">
-            <table class="card-table table table-vcenter">
+            <table class="card-table table-vcenter table">
                 <thead>
                     <tr>
                         <th>Judul Penelitian</th>
                         <th>Peneliti</th>
-                        <th>Skema</th>
+                        {{-- <th>Skema</th> --}}
                         <th>Status</th>
                         <th>Laporan Terakhir</th>
                         <th class="w-1">Aksi</th>
@@ -91,11 +91,11 @@
                                 <div>{{ $proposal->submitter?->name }}</div>
                                 <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
                             </td>
-                            <td>
+                            {{-- <td>
                                 <x-tabler.badge variant="outline">
                                     {{ $proposal->researchScheme?->name ?? '—' }}
                                 </x-tabler.badge>
-                            </td>
+                            </td> --}}
                             <td>
                                 <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
                                     {{ $proposal->status->label() }}
