@@ -4,6 +4,7 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use App\Models\ReviewLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -29,9 +30,28 @@ class ReviewerForm extends Component
 
         // Load existing review data if available
         $myReview = $this->myReview;
-        if ($myReview && $myReview->status === 'completed') {
+        if ($myReview && $myReview->isCompleted()) {
             $this->reviewNotes = $myReview->review_notes ?? '';
             $this->recommendation = $myReview->recommendation ?? '';
+        }
+
+        // Mark as started when form is mounted (if reviewer is viewing)
+        $this->markReviewAsStarted();
+
+        // If review is in progress, show the form by default
+        if ($this->myReview && $this->myReview->isInProgress()) {
+            $this->showForm = true;
+        }
+    }
+
+    /**
+     * Mark the review as started when reviewer first opens the form
+     */
+    protected function markReviewAsStarted(): void
+    {
+        $review = $this->myReview;
+        if ($review && $review->isPending()) {
+            $review->markAsStarted();
         }
     }
 
@@ -64,11 +84,27 @@ class ReviewerForm extends Component
     }
 
     #[Computed]
+    public function needsAction(): bool
+    {
+        return $this->myReview !== null && (
+            $this->myReview->requiresAction() || $this->myReview->isInProgress()
+        );
+    }
+
+    #[Computed]
     public function hasReviewed(): bool
     {
         $review = $this->myReview;
 
-        return $review && $review->status === 'completed';
+        return $review && $review->isCompleted();
+    }
+
+    #[Computed]
+    public function needsReReview(): bool
+    {
+        $review = $this->myReview;
+
+        return $review && $review->isReReviewRequested();
     }
 
     #[Computed]
@@ -84,12 +120,76 @@ class ReviewerForm extends Component
             return false;
         }
 
-        return $review->status === 'completed';
+        // Jika proposal sudah final, tidak bisa edit
+        if ($this->proposal->status->isFinal()) {
+            return false;
+        }
+
+        return $review->isCompleted();
+    }
+
+    #[Computed]
+    public function reviewRound(): int
+    {
+        return $this->myReview?->round ?? 1;
+    }
+
+    #[Computed]
+    public function deadline()
+    {
+        return $this->myReview?->deadline_at;
+    }
+
+    #[Computed]
+    public function isOverdue(): bool
+    {
+        return $this->myReview?->isOverdue() ?? false;
+    }
+
+    #[Computed]
+    public function daysRemaining(): ?int
+    {
+        return $this->myReview?->days_remaining;
+    }
+
+    /**
+     * Get previous round logs for the current reviewer (for showing history during re-review).
+     */
+    #[Computed]
+    public function previousRoundLogs()
+    {
+        $review = $this->myReview;
+        if (! $review) {
+            return collect();
+        }
+
+        return ReviewLog::where('proposal_reviewer_id', $review->id)
+            ->orderBy('round', 'desc')
+            ->get();
+    }
+
+    /**
+     * Get all review logs for this proposal (for showing complete history).
+     */
+    #[Computed]
+    public function allReviewLogs()
+    {
+        return ReviewLog::forProposal($this->proposalId)
+            ->with('user')
+            ->orderBy('round', 'desc')
+            ->orderBy('completed_at', 'desc')
+            ->get()
+            ->groupBy('round');
     }
 
     public function toggleForm(): void
     {
         $this->showForm = ! $this->showForm;
+
+        // Mark as started when form is opened
+        if ($this->showForm) {
+            $this->markReviewAsStarted();
+        }
     }
 
     public function submitReview(): void
@@ -105,21 +205,26 @@ class ReviewerForm extends Component
         }
 
         try {
-            $isNew = ! $review->exists;
-
             DB::transaction(function (): void {
                 $review = $this->myReview;
 
-                // Allow updating review even after submission
-                $review->update([
-                    'status' => 'completed',
+                // Complete the review with new method
+                $review->complete($this->reviewNotes, $this->recommendation);
+
+                // Create review log for history tracking
+                ReviewLog::create([
+                    'proposal_reviewer_id' => $review->id,
+                    'proposal_id' => $review->proposal_id,
+                    'user_id' => $review->user_id,
+                    'round' => $review->round ?? 1,
                     'review_notes' => $this->reviewNotes,
                     'recommendation' => $this->recommendation,
+                    'started_at' => $review->started_at,
+                    'completed_at' => $review->completed_at ?? now(),
                 ]);
 
                 // Refresh the proposal and review from DB to get updated data
                 $proposal = $this->proposal->fresh(['reviewers']);
-                $review = $proposal->reviewers->where('user_id', Auth::id())->first();
 
                 // Check if all reviews are completed using fresh data
                 $allCompleted = $proposal->allReviewsCompleted();
@@ -130,11 +235,14 @@ class ReviewerForm extends Component
                 }
             });
 
-            $review = $this->myReview;
-            $message = $isNew ? 'Review berhasil disubmit' : 'Review berhasil diupdate';
-            $this->dispatch('success', message: $message);
+            $message = $this->needsReReview ? 'Review ulang berhasil disubmit' : 'Review berhasil disubmit';
 
+            // Close the form after successful submission
+            $this->showForm = false;
+
+            // Flash message and dispatch event
             session()->flash('success', $message);
+            $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
             $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
         }

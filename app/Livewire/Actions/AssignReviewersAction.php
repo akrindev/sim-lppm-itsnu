@@ -3,6 +3,7 @@
 namespace App\Livewire\Actions;
 
 use App\Enums\ProposalStatus;
+use App\Enums\ReviewStatus;
 use App\Models\Proposal;
 use App\Models\ProposalReviewer;
 use App\Models\User;
@@ -21,10 +22,16 @@ class AssignReviewersAction
      */
     public function execute(Proposal $proposal, int|string $reviewerId, int $daysToReview = 14): array
     {
-        if ($proposal->status !== ProposalStatus::UNDER_REVIEW) {
+        // Allow assignment for both WAITING_REVIEWER and UNDER_REVIEW statuses
+        $allowedStatuses = [
+            ProposalStatus::WAITING_REVIEWER,
+            ProposalStatus::UNDER_REVIEW,
+        ];
+
+        if (! in_array($proposal->status, $allowedStatuses)) {
             return [
                 'success' => false,
-                'message' => 'Proposal harus dalam status under review untuk menugaskan reviewer.',
+                'message' => 'Proposal harus dalam status menunggu penugasan reviewer atau sedang direview.',
             ];
         }
 
@@ -47,21 +54,29 @@ class AssignReviewersAction
         }
 
         try {
-            DB::transaction(function () use ($proposal, $reviewerId, $reviewer, $daysToReview): void {
-                // Assign reviewer
+            $deadline = Carbon::now()->addDays($daysToReview);
+
+            DB::transaction(function () use ($proposal, $reviewerId, $reviewer, $daysToReview, $deadline): void {
+                // Get current round (for new assignments, start at round 1)
+                $currentRound = $proposal->reviewers()->max('round') ?? 1;
+
+                // Assign reviewer with new timestamp fields
                 ProposalReviewer::create([
                     'proposal_id' => $proposal->id,
                     'user_id' => $reviewerId,
-                    'status' => 'pending',
+                    'status' => ReviewStatus::PENDING,
+                    'round' => $currentRound,
+                    'assigned_at' => now(),
+                    'deadline_at' => $deadline,
                 ]);
 
                 // Send notifications
                 $this->sendNotifications($proposal, $reviewer, $daysToReview);
 
-                // Update proposal status to reviewed if this is first reviewer
-                $reviewerCount = $proposal->reviewers()->count();
-                if ($reviewerCount === 1) {
-                    $proposal->update(['status' => ProposalStatus::REVIEWED]);
+                // Update proposal status to UNDER_REVIEW if first reviewer assigned
+                // (transition from WAITING_REVIEWER to UNDER_REVIEW)
+                if ($proposal->status === ProposalStatus::WAITING_REVIEWER) {
+                    $proposal->update(['status' => ProposalStatus::UNDER_REVIEW]);
                 }
             });
 

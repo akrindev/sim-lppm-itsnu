@@ -43,8 +43,12 @@ class ReviewerAssignment extends Component
     #[Computed]
     public function proposals()
     {
+        // Include both WAITING_REVIEWER (new) and UNDER_REVIEW (existing) statuses
         $query = Proposal::query()
-            ->where('status', ProposalStatus::UNDER_REVIEW);
+            ->whereIn('status', [
+                ProposalStatus::WAITING_REVIEWER,
+                ProposalStatus::UNDER_REVIEW,
+            ]);
 
         return $query
             ->with([
@@ -82,18 +86,22 @@ class ReviewerAssignment extends Component
     #[Computed]
     public function statusStats(): array
     {
+        $statuses = [ProposalStatus::WAITING_REVIEWER, ProposalStatus::UNDER_REVIEW];
+
         return [
-            'all' => Proposal::where('status', ProposalStatus::UNDER_REVIEW)->count(),
-            'research' => Proposal::where('status', ProposalStatus::UNDER_REVIEW)
+            'all' => Proposal::whereIn('status', $statuses)->count(),
+            'waiting_reviewer' => Proposal::where('status', ProposalStatus::WAITING_REVIEWER)->count(),
+            'under_review' => Proposal::where('status', ProposalStatus::UNDER_REVIEW)->count(),
+            'research' => Proposal::whereIn('status', $statuses)
                 ->where('detailable_type', \App\Models\Research::class)
                 ->count(),
-            'community_service' => Proposal::where('status', ProposalStatus::UNDER_REVIEW)
+            'community_service' => Proposal::whereIn('status', $statuses)
                 ->where('detailable_type', \App\Models\CommunityService::class)
                 ->count(),
-            'assigned' => Proposal::where('status', ProposalStatus::UNDER_REVIEW)
+            'assigned' => Proposal::whereIn('status', $statuses)
                 ->has('reviewers')
                 ->count(),
-            'unassigned' => Proposal::where('status', ProposalStatus::UNDER_REVIEW)
+            'unassigned' => Proposal::whereIn('status', $statuses)
                 ->doesntHave('reviewers')
                 ->count(),
         ];
@@ -102,7 +110,9 @@ class ReviewerAssignment extends Component
     #[Computed]
     public function availableYears(): array
     {
-        $years = Proposal::where('status', ProposalStatus::UNDER_REVIEW)
+        $statuses = [ProposalStatus::WAITING_REVIEWER, ProposalStatus::UNDER_REVIEW];
+
+        $years = Proposal::whereIn('status', $statuses)
             ->selectRaw('YEAR(created_at) as year')
             ->distinct()
             ->orderBy('year', 'desc')

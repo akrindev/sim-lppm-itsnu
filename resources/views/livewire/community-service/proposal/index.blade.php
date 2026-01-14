@@ -145,8 +145,6 @@
                         <th>Judul</th>
                         <th>Author</th>
                         <th>Status</th>
-                        <th>Bidang Fokus</th>
-                        <th>Tanggal Dibuat</th>
                         <th class="w-1">Aksi</th>
                     </tr>
                 </thead>
@@ -155,6 +153,11 @@
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td style="max-width: 250px;">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
+                                <div class="mt-1">
+                                    <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                        {{ $proposal->focusArea?->name ?? '—' }}
+                                    </x-tabler.badge>
+                                </div>
                             </td>
                             <td>
                                 <div>{{ $proposal->submitter->name }}</div>
@@ -164,21 +167,11 @@
                                 <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
                                     {{ $proposal->status->label() }}
                                 </x-tabler.badge>
-                            </td>
-                            <td>
-                                <x-tabler.badge variant="outline">
-                                    {{ $proposal->focusArea?->name ?? '—' }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
-                                <x-tabler.badge variant="outline">
-                                    {{ $proposal->focusArea->name ?? '—' }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
-                                <small class="text-secondary">
-                                    {{ $proposal->created_at->format('d M Y') }}
-                                </small>
+                                <div class="mt-1">
+                                    <small class="text-secondary">
+                                        {{ $proposal->created_at->format('d M Y') }}
+                                    </small>
+                                </div>
                             </td>
                             <td>
                                 <div class="btn-list flex-nowrap">
@@ -203,7 +196,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-8 text-center">
+                            <td colspan="4" class="py-8 text-center">
                                 <div class="mb-3">
                                     <x-lucide-inbox class="text-secondary icon icon-lg" />
                                 </div>

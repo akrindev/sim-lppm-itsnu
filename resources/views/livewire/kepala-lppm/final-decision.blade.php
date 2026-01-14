@@ -116,9 +116,8 @@
                         <th>Judul</th>
                         <th>Jenis</th>
                         <th>Pengusul</th>
-                        <th>Bidang Fokus</th>
-                        <th>Status Review</th>
-                        <th>Tanggal Selesai Review</th>
+                        <th>Reviewer & Rekomendasi</th>
+                        <th>Tanggal Selesai</th>
                         <th class="w-1">Aksi</th>
                     </tr>
                 </thead>
@@ -127,6 +126,11 @@
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
+                                <div class="mt-1">
+                                    <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                        {{ $proposal->focusArea?->name ?? '—' }}
+                                    </x-tabler.badge>
+                                </div>
                             </td>
                             <td>
                                 @if ($proposal->detailable_type === 'App\Models\Research')
@@ -146,19 +150,22 @@
                                 <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
                             </td>
                             <td>
-                                <x-tabler.badge variant="outline">
-                                    {{ $proposal->focusArea?->name ?? '—' }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
-                                <x-tabler.badge color="green">
-                                    <x-lucide-check-circle class="icon icon-sm me-1" />
-                                    {{ $proposal->reviewers->count() }} Reviewer Selesai
-                                </x-tabler.badge>
+                                @foreach ($proposal->reviewers as $reviewer)
+                                    <div class="d-flex align-items-center mb-1">
+                                        @if($reviewer->recommendation === 'approved')
+                                            <x-lucide-check-circle class="icon icon-sm text-success me-1" title="Disetujui" />
+                                        @elseif($reviewer->recommendation === 'rejected')
+                                            <x-lucide-x-circle class="icon icon-sm text-danger me-1" title="Ditolak" />
+                                        @else
+                                            <x-lucide-rotate-ccw class="icon icon-sm text-warning me-1" title="Revisi" />
+                                        @endif
+                                        <small>{{ $reviewer->user?->name }}</small>
+                                    </div>
+                                @endforeach
                             </td>
                             <td>
                                 <small class="text-secondary">
-                                    {{ $proposal->updated_at?->format('d M Y H:i') }}
+                                    {{ $proposal->updated_at?->format('d M Y') }}
                                 </small>
                             </td>
                             <td>

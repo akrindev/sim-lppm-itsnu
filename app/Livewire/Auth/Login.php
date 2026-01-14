@@ -55,6 +55,26 @@ class Login extends Component
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
     }
 
+    public function devLogin(string $roleName): void
+    {
+        if (! app()->environment('local')) {
+            return;
+        }
+
+        $user = User::role($roleName)->first();
+
+        if (! $user) {
+            $this->addError('email', "No user found with role: $roleName");
+            return;
+        }
+
+        Auth::login($user, true);
+        Session::regenerate();
+        session(['active_role' => $roleName]);
+
+        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
+    }
+
     /**
      * Validate the user's credentials.
      */

@@ -13,10 +13,10 @@ class ApproveProposalAction
      */
     public function execute(Proposal $proposal, string $decision): array
     {
-        if (! in_array($decision, [ProposalStatus::APPROVED, ProposalStatus::REJECTED])) {
+        if (! in_array($decision, [ProposalStatus::COMPLETED->value, ProposalStatus::REJECTED->value])) {
             return [
                 'success' => false,
-                'message' => 'Keputusan harus "approved" atau "rejected".',
+                'message' => 'Keputusan harus "completed" atau "rejected".',
             ];
         }
 
@@ -36,8 +36,8 @@ class ApproveProposalAction
         // Update proposal status
         $proposal->update(['status' => $decision]);
 
-        $message = $decision === 'approved'
-            ? 'Proposal berhasil disetujui.'
+        $message = $decision === 'completed'
+            ? 'Proposal berhasil disetujui dan selesai.'
             : 'Proposal ditolak.';
 
         return [

@@ -4,6 +4,7 @@ namespace App\Livewire\Dekan;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
@@ -36,17 +37,42 @@ class ProposalIndex extends Component
         return view('livewire.dekan.proposal-index');
     }
 
+    /**
+     * Get Dekan's faculty ID for scoping proposals.
+     */
+    #[Computed]
+    public function dekanFacultyId(): ?string
+    {
+        return Auth::user()?->identity?->faculty_id;
+    }
+
+    /**
+     * Apply faculty scope to a query (only proposals from Dekan's faculty).
+     */
+    protected function applyFacultyScope($query)
+    {
+        $facultyId = $this->dekanFacultyId;
+
+        if ($facultyId) {
+            $query->whereHas('submitter.identity', function ($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+        }
+
+        return $query;
+    }
+
     #[Computed]
     public function proposals()
     {
         $query = Proposal::query()
             ->where('status', ProposalStatus::SUBMITTED);
 
-        // TODO: Filter by faculty/prodi if needed based on Dekan's assignment
-        // For now, show all submitted proposals
+        // Apply faculty scoping: Dekan only sees proposals from their faculty
+        $this->applyFacultyScope($query);
 
         return $query
-            ->with(['submitter', 'detailable', 'focusArea', 'researchScheme'])
+            ->with(['submitter.identity', 'detailable', 'focusArea', 'researchScheme'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('title', 'like', "%{$this->search}%")
@@ -69,12 +95,23 @@ class ProposalIndex extends Component
     #[Computed]
     public function statusStats(): array
     {
+        $facultyId = $this->dekanFacultyId;
+
+        $baseQuery = Proposal::where('status', ProposalStatus::SUBMITTED);
+
+        // Apply faculty scoping to stats
+        if ($facultyId) {
+            $baseQuery->whereHas('submitter.identity', function ($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+        }
+
         return [
-            'all' => Proposal::where('status', ProposalStatus::SUBMITTED)->count(),
-            'research' => Proposal::where('status', ProposalStatus::SUBMITTED)
+            'all' => (clone $baseQuery)->count(),
+            'research' => (clone $baseQuery)
                 ->where('detailable_type', \App\Models\Research::class)
                 ->count(),
-            'community_service' => Proposal::where('status', ProposalStatus::SUBMITTED)
+            'community_service' => (clone $baseQuery)
                 ->where('detailable_type', \App\Models\CommunityService::class)
                 ->count(),
         ];
@@ -83,13 +120,31 @@ class ProposalIndex extends Component
     #[Computed]
     public function availableYears(): array
     {
-        $years = Proposal::where('status', ProposalStatus::SUBMITTED)
+        $facultyId = $this->dekanFacultyId;
+
+        $query = Proposal::where('status', ProposalStatus::SUBMITTED);
+
+        // Apply faculty scoping
+        if ($facultyId) {
+            $query->whereHas('submitter.identity', function ($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+        }
+
+        return $query
             ->selectRaw('YEAR(created_at) as year')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
             ->toArray();
+    }
 
-        return $years;
+    /**
+     * Get the faculty name for display.
+     */
+    #[Computed]
+    public function facultyName(): ?string
+    {
+        return Auth::user()?->identity?->faculty?->name;
     }
 }

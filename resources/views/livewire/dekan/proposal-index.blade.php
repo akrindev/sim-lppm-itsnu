@@ -1,6 +1,6 @@
 <x-slot:title>Persetujuan Dekan</x-slot:title>
-<x-slot:pageTitle>Persetujuan Proposal</x-slot:pageTitle>
-<x-slot:pageSubtitle>Kelola persetujuan proposal penelitian dan pengabdian yang telah diajukan.</x-slot:pageSubtitle>
+<x-slot:pageTitle>Persetujuan Proposal @if($this->facultyName) - {{ $this->facultyName }} @endif</x-slot:pageTitle>
+<x-slot:pageSubtitle>Kelola persetujuan proposal penelitian dan pengabdian yang telah diajukan di fakultas Anda.</x-slot:pageSubtitle>
 
 <div>
     <x-tabler.alert />
@@ -112,47 +112,36 @@
         <div class="table-responsive">
             <table class="card-table table table-vcenter">
                 <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>Jenis</th>
-                        <th>Pengusul</th>
-                        <th>Bidang Fokus</th>
-                        <th>Tanggal Diajukan</th>
-                        <th class="w-1">Aksi</th>
-                    </tr>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Jenis</th>
+                            <th>Pengusul</th>
+                            <th class="w-1">Aksi</th>
+                        </tr>
                 </thead>
                 <tbody>
                     @forelse ($this->proposals as $proposal)
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
+                                <div class="mt-1">
+                                    <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                        {{ $proposal->focusArea?->name ?? '—' }}
+                                    </x-tabler.badge>
+                                </div>
                             </td>
                             <td>
                                 @if ($proposal->detailable_type === 'App\Models\Research')
                                     <x-tabler.badge color="blue" variant="light">
-                                        <x-lucide-microscope class="me-1 icon icon-sm" />
+                                        <x-lucide-microscope class="icon icon-sm me-1" />
                                         Penelitian
                                     </x-tabler.badge>
                                 @else
                                     <x-tabler.badge color="green" variant="light">
-                                        <x-lucide-hand-heart class="me-1 icon icon-sm" />
+                                        <x-lucide-hand-heart class="icon icon-sm me-1" />
                                         Pengabdian
                                     </x-tabler.badge>
                                 @endif
-                            </td>
-                            <td>
-                                <div>{{ $proposal->submitter?->name }}</div>
-                                <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
-                            </td>
-                            <td>
-                                <x-tabler.badge variant="outline">
-                                    {{ $proposal->focusArea?->name ?? '—' }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
-                                <small class="text-secondary">
-                                    {{ $proposal->created_at?->format('d M Y H:i') }}
-                                </small>
                             </td>
                             <td>
                                 <div class="flex-nowrap btn-list">
@@ -174,7 +163,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-8 text-center">
+                            <td colspan="4" class="py-8 text-center">
                                 <div class="mb-3">
                                     <x-lucide-inbox class="text-secondary icon icon-lg" />
                                 </div>

@@ -143,9 +143,7 @@
                         <th>Judul</th>
                         <th>Jenis</th>
                         <th>Pengusul</th>
-                        <th>Bidang Fokus</th>
                         <th>Reviewer</th>
-                        <th>Tanggal</th>
                         <th class="w-1">Aksi</th>
                     </tr>
                 </thead>
@@ -154,6 +152,11 @@
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
+                                <div class="mt-1">
+                                    <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                        {{ $proposal->focusArea?->name ?? '—' }}
+                                    </x-tabler.badge>
+                                </div>
                             </td>
                             <td>
                                 @if ($proposal->detailable_type === 'App\Models\Research')
@@ -170,29 +173,8 @@
                             </td>
                             <td>
                                 <div>{{ $proposal->submitter?->name }}</div>
-                                <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
-                            </td>
-                            <td>
-                                <x-tabler.badge variant="outline">
-                                    {{ $proposal->focusArea?->name ?? '—' }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
-                                @if ($proposal->reviewers->count() > 0)
-                                    <x-tabler.badge color="green">
-                                        <x-lucide-users class="icon icon-sm me-1" />
-                                        {{ $proposal->reviewers->count() }} Reviewer
-                                    </x-tabler.badge>
-                                @else
-                                    <x-tabler.badge color="yellow">
-                                        <x-lucide-alert-circle class="icon icon-sm me-1" />
-                                        Belum Ditugaskan
-                                    </x-tabler.badge>
-                                @endif
-                            </td>
-                            <td>
                                 <small class="text-secondary">
-                                    {{ $proposal->updated_at?->format('d M Y') }}
+                                    {{ $proposal->submitter?->identity->identity_id }} &middot; {{ $proposal->updated_at?->format('d M Y') }}
                                 </small>
                             </td>
                             <td>
@@ -215,7 +197,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-8 text-center">
+                            <td colspan="5" class="py-8 text-center">
                                 <div class="mb-3">
                                     <x-lucide-inbox class="text-secondary icon icon-lg" />
                                 </div>

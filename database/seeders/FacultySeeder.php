@@ -11,19 +11,20 @@ class FacultySeeder extends Seeder
      */
     public function run(): void
     {
-        $itsnu = \App\Models\Institution::where('name', 'like', '%ITSNU%')->first();
+        $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first() 
+            ?? \App\Models\Institution::first();
 
-        if ($itsnu) {
+        if ($institution) {
             $faculties = [
                 ['name' => 'Fakultas Sains dan Teknologi', 'code' => 'SAINTEK'],
                 ['name' => 'Fakultas Desain Kreatif dan Bisnis Digital', 'code' => 'DEKABITA'],
             ];
 
             foreach ($faculties as $faculty) {
-                \App\Models\Faculty::firstOrCreate(
+                \App\Models\Faculty::updateOrCreate(
                     ['code' => $faculty['code']],
                     [
-                        'institution_id' => $itsnu->id,
+                        'institution_id' => $institution->id,
                         'name' => $faculty['name'],
                         'code' => $faculty['code'],
                     ]

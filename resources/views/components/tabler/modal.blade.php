@@ -202,27 +202,44 @@
                 manageAriaHidden();
 
                 // Listen for open-modal dispatch from Livewire
-                window.Livewire.on('open-modal', (event) => {
-                    const modal = document.getElementById(event.detail.modalId);
-                    console.log('Received open-modal for:', event.detail);
-                    if (modal) {
-                        if (typeof tabler !== 'undefined' && tabler.Modal) {
-                            const bsModal = tabler.Modal.getInstance(modal) || new tabler
-                                .Modal(modal);
-                            bsModal.show();
+                // Livewire v3 sends dispatch data as array [{ modalId: 'xxx' }]
+                window.Livewire.on('open-modal', (data) => {
+                    // Handle both array format (Livewire v3) and object format
+                    const config = Array.isArray(data) ? data[0] : data;
+                    const modalId = config?.modalId || config?.detail?.modalId;
+                    
+                    console.log('Received open-modal for:', modalId);
+                    if (modalId) {
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            // Try bootstrap first, then tabler
+                            const bsModal = bootstrap?.Modal?.getOrCreateInstance(modal) || 
+                                           tabler?.Modal?.getOrCreateInstance(modal) ||
+                                           new bootstrap.Modal(modal);
+                            if (bsModal) {
+                                bsModal.show();
+                            }
                         }
                     }
                 });
 
                 // Listen for close-modal dispatch from Livewire
-                window.Livewire.on('close-modal', (event) => {
-                    const modal = document.getElementById(event.detail.modalId);
-                    console.log('Received close-modal for:', event.detail);
-                    if (modal) {
-                        if (typeof tabler !== 'undefined' && tabler.Modal) {
-                            const bsModal = tabler.Modal.getInstance(modal) || new tabler
-                                .Modal(modal);
-                            bsModal.hide();
+                // Livewire v3 sends dispatch data as array [{ modalId: 'xxx' }]
+                window.Livewire.on('close-modal', (data) => {
+                    // Handle both array format (Livewire v3) and object format
+                    const config = Array.isArray(data) ? data[0] : data;
+                    const modalId = config?.modalId || config?.detail?.modalId;
+                    
+                    console.log('Received close-modal for:', modalId);
+                    if (modalId) {
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            // Try bootstrap first, then tabler
+                            const bsModal = bootstrap?.Modal?.getInstance(modal) || 
+                                           tabler?.Modal?.getInstance(modal);
+                            if (bsModal) {
+                                bsModal.hide();
+                            }
                         }
                     }
                 });

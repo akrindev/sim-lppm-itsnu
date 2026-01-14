@@ -8,6 +8,7 @@ enum ProposalStatus: string
     case SUBMITTED = 'submitted';
     case NEED_ASSIGNMENT = 'need_assignment';
     case APPROVED = 'approved';
+    case WAITING_REVIEWER = 'waiting_reviewer';
     case UNDER_REVIEW = 'under_review';
     case REVIEWED = 'reviewed';
     case REVISION_NEEDED = 'revision_needed';
@@ -24,8 +25,9 @@ enum ProposalStatus: string
             self::SUBMITTED => 'Diajukan',
             self::NEED_ASSIGNMENT => 'Perlu Persetujuan Anggota',
             self::APPROVED => 'Disetujui Dekan',
-            self::UNDER_REVIEW => 'Menunggu Penugasan Reviewer',
-            self::REVIEWED => 'Sedang Direview',
+            self::WAITING_REVIEWER => 'Menunggu Penugasan Reviewer',
+            self::UNDER_REVIEW => 'Sedang Direview',
+            self::REVIEWED => 'Review Selesai',
             self::REVISION_NEEDED => 'Perlu Revisi',
             self::COMPLETED => 'Selesai',
             self::REJECTED => 'Ditolak',
@@ -42,8 +44,9 @@ enum ProposalStatus: string
             self::SUBMITTED => 'info',
             self::NEED_ASSIGNMENT => 'warning',
             self::APPROVED => 'primary',
-            self::UNDER_REVIEW => 'cyan',
-            self::REVIEWED => 'orange',
+            self::WAITING_REVIEWER => 'cyan',
+            self::UNDER_REVIEW => 'orange',
+            self::REVIEWED => 'purple',
             self::REVISION_NEEDED => 'yellow',
             self::COMPLETED => 'success',
             self::REJECTED => 'danger',
@@ -59,7 +62,8 @@ enum ProposalStatus: string
             self::DRAFT => in_array($newStatus, [self::SUBMITTED]),
             self::SUBMITTED => in_array($newStatus, [self::APPROVED, self::NEED_ASSIGNMENT, self::REJECTED]),
             self::NEED_ASSIGNMENT => in_array($newStatus, [self::SUBMITTED]),
-            self::APPROVED => in_array($newStatus, [self::UNDER_REVIEW, self::REJECTED]),
+            self::APPROVED => in_array($newStatus, [self::WAITING_REVIEWER, self::REJECTED]),
+            self::WAITING_REVIEWER => in_array($newStatus, [self::UNDER_REVIEW]),
             self::UNDER_REVIEW => in_array($newStatus, [self::REVIEWED]),
             self::REVIEWED => in_array($newStatus, [self::COMPLETED, self::REVISION_NEEDED, self::REJECTED]),
             self::REVISION_NEEDED => in_array($newStatus, [self::SUBMITTED]),
@@ -78,8 +82,9 @@ enum ProposalStatus: string
             self::SUBMITTED => 'Proposal telah diajukan dan menunggu persetujuan Dekan',
             self::NEED_ASSIGNMENT => 'Proposal memerlukan persetujuan anggota tim',
             self::APPROVED => 'Proposal telah disetujui Dekan dan menunggu persetujuan Kepala LPPM',
-            self::UNDER_REVIEW => 'Proposal telah disetujui Kepala LPPM untuk direview, menunggu Admin LPPM menugaskan reviewer',
-            self::REVIEWED => 'Proposal sedang dalam proses review oleh reviewer yang telah ditugaskan',
+            self::WAITING_REVIEWER => 'Proposal menunggu Admin LPPM menugaskan reviewer',
+            self::UNDER_REVIEW => 'Proposal sedang dalam proses review oleh reviewer yang ditugaskan',
+            self::REVIEWED => 'Semua reviewer telah menyelesaikan review, menunggu keputusan Kepala LPPM',
             self::REVISION_NEEDED => 'Proposal memerlukan perbaikan sebelum disetujui',
             self::COMPLETED => 'Proposal telah disetujui dan selesai',
             self::REJECTED => 'Proposal ditolak',
@@ -97,6 +102,7 @@ enum ProposalStatus: string
             self::SUBMITTED->value => self::SUBMITTED->label(),
             self::NEED_ASSIGNMENT->value => self::NEED_ASSIGNMENT->label(),
             self::APPROVED->value => self::APPROVED->label(),
+            self::WAITING_REVIEWER->value => self::WAITING_REVIEWER->label(),
             self::UNDER_REVIEW->value => self::UNDER_REVIEW->label(),
             self::REVIEWED->value => self::REVIEWED->label(),
             self::REVISION_NEEDED->value => self::REVISION_NEEDED->label(),
@@ -111,5 +117,29 @@ enum ProposalStatus: string
     public static function values(): array
     {
         return array_map(fn ($status) => $status->value, self::cases());
+    }
+
+    /**
+     * Cek apakah proposal dalam tahap review
+     */
+    public function isInReviewPhase(): bool
+    {
+        return in_array($this, [self::WAITING_REVIEWER, self::UNDER_REVIEW, self::REVIEWED]);
+    }
+
+    /**
+     * Cek apakah proposal sudah final (tidak bisa diubah)
+     */
+    public function isFinal(): bool
+    {
+        return in_array($this, [self::COMPLETED, self::REJECTED]);
+    }
+
+    /**
+     * Cek apakah proposal bisa diedit oleh dosen
+     */
+    public function canEdit(): bool
+    {
+        return in_array($this, [self::DRAFT, self::REVISION_NEEDED]);
     }
 }

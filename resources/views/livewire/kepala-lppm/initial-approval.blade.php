@@ -117,8 +117,6 @@
                         <th>Judul</th>
                         <th>Jenis</th>
                         <th>Pengusul</th>
-                        <th>Bidang Fokus</th>
-                        <th>Tanggal Disetujui Dekan</th>
                         <th class="w-1">Aksi</th>
                     </tr>
                 </thead>
@@ -127,6 +125,11 @@
                         <tr wire:key="proposal-{{ $proposal->id }}">
                             <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
+                                <div class="mt-1">
+                                    <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                        {{ $proposal->focusArea?->name ?? '—' }}
+                                    </x-tabler.badge>
+                                </div>
                             </td>
                             <td>
                                 @if ($proposal->detailable_type === 'App\Models\Research')
@@ -143,16 +146,8 @@
                             </td>
                             <td>
                                 <div>{{ $proposal->submitter?->name }}</div>
-                                <small class="text-secondary">{{ $proposal->submitter?->identity->identity_id }}</small>
-                            </td>
-                            <td>
-                                <x-tabler.badge variant="outline">
-                                    {{ $proposal->focusArea?->name ?? '—' }}
-                                </x-tabler.badge>
-                            </td>
-                            <td>
                                 <small class="text-secondary">
-                                    {{ $proposal->updated_at?->format('d M Y H:i') }}
+                                    {{ $proposal->submitter?->identity->identity_id }} &middot; {{ $proposal->updated_at?->format('d M Y H:i') }}
                                 </small>
                             </td>
                             <td>
@@ -175,7 +170,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-8 text-center">
+                            <td colspan="4" class="py-8 text-center">
                                 <div class="mb-3">
                                     <x-lucide-inbox class="text-secondary icon icon-lg" />
                                 </div>

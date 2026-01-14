@@ -69,13 +69,9 @@
                                 <td>{{ $reviewer->user->name }}</td>
                                 <td>{{ $reviewer->user->email }}</td>
                                 <td>
-                                    @if ($reviewer->status === 'pending')
-                                        <x-tabler.badge color="warning">Menunggu</x-tabler.badge>
-                                    @elseif ($reviewer->status === 'reviewing')
-                                        <x-tabler.badge color="info">Sedang Review</x-tabler.badge>
-                                    @elseif ($reviewer->status === 'completed')
-                                        <x-tabler.badge color="success">Selesai</x-tabler.badge>
-                                    @endif
+                                    <x-tabler.badge color="{{ $reviewer->status->color() }}">
+                                        {{ $reviewer->status->label() }}
+                                    </x-tabler.badge>
                                 </td>
                                 <td>
                                     <button type="button"

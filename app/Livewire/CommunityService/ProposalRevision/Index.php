@@ -32,14 +32,18 @@ class Index extends Component
     {
         $user = Auth::user();
 
-        $query = Proposal::where('detailable_type', 'App\\Models\\CommunityService');
+        $query = Proposal::where('detailable_type', \App\Models\CommunityService::class);
 
         // Filter berdasarkan role user
         if ($user->hasRole('dosen')) {
             // Dosen: hanya proposal milik sendiri yang perlu revisi
             $query->where(function ($q) use ($user) {
                 $q->where('submitter_id', $user->id)
-                    ->where('status', ProposalStatus::REVISION_NEEDED);
+                    ->where(function ($sq) {
+                        $sq->whereHas('reviewers', function ($ssq) {
+                            $ssq->where('recommendation', 'revision_needed');
+                        })->orWhere('status', ProposalStatus::REVISION_NEEDED);
+                    });
             });
         } elseif ($user->hasRole('reviewer')) {
             // Reviewer: proposal yang ditugaskan ke dia dengan review completed
@@ -89,7 +93,7 @@ class Index extends Component
     {
         $user = Auth::user();
 
-        $query = Proposal::where('detailable_type', 'App\\Models\\CommunityService');
+        $query = Proposal::where('detailable_type', \App\Models\CommunityService::class);
 
         if ($user->hasRole('dosen')) {
             $query->where('submitter_id', $user->id)

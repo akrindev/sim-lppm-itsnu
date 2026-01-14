@@ -8,7 +8,16 @@
     </a>
 </x-slot:pageActions>
 
-<div>
+<div x-on:close-modal.window="
+    const modalId = $event.detail.modalId || $event.detail[0]?.modalId;
+    if (modalId) {
+        const modalEl = document.getElementById(modalId);
+        if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+    }
+">
     <x-tabler.alert />
 
     @if ($errors->any())
@@ -494,10 +503,10 @@
                                 <option value="">Pilih Status</option>
                                 <option value="draft">Draft</option>
                                 <option value="submitted">Submitted</option>
+                                <option value="under_review">Under Review</option>
                                 <option value="accepted">Accepted</option>
                                 <option value="published">Published</option>
                                 <option value="rejected">Rejected</option>
-                                <option value="granted">Granted (HKI)</option>
                             </select>
                             @error("form.mandatoryOutputs.{$form->editingMandatoryId}.status_type")
                                 <small class="text-danger">{{ $message }}</small>
@@ -736,7 +745,7 @@
                     Tutup
                 </button>
                 @if ($canEdit)
-                    <button type="button" wire:click="saveMandatoryOutput" class="btn btn-primary"
+                    <button type="button" wire:click="saveMandatoryOutput({{ $form->editingMandatoryId }})" class="btn btn-primary"
                         wire:loading.attr="disabled">
                         <span wire:loading.remove wire:target="saveMandatoryOutput">
                             <x-lucide-save class="icon" /> Simpan
@@ -786,9 +795,12 @@
                             <select wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.status"
                                 class="form-select" @disabled(!$canEdit)>
                                 <option value="">Pilih Status</option>
-                                <option value="review">Review</option>
-                                <option value="editing">Editing</option>
-                                <option value="published">Terbit</option>
+                                <option value="draft">Draft</option>
+                                <option value="submitted">Submitted</option>
+                                <option value="under_review">Under Review</option>
+                                <option value="accepted">Accepted</option>
+                                <option value="published">Published</option>
+                                <option value="rejected">Rejected</option>
                             </select>
                             @error("form.additionalOutputs.{$form->editingAdditionalId}.status")
                                 <small class="text-danger">{{ $message }}</small>
@@ -952,7 +964,7 @@
                     Tutup
                 </button>
                 @if ($canEdit)
-                    <button type="button" wire:click="saveAdditionalOutput" class="btn btn-primary"
+                    <button type="button" wire:click="saveAdditionalOutput({{ $form->editingAdditionalId }})" class="btn btn-primary"
                         wire:loading.attr="disabled">
                         <span wire:loading.remove wire:target="saveAdditionalOutput">
                             <x-lucide-save class="icon" /> Simpan
@@ -967,4 +979,3 @@
         </x-tabler.modal>
     @endteleport
 </div>
-```

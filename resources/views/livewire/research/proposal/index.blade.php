@@ -52,7 +52,7 @@
         </div>
     @endunless
 
-    <div class="row mb-3">
+    <div class="row mb-3 gap-3">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -94,85 +94,87 @@
                 </div>
             </div>
         </div>
-        <!-- Proposals Table -->
-        <div class="card">
-            <div class="table-responsive">
-                <table class="card-table table-vcenter table">
-                    <thead>
-                        <tr>
-                            <th>Judul</th>
-                            <th>Author</th>
-                            <th>Bidang Fokus</th>
-                            <th>Status</th>
-                            <th>Tanggal Diajukan</th>
-                            <th class="w-1">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($this->proposals as $proposal)
-                            <tr wire:key="proposal-{{ $proposal->id }}">
-                                <td class="text-wrap">
-                                    <div class="text-reset fw-bold">{{ $proposal->title }}</div>
-                                </td>
-                                <td>
-                                    <div>{{ $proposal->submitter->name }}</div>
-                                    <small
-                                        class="text-secondary">{{ $proposal->submitter->identity->identity_id }}</small>
-                                </td>
-                                <td>
-                                    <x-tabler.badge variant="outline">
-                                        {{ $proposal->focusArea?->name ?? '—' }}
-                                    </x-tabler.badge>
-                                </td>
-                                <td>
-                                    <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
-                                        {{ $proposal->status->label() }}
-                                    </x-tabler.badge>
-                                </td>
-                                <td>
-                                    <small class="text-secondary">
-                                        {{ $proposal->created_at?->format('d M Y') }}
-                                    </small>
-                                </td>
-                                <td>
-                                    <div class="btn-list flex-nowrap">
-                                        <a href="{{ route('research.proposal.show', $proposal) }}"
-                                            class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
-                                            <x-lucide-eye class="icon" />
-                                        </a>
-                                        @if ($proposal->status === 'draft')
-                                            <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
-                                                <x-lucide-pencil class="icon" />
-                                            </a>
-                                        @endif
-                                        @if (auth()->user()->hasRole('admin lppm') && $proposal->status !== 'completed')
-                                            <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
-                                                wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
-                                                <x-lucide-trash-2 class="icon" />
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="py-8 text-center">
-                                    <div class="mb-3">
-                                        <x-lucide-inbox class="text-secondary icon icon-lg" />
-                                    </div>
-                                    <p class="text-secondary">Tidak ada data penelitian yang ditemukan.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
 
-            @if ($this->proposals->hasPages())
-                <div class="d-flex align-items-center card-footer">
-                    {{ $this->proposals->links() }}
+        <div class="col-12">
+            <!-- Proposals Table -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="card-table table-vcenter table">
+                        <thead>
+                            <tr>
+                                <th>Judul</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th class="w-1">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($this->proposals as $proposal)
+                                <tr wire:key="proposal-{{ $proposal->id }}">
+                                    <td class="text-wrap">
+                                        <div class="text-reset fw-bold">{{ $proposal->title }}</div>
+                                        <div class="mt-1">
+                                            <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                                {{ $proposal->focusArea?->name ?? '—' }}
+                                            </x-tabler.badge>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>{{ $proposal->submitter->name }}</div>
+                                        <small
+                                            class="text-secondary">{{ $proposal->submitter->identity->identity_id }}</small>
+                                    </td>
+                                    <td>
+                                        <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
+                                            {{ $proposal->status->label() }}
+                                        </x-tabler.badge>
+                                        <div class="mt-1">
+                                            <small class="text-secondary">
+                                                {{ $proposal->created_at?->format('d M Y') }}
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-list flex-nowrap">
+                                            <a href="{{ route('research.proposal.show', $proposal) }}"
+                                                class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
+                                                <x-lucide-eye class="icon" />
+                                            </a>
+                                            @if ($proposal->status === 'draft')
+                                                <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
+                                                    <x-lucide-pencil class="icon" />
+                                                </a>
+                                            @endif
+                                            @if (auth()->user()->hasRole('admin lppm') && $proposal->status !== 'completed')
+                                                <button type="button" class="btn btn-icon btn-ghost-danger"
+                                                    title="Hapus"
+                                                    wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
+                                                    <x-lucide-trash-2 class="icon" />
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="py-8 text-center">
+                                        <div class="mb-3">
+                                            <x-lucide-inbox class="text-secondary icon icon-lg" />
+                                        </div>
+                                        <p class="text-secondary">Tidak ada data penelitian yang ditemukan.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            @endif
+
+                @if ($this->proposals->hasPages())
+                    <div class="d-flex align-items-center card-footer">
+                        {{ $this->proposals->links() }}
+                    </div>
+                @endif
+            </div>
         </div>
 
         <!-- Delete Proposal Confirmation Modal -->

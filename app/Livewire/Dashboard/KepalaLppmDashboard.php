@@ -89,6 +89,9 @@ class KepalaLppmDashboard extends Component
             ->where('detailable_type', 'App\Models\CommunityService')
             ->where('status', 'completed')->count();
 
+        $pendingInitialCount = Proposal::whereYear('created_at', $yearFilter)
+            ->where('status', 'approved')->count();
+
         $this->stats = [
             'total_research' => $totalResearch,
             'total_community_service' => $totalCommunityService,
@@ -98,6 +101,8 @@ class KepalaLppmDashboard extends Component
             'community_service_approved' => $communityServiceApproved,
             'research_completed' => $researchCompleted,
             'community_service_completed' => $communityServiceCompleted,
+            'pending_initial_approval' => $pendingInitialCount,
+            'pending_final_decision' => $researchPending + $communityServicePending,
         ];
 
         // Data penelitian terbaru

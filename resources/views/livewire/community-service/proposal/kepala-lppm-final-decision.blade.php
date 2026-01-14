@@ -19,11 +19,16 @@
                 <x-lucide-check class="icon" />
                 Setujui Proposal
             </button>
-            {{-- <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#finalDecisionModal"
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#finalDecisionModal"
                 wire:click="$set('decision', 'revision_needed')">
                 <x-lucide-file-edit class="icon" />
                 Minta Perbaikan Usulan
-            </button> --}}
+            </button>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#finalDecisionModal"
+                wire:click="$set('decision', 'rejected')">
+                <x-lucide-x-circle class="icon" />
+                Tolak Proposal
+            </button>
         </div>
     @elseif ($this->pendingReviewers->count() > 0)
         <div class="alert alert-warning" role="alert">
@@ -48,6 +53,14 @@
                                 Proposal akan disetujui dan statusnya akan berubah menjadi <strong>Selesai</strong>.
                             </div>
                         </div>
+                    @elseif ($decision === 'rejected')
+                        <div class="mb-3 text-center">
+                            <x-lucide-x-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
+                            <h3>Tolak Proposal?</h3>
+                            <div class="text-secondary">
+                                Proposal akan <strong>ditolak secara permanen</strong>. Tindakan ini tidak dapat dibatalkan.
+                            </div>
+                        </div>
                     @else
                         <div class="mb-3 text-center">
                             <x-lucide-file-edit class="mb-2 text-warning icon" style="width: 3rem; height: 3rem;" />
@@ -61,12 +74,16 @@
 
                     <div class="mb-3">
                         <label class="form-label">
-                            Catatan {{ $decision === 'revision_needed' ? '(Wajib)' : '(Opsional)' }}
+                            Catatan {{ in_array($decision, ['revision_needed', 'rejected']) ? '(Wajib)' : '(Opsional)' }}
                         </label>
                         <textarea class="form-control" rows="4" wire:model="notes" placeholder="Tambahkan catatan atau komentar..."></textarea>
                         @if ($decision === 'revision_needed')
                             <small class="form-hint">
                                 Jelaskan perbaikan yang diperlukan agar pengusul dapat melakukan revisi dengan tepat.
+                            </small>
+                        @elseif ($decision === 'rejected')
+                            <small class="form-hint">
+                                Jelaskan alasan penolakan proposal.
                             </small>
                         @endif
                     </div>
@@ -82,12 +99,22 @@
                             </button>
                         </div>
                         <div class="col">
+                            @php
+                                $btnClass = match($decision) {
+                                    'completed' => 'btn-success',
+                                    'rejected' => 'btn-danger',
+                                    default => 'btn-warning',
+                                };
+                            @endphp
                             <button type="button" wire:click="processDecision"
-                                class="w-100 btn {{ $decision === 'completed' ? 'btn-success' : 'btn-warning' }}"
+                                class="w-100 btn {{ $btnClass }}"
                                 data-bs-dismiss="modal">
                                 @if ($decision === 'completed')
                                     <x-lucide-check class="icon" />
                                     Ya, Setujui
+                                @elseif ($decision === 'rejected')
+                                    <x-lucide-x-circle class="icon" />
+                                    Ya, Tolak
                                 @else
                                     <x-lucide-file-edit class="icon" />
                                     Ya, Minta Perbaikan

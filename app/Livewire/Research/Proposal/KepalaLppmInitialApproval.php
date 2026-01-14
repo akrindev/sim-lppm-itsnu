@@ -3,6 +3,7 @@
 namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
+use App\Livewire\Actions\RequestReReviewAction;
 use App\Models\Proposal;
 use App\Notifications\ReviewerAssignment;
 use App\Services\NotificationService;
@@ -72,27 +73,56 @@ class KepalaLppmInitialApproval extends Component
         }
 
         try {
-            // Transition to UNDER_REVIEW status (ready for reviewer assignment)
-            $proposal->update([
-                'status' => ProposalStatus::UNDER_REVIEW,
-            ]);
-
-            Log::info('Kepala LPPM initial approval', [
-                'proposal_id' => $proposal->id,
-                'user_id' => $user->id,
-                'new_status' => ProposalStatus::UNDER_REVIEW->value,
-            ]);
-
-            // Send notification to Admin LPPM to assign reviewers
             $notificationService = app(NotificationService::class);
-            $adminLppmUsers = $notificationService->getUsersByRole(['admin lppm']);
 
-            if ($adminLppmUsers->isNotEmpty()) {
-                // Send notification to Admin LPPM
-                $notificationService->sendToMany($adminLppmUsers, new ReviewerAssignment($proposal, $user));
+            // Check if this proposal has existing reviewers (resubmission after revision)
+            $hasExistingReviewers = $proposal->reviewers()->exists();
+
+            if ($hasExistingReviewers) {
+                // This is a resubmission - trigger re-review workflow
+                $reReviewAction = app(RequestReReviewAction::class);
+                $result = $reReviewAction->execute($proposal);
+
+                if (! $result['success']) {
+                    session()->flash('error', $result['message']);
+
+                    return;
+                }
+
+                // Transition directly to UNDER_REVIEW since reviewers are already assigned
+                $proposal->update([
+                    'status' => ProposalStatus::UNDER_REVIEW,
+                ]);
+
+                Log::info('Kepala LPPM initial approval - Re-review triggered', [
+                    'proposal_id' => $proposal->id,
+                    'user_id' => $user->id,
+                    'new_status' => ProposalStatus::UNDER_REVIEW->value,
+                    'has_existing_reviewers' => true,
+                ]);
+
+                session()->flash('success', 'Proposal berhasil disetujui dan permintaan review ulang telah dikirim ke reviewer sebelumnya.');
+            } else {
+                // First submission - transition to WAITING_REVIEWER status
+                $proposal->update([
+                    'status' => ProposalStatus::WAITING_REVIEWER,
+                ]);
+
+                Log::info('Kepala LPPM initial approval', [
+                    'proposal_id' => $proposal->id,
+                    'user_id' => $user->id,
+                    'new_status' => ProposalStatus::WAITING_REVIEWER->value,
+                ]);
+
+                // Send notification to Admin LPPM to assign reviewers
+                $adminLppmUsers = $notificationService->getUsersByRole(['admin lppm']);
+
+                if ($adminLppmUsers->isNotEmpty()) {
+                    $notificationService->sendToMany($adminLppmUsers, new ReviewerAssignment($proposal, $user));
+                }
+
+                session()->flash('success', 'Proposal berhasil disetujui dan siap untuk ditugaskan reviewer oleh Admin LPPM');
             }
-
-            session()->flash('success', 'Proposal berhasil disetujui dan siap untuk ditugaskan reviewer oleh Admin LPPM');
 
             $this->dispatch('close-modal', detail: ['modalId' => 'initialApprovalModal']);
             $this->dispatch('proposal-initial-approved', proposalId: $proposal->id);

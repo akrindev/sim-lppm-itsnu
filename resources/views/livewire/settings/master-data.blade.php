@@ -1,6 +1,6 @@
 <x-slot:title>Pengaturan</x-slot:title>
-<x-slot:pageTitle>Master Data</x-slot:pageTitle>
-<x-slot:pageSubtitle>Kelola semua data master sistem</x-slot:pageSubtitle>
+<x-slot:pageTitle>{{ $pageTitle }}</x-slot:pageTitle>
+<x-slot:pageSubtitle>Kelola data master sistem kelompok {{ strtolower($pageTitle) }}</x-slot:pageSubtitle>
 
 <div>
     <x-tabler.alert />
@@ -8,93 +8,104 @@
         <div class="row g-0">
             <div class="border-end col-12 col-md-3">
                 <div class="card-body">
-                    <h4 class="subheader">Konten Penelitian & Akademik</h4>
-                    <div class="list-group list-group-transparent">
-                        <button wire:click="setActiveTab('focus-areas')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'focus-areas' ? 'active' : '' }}">
-                            <x-lucide-target class="icon me-2" />
-                            Area Fokus
-                        </button>
-                        <button wire:click="setActiveTab('keywords')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'keywords' ? 'active' : '' }}">
-                            <x-lucide-hash class="icon me-2" />
-                            Kata Kunci
-                        </button>
-                        <button wire:click="setActiveTab('themes')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'themes' ? 'active' : '' }}">
-                            <x-lucide-palette class="icon me-2" />
-                            Tema
-                        </button>
-                        <button wire:click="setActiveTab('topics')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'topics' ? 'active' : '' }}">
-                            <x-lucide-message-square class="icon me-2" />
-                            Topik
-                        </button>
-                        <button wire:click="setActiveTab('research-schemes')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'research-schemes' ? 'active' : '' }}">
-                            <x-lucide-file-text class="icon me-2" />
-                            Skema Penelitian
-                        </button>
-                        <button wire:click="setActiveTab('science-clusters')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'science-clusters' ? 'active' : '' }}">
-                            <x-lucide-atom class="icon me-2" />
-                            Klaster Sains
-                        </button>
-                        <button wire:click="setActiveTab('tkt')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'tkt' ? 'active' : '' }}">
-                            <x-lucide-ruler class="icon me-2" />
-                            TKT
-                        </button>
-                    </div>
-                    <h4 class="subheader mt-4">Struktur Akademik</h4>
-                    <div class="list-group list-group-transparent">
-                        <button wire:click="setActiveTab('study-programs')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'study-programs' ? 'active' : '' }}">
-                            <x-lucide-graduation-cap class="icon me-2" />
-                            Program Studi
-                        </button>
-                        <button wire:click="setActiveTab('faculties')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'faculties' ? 'active' : '' }}">
-                            <x-lucide-building class="icon me-2" />
-                            Fakultas
-                        </button>
-                        <button wire:click="setActiveTab('institutions')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'institutions' ? 'active' : '' }}">
-                            <x-lucide-building-2 class="icon me-2" />
-                            Institusi
-                        </button>
-                    </div>
-                    <h4 class="subheader mt-4">Anggaran & RAB</h4>
-                    <div class="list-group list-group-transparent">
-                        <button wire:click="setActiveTab('budget-groups')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-groups' ? 'active' : '' }}">
-                            <x-lucide-archive class="icon me-2" />
-                            Kelompok Anggaran
-                        </button>
-                        <button wire:click="setActiveTab('budget-components')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-components' ? 'active' : '' }}">
-                            <x-lucide-package class="icon me-2" />
-                            Komponen Anggaran
-                        </button>
-                        <button wire:click="setActiveTab('budget-caps')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-caps' ? 'active' : '' }}">
-                            <x-lucide-shield-check class="icon me-2" />
-                            Batas Anggaran Tahunan
-                        </button>
-                    </div>
-                    <h4 class="subheader mt-4">Kemitraan & Prioritas</h4>
-                    <div class="list-group list-group-transparent">
-                        <button wire:click="setActiveTab('partners')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'partners' ? 'active' : '' }}">
-                            <x-lucide-users class="icon me-2" />
-                            Mitra
-                        </button>
-                        <button wire:click="setActiveTab('national-priorities')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'national-priorities' ? 'active' : '' }}">
-                            <x-lucide-star class="icon me-2" />
-                            Prioritas Nasional
-                        </button>
-                    </div>
+                    @if ($group === 'academic-content')
+                        <h4 class="subheader">Konten Penelitian & Akademik</h4>
+                        <div class="list-group list-group-transparent">
+                            <button wire:click="setActiveTab('focus-areas')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'focus-areas' ? 'active' : '' }}">
+                                <x-lucide-target class="icon me-2" />
+                                Area Fokus
+                            </button>
+                            <button wire:click="setActiveTab('keywords')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'keywords' ? 'active' : '' }}">
+                                <x-lucide-hash class="icon me-2" />
+                                Kata Kunci
+                            </button>
+                            <button wire:click="setActiveTab('themes')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'themes' ? 'active' : '' }}">
+                                <x-lucide-palette class="icon me-2" />
+                                Tema
+                            </button>
+                            <button wire:click="setActiveTab('topics')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'topics' ? 'active' : '' }}">
+                                <x-lucide-message-square class="icon me-2" />
+                                Topik
+                            </button>
+                            <button wire:click="setActiveTab('research-schemes')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'research-schemes' ? 'active' : '' }}">
+                                <x-lucide-file-text class="icon me-2" />
+                                Skema Penelitian
+                            </button>
+                            <button wire:click="setActiveTab('science-clusters')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'science-clusters' ? 'active' : '' }}">
+                                <x-lucide-atom class="icon me-2" />
+                                Klaster Sains
+                            </button>
+                            <button wire:click="setActiveTab('tkt')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'tkt' ? 'active' : '' }}">
+                                <x-lucide-ruler class="icon me-2" />
+                                TKT
+                            </button>
+                        </div>
+                    @endif
+
+                    @if ($group === 'academic-structure')
+                        <h4 class="subheader">Struktur Akademik</h4>
+                        <div class="list-group list-group-transparent">
+                            <button wire:click="setActiveTab('study-programs')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'study-programs' ? 'active' : '' }}">
+                                <x-lucide-graduation-cap class="icon me-2" />
+                                Program Studi
+                            </button>
+                            <button wire:click="setActiveTab('faculties')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'faculties' ? 'active' : '' }}">
+                                <x-lucide-building class="icon me-2" />
+                                Fakultas
+                            </button>
+                            <button wire:click="setActiveTab('institutions')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'institutions' ? 'active' : '' }}">
+                                <x-lucide-building-2 class="icon me-2" />
+                                Institusi
+                            </button>
+                        </div>
+                    @endif
+
+                    @if ($group === 'budget')
+                        <h4 class="subheader">Anggaran & RAB</h4>
+                        <div class="list-group list-group-transparent">
+                            <button wire:click="setActiveTab('budget-groups')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-groups' ? 'active' : '' }}">
+                                <x-lucide-archive class="icon me-2" />
+                                Kelompok Anggaran
+                            </button>
+                            <button wire:click="setActiveTab('budget-components')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-components' ? 'active' : '' }}">
+                                <x-lucide-package class="icon me-2" />
+                                Komponen Anggaran
+                            </button>
+                            <button wire:click="setActiveTab('budget-caps')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'budget-caps' ? 'active' : '' }}">
+                                <x-lucide-shield-check class="icon me-2" />
+                                Batas Anggaran Tahunan
+                            </button>
+                        </div>
+                    @endif
+
+                    @if ($group === 'partnership')
+                        <h4 class="subheader">Kemitraan & Prioritas</h4>
+                        <div class="list-group list-group-transparent">
+                            <button wire:click="setActiveTab('partners')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'partners' ? 'active' : '' }}">
+                                <x-lucide-users class="icon me-2" />
+                                Mitra
+                            </button>
+                            <button wire:click="setActiveTab('national-priorities')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'national-priorities' ? 'active' : '' }}">
+                                <x-lucide-star class="icon me-2" />
+                                Prioritas Nasional
+                            </button>
+                        </div>
+                    @endif
                 </div>
             </div>
 

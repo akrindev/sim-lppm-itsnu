@@ -18,6 +18,9 @@ class Research extends Component
     #[Url]
     public string $selectedYear = '';
 
+    #[Url]
+    public string $statusFilter = 'all'; // all, pending, completed
+
     public function mount(): void
     {
         if (! Auth::user()->hasRole('reviewer')) {
@@ -28,7 +31,7 @@ class Research extends Component
     #[On('resetFilters')]
     public function resetFilters(): void
     {
-        $this->reset(['search', 'selectedYear']);
+        $this->reset(['search', 'selectedYear', 'statusFilter']);
     }
 
     #[Computed]
@@ -60,6 +63,13 @@ class Research extends Component
             $query->whereYear('created_at', $this->selectedYear);
         }
 
+        if ($this->statusFilter !== 'all') {
+            $query->whereHas('reviewers', function ($q) {
+                $q->where('user_id', Auth::id())
+                    ->where('status', $this->statusFilter);
+            });
+        }
+
         return $query->latest()->get();
     }
 
@@ -73,6 +83,28 @@ class Research extends Component
             ->selectRaw('DISTINCT YEAR(created_at) as year')
             ->orderByDesc('year')
             ->pluck('year');
+    }
+
+    #[Computed]
+    public function statusStats(): array
+    {
+        $baseQuery = Proposal::where('detailable_type', 'App\Models\Research')
+            ->whereHas('reviewers', function ($query) {
+                $query->where('user_id', Auth::id());
+            });
+
+        return [
+            'all' => (clone $baseQuery)->count(),
+            'pending' => (clone $baseQuery)->whereHas('reviewers', function ($q) {
+                $q->where('user_id', Auth::id())->where('status', \App\Enums\ReviewStatus::PENDING);
+            })->count(),
+            'completed' => (clone $baseQuery)->whereHas('reviewers', function ($q) {
+                $q->where('user_id', Auth::id())->where('status', \App\Enums\ReviewStatus::COMPLETED);
+            })->count(),
+            're_review' => (clone $baseQuery)->whereHas('reviewers', function ($q) {
+                $q->where('user_id', Auth::id())->where('status', \App\Enums\ReviewStatus::RE_REVIEW_REQUESTED);
+            })->count(),
+        ];
     }
 
     public function render()

@@ -58,21 +58,27 @@ class ExecDashboard extends Component
     public function loadAnalytics()
     {
         $yearFilter = $this->selectedYear;
+        $facultyId = $this->roleName === 'dekan' ? $this->user->identity?->faculty_id : null;
+
+        // Base query for stats
+        $baseQuery = Proposal::whereYear('created_at', $yearFilter);
+        
+        if ($facultyId) {
+            $baseQuery->whereHas('submitter.identity', function($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+        }
 
         // Statistik Penelitian
-        $totalResearch = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', Research::class)->count();
+        $totalResearch = (clone $baseQuery)->where('detailable_type', Research::class)->count();
 
-        $researchApproved = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', Research::class)
+        $researchApproved = (clone $baseQuery)->where('detailable_type', Research::class)
             ->where('status', 'approved')->count();
 
         // Statistik PKM
-        $totalCommunityService = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', CommunityService::class)->count();
+        $totalCommunityService = (clone $baseQuery)->where('detailable_type', CommunityService::class)->count();
 
-        $communityServiceApproved = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', CommunityService::class)
+        $communityServiceApproved = (clone $baseQuery)->where('detailable_type', CommunityService::class)
             ->where('status', 'approved')->count();
 
         $this->stats = [
@@ -80,25 +86,36 @@ class ExecDashboard extends Component
             'total_community_service' => $totalCommunityService,
             'research_approved' => $researchApproved,
             'community_service_approved' => $communityServiceApproved,
+            'faculty_name' => $facultyId ? $this->user->identity?->faculty?->name : null,
         ];
 
         // Data penelitian terbaru
-        $this->recentResearch = Proposal::with(['submitter'])
+        $recentResearchQuery = Proposal::with(['submitter'])
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', Research::class)
-            ->whereIn('status', ['approved', 'completed'])
-            ->latest()
-            ->limit(10)
-            ->get();
+            ->whereIn('status', ['approved', 'completed']);
+            
+        if ($facultyId) {
+            $recentResearchQuery->whereHas('submitter.identity', function($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+        }
+            
+        $this->recentResearch = $recentResearchQuery->latest()->limit(10)->get();
 
         // Data PKM terbaru
-        $this->recentCommunityService = Proposal::with(['submitter'])
+        $recentPkmQuery = Proposal::with(['submitter'])
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', CommunityService::class)
-            ->whereIn('status', ['approved', 'completed'])
-            ->latest()
-            ->limit(10)
-            ->get();
+            ->whereIn('status', ['approved', 'completed']);
+            
+        if ($facultyId) {
+            $recentPkmQuery->whereHas('submitter.identity', function($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+        }
+            
+        $this->recentCommunityService = $recentPkmQuery->latest()->limit(10)->get();
     }
 
     public function render()

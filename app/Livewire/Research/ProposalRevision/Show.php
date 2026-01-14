@@ -36,9 +36,15 @@ class Show extends Component
      */
     public function mount(Proposal $proposal): void
     {
-        // if is community service proposal, redirect to community service show page
-        if ($proposal->detailable instanceof \App\Models\CommunityService) {
-            $this->redirect(route('community-service.proposal-revision.show', $proposal->id), navigate: true);
+        // Redirect if wrong type
+        if ($proposal->detailable_type !== \App\Models\Research::class) {
+            if (str_contains($proposal->detailable_type, 'CommunityService')) {
+                $this->redirect(route('community-service.proposal-revision.show', $proposal->id), navigate: true);
+            } else {
+                abort(404);
+            }
+
+            return;
         }
 
         // Eager load all required relationships for the show page
