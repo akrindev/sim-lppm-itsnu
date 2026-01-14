@@ -31,6 +31,26 @@ class Create extends ProposalCreate
                 if ($wajibCount < 1) {
                     $fail('Minimal harus ada 1 luaran wajib untuk proposal penelitian.');
                 }
+
+                // Validate each row has required fields
+                foreach ($value as $index => $item) {
+                    $rowNum = $index + 1;
+                    $errors = [];
+
+                    if (empty($item['group'])) {
+                        $errors[] = 'Kategori Luaran';
+                    }
+                    if (empty($item['type'])) {
+                        $errors[] = 'Luaran';
+                    }
+                    if (empty($item['status'])) {
+                        $errors[] = 'Status';
+                    }
+
+                    if (! empty($errors)) {
+                        $fail("Baris {$rowNum}: " . implode(', ', $errors) . ' wajib diisi.');
+                    }
+                }
             }],
         ];
     }
