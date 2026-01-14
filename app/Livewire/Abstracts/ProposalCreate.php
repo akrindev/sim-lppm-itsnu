@@ -62,6 +62,7 @@ abstract class ProposalCreate extends Component
         return $this->getProposalType();
     }
 
+    #[On('members-updated')]
     public function updateMembers(array $members): void
     {
         $this->form->members = $members;

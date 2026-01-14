@@ -266,6 +266,6 @@
         </div>
 
         <livewire:forms.team-members-form :members="$form->members" modal-title="Tambah Anggota Peneliti"
-            member-label="Anggota Peneliti" />
+            member-label="Anggota Peneliti" :key="'team-members-form'" />
     </div>
 </div>
