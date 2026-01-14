@@ -28,6 +28,9 @@ class Show extends Component
     // Form instance - Livewire v3 Form pattern
     public ReportForm $form;
 
+    // State to track if final report draft exists
+    public bool $isFinalReportDraft = false;
+
     /**
      * Mount the component
      */
@@ -44,10 +47,15 @@ class Show extends Component
         $this->checkAccess();
 
         // Load existing final report
-        $this->progressReport = $proposal->progressReports()->finalReports()->latest()->first();
+        $finalReport = $proposal->progressReports()->finalReports()->latest()->first();
 
-        if (! $this->progressReport) {
+        if ($finalReport) {
+            $this->progressReport = $finalReport;
+            $this->isFinalReportDraft = true;
+        } else {
+            // Fallback to latest progress report for pre-filling data
             $this->progressReport = $proposal->progressReports()->latest()->first();
+            $this->isFinalReportDraft = false;
         }
 
         // Initialize Livewire Form
@@ -57,11 +65,9 @@ class Show extends Component
         if ($this->progressReport) {
             // Load existing report data into form
             $this->form->setReport($this->progressReport);
-            $this->loadExistingReport($this->progressReport);
         } else {
             // Initialize new report structure
             $this->form->initializeNewReport();
-            $this->initializeNewReport($this->proposal);
         }
     }
 
@@ -79,6 +85,9 @@ class Show extends Component
                 // Save report via form
                 $report = $this->form->save($this->progressReport);
                 $this->progressReport = $report;
+                
+                // Mark as existing draft
+                $this->isFinalReportDraft = true;
 
                 // Save report files
                 $this->saveSubstanceFile($report, 'final');
@@ -112,6 +121,7 @@ class Show extends Component
             // Submit report via form
             $report = $this->form->submit($this->progressReport);
             $this->progressReport = $report;
+            $this->isFinalReportDraft = true;
 
             // Save report files
             $this->saveSubstanceFile($report, 'final');

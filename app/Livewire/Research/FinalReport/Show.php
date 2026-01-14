@@ -26,6 +26,9 @@ class Show extends Component
     // Form instance - Livewire v3 Form pattern
     public ReportForm $form;
 
+    // State to track if final report draft exists
+    public bool $isFinalReportDraft = false;
+
     /**
      * Mount the component
      */
@@ -42,10 +45,15 @@ class Show extends Component
         $this->checkAccess();
 
         // Load existing final report
-        $this->progressReport = $proposal->progressReports()->finalReports()->latest()->first();
+        $finalReport = $proposal->progressReports()->finalReports()->latest()->first();
 
-        if (! $this->progressReport) {
+        if ($finalReport) {
+            $this->progressReport = $finalReport;
+            $this->isFinalReportDraft = true;
+        } else {
+            // Fallback to latest progress report for pre-filling data, but it's NOT a final draft
             $this->progressReport = $proposal->progressReports()->latest()->first();
+            $this->isFinalReportDraft = false;
         }
 
         // Initialize Livewire Form
@@ -75,6 +83,9 @@ class Show extends Component
                 // Save report via form
                 $report = $this->form->save($this->progressReport);
                 $this->progressReport = $report;
+                
+                // Mark as existing draft
+                $this->isFinalReportDraft = true;
 
                 // Save report files
                 $this->saveSubstanceFile($report, 'final');
@@ -108,6 +119,7 @@ class Show extends Component
             // Submit report via form
             $report = $this->form->submit($this->progressReport);
             $this->progressReport = $report;
+            $this->isFinalReportDraft = true;
 
             // Save report files
             $this->saveSubstanceFile($report, 'final');
