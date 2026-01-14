@@ -43,7 +43,7 @@ class MasterDataService
         $query = Topic::query();
 
         if ($focusAreaId !== null) {
-            $query->where('focus_area_id', $focusAreaId);
+            $query->whereHas('theme', fn ($q) => $q->where('focus_area_id', $focusAreaId));
         }
 
         if ($themeId !== null) {
