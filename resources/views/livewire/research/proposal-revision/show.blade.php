@@ -163,9 +163,9 @@
                     <!-- Current File -->
                     <div class="mb-3">
                         <label class="form-label"><x-lucide-file class="me-2 icon" />File Substansi Saat Ini</label>
-                        @if ($research?->substance_file)
+                        @if ($research?->hasMedia('substance_file'))
                             <div class="d-flex align-items-center gap-2">
-                                <a href="{{ Storage::url($research->substance_file) }}" target="_blank"
+                                <a href="{{ $research->getFirstMediaUrl('substance_file') }}" target="_blank"
                                     class="btn-outline-primary btn btn-sm">
                                     <x-lucide-download class="icon" />
                                     Download File Substansi
@@ -195,7 +195,7 @@
                             @enderror
                             <small class="form-hint">
                                 Format: PDF, DOC, DOCX. Maksimal: 10MB.
-                                @if ($research?->substance_file)
+                                @if ($research?->hasMedia('substance_file'))
                                     File lama akan diganti dengan file baru.
                                 @endif
                             </small>

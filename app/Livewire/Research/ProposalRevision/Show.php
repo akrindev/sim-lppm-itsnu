@@ -8,7 +8,6 @@ use App\Livewire\Forms\ProposalForm;
 use App\Models\MacroResearchGroup;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -115,14 +114,16 @@ class Show extends Component
 
             // Handle file upload
             if ($this->substanceFile) {
-                // Delete old file if exists
-                if ($research->substance_file) {
-                    Storage::delete($research->substance_file);
-                }
+                // Upload new file using Media Library (supports S3)
+                $research->clearMediaCollection('substance_file');
 
-                // Store new file
-                $path = $this->substanceFile->store('proposals/substance-files', 'public');
-                $research->substance_file = $path;
+                $research
+                    ->addMedia($this->substanceFile->getRealPath())
+                    ->usingName($this->substanceFile->getClientOriginalName())
+                    ->usingFileName($this->substanceFile->hashName())
+                    ->withCustomProperties(['uploaded_by' => Auth::id()])
+                    ->toMediaCollection('substance_file');
+
                 $hasChanges = true;
                 $changedFields[] = 'File Substansi';
             }
