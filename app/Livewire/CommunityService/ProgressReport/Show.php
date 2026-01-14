@@ -52,6 +52,36 @@ class Show extends Component
     }
 
     /**
+     * Lifecycle hook: when temp mandatory file is uploaded
+     */
+    public function updatedTempMandatoryFiles(mixed $value, string $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateMandatoryFile((int) $key);
+        }
+    }
+
+    /**
+     * Lifecycle hook: when temp additional file is uploaded
+     */
+    public function updatedTempAdditionalFiles(mixed $value, string $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateAdditionalFile((int) $key);
+        }
+    }
+
+    /**
+     * Lifecycle hook: when temp additional certificate is uploaded
+     */
+    public function updatedTempAdditionalCerts(mixed $value, string $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateAdditionalCert((int) $key);
+        }
+    }
+
+    /**
      * Save the report as draft
      */
     public function save(): void
@@ -76,7 +106,11 @@ class Show extends Component
         });
 
         $this->dispatch('report-saved');
-        session()->flash('success', 'Laporan kemajuan berhasil disimpan.');
+        $this->dispatch('toast', [
+            'message' => 'Laporan kemajuan berhasil disimpan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
     }
 
     /**
@@ -100,7 +134,11 @@ class Show extends Component
             $this->saveOutputFiles($report);
         });
 
-        session()->flash('success', 'Laporan kemajuan berhasil diajukan.');
+        $this->dispatch('toast', [
+            'message' => 'Laporan kemajuan berhasil diajukan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
         $this->redirect(route('community-service.progress-report.index'), navigate: true);
     }
 
@@ -161,8 +199,21 @@ class Show extends Component
         }
 
         $this->form->saveMandatoryOutput($proposalOutputId);
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+
+        // Close modal using js() method - Livewire v3 pattern
+        $this->js("
+            const modal = document.getElementById('modalMandatoryOutput');
+            if (modal) {
+                const bsModal = bootstrap.Modal.getInstance(modal) || tabler?.Modal?.getInstance(modal);
+                if (bsModal) bsModal.hide();
+            }
+        ");
+
+        $this->dispatch('toast', [
+            'message' => 'Data luaran wajib berhasil disimpan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
     }
 
     /**
@@ -175,8 +226,21 @@ class Show extends Component
         }
 
         $this->form->saveAdditionalOutput($proposalOutputId);
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
-        session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+
+        // Close modal using js() method - Livewire v3 pattern
+        $this->js("
+            const modal = document.getElementById('modalAdditionalOutput');
+            if (modal) {
+                const bsModal = bootstrap.Modal.getInstance(modal) || tabler?.Modal?.getInstance(modal);
+                if (bsModal) bsModal.hide();
+            }
+        ");
+
+        $this->dispatch('toast', [
+            'message' => 'Data luaran tambahan berhasil disimpan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
     }
 
     /**

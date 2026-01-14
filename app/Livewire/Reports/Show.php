@@ -127,12 +127,27 @@ class Show extends Component
         $this->redirect(route($this->config['route']), navigate: true);
     }
 
+    public function updatedTempMandatoryFiles($value, $key): void
+    {
+        $this->saveMandatoryOutput((int) $key, closeModal: false, validate: false);
+    }
+
+    public function updatedTempAdditionalFiles($value, $key): void
+    {
+        $this->saveAdditionalOutput((int) $key, closeModal: false, validate: false);
+    }
+
+    public function updatedTempAdditionalCerts($value, $key): void
+    {
+        $this->saveAdditionalOutput((int) $key, closeModal: false, validate: false);
+    }
+
     public function editMandatoryOutput(int $proposalOutputId): void
     {
         $this->form->editMandatoryOutput($proposalOutputId);
     }
 
-    public function saveMandatoryOutput(?int $proposalOutputId = null): void
+    public function saveMandatoryOutput(?int $proposalOutputId = null, bool $closeModal = true, bool $validate = true): void
     {
         if (! $this->canEdit || ! $this->progressReport) {
             return;
@@ -155,14 +170,32 @@ class Show extends Component
             }
 
             // Save via form
-            $this->form->saveMandatoryOutputWithFile($proposalOutputId);
+            $this->form->saveMandatoryOutputWithFile($proposalOutputId, $validate);
 
             // Clear the component's temp files
             unset($this->tempMandatoryFiles[$proposalOutputId]);
 
-            $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-            session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+            if ($closeModal) {
+                $this->dispatch('close-modal', modalId: 'modalMandatoryOutput');
+            }
+            
+            if ($closeModal) {
+                session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+            } else {
+                 // For auto-save, maybe a toast? or just silent success + UI update
+                 // We can skip flash to avoid annoying popups, or use a different key.
+                 session()->flash('success', 'File berhasil diupload.');
+            }
+            
+            // Refresh parent report to update UI status
+            if ($this->progressReport) {
+                $this->progressReport->refresh();
+                $this->progressReport->load('mandatoryOutputs');
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
+            // If auto-saving (closeModal = false), we might want to suppress some errors or just show them
             session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
@@ -172,7 +205,7 @@ class Show extends Component
         $this->form->editAdditionalOutput($proposalOutputId);
     }
 
-    public function saveAdditionalOutput(?int $proposalOutputId = null): void
+    public function saveAdditionalOutput(?int $proposalOutputId = null, bool $closeModal = true, bool $validate = true): void
     {
         if (! $this->canEdit || ! $this->progressReport) {
             return;
@@ -198,14 +231,29 @@ class Show extends Component
             }
 
             // Save via form
-            $this->form->saveAdditionalOutputWithFile($proposalOutputId);
+            $this->form->saveAdditionalOutputWithFile($proposalOutputId, $validate);
 
             // Clear the component's temp files
             unset($this->tempAdditionalFiles[$proposalOutputId]);
             unset($this->tempAdditionalCerts[$proposalOutputId]);
 
-            $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
-            session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+            if ($closeModal) {
+                $this->dispatch('close-modal', modalId: 'modalAdditionalOutput');
+            }
+            
+            if ($closeModal) {
+                session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+            } else {
+                session()->flash('success', 'File berhasil diupload.');
+            }
+
+            // Refresh parent report to update UI status
+            if ($this->progressReport) {
+                $this->progressReport->refresh();
+                $this->progressReport->load('additionalOutputs');
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }

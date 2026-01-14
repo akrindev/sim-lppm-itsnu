@@ -48,6 +48,102 @@ class Show extends Component
     }
 
     /**
+     * Lifecycle hook: when substance file is uploaded
+     */
+    public function updatedSubstanceFile(): void
+    {
+        $this->validateSubstanceFile();
+
+        $this->form->substanceFile = $this->substanceFile;
+        $this->form->handleFileUpload('substanceFile');
+        $this->progressReport = $this->form->progressReport; // Refresh local reference
+
+        $this->dispatch('toast', [
+            'message' => 'File substansi berhasil diupload.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
+
+        // Optional: clear the input if desired, but keeping it shows what was selected.
+        // But for consistency with other inputs, we might want to keep it or let the view update.
+    }
+
+    /**
+     * Lifecycle hook: when temp mandatory file is uploaded
+     */
+    public function updatedTempMandatoryFiles(mixed $value, string $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateMandatoryFile((int) $key);
+
+            $this->form->tempMandatoryFiles[(int)$key] = $value;
+            $this->form->saveMandatoryOutputWithFile((int) $key);
+
+            // Refresh report reference in case it was created
+            $this->progressReport = $this->form->progressReport;
+
+            // Clear temp file to hide preview and allow showing the saved file
+            unset($this->tempMandatoryFiles[$key]);
+
+            $this->dispatch('toast', [
+                'message' => 'File luaran wajib berhasil disimpan.',
+                'variant' => 'success',
+                'title' => 'Berhasil',
+            ]);
+        }
+    }
+
+    /**
+     * Lifecycle hook: when temp additional file is uploaded
+     */
+    public function updatedTempAdditionalFiles(mixed $value, string $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateAdditionalFile((int) $key);
+
+            $this->form->tempAdditionalFiles[(int)$key] = $value;
+            $this->form->saveAdditionalOutputWithFile((int) $key);
+
+            // Refresh report reference
+            $this->progressReport = $this->form->progressReport;
+
+            // Clear temp file
+            unset($this->tempAdditionalFiles[$key]);
+
+            $this->dispatch('toast', [
+                'message' => 'File luaran tambahan berhasil disimpan.',
+                'variant' => 'success',
+                'title' => 'Berhasil',
+            ]);
+        }
+    }
+
+    /**
+     * Lifecycle hook: when temp additional certificate is uploaded
+     */
+    public function updatedTempAdditionalCerts(mixed $value, string $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateAdditionalCert((int) $key);
+
+            $this->form->tempAdditionalCerts[(int)$key] = $value;
+            $this->form->saveAdditionalOutputWithFile((int) $key);
+
+            // Refresh report reference
+            $this->progressReport = $this->form->progressReport;
+
+            // Clear temp file
+            unset($this->tempAdditionalCerts[$key]);
+
+            $this->dispatch('toast', [
+                'message' => 'Sertifikat berhasil disimpan.',
+                'variant' => 'success',
+                'title' => 'Berhasil',
+            ]);
+        }
+    }
+
+    /**
      * Save the report as draft
      */
     public function save(): void
@@ -56,20 +152,28 @@ class Show extends Component
             abort(403);
         }
 
-        // Validate substance file if present
-        $this->validateSubstanceFile();
+        // Validate substance file if presence check needed, but it's optional in draft usually
+        // $this->validateSubstanceFile();
 
         DB::transaction(function () {
             // Save report via form
             $report = $this->form->save($this->progressReport);
             $this->progressReport = $report;
 
-            // Save substance file
-            $this->saveSubstanceFile($report);
+            // Substance file is already saved if uploaded via auto-save,
+            // but if user selected file without auto-save triggering (unlikely given updated hook), check again?
+            if ($this->substanceFile) {
+                $this->form->substanceFile = $this->substanceFile;
+                $this->form->saveReportFiles($report);
+            }
         });
 
         $this->dispatch('report-saved');
-        session()->flash('success', 'Laporan kemajuan berhasil disimpan.');
+        $this->dispatch('toast', [
+            'message' => 'Laporan kemajuan berhasil disimpan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
     }
 
     /**
@@ -82,15 +186,21 @@ class Show extends Component
         }
 
         DB::transaction(function () {
+            // Ensure substance file is passed if exists
+            if ($this->substanceFile) {
+                $this->form->substanceFile = $this->substanceFile;
+            }
+
             // Submit report via form
             $report = $this->form->submit($this->progressReport);
             $this->progressReport = $report;
-
-            // Save substance file
-            $this->saveSubstanceFile($report);
         });
 
-        session()->flash('success', 'Laporan kemajuan berhasil diajukan.');
+        $this->dispatch('toast', [
+            'message' => 'Laporan kemajuan berhasil diajukan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
         $this->redirect(route('research.progress-report.index'), navigate: true);
     }
 
@@ -145,8 +255,22 @@ class Show extends Component
         }
 
         $this->form->saveMandatoryOutput($proposalOutputId);
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+        $this->progressReport = $this->form->progressReport; // Sync
+
+        // Close modal using robust JS
+        $this->js("
+            const modalEl = document.getElementById('modalMandatoryOutput');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.hide();
+            }
+        ");
+
+        $this->dispatch('toast', [
+            'message' => 'Data luaran wajib berhasil disimpan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
     }
 
     /**
@@ -159,8 +283,22 @@ class Show extends Component
         }
 
         $this->form->saveAdditionalOutput($proposalOutputId);
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
-        session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+        $this->progressReport = $this->form->progressReport; // Sync
+
+        // Close modal using robust JS
+        $this->js("
+            const modalEl = document.getElementById('modalAdditionalOutput');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.hide();
+            }
+        ");
+
+        $this->dispatch('toast', [
+            'message' => 'Data luaran tambahan berhasil disimpan.',
+            'variant' => 'success',
+            'title' => 'Berhasil',
+        ]);
     }
 
     /**

@@ -221,17 +221,24 @@ class Show extends Component
     /**
      * Handle mandatory output file upload (real-time)
      */
-    public function updatedTempMandatoryFiles(): void
+    public function updatedTempMandatoryFiles($value, $key): void
     {
         if (! $this->canEdit) {
             return;
         }
 
         try {
-            // Validate file
-            foreach ($this->tempMandatoryFiles as $proposalOutputId => $file) {
-                $this->validateMandatoryFile($proposalOutputId);
-            }
+            $this->validateMandatoryFile((int) $key);
+            
+            $this->form->tempMandatoryFiles[$key] = $value;
+            $this->form->saveMandatoryOutputWithFile((int) $key, validate: false);
+            
+            // Sync report
+            $this->progressReport = $this->form->progressReport;
+            
+            unset($this->tempMandatoryFiles[$key]);
+            
+            session()->flash('success', 'File luaran wajib berhasil disimpan.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
         }
@@ -240,17 +247,23 @@ class Show extends Component
     /**
      * Handle additional output file upload (real-time)
      */
-    public function updatedTempAdditionalFiles(): void
+    public function updatedTempAdditionalFiles($value, $key): void
     {
         if (! $this->canEdit) {
             return;
         }
 
         try {
-            // Validate file
-            foreach ($this->tempAdditionalFiles as $proposalOutputId => $file) {
-                $this->validateAdditionalFile($proposalOutputId);
-            }
+            $this->validateAdditionalFile((int) $key);
+            
+            $this->form->tempAdditionalFiles[$key] = $value;
+            $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
+            
+            $this->progressReport = $this->form->progressReport;
+            
+            unset($this->tempAdditionalFiles[$key]);
+            
+            session()->flash('success', 'File luaran tambahan berhasil disimpan.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
         }
@@ -259,17 +272,23 @@ class Show extends Component
     /**
      * Handle additional output certificate upload (real-time)
      */
-    public function updatedTempAdditionalCerts(): void
+    public function updatedTempAdditionalCerts($value, $key): void
     {
         if (! $this->canEdit) {
             return;
         }
 
         try {
-            // Validate file
-            foreach ($this->tempAdditionalCerts as $proposalOutputId => $file) {
-                $this->validateAdditionalCert($proposalOutputId);
-            }
+            $this->validateAdditionalCert((int) $key);
+            
+            $this->form->tempAdditionalCerts[$key] = $value;
+            $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
+            
+            $this->progressReport = $this->form->progressReport;
+            
+            unset($this->tempAdditionalCerts[$key]);
+            
+            session()->flash('success', 'Sertifikat berhasil disimpan.');
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
         }
@@ -338,6 +357,8 @@ class Show extends Component
         }
 
         $this->form->saveMandatoryOutput($proposalOutputId);
+        $this->dispatch('close-modal', modalId: 'modalMandatoryOutput');
+        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
     }
 
     /**
@@ -371,7 +392,11 @@ class Show extends Component
             $this->form->saveAdditionalOutputWithFile($proposalOutputId);
 
             session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
-            $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
+            $this->dispatch('close-modal', modalId: 'modalAdditionalOutput');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
         }

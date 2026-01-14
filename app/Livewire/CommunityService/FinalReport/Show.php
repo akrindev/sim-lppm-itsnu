@@ -272,9 +272,21 @@ class Show extends Component
             abort(403);
         }
 
-        $this->form->saveMandatoryOutput($proposalOutputId);
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalMandatoryOutput']);
-        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+        try {
+            $this->form->saveMandatoryOutput($proposalOutputId);
+
+            $this->dispatch('close-modal', modalId: 'modalMandatoryOutput');
+
+            $this->dispatch('toast', [
+                'message' => 'Data luaran wajib berhasil disimpan.',
+                'variant' => 'success',
+                'title' => 'Berhasil',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+        }
     }
 
     /**
@@ -286,17 +298,75 @@ class Show extends Component
             abort(403);
         }
 
-        $this->form->saveAdditionalOutput($proposalOutputId);
-        $this->dispatch('close-modal', detail: ['modalId' => 'modalAdditionalOutput']);
-        session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+        try {
+            $this->form->saveAdditionalOutput($proposalOutputId);
+
+            $this->dispatch('close-modal', modalId: 'modalAdditionalOutput');
+
+            $this->dispatch('toast', [
+                'message' => 'Data luaran tambahan berhasil disimpan.',
+                'variant' => 'success',
+                'title' => 'Berhasil',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+        }
     }
 
     /**
-     * Validate mandatory output
+     * Handle mandatory output file upload (real-time)
      */
-    public function validateMandatoryOutput(int $proposalOutputId): void
+    public function updatedTempMandatoryFiles($value, $key): void
     {
-        $this->form->validateMandatoryOutput($proposalOutputId);
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateMandatoryFile((int) $key);
+            
+            $this->form->tempMandatoryFiles[(int)$key] = $value;
+            $this->form->saveMandatoryOutputWithFile((int) $key, validate: false);
+            
+            $this->progressReport = $this->form->progressReport;
+            unset($this->tempMandatoryFiles[$key]);
+            
+            session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+        }
+    }
+
+    /**
+     * Handle additional output file upload (real-time)
+     */
+    public function updatedTempAdditionalFiles($value, $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateAdditionalFile((int) $key);
+            
+            $this->form->tempAdditionalFiles[(int)$key] = $value;
+            $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
+            
+            $this->progressReport = $this->form->progressReport;
+            unset($this->tempAdditionalFiles[$key]);
+            
+            session()->flash('success', 'File luaran tambahan berhasil disimpan.');
+        }
+    }
+
+    /**
+     * Handle additional output certificate upload (real-time)
+     */
+    public function updatedTempAdditionalCerts($value, $key): void
+    {
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->validateAdditionalCert((int) $key);
+            
+            $this->form->tempAdditionalCerts[(int)$key] = $value;
+            $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
+            
+            $this->progressReport = $this->form->progressReport;
+            unset($this->tempAdditionalCerts[$key]);
+            
+            session()->flash('success', 'Sertifikat berhasil disimpan.');
+        }
     }
 
     /**

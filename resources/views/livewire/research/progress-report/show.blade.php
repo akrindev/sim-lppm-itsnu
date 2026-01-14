@@ -8,7 +8,16 @@
     </a>
 </x-slot:pageActions>
 
-<div>
+<div x-on:close-modal.window="
+    const modalId = $event.detail.modalId || $event.detail[0]?.modalId;
+    if (modalId) {
+        const modalEl = document.getElementById(modalId);
+        if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+    }
+">
     <x-tabler.alert />
 
     <!-- Ringkasan & Kata Kunci -->
@@ -98,266 +107,271 @@
     </div>
 
     <!-- Luaran Wajib -->
-    <div class="card mb-3">
-        <div class="card-header">
-            <h3 class="card-title"><x-lucide-book-open class="icon me-2" />Luaran Wajib</h3>
-        </div>
-        <div class="card-body">
-            @php
-                $wajibs = $proposal->outputs->where('category', 'Wajib');
-            @endphp
+    @if ($progressReport)
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title"><x-lucide-book-open class="icon me-2" />Luaran Wajib</h3>
+            </div>
+            <div class="card-body">
+                @php
+                    $wajibs = $proposal->outputs->where('category', 'Wajib');
+                @endphp
 
-            @if ($wajibs->isNotEmpty())
-                <div class="table-responsive">
-                    <table class="card-table table-vcenter table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Jenis Luaran</th>
-                                <th>Tahun Target</th>
-                                <th>Target Status</th>
-                                <th>Status Input</th>
-                                <th>Dokumen</th>
-                                <th class="w-1">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($wajibs as $index => $output)
-                                @php
-                                    $rowMandatoryOutput = $progressReport
-                                        ? $progressReport
-                                            ->mandatoryOutputs()
-                                            ->where('proposal_output_id', $output->id)
-                                            ->first()
-                                        : null;
-                                @endphp
-                                <tr wire:key="wajib-row-{{ $output->id }}">
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>
-                                        <div class="fw-bold">{{ $output->type }}</div>
-                                    </td>
-                                    <td>{{ $output->output_year }}</td>
-                                    <td>
-                                        <x-tabler.badge variant="outline">
-                                            {{ $output->target_status }}
-                                        </x-tabler.badge>
-                                    </td>
-                                    <td>
-                                        @php
-                                            $hasData =
-                                                isset($form->mandatoryOutputs[$output->id]['status_type']) &&
-                                                !empty($form->mandatoryOutputs[$output->id]['status_type']);
-                                        @endphp
-                                        @if ($hasData)
-                                            <x-tabler.badge color="success">
-                                                <x-lucide-check class="icon icon-sm" />
-                                                Sudah Diisi
-                                            </x-tabler.badge>
-                                        @else
-                                            <x-tabler.badge color="secondary">
-                                                Belum Diisi
-                                            </x-tabler.badge>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($rowMandatoryOutput && $rowMandatoryOutput->hasMedia('journal_article'))
-                                            @php
-                                                $media = $rowMandatoryOutput->getFirstMedia('journal_article');
-                                            @endphp
-                                            <a href="{{ $media->getUrl() }}" target="_blank"
-                                                class="btn btn-sm btn-success">
-                                                <x-lucide-file-check class="icon icon-sm" />
-                                                Lihat Dokumen
-                                            </a>
-                                        @else
-                                            <span class="text-muted">
-                                                <x-lucide-file-x class="icon icon-sm" />
-                                                Belum Upload
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($canEdit)
-                                            <button type="button"
-                                                wire:click="editMandatoryOutput({{ $output->id }})"
-                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#modalMandatoryOutput">
-                                                <x-lucide-pencil class="icon" />
-                                            </button>
-                                        @else
-                                            <button type="button"
-                                                wire:click="editMandatoryOutput({{ $output->id }})"
-                                                class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
-                                                data-bs-target="#modalMandatoryOutput">
-                                                <x-lucide-eye class="icon" />
-                                            </button>
-                                        @endif
-                                    </td>
+                @if ($wajibs->isNotEmpty())
+                    <div class="table-responsive">
+                        <table class="card-table table-vcenter table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Jenis Luaran</th>
+                                    <th>Tahun Target</th>
+                                    <th>Target Status</th>
+                                    <th>Status Input</th>
+                                    <th>Dokumen</th>
+                                    <th class="w-1">Aksi</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="text-muted py-4 text-center">
-                    <x-lucide-inbox class="icon icon-lg mb-2" />
-                    <p>Tidak ada luaran wajib yang direncanakan</p>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Luaran Tambahan -->
-    <div class="card mb-3">
-        <div class="card-header">
-            <h3 class="card-title"><x-lucide-book class="icon me-2" />Luaran Tambahan</h3>
-        </div>
-        <div class="card-body">
-            @php
-                $tambahans = $proposal->outputs->where('category', 'Tambahan');
-            @endphp
-
-            @if ($tambahans->isNotEmpty())
-                <div class="table-responsive">
-                    <table class="card-table table-vcenter table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Jenis Luaran</th>
-                                <th>Tahun Target</th>
-                                <th>Status Input</th>
-                                <th>Dokumen</th>
-                                <th class="w-1">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($tambahans as $index => $output)
-                                @php
-                                    $rowAdditionalOutput = $progressReport
-                                        ? $progressReport
-                                            ->additionalOutputs()
-                                            ->where('proposal_output_id', $output->id)
-                                            ->first()
-                                        : null;
-                                @endphp
-                                <tr wire:key="tambahan-row-{{ $output->id }}">
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>
-                                        <div class="fw-bold">{{ $output->type }}</div>
-                                    </td>
-                                    <td>{{ $output->output_year }}</td>
-                                    <td>
-                                        @php
-                                            $hasData =
-                                                isset($form->additionalOutputs[$output->id]['status']) &&
-                                                !empty($form->additionalOutputs[$output->id]['status']);
-                                        @endphp
-                                        @if ($hasData)
-                                            <x-tabler.badge color="success">
-                                                <x-lucide-check class="icon icon-sm" />
-                                                Sudah Diisi
+                            </thead>
+                            <tbody>
+                                @foreach ($wajibs as $index => $output)
+                                    @php
+                                        $rowMandatoryOutput = $progressReport
+                                            ? $progressReport
+                                                ->mandatoryOutputs()
+                                                ->where('proposal_output_id', $output->id)
+                                                ->first()
+                                            : null;
+                                    @endphp
+                                    <tr wire:key="wajib-row-{{ $output->id }}">
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            <div class="fw-bold">{{ $output->type }}</div>
+                                        </td>
+                                        <td>{{ $output->output_year }}</td>
+                                        <td>
+                                            <x-tabler.badge variant="outline">
+                                                {{ $output->target_status }}
                                             </x-tabler.badge>
-                                        @else
-                                            <x-tabler.badge color="secondary">
-                                                Belum Diisi
-                                            </x-tabler.badge>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($rowAdditionalOutput)
-                                            <div class="d-flex gap-2">
-                                                @if ($rowAdditionalOutput->hasMedia('book_document'))
-                                                    @php
-                                                        $media = $rowAdditionalOutput->getFirstMedia('book_document');
-                                                    @endphp
-                                                    <a href="{{ $media->getUrl() }}" target="_blank"
-                                                        class="btn btn-sm btn-success">
-                                                        <x-lucide-book class="icon icon-sm" />
-                                                        Buku
-                                                    </a>
-                                                @endif
-
-                                                @if ($rowAdditionalOutput->hasMedia('publication_certificate'))
-                                                    @php
-                                                        $media = $rowAdditionalOutput->getFirstMedia(
-                                                            'publication_certificate',
-                                                        );
-                                                    @endphp
-                                                    <a href="{{ $media->getUrl() }}" target="_blank"
-                                                        class="btn btn-sm btn-info">
-                                                        <x-lucide-award class="icon icon-sm" />
-                                                        Sertifikat
-                                                    </a>
-                                                @endif
-                                            </div>
-
-                                            @if (!$rowAdditionalOutput->hasMedia('book_document') && !$rowAdditionalOutput->hasMedia('publication_certificate'))
+                                        </td>
+                                        <td>
+                                            @php
+                                                $hasData =
+                                                    isset($form->mandatoryOutputs[$output->id]['status_type']) &&
+                                                    !empty($form->mandatoryOutputs[$output->id]['status_type']);
+                                            @endphp
+                                            @if ($hasData)
+                                                <x-tabler.badge color="success">
+                                                    <x-lucide-check class="icon icon-sm" />
+                                                    Sudah Diisi
+                                                </x-tabler.badge>
+                                            @else
+                                                <x-tabler.badge color="secondary">
+                                                    Belum Diisi
+                                                </x-tabler.badge>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($rowMandatoryOutput && $rowMandatoryOutput->hasMedia('journal_article'))
+                                                @php
+                                                    $media = $rowMandatoryOutput->getFirstMedia('journal_article');
+                                                @endphp
+                                                <a href="{{ $media->getUrl() }}" target="_blank"
+                                                    class="btn btn-sm btn-success">
+                                                    <x-lucide-file-check class="icon icon-sm" />
+                                                    Lihat Dokumen
+                                                </a>
+                                            @else
                                                 <span class="text-muted">
                                                     <x-lucide-file-x class="icon icon-sm" />
                                                     Belum Upload
                                                 </span>
                                             @endif
-                                        @else
-                                            <span class="text-muted">
-                                                <x-lucide-file-x class="icon icon-sm" />
-                                                Belum Upload
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($canEdit)
-                                            <button type="button"
-                                                wire:click="editAdditionalOutput({{ $output->id }})"
-                                                class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#modalAdditionalOutput">
-                                                <x-lucide-pencil class="icon" />
-                                            </button>
-                                        @else
-                                            <button type="button"
-                                                wire:click="editAdditionalOutput({{ $output->id }})"
-                                                class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
-                                                data-bs-target="#modalAdditionalOutput">
-                                                <x-lucide-eye class="icon" />
-                                            </button>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="text-muted py-4 text-center">
-                    <x-lucide-inbox class="icon icon-lg mb-2" />
-                    <p>Tidak ada luaran tambahan yang direncanakan</p>
-                </div>
-            @endif
+                                        </td>
+                                        <td>
+                                            @if ($canEdit)
+                                                <button type="button"
+                                                    wire:click="editMandatoryOutput({{ $output->id }})"
+                                                    class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#modalMandatoryOutput">
+                                                    <x-lucide-pencil class="icon" />
+                                                </button>
+                                            @else
+                                                <button type="button"
+                                                    wire:click="editMandatoryOutput({{ $output->id }})"
+                                                    class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
+                                                    data-bs-target="#modalMandatoryOutput">
+                                                    <x-lucide-eye class="icon" />
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-muted py-4 text-center">
+                        <x-lucide-inbox class="icon icon-lg mb-2" />
+                        <p>Tidak ada luaran wajib yang direncanakan</p>
+                    </div>
+                @endif
+            </div>
         </div>
-    </div>
+
+        <!-- Luaran Tambahan -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title"><x-lucide-book class="icon me-2" />Luaran Tambahan</h3>
+            </div>
+            <div class="card-body">
+                @php
+                    $tambahans = $proposal->outputs->where('category', 'Tambahan');
+                @endphp
+
+                @if ($tambahans->isNotEmpty())
+                    <div class="table-responsive">
+                        <table class="card-table table-vcenter table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Jenis Luaran</th>
+                                    <th>Tahun Target</th>
+                                    <th>Status Input</th>
+                                    <th>Dokumen</th>
+                                    <th class="w-1">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($tambahans as $index => $output)
+                                    @php
+                                        $rowAdditionalOutput = $progressReport
+                                            ? $progressReport
+                                                ->additionalOutputs()
+                                                ->where('proposal_output_id', $output->id)
+                                                ->first()
+                                            : null;
+                                    @endphp
+                                    <tr wire:key="tambahan-row-{{ $output->id }}">
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            <div class="fw-bold">{{ $output->type }}</div>
+                                        </td>
+                                        <td>{{ $output->output_year }}</td>
+                                        <td>
+                                            @php
+                                                $hasData =
+                                                    isset($form->additionalOutputs[$output->id]['status']) &&
+                                                    !empty($form->additionalOutputs[$output->id]['status']);
+                                            @endphp
+                                            @if ($hasData)
+                                                <x-tabler.badge color="success">
+                                                    <x-lucide-check class="icon icon-sm" />
+                                                    Sudah Diisi
+                                                </x-tabler.badge>
+                                            @else
+                                                <x-tabler.badge color="secondary">
+                                                    Belum Diisi
+                                                </x-tabler.badge>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($rowAdditionalOutput)
+                                                <div class="d-flex gap-2">
+                                                    @if ($rowAdditionalOutput->hasMedia('book_document'))
+                                                        @php
+                                                            $media = $rowAdditionalOutput->getFirstMedia('book_document');
+                                                        @endphp
+                                                        <a href="{{ $media->getUrl() }}" target="_blank"
+                                                            class="btn btn-sm btn-success">
+                                                            <x-lucide-book class="icon icon-sm" />
+                                                            Buku
+                                                        </a>
+                                                    @endif
+
+                                                    @if ($rowAdditionalOutput->hasMedia('publication_certificate'))
+                                                        @php
+                                                            $media = $rowAdditionalOutput->getFirstMedia(
+                                                                'publication_certificate',
+                                                            );
+                                                        @endphp
+                                                        <a href="{{ $media->getUrl() }}" target="_blank"
+                                                            class="btn btn-sm btn-info">
+                                                            <x-lucide-award class="icon icon-sm" />
+                                                            Sertifikat
+                                                        </a>
+                                                    @endif
+                                                </div>
+
+                                                @if (!$rowAdditionalOutput->hasMedia('book_document') && !$rowAdditionalOutput->hasMedia('publication_certificate'))
+                                                    <span class="text-muted">
+                                                        <x-lucide-file-x class="icon icon-sm" />
+                                                        Belum Upload
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">
+                                                    <x-lucide-file-x class="icon icon-sm" />
+                                                    Belum Upload
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($canEdit)
+                                                <button type="button"
+                                                    wire:click="editAdditionalOutput({{ $output->id }})"
+                                                    class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#modalAdditionalOutput">
+                                                    <x-lucide-pencil class="icon" />
+                                                </button>
+                                            @else
+                                                <button type="button"
+                                                    wire:click="editAdditionalOutput({{ $output->id }})"
+                                                    class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
+                                                    data-bs-target="#modalAdditionalOutput">
+                                                    <x-lucide-eye class="icon" />
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-muted py-4 text-center">
+                        <x-lucide-inbox class="icon icon-lg mb-2" />
+                        <p>Tidak ada luaran tambahan yang direncanakan</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
 
     <!-- Action Buttons -->
     @if ($canEdit)
         <div class="card">
             <div class="card-body">
                 <div class="justify-content-end btn-list">
-                    <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="save">
-                            <x-lucide-save class="icon" /> Simpan Draft
-                        </span>
-                        <span wire:loading wire:target="save">
-                            <span class="spinner-border spinner-border-sm me-2"></span>
-                            Menyimpan...
-                        </span>
-                    </button>
-                    <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="submit">
-                            <x-lucide-send class="icon" /> Ajukan Laporan
-                        </span>
-                        <span wire:loading wire:target="submit">
-                            <span class="spinner-border spinner-border-sm me-2"></span>
-                            Mengajukan...
-                        </span>
-                    </button>
+                    @if (!$progressReport)
+                        <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="save">
+                                <x-lucide-save class="icon" /> Simpan Draft
+                            </span>
+                            <span wire:loading wire:target="save">
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                Menyimpan...
+                            </span>
+                        </button>
+                    @else
+                        <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="submit">
+                                <x-lucide-send class="icon" /> Ajukan Laporan
+                            </span>
+                            <span wire:loading wire:target="submit">
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                Mengajukan...
+                            </span>
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -365,7 +379,16 @@
 
     <!-- Modal: Mandatory Output -->
     @teleport('body')
-        <x-tabler.modal id="modalMandatoryOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} Luaran Wajib - Jurnal"
+        @php
+            $modalMandatoryTitle = 'Luaran Wajib';
+            if ($editingMandatoryId) {
+                $currentOutput = $proposal->outputs->find($editingMandatoryId);
+                if ($currentOutput) {
+                    $modalMandatoryTitle .= ' - ' . $currentOutput->type;
+                }
+            }
+        @endphp
+        <x-tabler.modal id="modalMandatoryOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} {{ $modalMandatoryTitle }}"
             size="xl" scrollable wire:ignore.self onHide="closeMandatoryModal">
 
             <x-slot:body>
@@ -394,10 +417,10 @@
                                 <option value="">Pilih Status</option>
                                 <option value="draft">Draft</option>
                                 <option value="submitted">Submitted</option>
+                                <option value="under_review">Under Review</option>
                                 <option value="accepted">Accepted</option>
                                 <option value="published">Published</option>
                                 <option value="rejected">Rejected</option>
-                                <option value="granted">Granted (HKI)</option>
                             </select>
                             @error("form.mandatoryOutputs.{$editingMandatoryId}.status_type")
                                 <small class="text-danger">{{ $message }}</small>
@@ -579,6 +602,26 @@
                                     Uploading...
                                 </small>
                             </div>
+
+                            {{-- Preview newly uploaded file (not yet saved to database) --}}
+                            @if (isset($tempMandatoryFiles[$editingMandatoryId]) &&
+                                    $tempMandatoryFiles[$editingMandatoryId] instanceof \Illuminate\Http\UploadedFile)
+                                <div class="alert alert-info mb-0 mt-2">
+                                    <div class="d-flex align-items-center">
+                                        <x-lucide-file-up class="text-info icon me-2" />
+                                        <div class="flex-fill">
+                                            <small class="text-muted">File siap disimpan:</small><br>
+                                            <strong>{{ $tempMandatoryFiles[$editingMandatoryId]->getClientOriginalName() }}</strong>
+                                            <small
+                                                class="text-muted">({{ number_format($tempMandatoryFiles[$editingMandatoryId]->getSize() / 1024, 2) }}
+                                                KB)</small>
+                                        </div>
+                                        <x-lucide-check-circle class="text-success icon" />
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Show existing saved file --}}
                             @if ($mandatoryOutput = $this->mandatoryOutput())
                                 @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
                                     <div class="bg-light mt-2 rounded border p-2">
@@ -610,8 +653,8 @@
                     Tutup
                 </button>
                 @if ($canEdit)
-                    <button type="button" wire:click="saveMandatoryOutput" class="btn btn-primary"
-                        wire:loading.attr="disabled">
+                    <button type="button" wire:click="saveMandatoryOutput({{ $form->editingMandatoryId }})"
+                        class="btn btn-primary" wire:loading.attr="disabled">
                         <span wire:loading.remove wire:target="saveMandatoryOutput">
                             <x-lucide-save class="icon" /> Simpan
                         </span>
@@ -627,7 +670,16 @@
 
     <!-- Modal: Additional Output -->
     @teleport('body')
-        <x-tabler.modal id="modalAdditionalOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} Luaran Tambahan - Buku"
+        @php
+            $modalAdditionalTitle = 'Luaran Tambahan';
+            if ($editingAdditionalId) {
+                $currentOutput = $proposal->outputs->find($editingAdditionalId);
+                if ($currentOutput) {
+                    $modalAdditionalTitle .= ' - ' . $currentOutput->type;
+                }
+            }
+        @endphp
+        <x-tabler.modal id="modalAdditionalOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} {{ $modalAdditionalTitle }}"
             size="lg" scrollable wire:ignore.self onHide="closeAdditionalModal">
 
             <x-slot:body>
@@ -656,10 +708,10 @@
                                 <option value="">Pilih Status</option>
                                 <option value="draft">Draft</option>
                                 <option value="submitted">Submitted</option>
+                                <option value="under_review">Under Review</option>
                                 <option value="accepted">Accepted</option>
                                 <option value="published">Published</option>
                                 <option value="rejected">Rejected</option>
-                                <option value="granted">Granted (HKI)</option>
                             </select>
                             @error("form.additionalOutputs.{$editingAdditionalId}.status")
                                 <small class="text-danger">{{ $message }}</small>
@@ -839,6 +891,26 @@
                                     Uploading...
                                 </small>
                             </div>
+
+                            {{-- Preview newly uploaded file (not yet saved to database) --}}
+                            @if (isset($tempAdditionalFiles[$editingAdditionalId]) &&
+                                    $tempAdditionalFiles[$editingAdditionalId] instanceof \Illuminate\Http\UploadedFile)
+                                <div class="alert alert-info mb-0 mt-2">
+                                    <div class="d-flex align-items-center">
+                                        <x-lucide-file-up class="text-info icon me-2" />
+                                        <div class="flex-fill">
+                                            <small class="text-muted">File siap disimpan:</small><br>
+                                            <strong>{{ $tempAdditionalFiles[$editingAdditionalId]->getClientOriginalName() }}</strong>
+                                            <small
+                                                class="text-muted">({{ number_format($tempAdditionalFiles[$editingAdditionalId]->getSize() / 1024, 2) }}
+                                                KB)</small>
+                                        </div>
+                                        <x-lucide-check-circle class="text-success icon" />
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Show existing saved file --}}
                             @if ($additionalOutput = $this->additionalOutput())
                                 @if ($media = $additionalOutput->getFirstMedia('book_document'))
                                     <div class="bg-light mt-2 rounded border p-2">
@@ -874,6 +946,26 @@
                                     Uploading...
                                 </small>
                             </div>
+
+                            {{-- Preview newly uploaded file (not yet saved to database) --}}
+                            @if (isset($tempAdditionalCerts[$editingAdditionalId]) &&
+                                    $tempAdditionalCerts[$editingAdditionalId] instanceof \Illuminate\Http\UploadedFile)
+                                <div class="alert alert-info mb-0 mt-2">
+                                    <div class="d-flex align-items-center">
+                                        <x-lucide-file-up class="text-info icon me-2" />
+                                        <div class="flex-fill">
+                                            <small class="text-muted">File siap disimpan:</small><br>
+                                            <strong>{{ $tempAdditionalCerts[$editingAdditionalId]->getClientOriginalName() }}</strong>
+                                            <small
+                                                class="text-muted">({{ number_format($tempAdditionalCerts[$editingAdditionalId]->getSize() / 1024, 2) }}
+                                                KB)</small>
+                                        </div>
+                                        <x-lucide-check-circle class="text-success icon" />
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Show existing saved file --}}
                             @if ($additionalOutput = $this->additionalOutput())
                                 @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
                                     <div class="bg-light mt-2 rounded border p-2">
@@ -905,8 +997,8 @@
                     Tutup
                 </button>
                 @if ($canEdit)
-                    <button type="button" wire:click="saveAdditionalOutput" class="btn btn-primary"
-                        wire:loading.attr="disabled">
+                    <button type="button" wire:click="saveAdditionalOutput({{ $form->editingAdditionalId }})"
+                        class="btn btn-primary" wire:loading.attr="disabled">
                         <span wire:loading.remove wire:target="saveAdditionalOutput">
                             <x-lucide-save class="icon" /> Simpan
                         </span>
