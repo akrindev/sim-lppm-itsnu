@@ -83,18 +83,32 @@
 
             <div>
                 @if ($currentStep < 5)
-                    <button type="button" wire:click="saveDraft" class="btn btn-outline-info me-2">
-                        <x-lucide-save class="icon" />
-                        Simpan Draft
+                    <button type="button" wire:click="saveDraft" class="btn btn-outline-info me-2"
+                        wire:loading.attr="disabled" wire:target="saveDraft">
+                        <span wire:loading.remove wire:target="saveDraft">
+                            <x-lucide-save class="icon" />
+                            Simpan Draft
+                        </span>
+                        <span wire:loading wire:target="saveDraft">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Menyimpan...
+                        </span>
                     </button>
                     <button type="button" wire:click="nextStep" class="btn btn-primary">
                         Selanjutnya
                         <x-lucide-arrow-right class="icon" />
                     </button>
                 @else
-                    <button type="button" wire:click="saveDraft" class="btn btn-outline-info me-2">
-                        <x-lucide-save class="icon" />
-                        Simpan Draft
+                    <button type="button" wire:click="saveDraft" class="btn btn-outline-info me-2"
+                        wire:loading.attr="disabled" wire:target="saveDraft">
+                        <span wire:loading.remove wire:target="saveDraft">
+                            <x-lucide-save class="icon" />
+                            Simpan Draft
+                        </span>
+                        <span wire:loading wire:target="saveDraft">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Menyimpan...
+                        </span>
                     </button>
                     <button type="submit" class="btn btn-success">
                         <span class="spinner-border spinner-border-sm me-2" wire:loading role="status"

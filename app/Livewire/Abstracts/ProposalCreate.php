@@ -61,6 +61,28 @@ abstract class ProposalCreate extends Component
 
     abstract protected function getStep2Rules(): array;
 
+    public function validationAttributes(): array
+    {
+        return [
+            'form.title' => 'Judul',
+            'form.research_scheme_id' => 'Skema Penelitian',
+            'form.focus_area_id' => 'Bidang Fokus',
+            'form.theme_id' => 'Tema',
+            'form.topic_id' => 'Topik',
+            'form.national_priority_id' => 'Prioritas Riset Nasional',
+            'form.cluster_level1_id' => 'Rumpun Ilmu Level 1',
+            'form.cluster_level2_id' => 'Rumpun Ilmu Level 2',
+            'form.cluster_level3_id' => 'Rumpun Ilmu Level 3',
+            'form.sbk_value' => 'Nilai SBK',
+            'form.duration_in_years' => 'Lama Kegiatan',
+            'form.start_year' => 'Tahun Usulan',
+            'form.summary' => 'Ringkasan',
+            'form.author_tasks' => 'Tugas Ketua',
+            'form.tkt_type' => 'Jenis TKT',
+            'form.macro_research_group_id' => 'Kelompok Makro Riset',
+        ];
+    }
+
     protected function getProposalTypeForValidation(): string
     {
         return $this->getProposalType();
@@ -165,16 +187,15 @@ abstract class ProposalCreate extends Component
                 $this->form,
                 false // Disable global validation
             );
-            $proposal = $this->form->proposal;
         } else {
             $proposal = app(ProposalService::class)->createProposal(
                 $this->form,
                 $this->getProposalType()
             );
+            $this->form->proposal = $proposal;
         }
 
         session()->flash('success', 'Draft proposal berhasil disimpan.');
-        $this->redirect(route($this->getIndexRoute()));
     }
 
     #[Computed]
