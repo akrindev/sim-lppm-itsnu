@@ -12,9 +12,11 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 abstract class ProposalCreate extends Component
 {
+    use WithFileUploads;
     use WithProposalWizard;
     use WithStepWizard;
 
