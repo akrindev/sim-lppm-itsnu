@@ -34,6 +34,22 @@
         </div>
     </div>
 
+    @if ($errors->any())
+        <div class="alert alert-danger mb-3">
+            <div class="d-flex">
+                <x-lucide-alert-circle class="icon me-2" />
+                <div>
+                    <h4 class="alert-title">Terdapat kesalahan pada input form:</h4>
+                    <ul class="mb-0 ps-3">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <form wire:submit.prevent="save" novalidate>
         <!-- Step Content -->
         @if ($currentStep === 1)

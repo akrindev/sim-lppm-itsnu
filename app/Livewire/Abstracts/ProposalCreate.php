@@ -28,24 +28,28 @@ abstract class ProposalCreate extends Component
 
     public array $budgetValidationErrors = [];
 
-    public function mount(?string $proposalId = null): void
+    public function mount(?string $proposalId = null, ?\App\Models\Proposal $proposal = null): void
     {
         $this->author_name = Auth::user()->name;
 
-        if ($proposalId) {
-            $proposal = \App\Models\Proposal::findOrFail($proposalId);
+        // Handle route model binding (if passed as object) or ID string
+        $proposalToLoad = $proposal ?? ($proposalId ? \App\Models\Proposal::find($proposalId) : null);
 
-            if (! $this->canEditProposal($proposal)) {
+        if ($proposalToLoad) {
+            if (! $this->canEditProposal($proposalToLoad)) {
                 abort(403);
             }
 
-            $this->form->setProposal($proposal);
+            $this->form->setProposal($proposalToLoad);
+        } elseif ($proposalId) {
+            // Fallback if find failed but ID was provided (should have been caught by model binding usually)
+            abort(404);
         }
     }
 
     protected function canEditProposal(\App\Models\Proposal $proposal): bool
     {
-        return $proposal->status === 'draft'
+        return $proposal->status === \App\Enums\ProposalStatus::DRAFT
             && $proposal->submitter_id === Auth::id();
     }
 
@@ -66,6 +70,28 @@ abstract class ProposalCreate extends Component
     public function updateMembers(array $members): void
     {
         $this->form->members = $members;
+    }
+
+    public function updatedFormFocusAreaId(): void
+    {
+        $this->form->theme_id = '';
+        $this->form->topic_id = '';
+    }
+
+    public function updatedFormThemeId(): void
+    {
+        $this->form->topic_id = '';
+    }
+
+    public function updatedFormClusterLevel1Id(): void
+    {
+        $this->form->cluster_level2_id = '';
+        $this->form->cluster_level3_id = '';
+    }
+
+    public function updatedFormClusterLevel2Id(): void
+    {
+        $this->form->cluster_level3_id = '';
     }
 
     public function updateTktResults(array $tktResults): void
@@ -96,12 +122,20 @@ abstract class ProposalCreate extends Component
             $this->getProposalType()
         );
 
-        $proposal = app(ProposalService::class)->createProposal(
-            $this->form,
-            $this->getProposalType()
-        );
+        if ($this->form->proposal) {
+            app(ProposalService::class)->updateProposal(
+                $this->form->proposal,
+                $this->form
+            );
+            $proposal = $this->form->proposal;
+        } else {
+            $proposal = app(ProposalService::class)->createProposal(
+                $this->form,
+                $this->getProposalType()
+            );
+        }
 
-        $this->redirectRoute($this->getShowRoute($proposal->id));
+        $this->redirect($this->getShowRoute($proposal->id));
     }
 
     #[Computed]
@@ -217,8 +251,72 @@ abstract class ProposalCreate extends Component
                 'form.start_year' => 'required|integer|min:2020|max:2050',
                 'form.summary' => 'required|string|min:100',
                 'form.author_tasks' => 'required|string',
+                'form.tkt_type' => $type === 'research' ? 'required|string|max:255' : 'nullable',
+                'form.tkt_results' => $type === 'research' ? ['nullable', 'array', function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        return;
+                    }
+
+                    // 1. Calculate achieved level
+                    $achievedLevel = 0;
+                    // Get level models to map IDs to integer levels
+                    $levels = \App\Models\TktLevel::whereIn('id', array_keys($value))->get();
+
+                    foreach ($levels as $level) {
+                        $data = $value[$level->id] ?? null;
+                        // Check if passed (percentage >= 80)
+                        if ($data && isset($data['percentage']) && $data['percentage'] >= 80) {
+                            $achievedLevel = max($achievedLevel, $level->level);
+                        }
+                    }
+
+                    // 2. Get required range for the scheme if selected
+                    if ($this->form->research_scheme_id) {
+                        $scheme = \App\Models\ResearchScheme::find($this->form->research_scheme_id);
+                        if ($scheme && $scheme->strata) {
+                            $range = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata($scheme->strata);
+
+                            // If range exists (not PKM), validate
+                            if ($range) {
+                                [$min, $max] = $range;
+
+                                // Check if achieved level is within range
+                                if ($achievedLevel < $min || $achievedLevel > $max) {
+                                    $fail("TKT Saat Ini (Level $achievedLevel) tidak sesuai dengan Skema $scheme->strata (Target: Level $min - $max).");
+                                }
+                            }
+                        }
+                    }
+                }] : 'nullable',
             ],
-            2 => $this->getStep2Rules(),
+            2 => array_merge($this->getStep2Rules(), $type === 'research' ? [
+                'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                    $wajibCount = collect($value)->where('category', 'Wajib')->count();
+                    if ($wajibCount < 1) {
+                        $fail('Minimal harus ada 1 luaran wajib untuk proposal penelitian.');
+                    }
+
+                    // Validate each row has required fields
+                    foreach ($value as $index => $item) {
+                        $rowNum = $index + 1;
+                        $errors = [];
+
+                        if (empty($item['group'])) {
+                            $errors[] = 'Kategori Luaran';
+                        }
+                        if (empty($item['type'])) {
+                            $errors[] = 'Luaran';
+                        }
+                        if (empty($item['status'])) {
+                            $errors[] = 'Status';
+                        }
+
+                        if (! empty($errors)) {
+                            $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
+                        }
+                    }
+                }],
+            ] : []),
             3 => [
                 'form.budget_items' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
                     foreach ($value as $index => $item) {
@@ -242,7 +340,7 @@ abstract class ProposalCreate extends Component
                         }
 
                         if (! empty($errors)) {
-                            $fail("Baris {$rowNum}: " . implode(', ', $errors) . ' wajib diisi.');
+                            $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
                         }
                     }
                 }],

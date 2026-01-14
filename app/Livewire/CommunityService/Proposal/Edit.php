@@ -8,14 +8,14 @@ class Edit extends ProposalCreate
 {
     public string $componentId = '';
 
-    public function mount(?string $proposalId = null): void
+    public function mount(?string $proposalId = null, ?\App\Models\Proposal $proposal = null): void
     {
-        if ($proposalId === null) {
+        if ($proposalId === null && $proposal === null) {
             abort(404);
         }
 
-        parent::mount($proposalId);
-        $this->componentId = $proposalId;
+        parent::mount($proposalId, $proposal);
+        $this->componentId = $proposal ? $proposal->id : $proposalId;
     }
 
     protected function getProposalType(): string

@@ -50,6 +50,14 @@
                             <x-lucide-file-check class="text-success icon" />
                             File terpilih: {{ $form->substance_file->getClientOriginalName() }}
                         </div>
+                    @elseif ($form->proposal && $form->proposal->detailable && $form->proposal->detailable->getFirstMediaUrl('substance_file'))
+                        <div class="mt-2">
+                            <x-lucide-file-check class="text-success icon" />
+                            <a href="{{ $form->proposal->detailable->getFirstMediaUrl('substance_file') }}" target="_blank"
+                                class="text-decoration-none">
+                                {{ $form->proposal->detailable->getFirstMedia('substance_file')->file_name }}
+                            </a>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -86,6 +94,22 @@
                 Belum ada luaran target. Klik tombol "Tambah Luaran" untuk menambahkan.
             </div>
         @else
+            @php
+                $outputTypes = [
+                    'jurnal' => [
+                        'Jurnal Nasional Terakreditasi (Sinta 1-2)',
+                        'Jurnal Nasional Terakreditasi (Sinta 3-6)',
+                        'Jurnal Internasional',
+                        'Jurnal Internasional Bereputasi',
+                    ],
+                    'prosiding' => ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional Terindeks'],
+                    'buku' => ['Buku Ajar', 'Buku Referensi', 'Monograf'],
+                    'hki' => ['Paten/Paten Sederhana', 'Hak Cipta', 'Merek', 'Desain Industri'],
+                    'media' => ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
+                    'video' => ['Video Kegiatan'],
+                    'produk' => ['Purwarupa/Prototipe TRL 4-6', 'Model/Purwarupa Sosial', 'TTG', 'Produk/Sistem'],
+                ];
+            @endphp
             <div class="table-responsive">
                 <table class="table-bordered table">
                     <thead>
@@ -104,24 +128,9 @@
                             @php
                                 $startYear = (int) ($form->start_year ?: date('Y'));
                                 $duration = (int) ($form->duration_in_years ?: 1);
+                                $currentGroup = $form->outputs[$index]['group'] ?? '';
                             @endphp
-                            <tr wire:key="output-{{ $index }}" x-data="{
-                                group: $wire.entangle('form.outputs.{{ $index }}.group'),
-                                types: {
-                                    'jurnal': [
-                                        'Jurnal Nasional Terakreditasi (Sinta 1-2)', 
-                                        'Jurnal Nasional Terakreditasi (Sinta 3-6)', 
-                                        'Jurnal Internasional', 
-                                        'Jurnal Internasional Bereputasi'
-                                    ],
-                                    'prosiding': ['Prosiding Seminar Nasional', 'Prosiding Seminar Internasional Terindeks'],
-                                    'buku': ['Buku Ajar', 'Buku Referensi', 'Monograf'],
-                                    'hki': ['Paten/Paten Sederhana', 'Hak Cipta', 'Merek', 'Desain Industri'],
-                                    'media': ['Media Massa Nasional', 'Media Massa Internasional', 'Media Massa Lokal'],
-                                    'video': ['Video Kegiatan'],
-                                    'produk': ['Purwarupa/Prototipe TRL 4-6', 'Model/Purwarupa Sosial', 'TTG', 'Produk/Sistem']
-                                }
-                            }">
+                            <tr wire:key="output-{{ $index }}">
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.year"
                                         class="form-select-sm form-select">
@@ -139,7 +148,8 @@
                                 </td>
 
                                 <td>
-                                    <select x-model="group" class="form-select-sm form-select">
+                                    <select wire:model.live="form.outputs.{{ $index }}.group"
+                                        class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
                                         <option value="jurnal">Jurnal</option>
                                         <option value="prosiding">Prosiding</option>
@@ -154,9 +164,11 @@
                                     <select wire:model="form.outputs.{{ $index }}.type"
                                         class="form-select-sm form-select">
                                         <option value="">-- Pilih --</option>
-                                        <template x-for="type in (types[group] || [])">
-                                            <option x-text="type" :value="type"></option>
-                                        </template>
+                                        @if (!empty($currentGroup) && isset($outputTypes[$currentGroup]))
+                                            @foreach ($outputTypes[$currentGroup] as $typeOption)
+                                                <option value="{{ $typeOption }}">{{ $typeOption }}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 </td>
                                 <td>

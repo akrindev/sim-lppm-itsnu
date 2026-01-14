@@ -46,22 +46,26 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('research')->name('research.')->group(function () {
         Route::get('/', \App\Livewire\Research\Proposal\Index::class)->name('proposal.index');
 
-        Route::get('proposal/create', \App\Livewire\Research\Proposal\Create::class)->name('proposal.create');
+        // Only dosen can create proposals
+        Route::get('proposal/create', \App\Livewire\Research\Proposal\Create::class)
+            ->middleware('role:dosen')
+            ->name('proposal.create');
+
         Route::get('proposal/{proposal}', \App\Livewire\Research\Proposal\Show::class)->name('proposal.show');
         Route::get('proposal/{proposal}/edit', \App\Livewire\Research\Proposal\Edit::class)->name('proposal.edit');
 
         Route::get('proposal-revision', \App\Livewire\Research\ProposalRevision\Index::class)->name('proposal-revision.index');
         Route::get('proposal-revision/{proposal}', \App\Livewire\Research\ProposalRevision\Show::class)->name('proposal-revision.show');
-        
+
         Route::get('progress-report', \App\Livewire\Research\ProgressReport\Index::class)->name('progress-report.index');
         Route::get('progress-report/{proposal}', \App\Livewire\Reports\Show::class)
             ->name('progress-report.show')
             ->defaults('type', 'research-progress');
-            
+
         Route::get('final-report', \App\Livewire\Research\FinalReport\Index::class)->name('final-report.index');
         Route::get('final-report/{proposal}', \App\Livewire\Research\FinalReport\Show::class)
             ->name('final-report.show');
-            
+
         Route::get('daily-note', \App\Livewire\Research\DailyNote\Index::class)->name('daily-note.index');
         Route::get('daily-note/{proposal}', \App\Livewire\Research\DailyNote\Show::class)->name('daily-note.show');
     });
@@ -69,22 +73,27 @@ Route::middleware(['auth'])->group(function () {
     // Community Service Routes
     Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('community-service')->name('community-service.')->group(function () {
         Route::get('/', \App\Livewire\CommunityService\Proposal\Index::class)->name('proposal.index');
-        Route::get('proposal/create', \App\Livewire\CommunityService\Proposal\Create::class)->name('proposal.create');
+
+        // Only dosen can create proposals
+        Route::get('proposal/create', \App\Livewire\CommunityService\Proposal\Create::class)
+            ->middleware('role:dosen')
+            ->name('proposal.create');
+
         Route::get('proposal/{proposal}', \App\Livewire\CommunityService\Proposal\Show::class)->name('proposal.show');
         Route::get('proposal/{proposal}/edit', \App\Livewire\CommunityService\Proposal\Edit::class)->name('proposal.edit');
-        
+
         Route::get('proposal-revision', \App\Livewire\CommunityService\ProposalRevision\Index::class)->name('proposal-revision.index');
         Route::get('proposal-revision/{proposal}', \App\Livewire\CommunityService\ProposalRevision\Show::class)->name('proposal-revision.show');
-        
+
         Route::get('progress-report', \App\Livewire\CommunityService\ProgressReport\Index::class)->name('progress-report.index');
         Route::get('progress-report/{proposal}', \App\Livewire\Reports\Show::class)
             ->name('progress-report.show')
             ->defaults('type', 'community-service-progress');
-            
+
         Route::get('final-report', \App\Livewire\CommunityService\FinalReport\Index::class)->name('final-report.index');
         Route::get('final-report/{proposal}', \App\Livewire\CommunityService\FinalReport\Show::class)
             ->name('final-report.show');
-            
+
         Route::get('daily-note', \App\Livewire\CommunityService\DailyNote\Index::class)->name('daily-note.index');
         Route::get('daily-note/{proposal}', \App\Livewire\CommunityService\DailyNote\Show::class)->name('daily-note.show');
     });
@@ -150,4 +159,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('role.switch');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

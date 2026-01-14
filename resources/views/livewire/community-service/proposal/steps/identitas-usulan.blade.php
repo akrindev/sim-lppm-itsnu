@@ -73,13 +73,15 @@
                 <div class="mb-3">
                     <label class="form-label" for="theme">Tema <span class="text-danger">*</span></label>
                     <div wire:key="theme-select-{{ $form->focus_area_id }}">
-                        <select id="theme" class="form-select @error('form.theme_id') is-invalid @enderror"
-                            wire:model.live="form.theme_id" x-data="tomSelect" placeholder="Pilih tema" required>
-                            <option value="">-- Pilih Tema --</option>
-                            @foreach ($this->themes as $theme)
-                                <option value="{{ $theme->id }}">{{ $theme->name }}</option>
-                            @endforeach
-                        </select>
+                        <div wire:ignore>
+                            <select id="theme" class="form-select @error('form.theme_id') is-invalid @enderror"
+                                wire:model.live="form.theme_id" x-data="tomSelect" placeholder="Pilih tema" required>
+                                <option value="">-- Pilih Tema --</option>
+                                @foreach ($this->themes as $theme)
+                                    <option value="{{ $theme->id }}">{{ $theme->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     @error('form.theme_id')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
@@ -91,13 +93,15 @@
                 <div class="mb-3">
                     <label class="form-label" for="topic">Topik <span class="text-danger">*</span></label>
                     <div wire:key="topic-select-{{ $form->theme_id }}">
-                        <select id="topic" class="form-select @error('form.topic_id') is-invalid @enderror"
-                            wire:model="form.topic_id" x-data="tomSelect" placeholder="Pilih topik" required>
-                            <option value="">-- Pilih Topik --</option>
-                            @foreach ($this->topics as $topic)
-                                <option value="{{ $topic->id }}">{{ $topic->name }}</option>
-                            @endforeach
-                        </select>
+                        <div wire:ignore>
+                            <select id="topic" class="form-select @error('form.topic_id') is-invalid @enderror"
+                                wire:model="form.topic_id" x-data="tomSelect" placeholder="Pilih topik" required>
+                                <option value="">-- Pilih Topik --</option>
+                                @foreach ($this->topics as $topic)
+                                    <option value="{{ $topic->id }}">{{ $topic->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     @error('form.topic_id')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
@@ -142,15 +146,17 @@
                 <div class="mb-3">
                     <label class="form-label" for="cluster_level2">Level 2</label>
                     <div wire:key="cluster2-select-{{ $form->cluster_level1_id }}">
-                        <select id="cluster_level2"
-                            class="form-select @error('form.cluster_level2_id') is-invalid @enderror"
-                            wire:model.live="form.cluster_level2_id" x-data="tomSelect"
-                            placeholder="Pilih level 2 (opsional)">
-                            <option value="">-- Pilih Level 2 (Opsional) --</option>
-                            @foreach ($this->clusterLevel2Options as $cluster)
-                                <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
-                            @endforeach
-                        </select>
+                        <div wire:ignore>
+                            <select id="cluster_level2"
+                                class="form-select @error('form.cluster_level2_id') is-invalid @enderror"
+                                wire:model.live="form.cluster_level2_id" x-data="tomSelect"
+                                placeholder="Pilih level 2 (opsional)">
+                                <option value="">-- Pilih Level 2 (Opsional) --</option>
+                                @foreach ($this->clusterLevel2Options as $cluster)
+                                    <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     @error('form.cluster_level2_id')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
@@ -162,15 +168,17 @@
                 <div class="mb-3">
                     <label class="form-label" for="cluster_level3">Level 3</label>
                     <div wire:key="cluster3-select-{{ $form->cluster_level2_id }}">
-                        <select id="cluster_level3"
-                            class="form-select @error('form.cluster_level3_id') is-invalid @enderror"
-                            wire:model="form.cluster_level3_id" x-data="tomSelect"
-                            placeholder="Pilih level 3 (opsional)">
-                            <option value="">-- Pilih Level 3 (Opsional) --</option>
-                            @foreach ($this->clusterLevel3Options as $cluster)
-                                <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
-                            @endforeach
-                        </select>
+                        <div wire:ignore>
+                            <select id="cluster_level3"
+                                class="form-select @error('form.cluster_level3_id') is-invalid @enderror"
+                                wire:model="form.cluster_level3_id" x-data="tomSelect"
+                                placeholder="Pilih level 3 (opsional)">
+                                <option value="">-- Pilih Level 3 (Opsional) --</option>
+                                @foreach ($this->clusterLevel3Options as $cluster)
+                                    <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     @error('form.cluster_level3_id')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
@@ -184,25 +192,6 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label" for="cluster_level3">Level 3</label>
-                    <div wire:ignore>
-                        <select id="cluster_level3"
-                            class="form-select @error('form.cluster_level3_id') is-invalid @enderror"
-                            wire:model.live="form.cluster_level3_id" x-data="tomSelect"
-                            placeholder="Pilih level 3 (opsional)">
-                            <option value="">-- Pilih Level 3 (Opsional) --</option>
-                            @foreach ($this->clusterLevel3Options as $cluster)
-                                <option value="{{ $cluster->id }}">{{ $cluster->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    @error('form.cluster_level3_id')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
         </div>
     </div>
 </div>

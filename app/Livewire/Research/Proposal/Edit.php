@@ -8,14 +8,14 @@ class Edit extends ProposalCreate
 {
     public string $componentId = '';
 
-    public function mount(?string $proposalId = null): void
+    public function mount(?string $proposalId = null, ?\App\Models\Proposal $proposal = null): void
     {
-        if ($proposalId === null) {
+        if ($proposalId === null && $proposal === null) {
             abort(404);
         }
 
-        parent::mount($proposalId);
-        $this->componentId = $proposalId;
+        parent::mount($proposalId, $proposal);
+        $this->componentId = $proposal ? $proposal->id : $proposalId;
     }
 
     protected function getProposalType(): string
@@ -36,11 +36,37 @@ class Edit extends ProposalCreate
     protected function getStep2Rules(): array
     {
         $rules = [
-            'form.background' => 'required|string|min:50',
-            'form.methodology' => 'required|string|min:50',
-            'form.state_of_the_art' => 'required|string|min:50',
+            // 'form.background' => 'required|string|min:50',
+            // 'form.methodology' => 'required|string|min:50',
+            // 'form.state_of_the_art' => 'required|string|min:50',
             'form.author_tasks' => 'required|string',
             'form.macro_research_group_id' => 'required|exists:macro_research_groups,id',
+            'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                $wajibCount = collect($value)->where('category', 'Wajib')->count();
+                if ($wajibCount < 1) {
+                    $fail('Minimal harus ada 1 luaran wajib untuk proposal penelitian.');
+                }
+
+                // Validate each row has required fields
+                foreach ($value as $index => $item) {
+                    $rowNum = $index + 1;
+                    $errors = [];
+
+                    if (empty($item['group'])) {
+                        $errors[] = 'Kategori Luaran';
+                    }
+                    if (empty($item['type'])) {
+                        $errors[] = 'Luaran';
+                    }
+                    if (empty($item['status'])) {
+                        $errors[] = 'Status';
+                    }
+
+                    if (! empty($errors)) {
+                        $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
+                    }
+                }
+            }],
         ];
 
         $rules['form.tkt_type'] = 'nullable|string';

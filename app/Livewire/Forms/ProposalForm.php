@@ -221,7 +221,7 @@ class ProposalForm extends Form
             return [
                 'year' => $output->output_year,
                 'category' => $output->category,
-                'group' => $output->group ?? '',
+                'group' => strtolower($output->group ?? ''),
                 'type' => $output->type,
                 'status' => $output->target_status,
                 'description' => $output->description ?? '',
@@ -411,7 +411,7 @@ class ProposalForm extends Form
                         'roadmap_data' => $this->roadmap_data ?: null,
                     ]);
 
-                    // Update substance file using Media Library
+                    // Update substance file ONLY if a new file is uploaded
                     if ($this->substance_file && ! is_string($this->substance_file)) {
                         $detailable->clearMediaCollection('substance_file');
                         $detailable
@@ -421,6 +421,8 @@ class ProposalForm extends Form
                             ->withCustomProperties(['uploaded_by' => Auth::id()])
                             ->toMediaCollection('substance_file');
                     }
+                    // IMPORTANT: If $this->substance_file is null, we do NOTHING.
+                    // This preserves the existing file in the media collection.
 
                     // Sync TKT Levels
                     if (! empty($this->tkt_results)) {
@@ -445,7 +447,7 @@ class ProposalForm extends Form
                         'methodology' => $this->methodology,
                     ]);
 
-                    // Update substance file using Media Library
+                    // Update substance file ONLY if a new file is uploaded
                     if ($this->substance_file && ! is_string($this->substance_file)) {
                         $detailable->clearMediaCollection('substance_file');
                         $detailable
@@ -538,6 +540,7 @@ class ProposalForm extends Form
 
         if ($isResearch) {
             $rules['research_scheme_id'] = 'required|exists:research_schemes,id';
+            $rules['tkt_type'] = 'required|string|max:255';
         }
 
         // Add conditional rules based on proposal type
@@ -731,7 +734,7 @@ class ProposalForm extends Form
             // Calculate total spent in this group
             $groupTotal = collect($this->budget_items)
                 ->where('budget_group_id', $group->id)
-                ->sum(fn($item) => (float) ($item['total'] ?? 0));
+                ->sum(fn ($item) => (float) ($item['total'] ?? 0));
 
             // Calculate percentage used BASED ON BUDGET CAP
             $percentageUsed = ($groupTotal / $budgetCap) * 100;
@@ -771,7 +774,7 @@ class ProposalForm extends Form
         }
 
         // Calculate total budget
-        $totalBudget = collect($this->budget_items)->sum(fn($item) => (float) ($item['total'] ?? 0));
+        $totalBudget = collect($this->budget_items)->sum(fn ($item) => (float) ($item['total'] ?? 0));
 
         if ($totalBudget <= 0) {
             return;

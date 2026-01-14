@@ -15,7 +15,7 @@
             }
         @endphp
 
-        @if ($isWithinSchedule)
+        @if ($isWithinSchedule && auth()->user()->activeHasRole('dosen'))
             <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
                 <x-lucide-plus class="icon" />
                 Usulan Penelitian Baru

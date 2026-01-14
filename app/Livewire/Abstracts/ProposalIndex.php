@@ -4,6 +4,7 @@ namespace App\Livewire\Abstracts;
 
 use App\Livewire\Traits\WithFilters;
 use App\Services\ProposalService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -16,6 +17,14 @@ abstract class ProposalIndex extends Component
     public string $confirmingDeleteProposalId = '';
 
     private ?ProposalService $proposalService = null;
+
+    public function mount(): void
+    {
+        // If user is a regular 'dosen' (not an admin/leader role), default to 'ketua' view
+        if (! Auth::user()->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor', 'dekan'])) {
+            $this->roleFilter = 'ketua';
+        }
+    }
 
     private function proposalService(): ProposalService
     {
