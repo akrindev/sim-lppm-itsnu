@@ -219,7 +219,32 @@ abstract class ProposalCreate extends Component
             ],
             2 => $this->getStep2Rules(),
             3 => [
-                'form.budget_items' => 'required|array|min:1',
+                'form.budget_items' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                    foreach ($value as $index => $item) {
+                        $rowNum = $index + 1;
+                        $errors = [];
+
+                        if (empty($item['budget_group_id'])) {
+                            $errors[] = 'Kelompok RAB';
+                        }
+                        if (empty($item['budget_component_id'])) {
+                            $errors[] = 'Komponen';
+                        }
+                        if (empty($item['item'])) {
+                            $errors[] = 'Item';
+                        }
+                        if (empty($item['volume']) || (float) $item['volume'] <= 0) {
+                            $errors[] = 'Volume';
+                        }
+                        if (empty($item['unit_price']) || (float) $item['unit_price'] <= 0) {
+                            $errors[] = 'Harga Satuan';
+                        }
+
+                        if (! empty($errors)) {
+                            $fail("Baris {$rowNum}: " . implode(', ', $errors) . ' wajib diisi.');
+                        }
+                    }
+                }],
             ],
             4 => [
                 'form.partner_ids' => 'nullable|array',
