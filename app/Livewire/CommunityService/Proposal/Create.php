@@ -24,12 +24,14 @@ class Create extends ProposalCreate
     protected function getStep2Rules(): array
     {
         return [
-            'form.background' => 'required|string|min:50',
-            'form.methodology' => 'required|string|min:50',
-            'form.partner_id' => 'nullable|exists:partners,id',
-            'form.partner_issue_summary' => 'nullable|string|min:50',
-            'form.solution_offered' => 'nullable|string|min:50',
-            'form.author_tasks' => 'required|string',
+            'form.macro_research_group_id' => 'nullable|exists:macro_research_groups,id',
+            'form.substance_file' => 'nullable|file|mimes:pdf|max:10240',
+            'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                $wajibCount = collect($value)->where('category', 'Wajib')->count();
+                if ($wajibCount < 1) {
+                    $fail('Minimal harus ada 1 luaran wajib untuk proposal pengabdian masyarakat.');
+                }
+            }],
         ];
     }
 }

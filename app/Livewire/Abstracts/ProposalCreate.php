@@ -215,6 +215,7 @@ abstract class ProposalCreate extends Component
                 'form.duration_in_years' => 'required|integer|min:1|max:10',
                 'form.start_year' => 'required|integer|min:2020|max:2050',
                 'form.summary' => 'required|string|min:100',
+                'form.author_tasks' => 'required|string',
             ],
             2 => $this->getStep2Rules(),
             3 => [

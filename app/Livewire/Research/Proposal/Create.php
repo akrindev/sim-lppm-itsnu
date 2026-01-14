@@ -23,19 +23,15 @@ class Create extends ProposalCreate
 
     protected function getStep2Rules(): array
     {
-        $rules = [
-            'form.background' => 'required|string|min:50',
-            'form.methodology' => 'required|string|min:50',
-            'form.state_of_the_art' => 'required|string|min:50',
-            'form.author_tasks' => 'required|string',
+        return [
             'form.macro_research_group_id' => 'required|exists:macro_research_groups,id',
-            'form.substance_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'form.substance_file' => 'nullable|file|mimes:pdf|max:10240',
+            'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                $wajibCount = collect($value)->where('category', 'Wajib')->count();
+                if ($wajibCount < 1) {
+                    $fail('Minimal harus ada 1 luaran wajib untuk proposal penelitian.');
+                }
+            }],
         ];
-
-        $rules['form.tkt_type'] = 'nullable|string';
-        $rules['form.tkt_results'] = 'nullable|array';
-        $rules['form.roadmap_data'] = 'nullable|array';
-
-        return $rules;
     }
 }
