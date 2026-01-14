@@ -85,7 +85,7 @@ class Show extends Component
                 // Save report via form
                 $report = $this->form->save($this->progressReport);
                 $this->progressReport = $report;
-                
+
                 // Mark as existing draft
                 $this->isFinalReportDraft = true;
 
@@ -104,7 +104,7 @@ class Show extends Component
             // Let Livewire handle validation errors
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan laporan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan laporan: ' . $e->getMessage());
         }
     }
 
@@ -295,7 +295,7 @@ class Show extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
@@ -321,7 +321,7 @@ class Show extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
@@ -332,13 +332,13 @@ class Show extends Component
     {
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateMandatoryFile((int) $key);
-            
+
             $this->form->tempMandatoryFiles[(int)$key] = $value;
             $this->form->saveMandatoryOutputWithFile((int) $key, validate: false);
-            
+
             $this->progressReport = $this->form->progressReport;
             unset($this->tempMandatoryFiles[$key]);
-            
+
             session()->flash('success', 'Data luaran wajib berhasil disimpan.');
         }
     }
@@ -350,13 +350,13 @@ class Show extends Component
     {
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateAdditionalFile((int) $key);
-            
+
             $this->form->tempAdditionalFiles[(int)$key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
-            
+
             $this->progressReport = $this->form->progressReport;
             unset($this->tempAdditionalFiles[$key]);
-            
+
             session()->flash('success', 'File luaran tambahan berhasil disimpan.');
         }
     }
@@ -368,13 +368,13 @@ class Show extends Component
     {
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateAdditionalCert((int) $key);
-            
+
             $this->form->tempAdditionalCerts[(int)$key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
-            
+
             $this->progressReport = $this->form->progressReport;
             unset($this->tempAdditionalCerts[$key]);
-            
+
             session()->flash('success', 'Sertifikat berhasil disimpan.');
         }
     }
@@ -415,6 +415,38 @@ class Show extends Component
         return \App\Models\AdditionalOutput::where('progress_report_id', $this->progressReport->id)
             ->where('proposal_output_id', $this->form->editingAdditionalId)
             ->first();
+    }
+
+    /**
+     * Override ManagesOutputs trait method to use form object
+     */
+    public function editMandatoryOutput(int $proposalOutputId): void
+    {
+        $this->form->editMandatoryOutput($proposalOutputId);
+    }
+
+    /**
+     * Override ManagesOutputs trait method to use form object
+     */
+    public function editAdditionalOutput(int $proposalOutputId): void
+    {
+        $this->form->editAdditionalOutput($proposalOutputId);
+    }
+
+    /**
+     * Override ManagesOutputs trait method to use form object
+     */
+    public function closeMandatoryModal(): void
+    {
+        $this->form->closeMandatoryModal();
+    }
+
+    /**
+     * Override ManagesOutputs trait method to use form object
+     */
+    public function closeAdditionalModal(): void
+    {
+        $this->form->closeAdditionalModal();
     }
 
     /**

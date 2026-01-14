@@ -114,10 +114,10 @@ class ReportForm extends Form
         $this->summaryUpdate = $report->summary_update ?? '';
         $this->keywordsInput = $report->keywords->pluck('name')->implode('; ');
         $this->reportingYear = (int) $report->reporting_year;
-        
+
         // Determine if we are cloning from a previous period
         $isCloning = false;
-        
+
         // Force final period if type is final
         if ($this->type === 'final') {
             $this->reportingPeriod = 'final';
@@ -377,31 +377,25 @@ class ReportForm extends Form
             $rules["mandatoryOutputs.{$outputId}.journal_url"] = 'nullable|url';
             $rules["mandatoryOutputs.{$outputId}.article_url"] = 'nullable|url';
             $rules["mandatoryOutputs.{$outputId}.doi"] = 'nullable|string|max:255';
-        } 
-        elseif (str_contains($type, 'buku') || str_contains($group, 'buku') || str_contains($type, 'modul') || str_contains($type, 'pedoman')) {
+        } elseif (str_contains($type, 'buku') || str_contains($group, 'buku') || str_contains($type, 'modul') || str_contains($type, 'pedoman')) {
             $rules["mandatoryOutputs.{$outputId}.book_title"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.publisher"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.isbn"] = 'nullable|string|max:20';
-        }
-        elseif (str_contains($type, 'hki') || str_contains($type, 'paten') || str_contains($type, 'hak cipta') || str_contains($group, 'hki')) {
+        } elseif (str_contains($type, 'hki') || str_contains($type, 'paten') || str_contains($type, 'hak cipta') || str_contains($group, 'hki')) {
             $rules["mandatoryOutputs.{$outputId}.hki_type"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.registration_number"] = 'nullable|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.inventors"] = 'nullable|string|max:255';
-        }
-        elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
+        } elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
             $rules["mandatoryOutputs.{$outputId}.media_name"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.media_url"] = 'required|url';
             $rules["mandatoryOutputs.{$outputId}.publication_date"] = 'required|date';
-        }
-        elseif (str_contains($type, 'video') || str_contains($group, 'video')) {
+        } elseif (str_contains($type, 'video') || str_contains($group, 'video')) {
             $rules["mandatoryOutputs.{$outputId}.video_url"] = 'required|url';
             $rules["mandatoryOutputs.{$outputId}.platform"] = 'nullable|string|max:50';
-        }
-        elseif (str_contains($type, 'produk') || str_contains($type, 'jasa') || str_contains($group, 'produk')) {
+        } elseif (str_contains($type, 'produk') || str_contains($type, 'jasa') || str_contains($type, 'sistem') || str_contains($type, 'ttg') || str_contains($type, 'purwarupa') || str_contains($type, 'prototipe') || str_contains($type, 'model') || str_contains($group, 'produk')) {
             $rules["mandatoryOutputs.{$outputId}.product_name"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.description"] = 'nullable|string';
-        }
-        elseif (str_contains($type, 'pemberdayaan') || str_contains($group, 'pemberdayaan')) {
+        } elseif (str_contains($type, 'pemberdayaan') || str_contains($type, ' mitra') || str_contains($group, 'pemberdayaan')) {
             $rules["mandatoryOutputs.{$outputId}.partner_name"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.indicator_type"] = 'required|string|max:50';
         }
@@ -429,16 +423,13 @@ class ReportForm extends Form
             $rules["additionalOutputs.{$outputId}.total_pages"] = 'nullable|integer|min:1';
             $rules["additionalOutputs.{$outputId}.publisher_url"] = 'nullable|url';
             $rules["additionalOutputs.{$outputId}.book_url"] = 'nullable|url';
-        }
-        elseif (str_contains($type, 'jurnal') || str_contains($group, 'jurnal')) {
+        } elseif (str_contains($type, 'jurnal') || str_contains($group, 'jurnal')) {
             $rules["additionalOutputs.{$outputId}.journal_title"] = 'required|string|max:255';
             $rules["additionalOutputs.{$outputId}.issn"] = 'nullable|string|max:20';
             $rules["additionalOutputs.{$outputId}.doi"] = 'nullable|string|max:255';
-        }
-        elseif (str_contains($type, 'hki') || str_contains($group, 'hki')) {
+        } elseif (str_contains($type, 'hki') || str_contains($group, 'hki')) {
             $rules["additionalOutputs.{$outputId}.hki_type"] = 'required|string|max:255';
-        }
-        elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
+        } elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
             $rules["additionalOutputs.{$outputId}.media_name"] = 'required|string|max:255';
             $rules["additionalOutputs.{$outputId}.media_url"] = 'required|url';
         }
@@ -849,14 +840,14 @@ class ReportForm extends Form
             // I'll skip saving those missing fields for now to avoid crash, or map them to 'description'.
 
             if (isset($data['partner_name'])) {
-               // $outputData['description'] = ($outputData['description'] ? $outputData['description'] . "\n" : "") . "Mitra: " . $data['partner_name'];
-               // Actually, let's just not save them if they don't exist to prevent crash.
-               // Users can put it in description.
-               // Or I can add them to description programmatically if I really want to save them.
-               // For now, I'll comment out the non-existent keys.
-               unset($outputData['partner_name']);
-               unset($outputData['indicator_type']);
-               unset($outputData['improvement_value']);
+                // $outputData['description'] = ($outputData['description'] ? $outputData['description'] . "\n" : "") . "Mitra: " . $data['partner_name'];
+                // Actually, let's just not save them if they don't exist to prevent crash.
+                // Users can put it in description.
+                // Or I can add them to description programmatically if I really want to save them.
+                // For now, I'll comment out the non-existent keys.
+                unset($outputData['partner_name']);
+                unset($outputData['indicator_type']);
+                unset($outputData['improvement_value']);
             }
 
             if ($output) {

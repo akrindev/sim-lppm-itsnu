@@ -1,14 +1,5 @@
-<x-slot:title>Laporan Akhir - {{ $proposal->title }}</x-slot:title>
-<x-slot:pageTitle>Laporan Akhir</x-slot:pageTitle>
-<x-slot:pageSubtitle>{{ $proposal->title }}</x-slot:pageSubtitle>
-<x-slot:pageActions>
-    <a href="{{ route('community-service.final-report.index') }}" class="btn-outline-secondary btn" wire:navigate>
-        <x-lucide-arrow-left class="icon" />
-        Kembali
-    </a>
-</x-slot:pageActions>
-
-<div x-on:close-modal.window="
+<div
+    x-on:close-modal.window="
     const modalId = $event.detail.modalId || $event.detail[0]?.modalId;
     if (modalId) {
         const modalEl = document.getElementById(modalId);
@@ -18,6 +9,15 @@
         }
     }
 ">
+    <x-slot:title>Laporan Akhir - {{ $proposal->title }}</x-slot:title>
+    <x-slot:pageTitle>Laporan Akhir</x-slot:pageTitle>
+    <x-slot:pageSubtitle>{{ $proposal->title }}</x-slot:pageSubtitle>
+    <x-slot:pageActions>
+        <a href="{{ route('community-service.final-report.index') }}" class="btn-outline-secondary btn" wire:navigate>
+            <x-lucide-arrow-left class="icon" />
+            Kembali
+        </a>
+    </x-slot:pageActions>
     <x-tabler.alert />
 
     <!-- Alert Info Workflow -->
@@ -30,15 +30,17 @@
                 <h4 class="alert-title">Panduan Pengisian Laporan Akhir</h4>
                 <div class="text-secondary">
                     <p class="mb-2">
-                        Data ringkasan dan luaran telah diisi otomatis dari Laporan Kemajuan sebelumnya. 
+                        Data ringkasan dan luaran telah diisi otomatis dari Laporan Kemajuan sebelumnya.
                         Silakan periksa kembali dan lengkapi data terbaru.
                     </p>
                     <ol class="mb-0 ps-3">
                         <li>Lengkapi <strong>Ringkasan & Kata Kunci</strong> serta upload dokumen laporan akhir.</li>
                         <li>Klik tombol <strong>Simpan Draft</strong> untuk menyimpan data sementara.</li>
-                        <li>Setelah draft tersimpan, kolom upload <strong>Luaran Wajib</strong> dan <strong>Luaran Tambahan</strong> akan muncul.</li>
+                        <li>Setelah draft tersimpan, kolom upload <strong>Luaran Wajib</strong> dan <strong>Luaran
+                                Tambahan</strong> akan muncul.</li>
                         <li>Upload bukti luaran yang diperlukan pada bagian tersebut.</li>
-                        <li>Jika semua data sudah lengkap, klik <strong>Ajukan Laporan Akhir</strong> untuk mengirim laporan.</li>
+                        <li>Jika semua data sudah lengkap, klik <strong>Ajukan Laporan Akhir</strong> untuk mengirim
+                            laporan.</li>
                     </ol>
                 </div>
             </div>
@@ -63,7 +65,7 @@
             <div class="mb-3">
                 <label class="form-label">Kata Kunci (Keywords)</label>
                 <input type="text" wire:model="form.keywordsInput" class="form-control"
-                    placeholder="Contoh: AI; Machine Learning; IoT" /> @disabled(!$canEdit) />
+                    placeholder="Contoh: AI; Machine Learning; IoT" @disabled(!$canEdit) />
                 <small class="form-hint">Pisahkan kata kunci dengan titik koma (;). Contoh: AI; Machine Learning; Deep
                     Learning</small>
                 @error('form.keywordsInput')
@@ -73,8 +75,8 @@
 
             <div class="mb-3">
                 <label class="form-label required">Tahun Pelaporan</label>
-                <input type="number" wire:model="form.reportingYear" class="form-control" min="2020"
-                    max="2030" /> @disabled(!$canEdit) />
+                <input type="number" wire:model="form.reportingYear" class="form-control" min="2020" max="2030"
+                    @disabled(!$canEdit) />
                 @error('form.reportingYear')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -199,244 +201,10 @@
     </div>
 
     <!-- Luaran Wajib -->
-    @if ($isFinalReportDraft)
-        <div class="card mb-3">
-            <div class="card-header">
-                <h3 class="card-title"><x-lucide-book-open class="icon me-2" />Luaran Wajib</h3>
-            </div>
-            <div class="card-body">
-                @php
-                    $wajibs = $proposal->outputs->where('category', 'Wajib');
-                @endphp
-
-                @if ($wajibs->isNotEmpty())
-                    <div class="table-responsive">
-                        <table class="card-table table-vcenter table">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Jenis Luaran</th>
-                                    <th>Tahun Target</th>
-                                    <th>Target Status</th>
-                                    <th>Status Input</th>
-                                    <th>Dokumen</th>
-                                    <th class="w-1">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($wajibs as $index => $output)
-                                    @php
-                                        $rowMandatoryOutput = $progressReport
-                                            ? $progressReport
-                                                ->mandatoryOutputs()
-                                                ->where('proposal_output_id', $output->id)
-                                                ->first()
-                                            : null;
-                                    @endphp
-                                    <tr wire:key="wajib-row-{{ $output->id }}">
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>
-                                            <div class="fw-bold">{{ $output->type }}</div>
-                                        </td>
-                                        <td>{{ $output->output_year }}</td>
-                                        <td>
-                                            <x-tabler.badge variant="outline">
-                                                {{ $output->target_status }}
-                                            </x-tabler.badge>
-                                        </td>
-                                        <td>
-                                            @php
-                                                $hasData =
-                                                    isset($form->mandatoryOutputs[$output->id]['status_type']) &&
-                                                    !empty($form->mandatoryOutputs[$output->id]['status_type']);
-                                            @endphp
-                                            @if ($hasData)
-                                                <x-tabler.badge color="success">
-                                                    <x-lucide-check class="icon icon-sm" />
-                                                    Sudah Diisi
-                                                </x-tabler.badge>
-                                            @else
-                                                <x-tabler.badge color="secondary">
-                                                    Belum Diisi
-                                                </x-tabler.badge>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($rowMandatoryOutput && $rowMandatoryOutput->hasMedia('journal_article'))
-                                                @php
-                                                    $media = $rowMandatoryOutput->getFirstMedia('journal_article');
-                                                @endphp
-                                                <a href="{{ $media->getUrl() }}" target="_blank"
-                                                    class="btn btn-sm btn-success">
-                                                    <x-lucide-file-check class="icon icon-sm" />
-                                                    Lihat Dokumen
-                                                </a>
-                                            @else
-                                                <span class="text-muted">
-                                                    <x-lucide-file-x class="icon icon-sm" />
-                                                    Belum Upload
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($canEdit)
-                                                <button type="button"
-                                                    wire:click="editMandatoryOutput({{ $output->id }})"
-                                                    class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                                    data-bs-target="#modalMandatoryOutput">
-                                                    <x-lucide-pencil class="icon" />
-                                                </button>
-                                            @else
-                                                <button type="button"
-                                                    wire:click="editMandatoryOutput({{ $output->id }})"
-                                                    class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
-                                                    data-bs-target="#modalMandatoryOutput">
-                                                    <x-lucide-eye class="icon" />
-                                                </button>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="text-muted py-4 text-center">
-                        <x-lucide-inbox class="icon icon-lg mb-2" />
-                        <p>Tidak ada luaran wajib yang direncanakan</p>
-                    </div>
-                @endif
-            </div>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title"><x-lucide-book-open class="icon me-2" />Luaran Wajib</h3>
         </div>
-
-        <!-- Luaran Tambahan -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h3 class="card-title"><x-lucide-book class="icon me-2" />Luaran Tambahan</h3>
-            </div>
-            <div class="card-body">
-                @php
-                    $tambahans = $proposal->outputs->where('category', 'Tambahan');
-                @endphp
-
-                @if ($tambahans->isNotEmpty())
-                    <div class="table-responsive">
-                        <table class="card-table table-vcenter table">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Jenis Luaran</th>
-                                    <th>Tahun Target</th>
-                                    <th>Status Input</th>
-                                    <th>Dokumen</th>
-                                    <th class="w-1">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($tambahans as $index => $output)
-                                    @php
-                                        $rowAdditionalOutput = $progressReport
-                                            ? $progressReport
-                                                ->additionalOutputs()
-                                                ->where('proposal_output_id', $output->id)
-                                                ->first()
-                                            : null;
-                                    @endphp
-                                    <tr wire:key="tambahan-row-{{ $output->id }}">
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>
-                                            <div class="fw-bold">{{ $output->type }}</div>
-                                        </td>
-                                        <td>{{ $output->output_year }}</td>
-                                        <td>
-                                            @php
-                                                $hasData =
-                                                    isset($form->additionalOutputs[$output->id]['status']) &&
-                                                    !empty($form->additionalOutputs[$output->id]['status']);
-                                            @endphp
-                                            @if ($hasData)
-                                                <x-tabler.badge color="success">
-                                                    <x-lucide-check class="icon icon-sm" />
-                                                    Sudah Diisi
-                                                </x-tabler.badge>
-                                            @else
-                                                <x-tabler.badge color="secondary">
-                                                    Belum Diisi
-                                                </x-tabler.badge>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($rowAdditionalOutput)
-                                                <div class="d-flex gap-2">
-                                                    @if ($rowAdditionalOutput->hasMedia('book_document'))
-                                                        @php
-                                                            $media = $rowAdditionalOutput->getFirstMedia('book_document');
-                                                        @endphp
-                                                        <a href="{{ $media->getUrl() }}" target="_blank"
-                                                            class="btn btn-sm btn-success">
-                                                            <x-lucide-book class="icon icon-sm" />
-                                                            Buku
-                                                        </a>
-                                                    @endif
-
-                                                    @if ($rowAdditionalOutput->hasMedia('publication_certificate'))
-                                                        @php
-                                                            $media = $rowAdditionalOutput->getFirstMedia(
-                                                                'publication_certificate',
-                                                            );
-                                                        @endphp
-                                                        <a href="{{ $media->getUrl() }}" target="_blank"
-                                                            class="btn btn-sm btn-info">
-                                                            <x-lucide-award class="icon icon-sm" />
-                                                            Sertifikat
-                                                        </a>
-                                                    @endif
-                                                </div>
-
-                                                @if (!$rowAdditionalOutput->hasMedia('book_document') && !$rowAdditionalOutput->hasMedia('publication_certificate'))
-                                                    <span class="text-muted">
-                                                        <x-lucide-file-x class="icon icon-sm" />
-                                                        Belum Upload
-                                                    </span>
-                                                @endif
-                                            @else
-                                                <span class="text-muted">
-                                                    <x-lucide-file-x class="icon icon-sm" />
-                                                    Belum Upload
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($canEdit)
-                                                <button type="button"
-                                                    wire:click="editAdditionalOutput({{ $output->id }})"
-                                                    class="btn btn-sm btn-icon btn-primary" data-bs-toggle="modal"
-                                                    data-bs-target="#modalAdditionalOutput">
-                                                    <x-lucide-pencil class="icon" />
-                                                </button>
-                                            @else
-                                                <button type="button"
-                                                    wire:click="editAdditionalOutput({{ $output->id }})"
-                                                    class="btn btn-sm btn-icon btn-info" data-bs-toggle="modal"
-                                                    data-bs-target="#modalAdditionalOutput">
-                                                    <x-lucide-eye class="icon" />
-                                                </button>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="text-muted py-4 text-center">
-                        <x-lucide-inbox class="icon icon-lg mb-2" />
-                        <p>Tidak ada luaran tambahan yang direncanakan</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-    @endif
         <div class="card-body">
             @php
                 $wajibs = $proposal->outputs->where('category', 'Wajib');
@@ -676,7 +444,8 @@
             <div class="card-body">
                 <div class="justify-content-end btn-list">
                     @if (!$isFinalReportDraft)
-                        <button type="button" wire:click="save" class="btn btn-primary" wire:loading.attr="disabled">
+                        <button type="button" wire:click="save" class="btn btn-primary"
+                            wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="save">
                                 <x-lucide-save class="icon" /> Simpan Draft
                             </span>
@@ -686,7 +455,8 @@
                             </span>
                         </button>
                     @else
-                        <button type="button" wire:click="submit" class="btn btn-success" wire:loading.attr="disabled">
+                        <button type="button" wire:click="submit" class="btn btn-success"
+                            wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="submit">
                                 <x-lucide-send class="icon" /> Ajukan Laporan Akhir
                             </span>
@@ -713,7 +483,7 @@
             }
         @endphp
         <x-tabler.modal id="modalMandatoryOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} {{ $modalMandatoryTitle }}"
-            size="xl" scrollable wire:ignore.self onHide="closeMandatoryModal">
+            size="xl" scrollable wire:ignore.self onHide="closeMandatoryModal" componentId="{{ $this->getId() }}">
 
             <x-slot:body>
                 @if ($errors->any())
@@ -932,6 +702,9 @@
                                 str_contains(strtolower($outputType), 'jasa') ||
                                 str_contains(strtolower($outputType), 'sistem') ||
                                 str_contains(strtolower($outputType), 'ttg') ||
+                                str_contains(strtolower($outputType), 'purwarupa') ||
+                                str_contains(strtolower($outputType), 'prototipe') ||
+                                str_contains(strtolower($outputType), 'model') ||
                                 str_contains(strtolower($outputGroup), 'produk'))
                             <div class="col-md-12">
                                 <label class="form-label required">Nama Produk/Jasa</label>
@@ -949,6 +722,7 @@
 
                         <!-- PEMBERDAYAAN MITRA Fields -->
                         @if (str_contains(strtolower($outputType), 'pemberdayaan') ||
+                                str_contains(strtolower($outputType), 'mitra') ||
                                 str_contains(strtolower($outputType), 'peningkatan') ||
                                 str_contains(strtolower($outputGroup), 'pemberdayaan'))
                             <div class="col-md-12">
@@ -1063,7 +837,7 @@
             }
         @endphp
         <x-tabler.modal id="modalAdditionalOutput" title="{{ $canEdit ? 'Edit' : 'Lihat' }} {{ $modalAdditionalTitle }}"
-            size="lg" scrollable wire:ignore.self onHide="closeAdditionalModal">
+            size="lg" scrollable wire:ignore.self onHide="closeAdditionalModal" componentId="{{ $this->getId() }}">
 
             <x-slot:body>
                 @if ($errors->any())
@@ -1088,6 +862,12 @@
                 @endif
 
                 @if ($form->editingAdditionalId)
+                    @php
+                        $currentOutput = $proposal->outputs->find($form->editingAdditionalId);
+                        $outputType = strtolower($currentOutput?->type ?? '');
+                        $outputGroup = strtolower($currentOutput?->group ?? '');
+                    @endphp
+
                     <div class="row g-3">
                         <!-- Status -->
                         <div class="col-md-12">
@@ -1102,117 +882,155 @@
                                 <option value="published">Published</option>
                                 <option value="rejected">Rejected</option>
                             </select>
-                            @error("form.additionalOutputs.{$editingAdditionalId}.status")
+                            @error("form.additionalOutputs.{$form->editingAdditionalId}.status")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
 
-                        <!-- Book Title -->
-                        <div class="col-md-12">
-                            <label class="form-label required">Judul Buku</label>
-                            <input type="text"
-                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.book_title"
-                                class="form-control" placeholder="Masukkan judul buku" @disabled(!$canEdit) />
-                            @error("form.additionalOutputs.{$editingAdditionalId}.book_title")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                        <!-- BOOK Fields -->
+                        @if (str_contains($outputType, 'buku') || str_contains($outputGroup, 'buku'))
+                            <div class="col-md-12">
+                                <label class="form-label required">Judul Buku</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.book_title"
+                                    class="form-control" placeholder="Masukkan judul buku"
+                                    @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Nama Penerbit</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publisher_name"
+                                    class="form-control" placeholder="Masukkan nama penerbit"
+                                    @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">ISBN</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.isbn"
+                                    class="form-control" placeholder="978-xxx-xxx-xxx-x" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tahun Terbit</label>
+                                <input type="number"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publication_year"
+                                    class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Jumlah Halaman</label>
+                                <input type="number"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.total_pages"
+                                    class="form-control" placeholder="100" @disabled(!$canEdit) />
+                            </div>
+                        @endif
 
-                        <!-- Publisher Name -->
+                        <!-- JURNAL/PROSIDING Fields -->
+                        @if (str_contains($outputType, 'jurnal') ||
+                                str_contains($outputGroup, 'jurnal') ||
+                                str_contains($outputType, 'prosiding') ||
+                                str_contains($outputGroup, 'prosiding'))
+                            <div class="col-md-12">
+                                <label class="form-label required">Judul
+                                    {{ str_contains($outputType, 'prosiding') ? 'Prosiding' : 'Jurnal' }}</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.journal_title"
+                                    class="form-control" placeholder="Masukkan judul" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label
+                                    class="form-label">{{ str_contains($outputType, 'prosiding') ? 'ISBN' : 'ISSN' }}</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.issn"
+                                    class="form-control" placeholder="1234-5678" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">DOI</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.doi"
+                                    class="form-control" placeholder="10.xxxx/..." @disabled(!$canEdit) />
+                            </div>
+                        @endif
+
+                        <!-- HKI Fields -->
+                        @if (str_contains($outputType, 'hki') || str_contains($outputGroup, 'hki'))
+                            <div class="col-md-6">
+                                <label class="form-label required">Jenis HKI</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.hki_type"
+                                    class="form-control" placeholder="Paten, Hak Cipta, Merek, dll"
+                                    @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nomor Pendaftaran</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.registration_number"
+                                    class="form-control" placeholder="Nomor" @disabled(!$canEdit) />
+                            </div>
+                        @endif
+
+                        <!-- MEDIA MASSA Fields -->
+                        @if (str_contains($outputType, 'media') || str_contains($outputGroup, 'media'))
+                            <div class="col-md-12">
+                                <label class="form-label required">Nama Media Massa</label>
+                                <input type="text"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.media_name"
+                                    class="form-control" placeholder="Kompas, Detik, dll" @disabled(!$canEdit) />
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label required">URL Berita</label>
+                                <input type="url"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.media_url"
+                                    class="form-control" placeholder="https://" @disabled(!$canEdit) />
+                            </div>
+                        @endif
+
+                        <!-- VIDEO Fields -->
+                        @if (str_contains($outputType, 'video') || str_contains($outputGroup, 'video'))
+                            <div class="col-md-12">
+                                <label class="form-label required">URL Video</label>
+                                <input type="url"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.video_url"
+                                    class="form-control" placeholder="https://youtube.com/..."
+                                    @disabled(!$canEdit) />
+                            </div>
+                        @endif
+
+                        <!-- Common Year Field (if not book) -->
+                        @if (!str_contains($outputType, 'buku') && !str_contains($outputGroup, 'buku'))
+                            <div class="col-md-6">
+                                <label class="form-label">Tahun Publikasi/Pelaksanaan</label>
+                                <input type="number"
+                                    wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publication_year"
+                                    class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
+                            </div>
+                        @endif
+
+                        <!-- URL Fields for All -->
                         <div class="col-md-6">
-                            <label class="form-label required">Nama Penerbit</label>
-                            <input type="text"
-                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publisher_name"
-                                class="form-control" placeholder="Masukkan nama penerbit" @disabled(!$canEdit) />
-                            @error("form.additionalOutputs.{$editingAdditionalId}.publisher_name")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- ISBN -->
-                        <div class="col-md-6">
-                            <label class="form-label">ISBN</label>
-                            <input type="text"
-                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.isbn"
-                                class="form-control" placeholder="978-xxx-xxx-xxx-x" @disabled(!$canEdit) />
-                            @error("form.additionalOutputs.{$editingAdditionalId}.isbn")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Publication Year -->
-                        <div class="col-md-6">
-                            <label class="form-label">Tahun Terbit</label>
-                            <input type="number"
-                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publication_year"
-                                class="form-control" min="2000" max="2030" @disabled(!$canEdit) />
-                            @disabled(!$canEdit) />
-                            @error("form.additionalOutputs.{$editingAdditionalId}.publication_year")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Total Pages -->
-                        <div class="col-md-6">
-                            <label class="form-label">Jumlah Halaman</label>
-                            <input type="number"
-                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.total_pages"
-                                class="form-control" placeholder="100" @disabled(!$canEdit) />
-                            @error("form.additionalOutputs.{$editingAdditionalId}.total_pages")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Publisher URL -->
-                        <div class="col-md-6">
-                            <label class="form-label">URL Web Penerbit</label>
-                            <input type="url"
-                                wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.publisher_url"
-                                class="form-control" placeholder="https://" @disabled(!$canEdit) />
-                            @error("form.additionalOutputs.{$editingAdditionalId}.publisher_url")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- Book URL -->
-                        <div class="col-md-6">
-                            <label class="form-label">URL Buku</label>
+                            <label class="form-label">URL Pendukung/Web</label>
                             <input type="url"
                                 wire:model="form.additionalOutputs.{{ $form->editingAdditionalId }}.book_url"
                                 class="form-control" placeholder="https://" @disabled(!$canEdit) />
-                            @error("form.additionalOutputs.{$editingAdditionalId}.book_url")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
                         </div>
 
-                        <!-- Document File -->
+                        <!-- Document File Upload -->
                         <div class="col-md-6">
-                            <label class="form-label">Dokumen Buku/Draft</label>
+                            <label class="form-label">Dokumen Bukti (PDF)</label>
                             <input type="file" wire:model="tempAdditionalFiles.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" @disabled(!$canEdit) />
                             @error("tempAdditionalFiles.{$form->editingAdditionalId}")
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
-                            <div wire:loading wire:target="tempAdditionalFiles.{{ $form->editingAdditionalId }}">
-                                <small class="text-muted">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                    Uploading...
-                                </small>
-                            </div>
                             @if ($additionalOutput = $this->additionalOutput())
                                 @if ($media = $additionalOutput->getFirstMedia('book_document'))
                                     <div class="bg-light mt-2 rounded border p-2">
                                         <div class="d-flex align-items-center">
                                             <x-lucide-file-text class="text-primary icon me-2" />
-                                            <div class="flex-fill">
-                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                            <div class="flex-fill text-truncate">
                                                 <strong>{{ $media->file_name }}</strong>
-                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
-                                                    KB)</small>
                                             </div>
                                             <a href="{{ $media->getUrl() }}" target="_blank"
                                                 class="btn btn-sm btn-primary">
-                                                <x-lucide-download class="icon" /> Download
+                                                <x-lucide-eye class="icon" /> Lihat
                                             </a>
                                         </div>
                                     </div>
@@ -1220,34 +1038,22 @@
                             @endif
                         </div>
 
-                        <!-- Publication Certificate -->
+                        <!-- Publication Certificate (Optional) -->
                         <div class="col-md-6">
-                            <label class="form-label">Surat Keterangan Terbit</label>
+                            <label class="form-label">Sertifikat/Surat Keterangan (Opsional)</label>
                             <input type="file" wire:model="tempAdditionalCerts.{{ $form->editingAdditionalId }}"
                                 class="form-control" accept=".pdf" @disabled(!$canEdit) />
-                            @error("tempAdditionalCerts.{$form->editingAdditionalId}")
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                            <div wire:loading wire:target="tempAdditionalCerts.{{ $form->editingAdditionalId }}">
-                                <small class="text-muted">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                    Uploading...
-                                </small>
-                            </div>
                             @if ($additionalOutput = $this->additionalOutput())
                                 @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
                                     <div class="bg-light mt-2 rounded border p-2">
                                         <div class="d-flex align-items-center">
-                                            <x-lucide-file-text class="text-primary icon me-2" />
-                                            <div class="flex-fill">
-                                                <small class="text-muted">File yang sudah diunggah:</small><br>
+                                            <x-lucide-award class="text-info icon me-2" />
+                                            <div class="flex-fill text-truncate">
                                                 <strong>{{ $media->file_name }}</strong>
-                                                <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
-                                                    KB)</small>
                                             </div>
                                             <a href="{{ $media->getUrl() }}" target="_blank"
-                                                class="btn btn-sm btn-primary">
-                                                <x-lucide-download class="icon" /> Download
+                                                class="btn btn-sm btn-info">
+                                                <x-lucide-eye class="icon" /> Lihat
                                             </a>
                                         </div>
                                     </div>
