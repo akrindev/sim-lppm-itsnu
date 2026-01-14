@@ -391,9 +391,11 @@ class ProposalForm extends Form
     /**
      * Update existing proposal
      */
-    public function update(): void
+    public function update(bool $validate = true): void
     {
-        $this->validate();
+        if ($validate) {
+            $this->validate();
+        }
 
         DB::transaction(function (): void {
             // Update detailable based on type

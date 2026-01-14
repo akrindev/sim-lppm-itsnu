@@ -138,6 +138,45 @@ abstract class ProposalCreate extends Component
         $this->redirect($this->getShowRoute($proposal->id));
     }
 
+    public function saveDraft(): void
+    {
+        // Validate only the current step
+        $rules = $this->getStepValidationRules($this->currentStep);
+        if (! empty($rules)) {
+            $this->validate($rules);
+        }
+
+        // Additional validation for budget in step 3 if items are present
+        if ($this->currentStep === 3 && ! empty($this->form->budget_items)) {
+            app(BudgetValidationService::class)->validateBudgetGroupPercentages(
+                $this->form->budget_items,
+                $this->getProposalType()
+            );
+
+            app(BudgetValidationService::class)->validateBudgetCap(
+                $this->form->budget_items,
+                $this->getProposalType()
+            );
+        }
+
+        if ($this->form->proposal) {
+            app(ProposalService::class)->updateProposal(
+                $this->form->proposal,
+                $this->form,
+                false // Disable global validation
+            );
+            $proposal = $this->form->proposal;
+        } else {
+            $proposal = app(ProposalService::class)->createProposal(
+                $this->form,
+                $this->getProposalType()
+            );
+        }
+
+        session()->flash('success', 'Draft proposal berhasil disimpan.');
+        $this->redirect(route($this->getIndexRoute()));
+    }
+
     #[Computed]
     public function schemes()
     {
