@@ -41,6 +41,7 @@ class Edit extends ProposalCreate
             'form.partner_id' => 'nullable|exists:partners,id',
             'form.partner_issue_summary' => 'nullable|string|min:50',
             'form.solution_offered' => 'nullable|string|min:50',
+            'form.substance_file' => 'nullable|file|mimes:pdf|max:10240',
             'form.author_tasks' => 'required|string',
         ];
     }

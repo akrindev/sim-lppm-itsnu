@@ -41,6 +41,7 @@ class Edit extends ProposalCreate
             // 'form.state_of_the_art' => 'required|string|min:50',
             'form.author_tasks' => 'required|string',
             'form.macro_research_group_id' => 'required|exists:macro_research_groups,id',
+            'form.substance_file' => 'nullable|file|mimes:pdf|max:10240',
             'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
                 $wajibCount = collect($value)->where('category', 'Wajib')->count();
                 if ($wajibCount < 1) {
