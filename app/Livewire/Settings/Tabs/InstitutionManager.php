@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Institution;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class InstitutionManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -45,7 +46,7 @@ class InstitutionManager extends Component
             Institution::create(['name' => $this->name]);
         }
 
-        session()->flash('success', $this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan');
+        $this->toastSuccess($this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-institution']);
@@ -64,7 +65,7 @@ class InstitutionManager extends Component
         $institution->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Institusi berhasil dihapus');
+        $this->toastSuccess('Institusi berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -77,7 +78,7 @@ class InstitutionManager extends Component
         if ($this->deleteItemId) {
             Institution::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Institusi berhasil dihapus');
+            $this->toastSuccess('Institusi berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }

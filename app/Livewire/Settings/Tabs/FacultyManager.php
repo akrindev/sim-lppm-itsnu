@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Faculty;
 use App\Models\Institution;
 use Livewire\Attributes\Validate;
@@ -10,7 +11,7 @@ use Livewire\WithPagination;
 
 class FacultyManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -59,7 +60,7 @@ class FacultyManager extends Component
             Faculty::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Fakultas berhasil diubah' : 'Fakultas berhasil ditambahkan');
+        $this->toastSuccess($this->editingId ? 'Fakultas berhasil diubah' : 'Fakultas berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-faculty']);
@@ -80,7 +81,7 @@ class FacultyManager extends Component
         $faculty->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Fakultas berhasil dihapus');
+        $this->toastSuccess('Fakultas berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -93,7 +94,7 @@ class FacultyManager extends Component
         if ($this->deleteItemId) {
             Faculty::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Fakultas berhasil dihapus');
+            $this->toastSuccess('Fakultas berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }

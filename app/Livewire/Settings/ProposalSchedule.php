@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\BudgetCap;
 use App\Models\Setting;
 use Livewire\Attributes\Computed;
@@ -9,6 +10,7 @@ use Livewire\Component;
 
 class ProposalSchedule extends Component
 {
+    use HasToast;
     public $research_start_date;
 
     public $research_end_date;
@@ -39,7 +41,7 @@ class ProposalSchedule extends Component
         Setting::updateOrCreate(['key' => 'community_service_proposal_start_date'], ['value' => $this->community_service_start_date]);
         Setting::updateOrCreate(['key' => 'community_service_proposal_end_date'], ['value' => $this->community_service_end_date]);
 
-        session()->flash('success', 'Jadwal proposal berhasil disimpan.');
+        $this->toastSuccess('Jadwal proposal berhasil disimpan.');
     }
 
     public function render()

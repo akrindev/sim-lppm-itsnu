@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\ResearchScheme;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class ResearchSchemeManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -53,7 +54,7 @@ class ResearchSchemeManager extends Component
             ResearchScheme::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan');
+        $this->toastSuccess($this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-research-scheme']);
@@ -73,7 +74,7 @@ class ResearchSchemeManager extends Component
         $researchScheme->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Skema Penelitian berhasil dihapus');
+        $this->toastSuccess('Skema Penelitian berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -86,7 +87,7 @@ class ResearchSchemeManager extends Component
         if ($this->deleteItemId) {
             ResearchScheme::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Skema Penelitian berhasil dihapus');
+            $this->toastSuccess('Skema Penelitian berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }

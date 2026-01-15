@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\BudgetGroup;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class BudgetGroupManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:2|max:10')]
     public string $code = '';
@@ -69,7 +70,7 @@ class BudgetGroupManager extends Component
             BudgetGroup::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Kelompok Anggaran berhasil diubah' : 'Kelompok Anggaran berhasil ditambahkan');
+        $this->toastSuccess($this->editingId ? 'Kelompok Anggaran berhasil diubah' : 'Kelompok Anggaran berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-group']);
@@ -91,7 +92,7 @@ class BudgetGroupManager extends Component
         $budgetGroup->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Kelompok Anggaran berhasil dihapus');
+        $this->toastSuccess('Kelompok Anggaran berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -104,7 +105,7 @@ class BudgetGroupManager extends Component
         if ($this->deleteItemId) {
             BudgetGroup::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Kelompok Anggaran berhasil dihapus');
+            $this->toastSuccess('Kelompok Anggaran berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }

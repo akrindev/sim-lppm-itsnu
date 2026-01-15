@@ -31,16 +31,9 @@ Usage:
         if ($type) {
             $alerts[$type] = null; // Will use slot
         }
-    } else {
-        // Check session flash for backward compatibility
-        // Note: Toast container now handles these, but we keep this for inline alerts
-        $flashTypes = ['danger' => 'error', 'warning' => 'warning', 'success' => 'success', 'info' => 'info'];
-        foreach ($flashTypes as $alertType => $sessionKey) {
-            if (session($sessionKey)) {
-                $alerts[$alertType] = session($sessionKey);
-            }
-        }
-    }
+    } 
+    // Session flash detection removed to prevent duplicates with Toast system.
+    // Use explicit type/message or slot for inline alerts.
 @endphp
 
 @foreach ($alerts as $alertType => $alertMessage)

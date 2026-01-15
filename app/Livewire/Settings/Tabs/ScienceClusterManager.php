@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\ScienceCluster;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class ScienceClusterManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -74,7 +75,7 @@ class ScienceClusterManager extends Component
             ScienceCluster::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan');
+        $this->toastSuccess($this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-science-cluster']);
@@ -94,7 +95,7 @@ class ScienceClusterManager extends Component
         $scienceCluster->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Klaster Sains berhasil dihapus');
+        $this->toastSuccess('Klaster Sains berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -107,7 +108,7 @@ class ScienceClusterManager extends Component
         if ($this->deleteItemId) {
             ScienceCluster::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Klaster Sains berhasil dihapus');
+            $this->toastSuccess('Klaster Sains berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }

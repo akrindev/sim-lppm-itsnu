@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Theme;
 use App\Models\Topic;
 use Livewire\Attributes\Validate;
@@ -10,7 +11,7 @@ use Livewire\WithPagination;
 
 class TopicManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -55,7 +56,7 @@ class TopicManager extends Component
             Topic::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Topik berhasil diubah' : 'Topik berhasil ditambahkan');
+        $this->toastSuccess($this->editingId ? 'Topik berhasil diubah' : 'Topik berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-topic']);
@@ -75,7 +76,7 @@ class TopicManager extends Component
         $topic->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Topik berhasil dihapus');
+        $this->toastSuccess('Topik berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -88,7 +89,7 @@ class TopicManager extends Component
         if ($this->deleteItemId) {
             Topic::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Topik berhasil dihapus');
+            $this->toastSuccess('Topik berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
