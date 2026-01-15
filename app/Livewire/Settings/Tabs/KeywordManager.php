@@ -51,7 +51,7 @@ class KeywordManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-keyword']);
+        $this->dispatch('close-modal', modalId: 'modal-keyword');
         $this->reset(['name', 'editingId']);
     }
 

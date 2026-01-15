@@ -75,7 +75,7 @@ class BudgetGroupManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-group']);
+        $this->dispatch('close-modal', modalId: 'modal-budget-group');
         $this->reset(['code', 'name', 'description', 'percentage', 'editingId']);
     }
 

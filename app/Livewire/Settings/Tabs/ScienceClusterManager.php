@@ -80,7 +80,7 @@ class ScienceClusterManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-science-cluster']);
+        $this->dispatch('close-modal', modalId: 'modal-science-cluster');
         $this->reset(['name', 'parentId', 'editingId']);
     }
 

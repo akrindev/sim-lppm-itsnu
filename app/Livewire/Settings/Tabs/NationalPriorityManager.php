@@ -51,7 +51,7 @@ class NationalPriorityManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-national-priority']);
+        $this->dispatch('close-modal', modalId: 'modal-national-priority');
         $this->reset(['name', 'editingId']);
     }
 

@@ -61,7 +61,7 @@ class TopicManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-topic']);
+        $this->dispatch('close-modal', modalId: 'modal-topic');
         $this->reset(['name', 'themeId', 'editingId']);
     }
 

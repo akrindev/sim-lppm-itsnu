@@ -162,7 +162,11 @@
                                 try {
                                     const livewireComponent = findLivewireComponent(modalEl);
                                     if (livewireComponent) {
-                                        livewireComponent.call(onShow);
+                                        if (typeof livewireComponent[onShow] === 'function') {
+                                            livewireComponent[onShow]();
+                                        } else {
+                                            livewireComponent.call(onShow);
+                                        }
                                     } else {
                                         console.warn('Livewire component not found for modal:', modalEl.id);
                                     }
@@ -178,7 +182,11 @@
                                 try {
                                     const livewireComponent = findLivewireComponent(modalEl);
                                     if (livewireComponent) {
-                                        livewireComponent.call(onHide);
+                                        if (typeof livewireComponent[onHide] === 'function') {
+                                            livewireComponent[onHide]();
+                                        } else {
+                                            livewireComponent.call(onHide);
+                                        }
                                     } else {
                                         console.warn('Livewire component not found for modal:', modalEl.id);
                                     }
@@ -245,11 +253,28 @@
                     if (modalId) {
                         const modal = document.getElementById(modalId);
                         if (modal) {
-                            // Try bootstrap first, then tabler
-                            const bsModal = bootstrap?.Modal?.getInstance(modal) || 
+                            // Try to get existing instance first
+                            let bsModal = bootstrap?.Modal?.getInstance(modal) || 
                                            tabler?.Modal?.getInstance(modal);
+                            
+                            // If instance not found, try to get or create (it might be in a weird state)
+                            if (!bsModal && (bootstrap?.Modal || tabler?.Modal)) {
+                                bsModal = (bootstrap?.Modal || tabler?.Modal).getOrCreateInstance(modal);
+                            }
+
                             if (bsModal) {
                                 bsModal.hide();
+                                
+                                // Force remove backdrop and classes if it's still stuck
+                                setTimeout(() => {
+                                    if (modal.classList.contains('show')) {
+                                        console.warn('Modal hide failed via BS, forcing cleanup...');
+                                        modal.classList.remove('show');
+                                        modal.style.display = 'none';
+                                        document.body.classList.remove('modal-open');
+                                        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                                    }
+                                }, 500);
                             }
                         }
                     }

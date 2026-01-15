@@ -51,7 +51,7 @@ class InstitutionManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-institution']);
+        $this->dispatch('close-modal', modalId: 'modal-institution');
         $this->reset(['name', 'editingId']);
     }
 

@@ -72,7 +72,7 @@ class BudgetComponentManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-component']);
+        $this->dispatch('close-modal', modalId: 'modal-budget-component');
         $this->reset(['budgetGroupId', 'code', 'name', 'unit', 'description', 'editingId']);
     }
 

@@ -63,7 +63,7 @@ class PartnerManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-partner']);
+        $this->dispatch('close-modal', modalId: 'modal-partner');
         $this->reset(['name', 'type', 'address', 'editingId']);
     }
 

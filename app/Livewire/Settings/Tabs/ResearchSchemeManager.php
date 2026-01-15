@@ -59,7 +59,7 @@ class ResearchSchemeManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-research-scheme']);
+        $this->dispatch('close-modal', modalId: 'modal-research-scheme');
         $this->reset(['name', 'strata', 'editingId']);
     }
 

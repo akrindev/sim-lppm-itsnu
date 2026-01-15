@@ -92,7 +92,7 @@ class BudgetCapManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-cap']);
+        $this->dispatch('close-modal', modalId: 'modal-budget-cap');
         $this->reset(['year', 'research_budget_cap', 'community_service_budget_cap', 'editingId']);
     }
 

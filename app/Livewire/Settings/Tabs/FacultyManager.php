@@ -65,7 +65,7 @@ class FacultyManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-faculty']);
+        $this->dispatch('close-modal', modalId: 'modal-faculty');
         $this->reset(['name', 'code', 'institutionId', 'editingId']);
     }
 

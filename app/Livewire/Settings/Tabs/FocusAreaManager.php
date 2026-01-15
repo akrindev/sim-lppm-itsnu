@@ -51,7 +51,7 @@ class FocusAreaManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-focus-area']);
+        $this->dispatch('close-modal', modalId: 'modal-focus-area');
         $this->reset(['name', 'editingId']);
     }
 

@@ -61,7 +61,7 @@ class ThemeManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-theme']);
+        $this->dispatch('close-modal', modalId: 'modal-theme');
         $this->reset(['name', 'focusAreaId', 'editingId']);
     }
 

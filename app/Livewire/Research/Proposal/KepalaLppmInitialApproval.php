@@ -136,7 +136,7 @@ class KepalaLppmInitialApproval extends Component
                 $this->toastSuccess($message);
             }
 
-            $this->dispatch('close-modal', detail: ['modalId' => 'initialApprovalModal']);
+            $this->dispatch('close-modal', modalId: 'initialApprovalModal');
             $this->dispatch('proposal-initial-approved', proposalId: $proposal->id);
             $this->showModal = false;
             // Refresh page to show updated status

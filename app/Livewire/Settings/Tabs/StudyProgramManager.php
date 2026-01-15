@@ -67,7 +67,7 @@ class StudyProgramManager extends Component
         $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-study-program']);
+        $this->dispatch('close-modal', modalId: 'modal-study-program');
         $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
     }
 
