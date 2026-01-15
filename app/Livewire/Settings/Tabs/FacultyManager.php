@@ -60,7 +60,9 @@ class FacultyManager extends Component
             Faculty::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Fakultas berhasil diubah' : 'Fakultas berhasil ditambahkan');
+        $message = $this->editingId ? 'Fakultas berhasil diubah' : 'Fakultas berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-faculty']);
@@ -81,7 +83,9 @@ class FacultyManager extends Component
         $faculty->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Fakultas berhasil dihapus');
+            $message = 'Fakultas berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -94,7 +98,9 @@ class FacultyManager extends Component
         if ($this->deleteItemId) {
             Faculty::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Fakultas berhasil dihapus');
+        $message = 'Fakultas berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Livewire\Concerns\HasToast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password as PasswordRule;
@@ -10,6 +11,8 @@ use Livewire\Component;
 
 class Password extends Component
 {
+    use HasToast;
+
     public string $current_password = '';
 
     public string $password = '';
@@ -36,7 +39,9 @@ class Password extends Component
             'password' => Hash::make($validated['password']),
         ]);
 
-        session()->flash('status', 'Kata sandi berhasil diperbarui.');
+        $message = 'Kata sandi berhasil diperbarui.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         $this->reset('current_password', 'password', 'password_confirmation');
 

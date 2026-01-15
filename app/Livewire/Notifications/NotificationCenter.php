@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Notifications;
 
+use App\Livewire\Concerns\HasToast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
@@ -9,6 +10,8 @@ use Livewire\Component;
 
 class NotificationCenter extends Component
 {
+    use HasToast;
+
     public string $filter = 'all'; // 'all', 'unread', 'read'
 
     public function render()
@@ -61,7 +64,9 @@ class NotificationCenter extends Component
         });
 
         $this->dispatch('notification-updated');
-        session()->flash('success', 'Semua notifikasi telah ditandai sebagai sudah dibaca.');
+        $message = 'Semua notifikasi telah ditandai sebagai sudah dibaca.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function setFilter(string $filter): void

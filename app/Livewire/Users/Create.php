@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Spatie\Permission\Models\Role;
 #[Layout('components.layouts.app', ['title' => 'Create User', 'pageTitle' => 'Create User', 'pageSubtitle' => 'Add a new user to the system'])]
 class Create extends Component
 {
+    use HasToast;
+
     public string $name = '';
 
     public string $email = '';
@@ -79,7 +82,9 @@ class Create extends Component
             }
         });
 
-        session()->flash('success', 'Pengguna baru telah dibuat.');
+        $message = 'Pengguna baru telah dibuat.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         $this->redirect(route('users.index'), navigate: true);
     }

@@ -1,4 +1,5 @@
 <div>
+    <x-tabler.alert />
     <div class="card border-0">
         <div class="card-header bg-transparent">
             <h3 class="card-title">

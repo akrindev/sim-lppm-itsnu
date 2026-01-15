@@ -54,7 +54,9 @@ class ResearchSchemeManager extends Component
             ResearchScheme::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan');
+        $message = $this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-research-scheme']);
@@ -74,7 +76,9 @@ class ResearchSchemeManager extends Component
         $researchScheme->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Skema Penelitian berhasil dihapus');
+            $message = 'Skema Penelitian berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -87,7 +91,9 @@ class ResearchSchemeManager extends Component
         if ($this->deleteItemId) {
             ResearchScheme::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Skema Penelitian berhasil dihapus');
+        $message = 'Skema Penelitian berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

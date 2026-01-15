@@ -46,7 +46,9 @@ class NationalPriorityManager extends Component
             NationalPriority::create(['name' => $this->name]);
         }
 
-        $this->toastSuccess($this->editingId ? 'Prioritas Nasional berhasil diubah' : 'Prioritas Nasional berhasil ditambahkan');
+        $message = $this->editingId ? 'Prioritas Nasional berhasil diubah' : 'Prioritas Nasional berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-national-priority']);
@@ -65,7 +67,9 @@ class NationalPriorityManager extends Component
         $nationalPriority->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Prioritas Nasional berhasil dihapus');
+            $message = 'Prioritas Nasional berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -78,7 +82,9 @@ class NationalPriorityManager extends Component
         if ($this->deleteItemId) {
             NationalPriority::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Prioritas Nasional berhasil dihapus');
+        $message = 'Prioritas Nasional berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

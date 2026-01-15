@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Reports;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ReportForm;
 use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ReportAccess;
@@ -18,6 +19,7 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
+    use HasToast;
     use HasFileUploads;
     use ReportAccess;
     use ReportAuthorization;
@@ -100,7 +102,9 @@ class Show extends Component
         });
 
         $this->dispatch('report-saved');
-        session()->flash('success', 'Laporan berhasil disimpan.');
+        $message = 'Laporan berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function submit(): void
@@ -123,7 +127,9 @@ class Show extends Component
             $this->config = $this->getConfig('research-progress');
         }
 
-        session()->flash('success', 'Laporan berhasil diajukan.');
+        $message = 'Laporan berhasil diajukan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->redirect(route($this->config['route']), navigate: true);
     }
 
@@ -180,11 +186,15 @@ class Show extends Component
             }
             
             if ($closeModal) {
-                session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+                $message = 'Data luaran wajib berhasil disimpan.';
+                session()->flash('success', $message);
+                $this->toastSuccess($message);
             } else {
                  // For auto-save, maybe a toast? or just silent success + UI update
                  // We can skip flash to avoid annoying popups, or use a different key.
-                 session()->flash('success', 'File berhasil diupload.');
+                 $message = 'File berhasil diupload.';
+                 session()->flash('success', $message);
+                 $this->toastSuccess($message);
             }
             
             // Refresh parent report to update UI status
@@ -196,7 +206,9 @@ class Show extends Component
             throw $e;
         } catch (\Exception $e) {
             // If auto-saving (closeModal = false), we might want to suppress some errors or just show them
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            $message = 'Gagal menyimpan: '.$e->getMessage();
+            session()->flash('error', $message);
+            $this->toastError($message);
         }
     }
 
@@ -242,9 +254,13 @@ class Show extends Component
             }
             
             if ($closeModal) {
-                session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+                $message = 'Data luaran tambahan berhasil disimpan.';
+                session()->flash('success', $message);
+                $this->toastSuccess($message);
             } else {
-                session()->flash('success', 'File berhasil diupload.');
+                $message = 'File berhasil diupload.';
+                session()->flash('success', $message);
+                $this->toastSuccess($message);
             }
 
             // Refresh parent report to update UI status
@@ -255,7 +271,9 @@ class Show extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            $message = 'Gagal menyimpan: '.$e->getMessage();
+            session()->flash('error', $message);
+            $this->toastError($message);
         }
     }
 

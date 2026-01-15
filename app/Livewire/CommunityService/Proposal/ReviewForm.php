@@ -3,6 +3,7 @@
 namespace App\Livewire\CommunityService\Proposal;
 
 use App\Livewire\Actions\CompleteReviewAction;
+use App\Livewire\Concerns\HasToast;
 use App\Models\ProposalReviewer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -12,6 +13,8 @@ use Livewire\Component;
 
 class ReviewForm extends Component
 {
+    use HasToast;
+
     public ProposalReviewer $review;
 
     #[Validate('required|string|min:10')]
@@ -32,7 +35,9 @@ class ReviewForm extends Component
 
         // Verify current user is the reviewer
         if (Auth::id() !== $this->review->user_id) {
-            session()->flash('error', 'Anda tidak memiliki akses untuk melakukan review ini.');
+            $message = 'Anda tidak memiliki akses untuk melakukan review ini.';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
@@ -43,9 +48,11 @@ class ReviewForm extends Component
         if ($result['success']) {
             $this->dispatch('review-completed', reviewId: $this->review->id);
             session()->flash('success', $result['message']);
+            $this->toastSuccess($result['message']);
             $this->reset();
         } else {
             session()->flash('error', $result['message']);
+            $this->toastError($result['message']);
         }
     }
 

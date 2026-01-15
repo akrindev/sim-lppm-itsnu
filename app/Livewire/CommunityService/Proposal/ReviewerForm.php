@@ -3,6 +3,7 @@
 namespace App\Livewire\CommunityService\Proposal;
 
 use App\Enums\ProposalStatus;
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Models\ReviewLog;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,8 @@ use Livewire\Component;
 
 class ReviewerForm extends Component
 {
+    use HasToast;
+
     public string $proposalId = '';
 
     public bool $showForm = false;
@@ -199,7 +202,9 @@ class ReviewerForm extends Component
         $review = $this->myReview;
 
         if (! $review) {
-            $this->dispatch('error', message: 'Anda bukan reviewer untuk proposal ini');
+            $message = 'Anda bukan reviewer untuk proposal ini';
+            $this->toastError($message);
+            $this->dispatch('error', message: $message);
 
             return;
         }
@@ -242,9 +247,12 @@ class ReviewerForm extends Component
 
             // Flash message and dispatch event
             session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->dispatch('review-submitted', proposalId: $this->proposalId);
         } catch (\Exception $e) {
-            $this->dispatch('error', message: 'Gagal menyimpan review: '.$e->getMessage());
+            $message = 'Gagal menyimpan review: '.$e->getMessage();
+            $this->addError('error', $message);
+            $this->toastError($message);
         }
     }
 

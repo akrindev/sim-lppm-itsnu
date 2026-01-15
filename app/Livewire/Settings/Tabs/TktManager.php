@@ -98,7 +98,9 @@ class TktManager extends Component
             }
         }
 
-        $this->toastSuccess($this->editingId ? 'Kategori TKT berhasil diubah' : 'Kategori TKT berhasil ditambahkan');
+        $message = $this->editingId ? 'Kategori TKT berhasil diubah' : 'Kategori TKT berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('close-modal', modalId: 'modal-type');
         $this->resetForm();
     }
@@ -106,7 +108,9 @@ class TktManager extends Component
     public function deleteType($type)
     {
         TktLevel::where('type', $type)->delete();
-        $this->toastSuccess('Kategori TKT berhasil dihapus');
+        $message = 'Kategori TKT berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     // --- Levels CRUD ---
@@ -127,7 +131,9 @@ class TktManager extends Component
 
         TktLevel::find($this->editingId)->update(['description' => $this->levelDescription]);
 
-        $this->toastSuccess('Level TKT berhasil diperbarui');
+        $message = 'Level TKT berhasil diperbarui';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('close-modal', modalId: 'modal-level');
         $this->resetForm();
     }
@@ -171,7 +177,9 @@ class TktManager extends Component
             ]);
         }
 
-        $this->toastSuccess($this->editingId ? 'Indikator berhasil diubah' : 'Indikator berhasil ditambahkan');
+        $message = $this->editingId ? 'Indikator berhasil diubah' : 'Indikator berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('close-modal', modalId: 'modal-indicator');
         $this->resetForm();
     }
@@ -179,7 +187,9 @@ class TktManager extends Component
     public function deleteIndicator($id)
     {
         TktIndicator::find($id)?->delete();
-        $this->toastSuccess('Indikator berhasil dihapus');
+        $message = 'Indikator berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     private function resetForm()

@@ -70,7 +70,9 @@ class BudgetGroupManager extends Component
             BudgetGroup::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Kelompok Anggaran berhasil diubah' : 'Kelompok Anggaran berhasil ditambahkan');
+        $message = $this->editingId ? 'Kelompok Anggaran berhasil diubah' : 'Kelompok Anggaran berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-group']);
@@ -92,7 +94,9 @@ class BudgetGroupManager extends Component
         $budgetGroup->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Kelompok Anggaran berhasil dihapus');
+            $message = 'Kelompok Anggaran berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -105,7 +109,9 @@ class BudgetGroupManager extends Component
         if ($this->deleteItemId) {
             BudgetGroup::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Kelompok Anggaran berhasil dihapus');
+        $message = 'Kelompok Anggaran berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

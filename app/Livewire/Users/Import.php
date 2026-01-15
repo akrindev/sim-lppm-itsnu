@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Identity;
 use App\Models\User;
 use Livewire\Attributes\Layout;
@@ -13,7 +14,7 @@ use Maatwebsite\Excel\Facades\Excel;
 #[Layout('components.layouts.app', ['title' => 'Import Users', 'pageTitle' => 'Import Pengguna', 'pageSubtitle' => 'Import data pengguna dari file Excel'])]
 class Import extends Component
 {
-    use WithFileUploads;
+    use HasToast, WithFileUploads;
 
     #[Validate('required|file|mimes:xlsx,xls')]
     public $file;
@@ -111,16 +112,23 @@ class Import extends Component
         try {
             Excel::import(new \App\Imports\UsersImport, $this->file);
 
+            $message = 'Data pengguna berhasil diimpor.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
+
             $this->redirect(route('users.index'), navigate: true);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
             foreach ($failures as $failure) {
                 $this->validationErrors[$failure->row()] = $failure->errors();
             }
-            $this->addError('error', 'Terdapat kesalahan validasi.');
+            $message = 'Terdapat kesalahan validasi.';
+            $this->addError('error', $message);
+            $this->toastError($message);
         } catch (\Exception $e) {
-            $this->addError('error', 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage());
-            dd($e);
+            $message = 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage();
+            $this->addError('error', $message);
+            $this->toastError($message);
         }
     }
 

@@ -46,7 +46,9 @@ class FocusAreaManager extends Component
             FocusArea::create(['name' => $this->name]);
         }
 
-        $this->toastSuccess($this->editingId ? 'Area Fokus berhasil diubah' : 'Area Fokus berhasil ditambahkan');
+        $message = $this->editingId ? 'Area Fokus berhasil diubah' : 'Area Fokus berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-focus-area']);
@@ -65,7 +67,9 @@ class FocusAreaManager extends Component
         $focusArea->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Area Fokus berhasil dihapus');
+        $message = 'Area Fokus berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -78,7 +82,9 @@ class FocusAreaManager extends Component
         if ($this->deleteItemId) {
             FocusArea::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Area Fokus berhasil dihapus');
+            $message = 'Area Fokus berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Setting;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithFileUploads;
 
 class ProposalTemplate extends Component
 {
-    use WithFileUploads;
+    use HasToast, WithFileUploads;
 
     public $research_template;
     public $community_service_template;
@@ -29,7 +30,9 @@ class ProposalTemplate extends Component
 
         $this->research_template = null;
         unset($this->researchTemplateMedia); // Invalidate computed property
-        session()->flash('success_research', 'Template penelitian berhasil diunggah.');
+        $message = 'Template penelitian berhasil diunggah.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function saveCommunityServiceTemplate()
@@ -47,7 +50,9 @@ class ProposalTemplate extends Component
 
         $this->community_service_template = null;
         unset($this->communityServiceTemplateMedia); // Invalidate computed property
-        session()->flash('success_community_service', 'Template pengabdian berhasil diunggah.');
+        $message = 'Template pengabdian berhasil diunggah.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function downloadResearchTemplate()
@@ -56,7 +61,9 @@ class ProposalTemplate extends Component
         if ($setting && $setting->hasMedia('template')) {
             return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
         }
-        session()->flash('error_research', 'Template belum tersedia.');
+        $message = 'Template belum tersedia.';
+        session()->flash('error', $message);
+        $this->toastError($message);
     }
 
     public function downloadCommunityServiceTemplate()
@@ -65,7 +72,9 @@ class ProposalTemplate extends Component
         if ($setting && $setting->hasMedia('template')) {
             return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
         }
-        session()->flash('error_community_service', 'Template belum tersedia.');
+        $message = 'Template belum tersedia.';
+        session()->flash('error', $message);
+        $this->toastError($message);
     }
 
     #[Computed]

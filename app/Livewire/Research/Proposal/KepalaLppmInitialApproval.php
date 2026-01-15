@@ -4,6 +4,7 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Livewire\Actions\RequestReReviewAction;
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Notifications\ReviewerAssignment;
 use App\Services\NotificationService;
@@ -16,6 +17,8 @@ use Livewire\Component;
 
 class KepalaLppmInitialApproval extends Component
 {
+    use HasToast;
+
     public string $proposalId = '';
 
     public bool $showModal = false;
@@ -59,7 +62,9 @@ class KepalaLppmInitialApproval extends Component
         $isKepalaLppm = $user->hasRole(['kepala lppm']);
 
         if (! $isKepalaLppm) {
-            session()->flash('error', 'Anda tidak memiliki akses untuk menyetujui proposal');
+            $message = 'Anda tidak memiliki akses untuk menyetujui proposal';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
@@ -67,7 +72,9 @@ class KepalaLppmInitialApproval extends Component
         $proposal = $this->proposal;
 
         if ($proposal->status !== ProposalStatus::APPROVED) {
-            session()->flash('error', 'Proposal tidak dalam status yang dapat disetujui');
+            $message = 'Proposal tidak dalam status yang dapat disetujui';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
@@ -85,6 +92,7 @@ class KepalaLppmInitialApproval extends Component
 
                 if (! $result['success']) {
                     session()->flash('error', $result['message']);
+                    $this->toastError($result['message']);
 
                     return;
                 }
@@ -101,7 +109,9 @@ class KepalaLppmInitialApproval extends Component
                     'has_existing_reviewers' => true,
                 ]);
 
-                session()->flash('success', 'Proposal berhasil disetujui dan permintaan review ulang telah dikirim ke reviewer sebelumnya.');
+                $message = 'Proposal berhasil disetujui dan permintaan review ulang telah dikirim ke reviewer sebelumnya.';
+                session()->flash('success', $message);
+                $this->toastSuccess($message);
             } else {
                 // First submission - transition to WAITING_REVIEWER status
                 $proposal->update([
@@ -121,7 +131,9 @@ class KepalaLppmInitialApproval extends Component
                     $notificationService->sendToMany($adminLppmUsers, new ReviewerAssignment($proposal, $user));
                 }
 
-                session()->flash('success', 'Proposal berhasil disetujui dan siap untuk ditugaskan reviewer oleh Admin LPPM');
+                $message = 'Proposal berhasil disetujui dan siap untuk ditugaskan reviewer oleh Admin LPPM';
+                session()->flash('success', $message);
+                $this->toastSuccess($message);
             }
 
             $this->dispatch('close-modal', detail: ['modalId' => 'initialApprovalModal']);
@@ -135,7 +147,9 @@ class KepalaLppmInitialApproval extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Terjadi kesalahan saat menyetujui proposal: '.$e->getMessage());
+            $message = 'Terjadi kesalahan saat menyetujui proposal: '.$e->getMessage();
+            session()->flash('error', $message);
+            $this->toastError($message);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Abstracts;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Traits\WithFilters;
 use App\Services\ProposalService;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,7 @@ use Livewire\WithPagination;
 
 abstract class ProposalIndex extends Component
 {
+    use HasToast;
     use WithFilters;
     use WithPagination;
 
@@ -117,7 +119,9 @@ abstract class ProposalIndex extends Component
 
         app(\App\Services\ProposalService::class)->deleteProposal($proposal);
 
-        session()->flash('success', 'Proposal berhasil dihapus.');
+        $message = 'Proposal berhasil dihapus.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('proposal-deleted');
         $this->cancelDeleteProposal();
     }

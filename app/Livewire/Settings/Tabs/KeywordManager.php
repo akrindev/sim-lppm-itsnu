@@ -46,7 +46,9 @@ class KeywordManager extends Component
             Keyword::create(['name' => $this->name]);
         }
 
-        $this->toastSuccess($this->editingId ? 'Kata Kunci berhasil diubah' : 'Kata Kunci berhasil ditambahkan');
+        $message = $this->editingId ? 'Kata Kunci berhasil diubah' : 'Kata Kunci berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-keyword']);
@@ -65,7 +67,9 @@ class KeywordManager extends Component
         $keyword->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Kata Kunci berhasil dihapus');
+            $message = 'Kata Kunci berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -78,7 +82,9 @@ class KeywordManager extends Component
         if ($this->deleteItemId) {
             Keyword::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Kata Kunci berhasil dihapus');
+        $message = 'Kata Kunci berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

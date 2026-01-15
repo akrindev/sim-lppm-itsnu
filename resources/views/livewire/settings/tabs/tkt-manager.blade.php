@@ -1,4 +1,5 @@
 <div>
+    <x-tabler.alert />
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">

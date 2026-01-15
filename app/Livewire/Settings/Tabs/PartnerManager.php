@@ -58,7 +58,9 @@ class PartnerManager extends Component
             Partner::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Mitra berhasil diubah' : 'Mitra berhasil ditambahkan');
+        $message = $this->editingId ? 'Mitra berhasil diubah' : 'Mitra berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-partner']);
@@ -79,7 +81,9 @@ class PartnerManager extends Component
         $partner->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Mitra berhasil dihapus');
+            $message = 'Mitra berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -92,7 +96,9 @@ class PartnerManager extends Component
         if ($this->deleteItemId) {
             Partner::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Mitra berhasil dihapus');
+        $message = 'Mitra berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

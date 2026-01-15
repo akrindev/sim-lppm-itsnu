@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Research\ProgressReport;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ReportForm;
 use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ReportAccess;
@@ -17,6 +18,7 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
+    use HasToast;
     use HasFileUploads;
     use ReportAccess;
     use ReportAuthorization;
@@ -58,11 +60,9 @@ class Show extends Component
         $this->form->handleFileUpload('substanceFile');
         $this->progressReport = $this->form->progressReport; // Refresh local reference
 
-        $this->dispatch('toast', [
-            'message' => 'File substansi berhasil diupload.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'File substansi berhasil diupload.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // Optional: clear the input if desired, but keeping it shows what was selected.
         // But for consistency with other inputs, we might want to keep it or let the view update.
@@ -85,11 +85,9 @@ class Show extends Component
             // Clear temp file to hide preview and allow showing the saved file
             unset($this->tempMandatoryFiles[$key]);
 
-            $this->dispatch('toast', [
-                'message' => 'File luaran wajib berhasil disimpan.',
-                'variant' => 'success',
-                'title' => 'Berhasil',
-            ]);
+            $message = 'File luaran wajib berhasil disimpan.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
         }
     }
 
@@ -110,11 +108,9 @@ class Show extends Component
             // Clear temp file
             unset($this->tempAdditionalFiles[$key]);
 
-            $this->dispatch('toast', [
-                'message' => 'File luaran tambahan berhasil disimpan.',
-                'variant' => 'success',
-                'title' => 'Berhasil',
-            ]);
+            $message = 'File luaran tambahan berhasil disimpan.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
         }
     }
 
@@ -135,11 +131,9 @@ class Show extends Component
             // Clear temp file
             unset($this->tempAdditionalCerts[$key]);
 
-            $this->dispatch('toast', [
-                'message' => 'Sertifikat berhasil disimpan.',
-                'variant' => 'success',
-                'title' => 'Berhasil',
-            ]);
+            $message = 'Sertifikat berhasil disimpan.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
         }
     }
 
@@ -169,11 +163,9 @@ class Show extends Component
         });
 
         $this->dispatch('report-saved');
-        $this->dispatch('toast', [
-            'message' => 'Laporan kemajuan berhasil disimpan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Laporan kemajuan berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**
@@ -192,15 +184,13 @@ class Show extends Component
             }
 
             // Submit report via form
-            $report = $this->form->submit($this->progressReport);
+            $report =             $this->form->submit($this->progressReport);
             $this->progressReport = $report;
         });
 
-        $this->dispatch('toast', [
-            'message' => 'Laporan kemajuan berhasil diajukan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Laporan kemajuan berhasil diajukan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->redirect(route('research.progress-report.index'), navigate: true);
     }
 
@@ -266,11 +256,9 @@ class Show extends Component
             }
         ");
 
-        $this->dispatch('toast', [
-            'message' => 'Data luaran wajib berhasil disimpan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Data luaran wajib berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**
@@ -294,11 +282,9 @@ class Show extends Component
             }
         ");
 
-        $this->dispatch('toast', [
-            'message' => 'Data luaran tambahan berhasil disimpan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Data luaran tambahan berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**

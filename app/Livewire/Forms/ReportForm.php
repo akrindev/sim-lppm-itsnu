@@ -698,7 +698,7 @@ class ReportForm extends Form
     /**
      * Save all report files to media collections
      */
-    protected function saveReportFiles(\App\Models\ProgressReport $report): void
+    public function saveReportFiles(\App\Models\ProgressReport $report): void
     {
         // Save substance file (all report types have this)
         if ($this->substanceFile instanceof \Illuminate\Http\UploadedFile && $this->substanceFile->isValid()) {

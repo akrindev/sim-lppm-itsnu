@@ -92,7 +92,9 @@ class Show extends Component
         $this->activity_date = date('Y-m-d');
         $this->dispatch('note-saved');
         $this->dispatch('close-modal', modalId: 'daily-note-modal');
-        $this->toastSuccess('Catatan harian berhasil disimpan.');
+        $message = 'Catatan harian berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(string $id): void
@@ -120,7 +122,9 @@ class Show extends Component
             abort(403);
         }
         $note->delete();
-        $this->toastSuccess('Catatan harian berhasil dihapus.');
+        $message = 'Catatan harian berhasil dihapus.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function deleteEvidence(string $mediaId): void
@@ -132,7 +136,9 @@ class Show extends Component
 
         if ($note && $note->proposal_id === $this->proposal->id) {
             $media->delete();
-            $this->toastSuccess('File bukti berhasil dihapus.');
+            $message = 'File bukti berhasil dihapus.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
         } else {
             abort(403);
         }

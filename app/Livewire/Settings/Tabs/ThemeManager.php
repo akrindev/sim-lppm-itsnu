@@ -56,7 +56,9 @@ class ThemeManager extends Component
             Theme::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Tema berhasil diubah' : 'Tema berhasil ditambahkan');
+        $message = $this->editingId ? 'Tema berhasil diubah' : 'Tema berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-theme']);
@@ -76,7 +78,9 @@ class ThemeManager extends Component
         $theme->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Tema berhasil dihapus');
+            $message = 'Tema berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -89,7 +93,9 @@ class ThemeManager extends Component
         if ($this->deleteItemId) {
             Theme::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Tema berhasil dihapus');
+        $message = 'Tema berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

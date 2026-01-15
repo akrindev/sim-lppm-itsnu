@@ -3,6 +3,7 @@
 namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -15,6 +16,8 @@ use Livewire\Component;
 
 class KepalaLppmFinalDecision extends Component
 {
+    use HasToast;
+
     public string $proposalId = '';
 
     public string $decision = '';
@@ -78,7 +81,9 @@ class KepalaLppmFinalDecision extends Component
         $isKepalaLppm = $user->hasRole(['kepala lppm']);
 
         if (! $isKepalaLppm) {
-            session()->flash('error', 'Anda tidak memiliki akses untuk membuat keputusan');
+            $message = 'Anda tidak memiliki akses untuk membuat keputusan';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
@@ -86,19 +91,25 @@ class KepalaLppmFinalDecision extends Component
         $proposal = $this->proposal;
 
         if ($proposal->status !== ProposalStatus::REVIEWED) {
-            session()->flash('error', 'Proposal tidak dalam status yang dapat diputuskan');
+            $message = 'Proposal tidak dalam status yang dapat diputuskan';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
 
         if (! $proposal->allReviewsCompleted()) {
-            session()->flash('error', 'Semua reviewer harus menyelesaikan review terlebih dahulu');
+            $message = 'Semua reviewer harus menyelesaikan review terlebih dahulu';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
 
         if (! in_array($this->decision, ['completed', 'revision_needed', 'rejected'])) {
-            session()->flash('error', 'Keputusan tidak valid');
+            $message = 'Keputusan tidak valid';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
@@ -112,7 +123,9 @@ class KepalaLppmFinalDecision extends Component
 
             // Validate transition
             if (! $proposal->status->canTransitionTo($newStatus)) {
-                session()->flash('error', 'Transisi status tidak diizinkan');
+                $message = 'Transisi status tidak diizinkan';
+                session()->flash('error', $message);
+                $this->toastError($message);
 
                 return;
             }
@@ -140,6 +153,7 @@ class KepalaLppmFinalDecision extends Component
             };
 
             session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->dispatch('close-final-decision-modal');
             $this->dispatch('proposal-final-decided', proposalId: $proposal->id, decision: $this->decision);
             $this->cancelDecision();
@@ -149,7 +163,9 @@ class KepalaLppmFinalDecision extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Terjadi kesalahan saat membuat keputusan: '.$e->getMessage());
+            $message = 'Terjadi kesalahan saat membuat keputusan: '.$e->getMessage();
+            session()->flash('error', $message);
+            $this->toastError($message);
         }
     }
 

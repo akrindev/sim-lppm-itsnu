@@ -46,7 +46,9 @@ class InstitutionManager extends Component
             Institution::create(['name' => $this->name]);
         }
 
-        $this->toastSuccess($this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan');
+        $message = $this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-institution']);
@@ -65,7 +67,9 @@ class InstitutionManager extends Component
         $institution->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Institusi berhasil dihapus');
+            $message = 'Institusi berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -78,7 +82,9 @@ class InstitutionManager extends Component
         if ($this->deleteItemId) {
             Institution::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Institusi berhasil dihapus');
+        $message = 'Institusi berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

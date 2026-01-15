@@ -4,6 +4,7 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Livewire\Actions\ApproveProposalAction;
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -12,6 +13,8 @@ use Livewire\Component;
 
 class ApprovalButton extends Component
 {
+    use HasToast;
+
     public string $proposalId = '';
 
     public function mount(string $proposalId): void
@@ -57,7 +60,9 @@ class ApprovalButton extends Component
         $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
 
         if (! $isAdmin) {
-            $this->dispatch('error', message: 'Anda tidak memiliki akses untuk approve proposal');
+            $message = 'Anda tidak memiliki akses untuk approve proposal';
+            $this->dispatch('error', message: $message);
+            $this->toastError($message);
 
             return;
         }
@@ -67,9 +72,13 @@ class ApprovalButton extends Component
         $result = $action->execute($proposal, 'completed');
 
         if ($result['success']) {
+            session()->flash('success', $result['message']);
+            $this->toastSuccess($result['message']);
             $this->dispatch('success', message: $result['message']);
             $this->dispatch('proposal-approved', proposalId: $proposal->id);
         } else {
+            session()->flash('error', $result['message']);
+            $this->toastError($result['message']);
             $this->dispatch('error', message: $result['message']);
         }
     }
@@ -80,7 +89,9 @@ class ApprovalButton extends Component
         $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
 
         if (! $isAdmin) {
-            $this->dispatch('error', message: 'Anda tidak memiliki akses untuk reject proposal');
+            $message = 'Anda tidak memiliki akses untuk reject proposal';
+            $this->dispatch('error', message: $message);
+            $this->toastError($message);
 
             return;
         }
@@ -90,9 +101,13 @@ class ApprovalButton extends Component
         $result = $action->execute($proposal, 'rejected');
 
         if ($result['success']) {
+            session()->flash('warning', $result['message']);
+            $this->toastWarning($result['message']);
             $this->dispatch('warning', message: $result['message']);
             $this->dispatch('proposal-rejected', proposalId: $proposal->id);
         } else {
+            session()->flash('error', $result['message']);
+            $this->toastError($result['message']);
             $this->dispatch('error', message: $result['message']);
         }
     }

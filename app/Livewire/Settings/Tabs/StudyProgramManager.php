@@ -62,7 +62,9 @@ class StudyProgramManager extends Component
             StudyProgram::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Program Studi berhasil diubah' : 'Program Studi berhasil ditambahkan');
+        $message = $this->editingId ? 'Program Studi berhasil diubah' : 'Program Studi berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-study-program']);
@@ -83,7 +85,9 @@ class StudyProgramManager extends Component
         $studyProgram->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Program Studi berhasil dihapus');
+            $message = 'Program Studi berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -96,7 +100,9 @@ class StudyProgramManager extends Component
         if ($this->deleteItemId) {
             StudyProgram::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Program Studi berhasil dihapus');
+        $message = 'Program Studi berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

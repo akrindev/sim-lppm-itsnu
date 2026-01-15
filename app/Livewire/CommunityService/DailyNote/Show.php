@@ -2,6 +2,7 @@
 
 namespace App\Livewire\CommunityService\DailyNote;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\DailyNote;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Show extends Component
 {
+    use HasToast;
     use WithFileUploads;
 
     public Proposal $proposal;
@@ -89,7 +91,9 @@ class Show extends Component
         $this->activity_date = date('Y-m-d');
         $this->dispatch('note-saved');
         $this->dispatch('close-modal', modalId: 'daily-note-modal');
-        session()->flash('success', 'Catatan harian berhasil disimpan.');
+        $message = 'Catatan harian berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(string $id): void
@@ -116,7 +120,9 @@ class Show extends Component
              abort(403);
         }
         $note->delete();
-        session()->flash('success', 'Catatan harian berhasil dihapus.');
+        $message = 'Catatan harian berhasil dihapus.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function deleteEvidence(string $mediaId): void
@@ -128,7 +134,9 @@ class Show extends Component
         
         if ($note && $note->proposal_id === $this->proposal->id) {
             $media->delete();
-            session()->flash('success', 'File bukti berhasil dihapus.');
+            $message = 'File bukti berhasil dihapus.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
         } else {
             abort(403);
         }

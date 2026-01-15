@@ -75,7 +75,9 @@ class ScienceClusterManager extends Component
             ScienceCluster::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan');
+        $message = $this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-science-cluster']);
@@ -95,7 +97,9 @@ class ScienceClusterManager extends Component
         $scienceCluster->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Klaster Sains berhasil dihapus');
+            $message = 'Klaster Sains berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -108,7 +112,9 @@ class ScienceClusterManager extends Component
         if ($this->deleteItemId) {
             ScienceCluster::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Klaster Sains berhasil dihapus');
+        $message = 'Klaster Sains berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -87,7 +87,9 @@ class BudgetCapManager extends Component
             BudgetCap::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Pengaturan Anggaran berhasil diubah' : 'Pengaturan Anggaran berhasil ditambahkan');
+        $message = $this->editingId ? 'Pengaturan Anggaran berhasil diubah' : 'Pengaturan Anggaran berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-cap']);
@@ -108,7 +110,9 @@ class BudgetCapManager extends Component
         $budgetCap->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Pengaturan Anggaran berhasil dihapus');
+            $message = 'Pengaturan Anggaran berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -121,7 +125,9 @@ class BudgetCapManager extends Component
         if ($this->deleteItemId) {
             BudgetCap::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Pengaturan Anggaran berhasil dihapus');
+        $message = 'Pengaturan Anggaran berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Spatie\Permission\Models\Role;
 #[Layout('components.layouts.app', ['title' => 'Edit User', 'pageTitle' => 'Edit User', 'pageSubtitle' => 'Update the user profile and role assignments'])]
 class Edit extends Component
 {
+    use HasToast;
+
     public string $userId;
 
     public string $name = '';
@@ -156,7 +159,9 @@ class Edit extends Component
         $this->selectedRoles = $this->user->getRoleNames()->toArray();
         $this->emailVerified = $this->user->hasVerifiedEmail();
 
-        session()->flash('success', 'Pengguna telah diperbarui.');
+        $message = 'Pengguna telah diperbarui.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         $this->dispatch('user-updated');
     }

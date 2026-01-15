@@ -56,7 +56,9 @@ class TopicManager extends Component
             Topic::create($data);
         }
 
-        $this->toastSuccess($this->editingId ? 'Topik berhasil diubah' : 'Topik berhasil ditambahkan');
+        $message = $this->editingId ? 'Topik berhasil diubah' : 'Topik berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-topic']);
@@ -76,7 +78,9 @@ class TopicManager extends Component
         $topic->delete();
 
         $this->resetForm();
-        $this->toastSuccess('Topik berhasil dihapus');
+            $message = 'Topik berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -89,7 +93,9 @@ class TopicManager extends Component
         if ($this->deleteItemId) {
             Topic::findOrFail($this->deleteItemId)->delete();
 
-            $this->toastSuccess('Topik berhasil dihapus');
+        $message = 'Topik berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

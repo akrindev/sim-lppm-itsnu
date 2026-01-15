@@ -41,7 +41,9 @@ class ProposalSchedule extends Component
         Setting::updateOrCreate(['key' => 'community_service_proposal_start_date'], ['value' => $this->community_service_start_date]);
         Setting::updateOrCreate(['key' => 'community_service_proposal_end_date'], ['value' => $this->community_service_end_date]);
 
-        $this->toastSuccess('Jadwal proposal berhasil disimpan.');
+        $message = 'Jadwal proposal berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function render()
