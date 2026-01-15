@@ -3,7 +3,7 @@ Inline Alert Component (for non-toast alerts)
 Use this when you need a persistent inline alert that stays on the page.
 For toast notifications, the toast-container component handles those automatically.
 
-Note: Session flash messages (success, error, warning, info) are now displayed 
+Note: Session flash messages (success, error, warning, info) are now displayed
 as toast notifications via the toast-container component in the layout.
 This component is kept for inline alerts when needed.
 
@@ -23,7 +23,7 @@ Usage:
     // If type and message are provided directly, use them
     // Otherwise, check session flash (backward compatibility)
     $alerts = [];
-    
+
     if ($type && $message) {
         $alerts[$type] = $message;
     } elseif ($slot && $slot->isNotEmpty()) {
@@ -31,13 +31,23 @@ Usage:
         if ($type) {
             $alerts[$type] = null; // Will use slot
         }
-    } 
+    } else {
+        // Check session flash for backward compatibility
+        // Note: Toast container now handles these, but we keep this for inline alerts
+        $flashTypes = ['danger' => 'error', 'warning' => 'warning', 'success' => 'success', 'info' => 'info'];
+        foreach ($flashTypes as $alertType => $sessionKey) {
+            if (session($sessionKey)) {
+                $alerts[$alertType] = session($sessionKey);
+            }
+        }
+    }
     // Session flash detection removed to prevent duplicates with Toast system.
     // Use explicit type/message or slot for inline alerts.
 @endphp
 
 @foreach ($alerts as $alertType => $alertMessage)
-    <div {{ $attributes->merge(['class' => "alert alert-{$alertType}" . ($dismissible ? ' alert-dismissible' : '')]) }} role="alert">
+    <div {{ $attributes->merge(['class' => "alert alert-{$alertType}" . ($dismissible ? ' alert-dismissible' : '')]) }}
+        role="alert">
         <div class="d-flex">
             <div class="alert-icon">
                 @if ($alertType === 'danger')
@@ -53,7 +63,9 @@ Usage:
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" class="icon alert-icon icon-2">
                         <path d="M12 9v4"></path>
-                        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"></path>
+                        <path
+                            d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z">
+                        </path>
                         <path d="M12 16h.01"></path>
                     </svg>
                 @elseif($alertType === 'success')
