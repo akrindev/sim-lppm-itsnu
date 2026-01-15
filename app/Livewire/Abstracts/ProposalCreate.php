@@ -34,7 +34,7 @@ abstract class ProposalCreate extends Component
 
     public function mount(?string $proposalId = null, ?\App\Models\Proposal $proposal = null): void
     {
-        $this->author_name = Auth::user()->name;
+        $this->author_name = Auth::user()?->name ?? '';
 
         // Handle route model binding (if passed as object) or ID string
         $proposalToLoad = $proposal ?? ($proposalId ? \App\Models\Proposal::find($proposalId) : null);
@@ -422,5 +422,11 @@ abstract class ProposalCreate extends Component
             ],
             default => [],
         };
+    }
+
+    public function render()
+    {
+        // dump("Rendering ProposalCreate, Auth check: " . (Auth::check() ? 'Yes' : 'No'));
+        return view($this->getProposalType() === 'research' ? 'livewire.research.proposal.create' : 'livewire.community-service.proposal.create');
     }
 }
