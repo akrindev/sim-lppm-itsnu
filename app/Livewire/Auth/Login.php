@@ -65,6 +65,7 @@ class Login extends Component
 
         if (! $user) {
             $this->addError('email', "No user found with role: $roleName");
+
             return;
         }
 

@@ -197,7 +197,7 @@ class Edit extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Role $role) => [
+            ->map(fn (Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
             ])
@@ -217,7 +217,7 @@ class Edit extends Component
         return Institution::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Institution $institution) => [
+            ->map(fn (Institution $institution) => [
                 'value' => $institution->id,
                 'label' => $institution->name,
             ])
@@ -245,7 +245,7 @@ class Edit extends Component
             ->where('institution_id', $this->institution_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(Faculty $faculty) => [
+            ->map(fn (Faculty $faculty) => [
                 'value' => $faculty->id,
                 'label' => $faculty->name,
             ])
@@ -273,7 +273,7 @@ class Edit extends Component
             ->where('faculty_id', $this->faculty_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(\App\Models\StudyProgram $program) => [
+            ->map(fn (\App\Models\StudyProgram $program) => [
                 'value' => $program->id,
                 'label' => $program->name,
             ])

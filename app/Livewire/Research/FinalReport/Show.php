@@ -132,7 +132,7 @@ class Show extends Component
             $this->saveRealizationFile($report, 'final');
             $this->savePresentationFile($report, 'final');
 
-                // Save output files
+            // Save output files
             $this->saveOutputFiles($report);
         });
 

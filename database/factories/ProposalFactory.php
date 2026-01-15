@@ -51,7 +51,7 @@ class ProposalFactory extends Factory
                 if ($cluster3) {
                     $proposal->cluster_level3_id = $cluster3->id;
                     $proposal->cluster_level2_id = $cluster3->parent_id;
-                    
+
                     $cluster2 = \App\Models\ScienceCluster::find($cluster3->parent_id);
                     if ($cluster2) {
                         $proposal->cluster_level1_id = $cluster2->parent_id;

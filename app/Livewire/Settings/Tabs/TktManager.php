@@ -14,16 +14,23 @@ use Livewire\Component;
 class TktManager extends Component
 {
     use HasToast;
+
     // Tab navigation
     public $currentTab = 'types'; // types, levels, indicators
+
     public $selectedType;
+
     public $selectedLevel;
 
     // Form properties
     public $typeName;
+
     public $levelDescription;
+
     public $indicatorCode;
+
     public $indicatorText;
+
     public $editingId;
 
     public function render()
@@ -93,7 +100,7 @@ class TktManager extends Component
                 TktLevel::create([
                     'type' => $this->typeName,
                     'level' => $i,
-                    'description' => 'Deskripsi Level ' . $i,
+                    'description' => 'Deskripsi Level '.$i,
                 ]);
             }
         }
@@ -118,7 +125,9 @@ class TktManager extends Component
     public function editLevel($levelId)
     {
         $level = TktLevel::find($levelId);
-        if (!$level) return;
+        if (! $level) {
+            return;
+        }
 
         $this->editingId = $levelId;
         $this->levelDescription = $level->description;
@@ -149,7 +158,9 @@ class TktManager extends Component
     public function editIndicator($indicatorId)
     {
         $indicator = TktIndicator::find($indicatorId);
-        if (!$indicator) return;
+        if (! $indicator) {
+            return;
+        }
 
         $this->editingId = $indicatorId;
         $this->indicatorCode = $indicator->code;

@@ -99,9 +99,9 @@ class Show extends Component
     public function edit(string $id): void
     {
         $note = DailyNote::findOrFail($id);
-        
-        if($note->proposal_id !== $this->proposal->id) {
-             abort(403);
+
+        if ($note->proposal_id !== $this->proposal->id) {
+            abort(403);
         }
 
         $this->editingId = $id;
@@ -109,15 +109,15 @@ class Show extends Component
         $this->activity_description = $note->activity_description;
         $this->progress_percentage = $note->progress_percentage;
         $this->notes = $note->notes ?? '';
-        
+
         $this->dispatch('open-modal', modalId: 'daily-note-modal');
     }
 
     public function delete(string $id): void
     {
         $note = DailyNote::findOrFail($id);
-        if($note->proposal_id !== $this->proposal->id) {
-             abort(403);
+        if ($note->proposal_id !== $this->proposal->id) {
+            abort(403);
         }
         $note->delete();
         $message = 'Catatan harian berhasil dihapus.';
@@ -128,10 +128,10 @@ class Show extends Component
     public function deleteEvidence(string $mediaId): void
     {
         $media = Media::findOrFail($mediaId);
-        
+
         // Check if the media belongs to a note in this proposal
         $note = DailyNote::find($media->model_id);
-        
+
         if ($note && $note->proposal_id === $this->proposal->id) {
             $media->delete();
             $message = 'File bukti berhasil dihapus.';

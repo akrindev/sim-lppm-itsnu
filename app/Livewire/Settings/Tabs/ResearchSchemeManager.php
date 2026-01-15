@@ -76,9 +76,9 @@ class ResearchSchemeManager extends Component
         $researchScheme->delete();
 
         $this->resetForm();
-            $message = 'Skema Penelitian berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Skema Penelitian berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -91,9 +91,9 @@ class ResearchSchemeManager extends Component
         if ($this->deleteItemId) {
             ResearchScheme::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Skema Penelitian berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Skema Penelitian berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

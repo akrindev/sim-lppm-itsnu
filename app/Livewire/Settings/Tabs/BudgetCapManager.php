@@ -110,9 +110,9 @@ class BudgetCapManager extends Component
         $budgetCap->delete();
 
         $this->resetForm();
-            $message = 'Pengaturan Anggaran berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Pengaturan Anggaran berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -125,9 +125,9 @@ class BudgetCapManager extends Component
         if ($this->deleteItemId) {
             BudgetCap::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Pengaturan Anggaran berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Pengaturan Anggaran berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -20,8 +20,8 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
-    use HasToast;
     use HasFileUploads;
+    use HasToast;
     use ManagesOutputs;
     use ReportAccess;
     use ReportAuthorization;
@@ -108,7 +108,7 @@ class Show extends Component
             // Let Livewire handle validation errors
             throw $e;
         } catch (\Exception $e) {
-            $message = 'Gagal menyimpan laporan: ' . $e->getMessage();
+            $message = 'Gagal menyimpan laporan: '.$e->getMessage();
             session()->flash('error', $message);
             $this->toastError($message);
         }
@@ -307,7 +307,7 @@ class Show extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            $message = 'Gagal menyimpan: ' . $e->getMessage();
+            $message = 'Gagal menyimpan: '.$e->getMessage();
             session()->flash('error', $message);
             $this->toastError($message);
         }
@@ -333,7 +333,7 @@ class Show extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            $message = 'Gagal menyimpan: ' . $e->getMessage();
+            $message = 'Gagal menyimpan: '.$e->getMessage();
             session()->flash('error', $message);
             $this->toastError($message);
         }
@@ -347,7 +347,7 @@ class Show extends Component
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateMandatoryFile((int) $key);
 
-            $this->form->tempMandatoryFiles[(int)$key] = $value;
+            $this->form->tempMandatoryFiles[(int) $key] = $value;
             $this->form->saveMandatoryOutputWithFile((int) $key, validate: false);
 
             $this->progressReport = $this->form->progressReport;
@@ -367,7 +367,7 @@ class Show extends Component
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateAdditionalFile((int) $key);
 
-            $this->form->tempAdditionalFiles[(int)$key] = $value;
+            $this->form->tempAdditionalFiles[(int) $key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
 
             $this->progressReport = $this->form->progressReport;
@@ -387,7 +387,7 @@ class Show extends Component
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateAdditionalCert((int) $key);
 
-            $this->form->tempAdditionalCerts[(int)$key] = $value;
+            $this->form->tempAdditionalCerts[(int) $key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
 
             $this->progressReport = $this->form->progressReport;

@@ -73,7 +73,7 @@ class ProposalTest extends TestCase
             ->assertHasErrors([
                 'form.macro_research_group_id',
                 'form.substance_file',
-                'form.outputs'
+                'form.outputs',
             ]);
     }
 
@@ -93,7 +93,7 @@ class ProposalTest extends TestCase
             ->set('form.macro_research_group_id', $macroGroup->id)
             ->set('form.substance_file', $file)
             ->set('form.outputs', [
-                ['category' => 'Tambahan', 'group' => 'A', 'type' => 'B', 'status' => 'C', 'description' => 'D']
+                ['category' => 'Tambahan', 'group' => 'A', 'type' => 'B', 'status' => 'C', 'description' => 'D'],
             ])
             ->call('nextStep')
             ->assertHasErrors(['form.outputs']);

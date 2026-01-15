@@ -67,9 +67,9 @@ class KeywordManager extends Component
         $keyword->delete();
 
         $this->resetForm();
-            $message = 'Kata Kunci berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Kata Kunci berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -82,9 +82,9 @@ class KeywordManager extends Component
         if ($this->deleteItemId) {
             Keyword::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Kata Kunci berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Kata Kunci berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

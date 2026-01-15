@@ -97,9 +97,9 @@ class ScienceClusterManager extends Component
         $scienceCluster->delete();
 
         $this->resetForm();
-            $message = 'Klaster Sains berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Klaster Sains berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -112,9 +112,9 @@ class ScienceClusterManager extends Component
         if ($this->deleteItemId) {
             ScienceCluster::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Klaster Sains berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Klaster Sains berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

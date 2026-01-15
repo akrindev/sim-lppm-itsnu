@@ -62,7 +62,7 @@ class Import extends Component
 
             $this->isPreviewing = true;
         } catch (\Exception $e) {
-            $this->addError('file', 'Gagal memproses file: ' . $e->getMessage());
+            $this->addError('file', 'Gagal memproses file: '.$e->getMessage());
         }
     }
 
@@ -95,7 +95,6 @@ class Import extends Component
             $errors[] = "Tipe harus 'dosen' atau 'mahasiswa'.";
         }
 
-
         if (! empty($errors)) {
             $this->validationErrors[$rowIndex] = $errors;
         }
@@ -126,7 +125,7 @@ class Import extends Component
             $this->addError('error', $message);
             $this->toastError($message);
         } catch (\Exception $e) {
-            $message = 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage();
+            $message = 'Terjadi kesalahan saat menyimpan: '.$e->getMessage();
             $this->addError('error', $message);
             $this->toastError($message);
         }

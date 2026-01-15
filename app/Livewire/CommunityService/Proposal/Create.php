@@ -48,7 +48,7 @@ class Create extends ProposalCreate
                     }
 
                     if (! empty($errors)) {
-                        $fail("Baris {$rowNum}: " . implode(', ', $errors) . ' wajib diisi.');
+                        $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
                     }
                 }
             }],

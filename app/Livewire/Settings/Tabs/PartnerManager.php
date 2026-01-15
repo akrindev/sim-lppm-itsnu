@@ -81,9 +81,9 @@ class PartnerManager extends Component
         $partner->delete();
 
         $this->resetForm();
-            $message = 'Mitra berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Mitra berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -96,9 +96,9 @@ class PartnerManager extends Component
         if ($this->deleteItemId) {
             Partner::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Mitra berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Mitra berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

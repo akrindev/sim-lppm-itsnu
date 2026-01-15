@@ -78,9 +78,9 @@ class ThemeManager extends Component
         $theme->delete();
 
         $this->resetForm();
-            $message = 'Tema berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Tema berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -93,9 +93,9 @@ class ThemeManager extends Component
         if ($this->deleteItemId) {
             Theme::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Tema berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Tema berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

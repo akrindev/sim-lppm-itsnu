@@ -94,9 +94,9 @@ class BudgetGroupManager extends Component
         $budgetGroup->delete();
 
         $this->resetForm();
-            $message = 'Kelompok Anggaran berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Kelompok Anggaran berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -109,9 +109,9 @@ class BudgetGroupManager extends Component
         if ($this->deleteItemId) {
             BudgetGroup::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Kelompok Anggaran berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Kelompok Anggaran berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

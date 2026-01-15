@@ -78,9 +78,9 @@ class TopicManager extends Component
         $topic->delete();
 
         $this->resetForm();
-            $message = 'Topik berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Topik berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -93,9 +93,9 @@ class TopicManager extends Component
         if ($this->deleteItemId) {
             Topic::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Topik berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Topik berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

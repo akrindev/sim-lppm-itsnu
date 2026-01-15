@@ -92,9 +92,9 @@ class BudgetComponentManager extends Component
         $budgetComponent->delete();
 
         $this->resetForm();
-            $message = 'Komponen Anggaran berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Komponen Anggaran berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -107,9 +107,9 @@ class BudgetComponentManager extends Component
         if ($this->deleteItemId) {
             BudgetComponent::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Komponen Anggaran berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Komponen Anggaran berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -83,9 +83,9 @@ class FacultyManager extends Component
         $faculty->delete();
 
         $this->resetForm();
-            $message = 'Fakultas berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Fakultas berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -98,9 +98,9 @@ class FacultyManager extends Component
         if ($this->deleteItemId) {
             Faculty::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Fakultas berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Fakultas berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

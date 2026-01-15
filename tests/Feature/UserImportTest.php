@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Livewire\Users\Import;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;

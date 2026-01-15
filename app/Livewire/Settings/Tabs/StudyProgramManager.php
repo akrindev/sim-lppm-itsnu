@@ -85,9 +85,9 @@ class StudyProgramManager extends Component
         $studyProgram->delete();
 
         $this->resetForm();
-            $message = 'Program Studi berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Program Studi berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -100,9 +100,9 @@ class StudyProgramManager extends Component
         if ($this->deleteItemId) {
             StudyProgram::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Program Studi berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Program Studi berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

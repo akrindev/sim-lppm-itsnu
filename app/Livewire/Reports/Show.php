@@ -19,8 +19,8 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
-    use HasToast;
     use HasFileUploads;
+    use HasToast;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
@@ -184,19 +184,19 @@ class Show extends Component
             if ($closeModal) {
                 $this->dispatch('close-modal', modalId: 'modalMandatoryOutput');
             }
-            
+
             if ($closeModal) {
                 $message = 'Data luaran wajib berhasil disimpan.';
                 session()->flash('success', $message);
                 $this->toastSuccess($message);
             } else {
-                 // For auto-save, maybe a toast? or just silent success + UI update
-                 // We can skip flash to avoid annoying popups, or use a different key.
-                 $message = 'File berhasil diupload.';
-                 session()->flash('success', $message);
-                 $this->toastSuccess($message);
+                // For auto-save, maybe a toast? or just silent success + UI update
+                // We can skip flash to avoid annoying popups, or use a different key.
+                $message = 'File berhasil diupload.';
+                session()->flash('success', $message);
+                $this->toastSuccess($message);
             }
-            
+
             // Refresh parent report to update UI status
             if ($this->progressReport) {
                 $this->progressReport->refresh();
@@ -252,7 +252,7 @@ class Show extends Component
             if ($closeModal) {
                 $this->dispatch('close-modal', modalId: 'modalAdditionalOutput');
             }
-            
+
             if ($closeModal) {
                 $message = 'Data luaran tambahan berhasil disimpan.';
                 session()->flash('success', $message);

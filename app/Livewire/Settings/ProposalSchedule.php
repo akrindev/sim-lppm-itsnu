@@ -11,6 +11,7 @@ use Livewire\Component;
 class ProposalSchedule extends Component
 {
     use HasToast;
+
     public $research_start_date;
 
     public $research_end_date;

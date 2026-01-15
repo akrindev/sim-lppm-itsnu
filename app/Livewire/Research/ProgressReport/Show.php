@@ -18,8 +18,8 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
-    use HasToast;
     use HasFileUploads;
+    use HasToast;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
@@ -76,7 +76,7 @@ class Show extends Component
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateMandatoryFile((int) $key);
 
-            $this->form->tempMandatoryFiles[(int)$key] = $value;
+            $this->form->tempMandatoryFiles[(int) $key] = $value;
             $this->form->saveMandatoryOutputWithFile((int) $key);
 
             // Refresh report reference in case it was created
@@ -99,7 +99,7 @@ class Show extends Component
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateAdditionalFile((int) $key);
 
-            $this->form->tempAdditionalFiles[(int)$key] = $value;
+            $this->form->tempAdditionalFiles[(int) $key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key);
 
             // Refresh report reference
@@ -122,7 +122,7 @@ class Show extends Component
         if ($value instanceof \Illuminate\Http\UploadedFile) {
             $this->validateAdditionalCert((int) $key);
 
-            $this->form->tempAdditionalCerts[(int)$key] = $value;
+            $this->form->tempAdditionalCerts[(int) $key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key);
 
             // Refresh report reference
@@ -184,7 +184,7 @@ class Show extends Component
             }
 
             // Submit report via form
-            $report =             $this->form->submit($this->progressReport);
+            $report = $this->form->submit($this->progressReport);
             $this->progressReport = $report;
         });
 

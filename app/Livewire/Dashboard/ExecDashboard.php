@@ -62,9 +62,9 @@ class ExecDashboard extends Component
 
         // Base query for stats
         $baseQuery = Proposal::whereYear('created_at', $yearFilter);
-        
+
         if ($facultyId) {
-            $baseQuery->whereHas('submitter.identity', function($q) use ($facultyId) {
+            $baseQuery->whereHas('submitter.identity', function ($q) use ($facultyId) {
                 $q->where('faculty_id', $facultyId);
             });
         }
@@ -94,13 +94,13 @@ class ExecDashboard extends Component
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', Research::class)
             ->whereIn('status', ['approved', 'completed']);
-            
+
         if ($facultyId) {
-            $recentResearchQuery->whereHas('submitter.identity', function($q) use ($facultyId) {
+            $recentResearchQuery->whereHas('submitter.identity', function ($q) use ($facultyId) {
                 $q->where('faculty_id', $facultyId);
             });
         }
-            
+
         $this->recentResearch = $recentResearchQuery->latest()->limit(10)->get();
 
         // Data PKM terbaru
@@ -108,13 +108,13 @@ class ExecDashboard extends Component
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', CommunityService::class)
             ->whereIn('status', ['approved', 'completed']);
-            
+
         if ($facultyId) {
-            $recentPkmQuery->whereHas('submitter.identity', function($q) use ($facultyId) {
+            $recentPkmQuery->whereHas('submitter.identity', function ($q) use ($facultyId) {
                 $q->where('faculty_id', $facultyId);
             });
         }
-            
+
         $this->recentCommunityService = $recentPkmQuery->latest()->limit(10)->get();
     }
 

@@ -67,9 +67,9 @@ class InstitutionManager extends Component
         $institution->delete();
 
         $this->resetForm();
-            $message = 'Institusi berhasil dihapus';
-            session()->flash('success', $message);
-            $this->toastSuccess($message);
+        $message = 'Institusi berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -82,9 +82,9 @@ class InstitutionManager extends Component
         if ($this->deleteItemId) {
             Institution::findOrFail($this->deleteItemId)->delete();
 
-        $message = 'Institusi berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            $message = 'Institusi berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

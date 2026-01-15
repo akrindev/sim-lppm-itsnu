@@ -19,8 +19,8 @@ use Livewire\WithFileUploads;
 
 class Show extends Component
 {
-    use HasToast;
     use HasFileUploads;
+    use HasToast;
     use ManagesOutputs;
     use ReportAccess;
     use ReportAuthorization;

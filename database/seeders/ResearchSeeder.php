@@ -162,8 +162,8 @@ class ResearchSeeder extends Seeder
                     \App\Models\ProposalOutput::factory()->create([
                         'proposal_id' => $proposal->id,
                         'category' => 'Wajib',
-                        'type' => $proposal->researchScheme->strata === 'Terapan' 
-                            ? 'Purwarupa/Prototipe TRL 4-6' 
+                        'type' => $proposal->researchScheme->strata === 'Terapan'
+                            ? 'Purwarupa/Prototipe TRL 4-6'
                             : 'Jurnal Nasional Terakreditasi (Sinta 1-2)',
                         'target_status' => 'Accepted/Published',
                         'output_year' => $proposal->duration_in_years,

@@ -13,6 +13,7 @@ class ProposalTemplate extends Component
     use HasToast, WithFileUploads;
 
     public $research_template;
+
     public $community_service_template;
 
     public function saveResearchTemplate()
@@ -81,6 +82,7 @@ class ProposalTemplate extends Component
     public function researchTemplateMedia()
     {
         $setting = Setting::where('key', 'research_proposal_template')->first();
+
         return $setting ? $setting->getFirstMedia('template') : null;
     }
 
@@ -88,6 +90,7 @@ class ProposalTemplate extends Component
     public function communityServiceTemplateMedia()
     {
         $setting = Setting::where('key', 'community_service_proposal_template')->first();
+
         return $setting ? $setting->getFirstMedia('template') : null;
     }
 

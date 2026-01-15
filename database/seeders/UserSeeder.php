@@ -60,12 +60,12 @@ class UserSeeder extends Seeder
                 // Get a random study program from this faculty
                 $studyProgram = \App\Models\StudyProgram::where('faculty_id', $faculty->id)->inRandomOrder()->first();
 
-                $email = str($role->name)->slug() . ($count > 1 ? $i + 1 : '') . '@email.com';
+                $email = str($role->name)->slug().($count > 1 ? $i + 1 : '').'@email.com';
 
                 $user = \App\Models\User::firstOrCreate(
                     ['email' => $email],
                     [
-                        'name' => str($role->name)->title() . ' User' . ($count > 1 ? ' ' . ($i + 1) : ''),
+                        'name' => str($role->name)->title().' User'.($count > 1 ? ' '.($i + 1) : ''),
                         'email' => $email,
                         'password' => bcrypt('password'),
                         'email_verified_at' => now(),
@@ -85,7 +85,7 @@ class UserSeeder extends Seeder
                         'institution_id' => $institution->id,
                         'study_program_id' => $studyProgram?->id,
                         'faculty_id' => $faculty->id,
-                        'address' => 'Jl. Example No. ' . rand(1, 100),
+                        'address' => 'Jl. Example No. '.rand(1, 100),
                         'birthdate' => now()->subYears(rand(20, 40))->toDateString(),
                         'birthplace' => fake()->city(),
                         'profile_picture' => null,
@@ -100,7 +100,7 @@ class UserSeeder extends Seeder
         }
 
         $this->command->info('Users seeded successfully!');
-        $this->command->info('Total users created: ' . \App\Models\User::count());
-        $this->command->info('Faculties used: ' . $faculties->pluck('name')->implode(', '));
+        $this->command->info('Total users created: '.\App\Models\User::count());
+        $this->command->info('Faculties used: '.$faculties->pluck('name')->implode(', '));
     }
 }

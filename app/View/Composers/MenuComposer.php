@@ -390,7 +390,7 @@ class MenuComposer
 
                 [$key, $value] = explode('=', $pattern);
                 $queryVal = request()->query($key);
-                
+
                 // Handle default values if query param is missing
                 if ($queryVal === null && $key === 'group' && $value === 'academic-content') {
                     return true;
@@ -399,6 +399,7 @@ class MenuComposer
                 if ($queryVal === $value) {
                     return true;
                 }
+
                 continue;
             }
 
@@ -410,7 +411,7 @@ class MenuComposer
             if ($expandIndex && str_ends_with($pattern, '.index')) {
                 $resourceRoute = substr($pattern, 0, -6);
 
-                if (request()->routeIs($resourceRoute . '.*')) {
+                if (request()->routeIs($resourceRoute.'.*')) {
                     return true;
                 }
             }
