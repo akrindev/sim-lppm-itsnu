@@ -51,7 +51,7 @@ class ThemeSeeder extends Seeder
                 }
             } else {
                 // Create default themes for other focus areas
-                $defaultThemeName = 'General ' . $focusArea->name;
+                $defaultThemeName = 'General '.$focusArea->name;
                 \App\Models\Theme::firstOrCreate(
                     ['focus_area_id' => $focusArea->id, 'name' => $defaultThemeName],
                     ['focus_area_id' => $focusArea->id, 'name' => $defaultThemeName]

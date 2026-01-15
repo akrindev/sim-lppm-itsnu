@@ -22,21 +22,21 @@ class TktMeasurementTest extends TestCase
 
         Livewire::test(TktMeasurement::class)
             ->call('loadLevels', 'Umum')
-            ->set('indicatorScores.' . $ind1->id, 80)
-            ->set('indicatorScores.' . $ind2->id, 80)
-            ->assertSet('levelAverages.' . $level1->id, 80);
+            ->set('indicatorScores.'.$ind1->id, 80)
+            ->set('indicatorScores.'.$ind2->id, 80)
+            ->assertSet('levelAverages.'.$level1->id, 80);
 
         Livewire::test(TktMeasurement::class)
             ->call('loadLevels', 'Umum')
-            ->set('indicatorScores.' . $ind1->id, 100)
-            ->set('indicatorScores.' . $ind2->id, 60)
-            ->assertSet('levelAverages.' . $level1->id, 80); // (100+60)/2 = 80
+            ->set('indicatorScores.'.$ind1->id, 100)
+            ->set('indicatorScores.'.$ind2->id, 60)
+            ->assertSet('levelAverages.'.$level1->id, 80); // (100+60)/2 = 80
 
         Livewire::test(TktMeasurement::class)
             ->call('loadLevels', 'Umum')
-            ->set('indicatorScores.' . $ind1->id, 100)
-            ->set('indicatorScores.' . $ind2->id, 40)
-            ->assertSet('levelAverages.' . $level1->id, 70); // (100+40)/2 = 70
+            ->set('indicatorScores.'.$ind1->id, 100)
+            ->set('indicatorScores.'.$ind2->id, 40)
+            ->assertSet('levelAverages.'.$level1->id, 70); // (100+40)/2 = 70
     }
 
     public function test_it_determines_level_passed_status()
@@ -46,11 +46,11 @@ class TktMeasurementTest extends TestCase
 
         $component = Livewire::test(TktMeasurement::class)
             ->call('loadLevels', 'Umum')
-            ->set('indicatorScores.' . $ind1->id, 80);
+            ->set('indicatorScores.'.$ind1->id, 80);
 
         $this->assertTrue($component->instance()->isLevelPassed($level1->id));
 
-        $component->set('indicatorScores.' . $ind1->id, 60);
+        $component->set('indicatorScores.'.$ind1->id, 60);
         $this->assertFalse($component->instance()->isLevelPassed($level1->id));
     }
 
@@ -69,7 +69,7 @@ class TktMeasurementTest extends TestCase
         $this->assertTrue($component->instance()->isLevelLocked($level2));
 
         // Pass Level 1
-        $component->set('indicatorScores.' . $ind1->id, 80);
+        $component->set('indicatorScores.'.$ind1->id, 80);
 
         // Level 2 should be unlocked
         $this->assertFalse($component->instance()->isLevelLocked($level2));
@@ -85,7 +85,7 @@ class TktMeasurementTest extends TestCase
 
         Livewire::test(TktMeasurement::class)
             ->call('loadLevels', 'Umum')
-            ->set('indicatorScores.' . $ind1->id, 80)
+            ->set('indicatorScores.'.$ind1->id, 80)
             ->assertDispatched('switch-level', level: 2);
     }
 
@@ -96,7 +96,7 @@ class TktMeasurementTest extends TestCase
 
         Livewire::test(TktMeasurement::class)
             ->call('loadLevels', 'Umum')
-            ->set('indicatorScores.' . $ind1->id, 80)
+            ->set('indicatorScores.'.$ind1->id, 80)
             ->call('save')
             ->assertDispatched('tkt-calculated', function ($event, $data) use ($level1, $ind1) {
                 return $data['levelResults'][$level1->id]['percentage'] == 80

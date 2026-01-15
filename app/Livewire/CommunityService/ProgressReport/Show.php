@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\CommunityService\ProgressReport;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ReportForm;
 use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ManagesOutputs;
@@ -19,6 +20,7 @@ use Livewire\WithFileUploads;
 class Show extends Component
 {
     use HasFileUploads;
+    use HasToast;
     use ManagesOutputs;
     use ReportAccess;
     use ReportAuthorization;
@@ -106,11 +108,9 @@ class Show extends Component
         });
 
         $this->dispatch('report-saved');
-        $this->dispatch('toast', [
-            'message' => 'Laporan kemajuan berhasil disimpan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Laporan kemajuan berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**
@@ -134,11 +134,9 @@ class Show extends Component
             $this->saveOutputFiles($report);
         });
 
-        $this->dispatch('toast', [
-            'message' => 'Laporan kemajuan berhasil diajukan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Laporan kemajuan berhasil diajukan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->redirect(route('community-service.progress-report.index'), navigate: true);
     }
 
@@ -209,11 +207,9 @@ class Show extends Component
             }
         ");
 
-        $this->dispatch('toast', [
-            'message' => 'Data luaran wajib berhasil disimpan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Data luaran wajib berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**
@@ -236,11 +232,9 @@ class Show extends Component
             }
         ");
 
-        $this->dispatch('toast', [
-            'message' => 'Data luaran tambahan berhasil disimpan.',
-            'variant' => 'success',
-            'title' => 'Berhasil',
-        ]);
+        $message = 'Data luaran tambahan berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**

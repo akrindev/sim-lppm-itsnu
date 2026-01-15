@@ -194,6 +194,8 @@ class MenuComposer
                         'title' => 'Daftar Pengguna',
                         'icon' => 'list',
                         'route' => 'users.index',
+                        'active' => ['users.index', 'users.show', 'users.edit'],
+                        'expand_index' => false,
                     ],
                     [
                         'title' => 'Buat Pengguna',
@@ -372,6 +374,7 @@ class MenuComposer
     protected function isActive(array $item, ?string $routeName): bool
     {
         $patterns = (array) ($item['active'] ?? array_filter([$routeName]));
+        $expandIndex = $item['expand_index'] ?? true;
 
         foreach ($patterns as $pattern) {
             if (empty($pattern)) {
@@ -380,9 +383,14 @@ class MenuComposer
 
             // Check for query parameter matches (e.g. group=academic-structure)
             if (str_contains($pattern, '=')) {
+                // Ensure the route matches if one is defined
+                if ($routeName && ! request()->routeIs($routeName)) {
+                    continue;
+                }
+
                 [$key, $value] = explode('=', $pattern);
                 $queryVal = request()->query($key);
-                
+
                 // Handle default values if query param is missing
                 if ($queryVal === null && $key === 'group' && $value === 'academic-content') {
                     return true;
@@ -391,6 +399,7 @@ class MenuComposer
                 if ($queryVal === $value) {
                     return true;
                 }
+
                 continue;
             }
 
@@ -399,10 +408,10 @@ class MenuComposer
             }
 
             // For index routes, also check all other actions in the same resource
-            if (str_ends_with($pattern, '.index')) {
+            if ($expandIndex && str_ends_with($pattern, '.index')) {
                 $resourceRoute = substr($pattern, 0, -6);
 
-                if (request()->routeIs($resourceRoute . '.*')) {
+                if (request()->routeIs($resourceRoute.'.*')) {
                     return true;
                 }
             }

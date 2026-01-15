@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Abstracts;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Traits\WithFilters;
 use App\Services\ProposalService;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,7 @@ use Livewire\WithPagination;
 
 abstract class ProposalIndex extends Component
 {
+    use HasToast;
     use WithFilters;
     use WithPagination;
 
@@ -81,6 +83,7 @@ abstract class ProposalIndex extends Component
     public function confirmDeleteProposal(string $proposalId): void
     {
         $this->confirmingDeleteProposalId = $proposalId;
+        $this->dispatch('open-modal', modalId: 'deleteProposalModal');
     }
 
     public function cancelDeleteProposal(): void
@@ -88,9 +91,20 @@ abstract class ProposalIndex extends Component
         $this->confirmingDeleteProposalId = '';
     }
 
-    public function deleteProposal(string $proposalId): void
+    public function prepareConfirmation(): void
     {
-        $proposal = \App\Models\Proposal::findOrFail($proposalId);
+        // Required by modal-confirmation component
+    }
+
+    public function cleanupConfirmation(): void
+    {
+        $this->cancelDeleteProposal();
+    }
+
+    public function deleteProposal(?string $proposalId = null): void
+    {
+        $id = $proposalId ?: $this->confirmingDeleteProposalId;
+        $proposal = \App\Models\Proposal::findOrFail($id);
 
         if ($proposal->detailable_type !== match ($this->getProposalType()) {
             'research' => \App\Models\Research::class,
@@ -105,6 +119,9 @@ abstract class ProposalIndex extends Component
 
         app(\App\Services\ProposalService::class)->deleteProposal($proposal);
 
+        $message = 'Proposal berhasil dihapus.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('proposal-deleted');
         $this->cancelDeleteProposal();
     }

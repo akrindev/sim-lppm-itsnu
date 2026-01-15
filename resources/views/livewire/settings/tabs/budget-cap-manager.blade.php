@@ -42,12 +42,12 @@
                             <td>
                                 <div class="btn-list">
                                     <button type="button" class="btn-outline-warning btn btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#modal-budget-cap" wire:click="edit({{ $item->id }})">
+                                        data-bs-target="#modal-budget-cap" wire:click="edit('{{ $item->id }}')">
                                         Edit
                                     </button>
                                     <button type="button" class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#modal-confirm-delete"
-                                        wire:click="confirmDelete({{ $item->id }}, '{{ $item->year }}')">
+                                        wire:click="confirmDelete('{{ $item->id }}', '{{ $item->year }}')">
                                         Hapus
                                     </button>
                                 </div>

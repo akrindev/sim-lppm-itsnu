@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Spatie\Permission\Models\Role;
 #[Layout('components.layouts.app', ['title' => 'Edit User', 'pageTitle' => 'Edit User', 'pageSubtitle' => 'Update the user profile and role assignments'])]
 class Edit extends Component
 {
+    use HasToast;
+
     public string $userId;
 
     public string $name = '';
@@ -156,7 +159,9 @@ class Edit extends Component
         $this->selectedRoles = $this->user->getRoleNames()->toArray();
         $this->emailVerified = $this->user->hasVerifiedEmail();
 
-        session()->flash('success', 'Pengguna telah diperbarui.');
+        $message = 'Pengguna telah diperbarui.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         $this->dispatch('user-updated');
     }
@@ -192,7 +197,7 @@ class Edit extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Role $role) => [
+            ->map(fn (Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
             ])
@@ -212,7 +217,7 @@ class Edit extends Component
         return Institution::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Institution $institution) => [
+            ->map(fn (Institution $institution) => [
                 'value' => $institution->id,
                 'label' => $institution->name,
             ])
@@ -240,7 +245,7 @@ class Edit extends Component
             ->where('institution_id', $this->institution_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(Faculty $faculty) => [
+            ->map(fn (Faculty $faculty) => [
                 'value' => $faculty->id,
                 'label' => $faculty->name,
             ])
@@ -268,7 +273,7 @@ class Edit extends Component
             ->where('faculty_id', $this->faculty_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(\App\Models\StudyProgram $program) => [
+            ->map(fn (\App\Models\StudyProgram $program) => [
                 'value' => $program->id,
                 'label' => $program->name,
             ])

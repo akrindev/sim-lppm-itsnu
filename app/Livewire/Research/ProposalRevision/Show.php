@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Research\ProposalRevision;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ProposalForm;
 use App\Models\MacroResearchGroup;
 use App\Models\Proposal;
@@ -20,6 +21,7 @@ use Livewire\WithFileUploads;
 #[Title('Detail Revisi Proposal Penelitian')]
 class Show extends Component
 {
+    use HasToast;
     use WithFileUploads;
 
     public ProposalForm $form;
@@ -89,8 +91,10 @@ class Show extends Component
     public function save(): void
     {
         if (! $this->canEdit()) {
-            session()->flash('error', 'Anda tidak memiliki akses untuk mengedit proposal ini');
-            $this->dispatch('show-alert', type: 'error', message: 'Anda tidak memiliki akses untuk mengedit proposal ini');
+            $message = 'Anda tidak memiliki akses untuk mengedit proposal ini';
+            session()->flash('error', $message);
+            $this->toastError($message);
+            $this->dispatch('show-alert', type: 'error', message: $message);
 
             return;
         }
@@ -132,7 +136,9 @@ class Show extends Component
             $this->macroResearchGroupId = (string) ($research->macro_research_group_id ?? '');
 
             // Flash message
-            session()->flash('success', 'Perubahan berhasil disimpan');
+            $message = 'Perubahan berhasil disimpan';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
 
             // Dispatch update events for UI refresh
             $this->dispatch('content-updated', fields: $changedFields);
@@ -143,8 +149,10 @@ class Show extends Component
             $this->substanceFile = null;
 
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan perubahan: '.$e->getMessage());
-            $this->dispatch('show-alert', type: 'error', message: 'Gagal menyimpan perubahan: '.$e->getMessage());
+            $message = 'Gagal menyimpan perubahan: '.$e->getMessage();
+            session()->flash('error', $message);
+            $this->toastError($message);
+            $this->dispatch('show-alert', type: 'error', message: $message);
         }
     }
 

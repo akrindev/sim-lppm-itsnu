@@ -538,8 +538,8 @@ class ReportForm extends Form
 
             $outputData = [
                 // 'progress_report_id' and 'proposal_output_id' are in the lookup array
-                'status_type' => !empty($data['status_type']) ? $data['status_type'] : null,
-                'author_status' => !empty($data['author_status']) ? $data['author_status'] : null,
+                'status_type' => ! empty($data['status_type']) ? $data['status_type'] : null,
+                'author_status' => ! empty($data['author_status']) ? $data['author_status'] : null,
                 'journal_title' => $data['journal_title'] ?? null,
                 'issn' => $data['issn'] ?? null,
                 'eissn' => $data['eissn'] ?? null,
@@ -565,7 +565,7 @@ class ReportForm extends Form
                 // Media / Video / Product
                 'media_name' => $data['media_name'] ?? null,
                 'media_url' => $data['media_url'] ?? null,
-                'publication_date' => !empty($data['publication_date']) ? $data['publication_date'] : null,
+                'publication_date' => ! empty($data['publication_date']) ? $data['publication_date'] : null,
                 'video_url' => $data['video_url'] ?? null,
                 'platform' => $data['platform'] ?? null,
                 'product_name' => $data['product_name'] ?? null,
@@ -595,7 +595,7 @@ class ReportForm extends Form
 
             $outputData = [
                 // Lookup keys
-                'status' => !empty($data['status']) ? $data['status'] : null,
+                'status' => ! empty($data['status']) ? $data['status'] : null,
                 'book_title' => $data['book_title'] ?? null,
                 'publisher_name' => $data['publisher_name'] ?? null,
                 'isbn' => $data['isbn'] ?? null,
@@ -616,7 +616,7 @@ class ReportForm extends Form
                 'inventors' => $data['inventors'] ?? null,
                 'media_name' => $data['media_name'] ?? null,
                 'media_url' => $data['media_url'] ?? null,
-                'publication_date' => !empty($data['publication_date']) ? $data['publication_date'] : null,
+                'publication_date' => ! empty($data['publication_date']) ? $data['publication_date'] : null,
                 'video_url' => $data['video_url'] ?? null,
                 'platform' => $data['platform'] ?? null,
                 'product_name' => $data['product_name'] ?? null,
@@ -698,7 +698,7 @@ class ReportForm extends Form
     /**
      * Save all report files to media collections
      */
-    protected function saveReportFiles(\App\Models\ProgressReport $report): void
+    public function saveReportFiles(\App\Models\ProgressReport $report): void
     {
         // Save substance file (all report types have this)
         if ($this->substanceFile instanceof \Illuminate\Http\UploadedFile && $this->substanceFile->isValid()) {
@@ -791,10 +791,10 @@ class ReportForm extends Form
             $outputData = [
                 'progress_report_id' => $this->progressReport->id,
                 'proposal_output_id' => $proposalOutputId,
-                'status_type' => !empty($data['status_type']) ? $data['status_type'] : null,
+                'status_type' => ! empty($data['status_type']) ? $data['status_type'] : null,
                 'publication_year' => ! empty($data['publication_year']) ? (int) $data['publication_year'] : null,
                 // Journal
-                'author_status' => !empty($data['author_status']) ? $data['author_status'] : null,
+                'author_status' => ! empty($data['author_status']) ? $data['author_status'] : null,
                 'journal_title' => $data['journal_title'] ?? null,
                 'issn' => $data['issn'] ?? null,
                 'eissn' => $data['eissn'] ?? null,
@@ -819,7 +819,7 @@ class ReportForm extends Form
                 // Media / Video / Product
                 'media_name' => $data['media_name'] ?? null,
                 'media_url' => $data['media_url'] ?? null,
-                'publication_date' => !empty($data['publication_date']) ? $data['publication_date'] : null,
+                'publication_date' => ! empty($data['publication_date']) ? $data['publication_date'] : null,
                 'video_url' => $data['video_url'] ?? null,
                 'platform' => $data['platform'] ?? null,
                 'product_name' => $data['product_name'] ?? null,
@@ -902,7 +902,7 @@ class ReportForm extends Form
             $outputData = [
                 'progress_report_id' => $this->progressReport->id,
                 'proposal_output_id' => $proposalOutputId,
-                'status' => !empty($data['status']) ? $data['status'] : null,
+                'status' => ! empty($data['status']) ? $data['status'] : null,
                 'publication_year' => ! empty($data['publication_year']) ? (int) $data['publication_year'] : null,
                 // Book
                 'book_title' => $data['book_title'] ?? null,
@@ -924,7 +924,7 @@ class ReportForm extends Form
                 'inventors' => $data['inventors'] ?? null,
                 'media_name' => $data['media_name'] ?? null,
                 'media_url' => $data['media_url'] ?? null,
-                'publication_date' => !empty($data['publication_date']) ? $data['publication_date'] : null,
+                'publication_date' => ! empty($data['publication_date']) ? $data['publication_date'] : null,
                 'video_url' => $data['video_url'] ?? null,
                 'platform' => $data['platform'] ?? null,
                 'product_name' => $data['product_name'] ?? null,

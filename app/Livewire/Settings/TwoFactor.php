@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Livewire\Concerns\HasToast;
 use Exception;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
@@ -15,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TwoFactor extends Component
 {
+    use HasToast;
+
     #[Locked]
     public bool $twoFactorEnabled;
 
@@ -110,6 +113,10 @@ class TwoFactor extends Component
         $this->closeModal();
 
         $this->twoFactorEnabled = true;
+
+        $message = __('Two-factor authentication enabled successfully.');
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**
@@ -130,6 +137,10 @@ class TwoFactor extends Component
         $disableTwoFactorAuthentication(auth()->user());
 
         $this->twoFactorEnabled = false;
+
+        $message = __('Two-factor authentication disabled successfully.');
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**

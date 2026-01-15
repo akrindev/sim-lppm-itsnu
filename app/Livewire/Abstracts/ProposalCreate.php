@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Abstracts;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ProposalForm;
 use App\Livewire\Traits\WithProposalWizard;
 use App\Livewire\Traits\WithStepWizard;
@@ -16,6 +17,7 @@ use Livewire\WithFileUploads;
 
 abstract class ProposalCreate extends Component
 {
+    use HasToast;
     use WithFileUploads;
     use WithProposalWizard;
     use WithStepWizard;
@@ -32,7 +34,7 @@ abstract class ProposalCreate extends Component
 
     public function mount(?string $proposalId = null, ?\App\Models\Proposal $proposal = null): void
     {
-        $this->author_name = Auth::user()->name;
+        $this->author_name = Auth::user()?->name ?? '';
 
         // Handle route model binding (if passed as object) or ID string
         $proposalToLoad = $proposal ?? ($proposalId ? \App\Models\Proposal::find($proposalId) : null);
@@ -205,7 +207,7 @@ abstract class ProposalCreate extends Component
         $this->form->substance_file = null;
         $this->fileInputIteration++;
 
-        session()->flash('success', 'Draft proposal berhasil disimpan.');
+        $this->toastSuccess('Draft proposal berhasil disimpan.');
     }
 
     #[Computed]
@@ -420,5 +422,11 @@ abstract class ProposalCreate extends Component
             ],
             default => [],
         };
+    }
+
+    public function render()
+    {
+        // dump("Rendering ProposalCreate, Auth check: " . (Auth::check() ? 'Yes' : 'No'));
+        return view($this->getProposalType() === 'research' ? 'livewire.research.proposal.create' : 'livewire.community-service.proposal.create');
     }
 }

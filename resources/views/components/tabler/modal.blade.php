@@ -12,7 +12,6 @@
     'variant' => 'default', // simple, large, small, full-width, scrollable, form, success, danger, confirmation
     'type' => 'default', // success, danger, warning, info, primary (for colored headers)
     'icon' => null, // icon class for header
-    'componentId' => str()->random(15),
     'onShow' => null,
     'onHide' => null,
 ])
@@ -90,7 +89,6 @@
                 'aria-labelledby' => $titleId,
                 'aria-hidden' => 'true',
                 'data-livewire-modal' => $id,
-                'data-livewire-component' => $componentId,
                 'data-livewire-on-show' => $onShow,
                 'data-livewire-on-hide' => $onHide,
             ],
@@ -133,6 +131,20 @@
     @push('scripts')
         <script>
             document.addEventListener('livewire:initialized', () => {
+                // Helper function to find the closest Livewire component
+                const findLivewireComponent = (element) => {
+                    // Walk up the DOM tree to find the closest [wire:id] element
+                    let current = element;
+                    while (current && current !== document.body) {
+                        if (current.hasAttribute('wire:id')) {
+                            const wireId = current.getAttribute('wire:id');
+                            return window.Livewire?.find(wireId);
+                        }
+                        current = current.parentElement;
+                    }
+                    return null;
+                };
+
                 const setupTablerModalListeners = () => {
                     document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
                         if (modalEl.dataset.livewireModalBound === 'true') {
@@ -141,19 +153,22 @@
 
                         modalEl.dataset.livewireModalBound = 'true';
 
-                        const componentId = modalEl.dataset.livewireComponent;
                         const onShow = modalEl.dataset.livewireOnShow;
                         const onHide = modalEl.dataset.livewireOnHide;
 
-                        if (onShow && componentId) {
+                        if (onShow) {
                             modalEl.addEventListener('show.bs.modal', () => {
                                 console.log('Modal show event:', modalEl.id, 'calling:', onShow);
                                 try {
-                                    const livewireComponent = window.Livewire?.find(componentId);
+                                    const livewireComponent = findLivewireComponent(modalEl);
                                     if (livewireComponent) {
-                                        livewireComponent.call(onShow);
+                                        if (typeof livewireComponent[onShow] === 'function') {
+                                            livewireComponent[onShow]();
+                                        } else {
+                                            livewireComponent.call(onShow);
+                                        }
                                     } else {
-                                        console.warn('Livewire component not found:', componentId);
+                                        console.warn('Livewire component not found for modal:', modalEl.id);
                                     }
                                 } catch (error) {
                                     console.error('Error calling onShow:', error);
@@ -161,15 +176,19 @@
                             });
                         }
 
-                        if (onHide && componentId) {
+                        if (onHide) {
                             modalEl.addEventListener('hidden.bs.modal', () => {
                                 console.log('Modal hide event:', modalEl.id, 'calling:', onHide);
                                 try {
-                                    const livewireComponent = window.Livewire?.find(componentId);
+                                    const livewireComponent = findLivewireComponent(modalEl);
                                     if (livewireComponent) {
-                                        livewireComponent.call(onHide);
+                                        if (typeof livewireComponent[onHide] === 'function') {
+                                            livewireComponent[onHide]();
+                                        } else {
+                                            livewireComponent.call(onHide);
+                                        }
                                     } else {
-                                        console.warn('Livewire component not found:', componentId);
+                                        console.warn('Livewire component not found for modal:', modalEl.id);
                                     }
                                 } catch (error) {
                                     console.error('Error calling onHide:', error);
@@ -234,11 +253,28 @@
                     if (modalId) {
                         const modal = document.getElementById(modalId);
                         if (modal) {
-                            // Try bootstrap first, then tabler
-                            const bsModal = bootstrap?.Modal?.getInstance(modal) || 
+                            // Try to get existing instance first
+                            let bsModal = bootstrap?.Modal?.getInstance(modal) || 
                                            tabler?.Modal?.getInstance(modal);
+                            
+                            // If instance not found, try to get or create (it might be in a weird state)
+                            if (!bsModal && (bootstrap?.Modal || tabler?.Modal)) {
+                                bsModal = (bootstrap?.Modal || tabler?.Modal).getOrCreateInstance(modal);
+                            }
+
                             if (bsModal) {
                                 bsModal.hide();
+                                
+                                // Force remove backdrop and classes if it's still stuck
+                                setTimeout(() => {
+                                    if (modal.classList.contains('show')) {
+                                        console.warn('Modal hide failed via BS, forcing cleanup...');
+                                        modal.classList.remove('show');
+                                        modal.style.display = 'none';
+                                        document.body.classList.remove('modal-open');
+                                        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                                    }
+                                }, 500);
                             }
                         }
                     }

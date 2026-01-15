@@ -291,7 +291,7 @@ class ProposalForm extends Form
                 ->usingFileName($this->substance_file->hashName())
                 ->withCustomProperties(['uploaded_by' => $submitterId])
                 ->toMediaCollection('substance_file');
-            
+
             // Reset to prevent "UnableToRetrieveMetadata" error on subsequent validations
             $this->substance_file = null;
         }

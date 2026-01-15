@@ -5,6 +5,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
         <title>{{ $title ?? '' }} - {{ config('app.name') }}</title>
         <!-- BEGIN GLOBAL MANDATORY STYLES -->
         <!-- END GLOBAL MANDATORY STYLES -->
@@ -21,6 +22,9 @@
     </head>
 
     <body>
+        <!-- Toast Container for notifications -->
+        <x-tabler.toast-container />
+        
         <!-- BEGIN GLOBAL THEME SCRIPT -->
         {{-- @vite(['resources/js/theme-config.js']) --}}
         <!-- END GLOBAL THEME SCRIPT -->

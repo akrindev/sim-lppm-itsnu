@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\ResearchScheme;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class ResearchSchemeManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -53,10 +54,12 @@ class ResearchSchemeManager extends Component
             ResearchScheme::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan');
+        $message = $this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-research-scheme']);
+        $this->dispatch('close-modal', modalId: 'modal-research-scheme');
         $this->reset(['name', 'strata', 'editingId']);
     }
 
@@ -73,7 +76,9 @@ class ResearchSchemeManager extends Component
         $researchScheme->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Skema Penelitian berhasil dihapus');
+        $message = 'Skema Penelitian berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -86,7 +91,9 @@ class ResearchSchemeManager extends Component
         if ($this->deleteItemId) {
             ResearchScheme::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Skema Penelitian berhasil dihapus');
+            $message = 'Skema Penelitian berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

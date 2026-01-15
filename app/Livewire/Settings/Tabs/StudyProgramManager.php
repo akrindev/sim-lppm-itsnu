@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\StudyProgram;
@@ -11,7 +12,7 @@ use Livewire\WithPagination;
 
 class StudyProgramManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -61,10 +62,12 @@ class StudyProgramManager extends Component
             StudyProgram::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Program Studi berhasil diubah' : 'Program Studi berhasil ditambahkan');
+        $message = $this->editingId ? 'Program Studi berhasil diubah' : 'Program Studi berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-study-program']);
+        $this->dispatch('close-modal', modalId: 'modal-study-program');
         $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
     }
 
@@ -82,7 +85,9 @@ class StudyProgramManager extends Component
         $studyProgram->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Program Studi berhasil dihapus');
+        $message = 'Program Studi berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -95,7 +100,9 @@ class StudyProgramManager extends Component
         if ($this->deleteItemId) {
             StudyProgram::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Program Studi berhasil dihapus');
+            $message = 'Program Studi berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -3,6 +3,8 @@
     <x-slot:pageTitle>Daftar Notifikasi</x-slot:pageTitle>
     <x-slot:pageSubtitle>Kelola semua notifikasi Anda di sini.</x-slot:pageSubtitle>
 
+    <x-tabler.alert />
+
     <div class="card">
         <div class="card-header">
             <div class="d-flex align-items-center justify-content-between">

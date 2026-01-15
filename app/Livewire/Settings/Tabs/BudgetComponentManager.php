@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\BudgetComponent;
 use App\Models\BudgetGroup;
 use Livewire\Attributes\Validate;
@@ -10,7 +11,7 @@ use Livewire\WithPagination;
 
 class BudgetComponentManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|exists:budget_groups,id')]
     public ?int $budgetGroupId = null;
@@ -66,10 +67,12 @@ class BudgetComponentManager extends Component
             BudgetComponent::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Komponen Anggaran berhasil diubah' : 'Komponen Anggaran berhasil ditambahkan');
+        $message = $this->editingId ? 'Komponen Anggaran berhasil diubah' : 'Komponen Anggaran berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-component']);
+        $this->dispatch('close-modal', modalId: 'modal-budget-component');
         $this->reset(['budgetGroupId', 'code', 'name', 'unit', 'description', 'editingId']);
     }
 
@@ -89,7 +92,9 @@ class BudgetComponentManager extends Component
         $budgetComponent->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Komponen Anggaran berhasil dihapus');
+        $message = 'Komponen Anggaran berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -102,7 +107,9 @@ class BudgetComponentManager extends Component
         if ($this->deleteItemId) {
             BudgetComponent::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Komponen Anggaran berhasil dihapus');
+            $message = 'Komponen Anggaran berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

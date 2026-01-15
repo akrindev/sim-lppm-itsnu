@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\TktIndicator;
 use App\Models\TktLevel;
 use Livewire\Component;
@@ -12,16 +13,24 @@ use Livewire\Component;
  */
 class TktManager extends Component
 {
+    use HasToast;
+
     // Tab navigation
     public $currentTab = 'types'; // types, levels, indicators
+
     public $selectedType;
+
     public $selectedLevel;
 
     // Form properties
     public $typeName;
+
     public $levelDescription;
+
     public $indicatorCode;
+
     public $indicatorText;
+
     public $editingId;
 
     public function render()
@@ -91,11 +100,14 @@ class TktManager extends Component
                 TktLevel::create([
                     'type' => $this->typeName,
                     'level' => $i,
-                    'description' => 'Deskripsi Level ' . $i,
+                    'description' => 'Deskripsi Level '.$i,
                 ]);
             }
         }
 
+        $message = $this->editingId ? 'Kategori TKT berhasil diubah' : 'Kategori TKT berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('close-modal', modalId: 'modal-type');
         $this->resetForm();
     }
@@ -103,6 +115,9 @@ class TktManager extends Component
     public function deleteType($type)
     {
         TktLevel::where('type', $type)->delete();
+        $message = 'Kategori TKT berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     // --- Levels CRUD ---
@@ -110,7 +125,9 @@ class TktManager extends Component
     public function editLevel($levelId)
     {
         $level = TktLevel::find($levelId);
-        if (!$level) return;
+        if (! $level) {
+            return;
+        }
 
         $this->editingId = $levelId;
         $this->levelDescription = $level->description;
@@ -123,6 +140,9 @@ class TktManager extends Component
 
         TktLevel::find($this->editingId)->update(['description' => $this->levelDescription]);
 
+        $message = 'Level TKT berhasil diperbarui';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('close-modal', modalId: 'modal-level');
         $this->resetForm();
     }
@@ -138,7 +158,9 @@ class TktManager extends Component
     public function editIndicator($indicatorId)
     {
         $indicator = TktIndicator::find($indicatorId);
-        if (!$indicator) return;
+        if (! $indicator) {
+            return;
+        }
 
         $this->editingId = $indicatorId;
         $this->indicatorCode = $indicator->code;
@@ -166,6 +188,9 @@ class TktManager extends Component
             ]);
         }
 
+        $message = $this->editingId ? 'Indikator berhasil diubah' : 'Indikator berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
         $this->dispatch('close-modal', modalId: 'modal-indicator');
         $this->resetForm();
     }
@@ -173,6 +198,9 @@ class TktManager extends Component
     public function deleteIndicator($id)
     {
         TktIndicator::find($id)?->delete();
+        $message = 'Indikator berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     private function resetForm()

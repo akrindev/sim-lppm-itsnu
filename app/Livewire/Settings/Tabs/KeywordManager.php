@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Keyword;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class KeywordManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -45,10 +46,12 @@ class KeywordManager extends Component
             Keyword::create(['name' => $this->name]);
         }
 
-        session()->flash('success', $this->editingId ? 'Kata Kunci berhasil diubah' : 'Kata Kunci berhasil ditambahkan');
+        $message = $this->editingId ? 'Kata Kunci berhasil diubah' : 'Kata Kunci berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-keyword']);
+        $this->dispatch('close-modal', modalId: 'modal-keyword');
         $this->reset(['name', 'editingId']);
     }
 
@@ -64,7 +67,9 @@ class KeywordManager extends Component
         $keyword->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Kata Kunci berhasil dihapus');
+        $message = 'Kata Kunci berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -77,7 +82,9 @@ class KeywordManager extends Component
         if ($this->deleteItemId) {
             Keyword::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Kata Kunci berhasil dihapus');
+            $message = 'Kata Kunci berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

@@ -11,7 +11,7 @@ class FacultySeeder extends Seeder
      */
     public function run(): void
     {
-        $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first() 
+        $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first()
             ?? \App\Models\Institution::first();
 
         if ($institution) {

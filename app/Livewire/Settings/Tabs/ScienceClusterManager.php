@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\ScienceCluster;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class ScienceClusterManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -74,10 +75,12 @@ class ScienceClusterManager extends Component
             ScienceCluster::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan');
+        $message = $this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-science-cluster']);
+        $this->dispatch('close-modal', modalId: 'modal-science-cluster');
         $this->reset(['name', 'parentId', 'editingId']);
     }
 
@@ -94,7 +97,9 @@ class ScienceClusterManager extends Component
         $scienceCluster->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Klaster Sains berhasil dihapus');
+        $message = 'Klaster Sains berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -107,7 +112,9 @@ class ScienceClusterManager extends Component
         if ($this->deleteItemId) {
             ScienceCluster::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Klaster Sains berhasil dihapus');
+            $message = 'Klaster Sains berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

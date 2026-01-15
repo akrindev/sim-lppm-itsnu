@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Partner;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class PartnerManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -20,11 +21,11 @@ class PartnerManager extends Component
     #[Validate('required|min:3|max:255')]
     public string $address = '';
 
-    public ?int $editingId = null;
+    public ?string $editingId = null;
 
     public string $modalTitle = 'Mitra';
 
-    public ?int $deleteItemId = null;
+    public ?string $deleteItemId = null;
 
     public string $deleteItemName = '';
 
@@ -57,10 +58,12 @@ class PartnerManager extends Component
             Partner::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Mitra berhasil diubah' : 'Mitra berhasil ditambahkan');
+        $message = $this->editingId ? 'Mitra berhasil diubah' : 'Mitra berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-partner']);
+        $this->dispatch('close-modal', modalId: 'modal-partner');
         $this->reset(['name', 'type', 'address', 'editingId']);
     }
 
@@ -78,7 +81,9 @@ class PartnerManager extends Component
         $partner->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Mitra berhasil dihapus');
+        $message = 'Mitra berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -91,7 +96,9 @@ class PartnerManager extends Component
         if ($this->deleteItemId) {
             Partner::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Mitra berhasil dihapus');
+            $message = 'Mitra berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }
@@ -101,7 +108,7 @@ class PartnerManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(string $id, string $name): void
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = $name;

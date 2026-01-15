@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\BudgetGroup;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class BudgetGroupManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:2|max:10')]
     public string $code = '';
@@ -69,10 +70,12 @@ class BudgetGroupManager extends Component
             BudgetGroup::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Kelompok Anggaran berhasil diubah' : 'Kelompok Anggaran berhasil ditambahkan');
+        $message = $this->editingId ? 'Kelompok Anggaran berhasil diubah' : 'Kelompok Anggaran berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-budget-group']);
+        $this->dispatch('close-modal', modalId: 'modal-budget-group');
         $this->reset(['code', 'name', 'description', 'percentage', 'editingId']);
     }
 
@@ -91,7 +94,9 @@ class BudgetGroupManager extends Component
         $budgetGroup->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Kelompok Anggaran berhasil dihapus');
+        $message = 'Kelompok Anggaran berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -104,7 +109,9 @@ class BudgetGroupManager extends Component
         if ($this->deleteItemId) {
             BudgetGroup::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Kelompok Anggaran berhasil dihapus');
+            $message = 'Kelompok Anggaran berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

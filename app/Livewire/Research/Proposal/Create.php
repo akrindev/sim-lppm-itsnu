@@ -24,8 +24,8 @@ class Create extends ProposalCreate
     protected function getStep2Rules(): array
     {
         // Check if file already exists (edit mode)
-        $hasFile = $this->form->proposal && 
-                   $this->form->proposal->detailable && 
+        $hasFile = $this->form->proposal &&
+                   $this->form->proposal->detailable &&
                    $this->form->proposal->detailable->hasMedia('substance_file');
 
         return [

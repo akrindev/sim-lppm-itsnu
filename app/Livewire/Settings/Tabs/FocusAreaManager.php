@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\FocusArea;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class FocusAreaManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -45,10 +46,12 @@ class FocusAreaManager extends Component
             FocusArea::create(['name' => $this->name]);
         }
 
-        session()->flash('success', $this->editingId ? 'Area Fokus berhasil diubah' : 'Area Fokus berhasil ditambahkan');
+        $message = $this->editingId ? 'Area Fokus berhasil diubah' : 'Area Fokus berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-focus-area']);
+        $this->dispatch('close-modal', modalId: 'modal-focus-area');
         $this->reset(['name', 'editingId']);
     }
 
@@ -64,7 +67,9 @@ class FocusAreaManager extends Component
         $focusArea->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Area Fokus berhasil dihapus');
+        $message = 'Area Fokus berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -77,7 +82,9 @@ class FocusAreaManager extends Component
         if ($this->deleteItemId) {
             FocusArea::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Area Fokus berhasil dihapus');
+            $message = 'Area Fokus berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }

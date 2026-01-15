@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\StudyProgram;
@@ -13,6 +14,8 @@ use Livewire\Component;
 
 class ProfileForm extends Component
 {
+    use HasToast;
+
     public string $name = '';
 
     public string $email = '';
@@ -175,7 +178,9 @@ class ProfileForm extends Component
             $identityData
         );
 
-        session()->flash('success', 'Profile berhasil diperbarui.');
+        $message = 'Profile berhasil diperbarui.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         $this->dispatch('profile-updated', name: $user->name);
     }

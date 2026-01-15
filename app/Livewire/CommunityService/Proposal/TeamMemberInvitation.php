@@ -2,6 +2,7 @@
 
 namespace App\Livewire\CommunityService\Proposal;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,8 @@ use Livewire\Component;
 
 class TeamMemberInvitation extends Component
 {
+    use HasToast;
+
     public Proposal $proposal;
 
     #[Computed]
@@ -62,7 +65,9 @@ class TeamMemberInvitation extends Component
             });
 
             $this->dispatch('team-member-accepted', proposalId: $this->proposal->id);
-            session()->flash('success', 'Anda telah menerima undangan menjadi anggota proposal ini.');
+            $message = 'Anda telah menerima undangan menjadi anggota proposal ini.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
         }
     }
 
@@ -84,7 +89,9 @@ class TeamMemberInvitation extends Component
             });
 
             $this->dispatch('team-member-rejected', proposalId: $this->proposal->id);
-            session()->flash('warning', 'Anda telah menolak undangan untuk proposal ini.');
+            $message = 'Anda telah menolak undangan untuk proposal ini.';
+            session()->flash('warning', $message);
+            $this->toastWarning($message);
         }
     }
 

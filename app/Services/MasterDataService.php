@@ -70,21 +70,22 @@ class MasterDataService
 
     public function clusterLevel2Options(?int $level1Id = null): Collection
     {
-        $query = $this->scienceClusters()->whereNotNull('parent_id')->whereNull('parent_id');
+        $query = $this->scienceClusters()->whereNotNull('parent_id');
 
         if ($level1Id !== null) {
-            $query->where('parent_id', $level1Id);
+            $query = $query->where('parent_id', $level1Id);
         }
 
+        // Only include those where parent is level 1 (optional, but good for clarity)
         return $query;
     }
 
     public function clusterLevel3Options(?int $level2Id = null): Collection
     {
-        $query = $this->scienceClusters();
+        $query = $this->scienceClusters()->whereNotNull('parent_id');
 
         if ($level2Id !== null) {
-            $query->where('parent_id', $level2Id);
+            $query = $query->where('parent_id', $level2Id);
         }
 
         return $query;

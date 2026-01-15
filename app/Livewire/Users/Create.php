@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Users;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Faculty;
 use App\Models\Institution;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Spatie\Permission\Models\Role;
 #[Layout('components.layouts.app', ['title' => 'Create User', 'pageTitle' => 'Create User', 'pageSubtitle' => 'Add a new user to the system'])]
 class Create extends Component
 {
+    use HasToast;
+
     public string $name = '';
 
     public string $email = '';
@@ -79,7 +82,9 @@ class Create extends Component
             }
         });
 
-        session()->flash('success', 'Pengguna baru telah dibuat.');
+        $message = 'Pengguna baru telah dibuat.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         $this->redirect(route('users.index'), navigate: true);
     }
@@ -141,7 +146,7 @@ class Create extends Component
         return Role::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Role $role) => [
+            ->map(fn (Role $role) => [
                 'value' => $role->name,
                 'label' => str($role->name)->title()->toString(),
             ])
@@ -159,7 +164,7 @@ class Create extends Component
         return Institution::query()
             ->orderBy('name')
             ->get()
-            ->map(fn(Institution $institution) => [
+            ->map(fn (Institution $institution) => [
                 'value' => $institution->id,
                 'label' => $institution->name,
             ])
@@ -182,7 +187,7 @@ class Create extends Component
             ->where('institution_id', $this->institution_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(Faculty $faculty) => [
+            ->map(fn (Faculty $faculty) => [
                 'value' => $faculty->id,
                 'label' => $faculty->name,
             ])
@@ -205,7 +210,7 @@ class Create extends Component
             ->where('faculty_id', $this->faculty_id)
             ->orderBy('name')
             ->get()
-            ->map(fn(\App\Models\StudyProgram $program) => [
+            ->map(fn (\App\Models\StudyProgram $program) => [
                 'value' => $program->id,
                 'label' => $program->name,
             ])

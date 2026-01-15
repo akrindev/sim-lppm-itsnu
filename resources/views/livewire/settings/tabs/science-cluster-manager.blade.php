@@ -54,12 +54,12 @@
                                     <div class="btn-list">
                                         <button type="button" class="btn-outline-warning btn btn-sm"
                                             data-bs-toggle="modal" data-bs-target="#modal-science-cluster"
-                                            wire:click="edit({{ $cluster->id }})">
+                                            wire:click="edit('{{ $cluster->id }}')">
                                             Edit
                                         </button>
                                         <button type="button" class="btn-outline-danger btn btn-sm"
                                             data-bs-toggle="modal" data-bs-target="#modal-confirm-delete"
-                                            wire:click="confirmDelete({{ $cluster->id }}, '{{ $cluster->name }}')">
+                                            wire:click="confirmDelete('{{ $cluster->id }}', '{{ $cluster->name }}')">
                                             Hapus
                                         </button>
                                     </div>
@@ -83,12 +83,12 @@
                                     <div class="btn-list">
                                         <button type="button" class="btn-outline-warning btn btn-sm"
                                             data-bs-toggle="modal" data-bs-target="#modal-science-cluster"
-                                            wire:click="edit({{ $cluster->id }})">
+                                            wire:click="edit('{{ $cluster->id }}')">
                                             Edit
                                         </button>
                                         <button type="button" class="btn-outline-danger btn btn-sm"
                                             data-bs-toggle="modal" data-bs-target="#modal-confirm-delete"
-                                            wire:click="confirmDelete({{ $cluster->id }}, '{{ $cluster->name }}')">
+                                            wire:click="confirmDelete('{{ $cluster->id }}', '{{ $cluster->name }}')">
                                             Hapus
                                         </button>
                                     </div>
@@ -112,12 +112,12 @@
                                     <div class="btn-list">
                                         <button type="button" class="btn-outline-warning btn btn-sm"
                                             data-bs-toggle="modal" data-bs-target="#modal-science-cluster"
-                                            wire:click="edit({{ $cluster->id }})">
+                                            wire:click="edit('{{ $cluster->id }}')">
                                             Edit
                                         </button>
                                         <button type="button" class="btn-outline-danger btn btn-sm"
                                             data-bs-toggle="modal" data-bs-target="#modal-confirm-delete"
-                                            wire:click="confirmDelete({{ $cluster->id }}, '{{ $cluster->name }}')">
+                                            wire:click="confirmDelete('{{ $cluster->id }}', '{{ $cluster->name }}')">
                                             Hapus
                                         </button>
                                     </div>

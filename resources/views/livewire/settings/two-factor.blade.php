@@ -1,4 +1,5 @@
 <div>
+    <x-tabler.alert />
 
     @if ($twoFactorEnabled)
         <div class="space-y-4">

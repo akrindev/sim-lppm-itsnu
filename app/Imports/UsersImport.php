@@ -6,7 +6,6 @@ use App\Models\Identity;
 use App\Models\Institution;
 use App\Models\StudyProgram;
 use App\Models\User;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

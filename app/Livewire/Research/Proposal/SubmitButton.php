@@ -4,6 +4,7 @@ namespace App\Livewire\Research\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Livewire\Actions\SubmitProposalAction;
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -12,6 +13,8 @@ use Livewire\Component;
 
 class SubmitButton extends Component
 {
+    use HasToast;
+
     public string $proposalId = '';
 
     public function mount(string $proposalId): void
@@ -61,13 +64,15 @@ class SubmitButton extends Component
         $result = $action->execute($proposal);
 
         if ($result['success']) {
-            $this->dispatch('success', message: $result['message']);
-            session()->flash('success', 'Proposal penelitian berhasil diajukan');
+            $message = 'Proposal penelitian berhasil diajukan';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->dispatch('proposal-submitted', proposalId: $proposal->id);
             $this->redirect(route('research.proposal.show', $proposal->id));
         } else {
-            $this->dispatch('error', message: $result['message']);
-            session()->flash('error', 'Gagal mengajukan proposal: '.$result['message']);
+            $message = 'Gagal mengajukan proposal: '.$result['message'];
+            session()->flash('error', $message);
+            $this->toastError($message);
         }
     }
 

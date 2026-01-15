@@ -219,7 +219,6 @@ class ScienceClusterSeeder extends Seeder
             ['id' => 114, 'parent_id' => 46, 'level' => 3, 'name' => 'Desain Komunikasi Visual'],
         ];
 
-
         // Prepare data for upsert - include all fields needed
         $upsertData = array_map(function ($cluster) {
             return [
@@ -237,8 +236,8 @@ class ScienceClusterSeeder extends Seeder
 
         $this->command->info('Science clusters seeded successfully!');
         $this->command->info('Level 1: 12 Rumpun Ilmu');
-        $this->command->info('Level 2: ' . (count(array_filter($clusters, fn($c) => $c['level'] == 2))) . ' Sub Rumpun');
-        $this->command->info('Level 3: ' . (count(array_filter($clusters, fn($c) => $c['level'] == 3))) . ' Bidang Ilmu Detail');
-        $this->command->info('Total: ' . count($clusters) . ' clusters seeded');
+        $this->command->info('Level 2: '.(count(array_filter($clusters, fn ($c) => $c['level'] == 2))).' Sub Rumpun');
+        $this->command->info('Level 3: '.(count(array_filter($clusters, fn ($c) => $c['level'] == 3))).' Bidang Ilmu Detail');
+        $this->command->info('Total: '.count($clusters).' clusters seeded');
     }
 }

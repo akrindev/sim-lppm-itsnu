@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\CommunityService\ProposalRevision;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ProposalForm;
 use App\Models\Partner;
 use App\Models\Proposal;
@@ -19,6 +20,8 @@ use Livewire\Component;
 #[Title('Detail Revisi Proposal Pengabdian')]
 class Show extends Component
 {
+    use HasToast;
+
     public ProposalForm $form;
 
     #[Validate('required|exists:partners,id')]
@@ -92,7 +95,9 @@ class Show extends Component
     public function save(): void
     {
         if (! $this->canEdit()) {
-            session()->flash('error', 'Anda tidak memiliki akses untuk mengedit proposal ini');
+            $message = 'Anda tidak memiliki akses untuk mengedit proposal ini';
+            session()->flash('error', $message);
+            $this->toastError($message);
 
             return;
         }
@@ -109,12 +114,16 @@ class Show extends Component
 
             $communityService->save();
 
-            session()->flash('success', 'Perubahan berhasil disimpan');
+            $message = 'Perubahan berhasil disimpan';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
 
             // Refresh proposal data
             $this->form->setProposal($this->form->proposal->fresh());
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan perubahan: '.$e->getMessage());
+            $message = 'Gagal menyimpan perubahan: '.$e->getMessage();
+            session()->flash('error', $message);
+            $this->toastError($message);
         }
     }
 

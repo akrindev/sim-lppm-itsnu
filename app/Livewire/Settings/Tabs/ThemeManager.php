@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\FocusArea;
 use App\Models\Theme;
 use Livewire\Attributes\Validate;
@@ -10,7 +11,7 @@ use Livewire\WithPagination;
 
 class ThemeManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
@@ -55,10 +56,12 @@ class ThemeManager extends Component
             Theme::create($data);
         }
 
-        session()->flash('success', $this->editingId ? 'Tema berhasil diubah' : 'Tema berhasil ditambahkan');
+        $message = $this->editingId ? 'Tema berhasil diubah' : 'Tema berhasil ditambahkan';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         // close modal
-        $this->dispatch('close-modal', detail: ['modalId' => 'modal-theme']);
+        $this->dispatch('close-modal', modalId: 'modal-theme');
         $this->reset(['name', 'focusAreaId', 'editingId']);
     }
 
@@ -75,7 +78,9 @@ class ThemeManager extends Component
         $theme->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Tema berhasil dihapus');
+        $message = 'Tema berhasil dihapus';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function resetForm(): void
@@ -88,7 +93,9 @@ class ThemeManager extends Component
         if ($this->deleteItemId) {
             Theme::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Tema berhasil dihapus');
+            $message = 'Tema berhasil dihapus';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
             $this->resetConfirmDelete();
         }
     }
