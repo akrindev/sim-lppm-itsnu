@@ -81,6 +81,7 @@ abstract class ProposalIndex extends Component
     public function confirmDeleteProposal(string $proposalId): void
     {
         $this->confirmingDeleteProposalId = $proposalId;
+        $this->dispatch('open-modal', modalId: 'deleteProposalModal');
     }
 
     public function cancelDeleteProposal(): void
@@ -88,9 +89,20 @@ abstract class ProposalIndex extends Component
         $this->confirmingDeleteProposalId = '';
     }
 
-    public function deleteProposal(string $proposalId): void
+    public function prepareConfirmation(): void
     {
-        $proposal = \App\Models\Proposal::findOrFail($proposalId);
+        // Required by modal-confirmation component
+    }
+
+    public function cleanupConfirmation(): void
+    {
+        $this->cancelDeleteProposal();
+    }
+
+    public function deleteProposal(?string $proposalId = null): void
+    {
+        $id = $proposalId ?: $this->confirmingDeleteProposalId;
+        $proposal = \App\Models\Proposal::findOrFail($id);
 
         if ($proposal->detailable_type !== match ($this->getProposalType()) {
             'research' => \App\Models\Research::class,
@@ -105,6 +117,7 @@ abstract class ProposalIndex extends Component
 
         app(\App\Services\ProposalService::class)->deleteProposal($proposal);
 
+        session()->flash('success', 'Proposal berhasil dihapus.');
         $this->dispatch('proposal-deleted');
         $this->cancelDeleteProposal();
     }

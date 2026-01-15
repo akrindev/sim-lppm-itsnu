@@ -25,6 +25,7 @@
 </x-slot:pageActions>
 
 <div>
+    <x-tabler.alert />
 
     <!-- Status Stats -->
     <div class="row row-cards row-deck mb-3">
@@ -154,7 +155,8 @@
                             <td style="max-width: 250px;">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
                                 <div class="mt-1">
-                                    <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                    <x-tabler.badge variant="outline" class="text-uppercase"
+                                        style="font-size: 0.65rem;">
                                         {{ $proposal->focusArea?->name ?? '—' }}
                                     </x-tabler.badge>
                                 </div>
@@ -179,13 +181,15 @@
                                         class="btn btn-icon btn-ghost-primary" wire:navigate title="Lihat">
                                         <x-lucide-eye class="icon" />
                                     </a>
-                                    @if ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id())
+                                    {{-- @if ($proposal->status->value === 'draft' && $proposal->submitter_id === auth()->id())
                                         <a href="{{ route('community-service.proposal.edit', $proposal) }}"
                                             class="btn btn-icon btn-ghost-info" title="Edit" wire:navigate>
                                             <x-lucide-pencil class="icon" />
                                         </a>
-                                    @endif
-                                    @if ($proposal->status === 'draft' && $proposal->submitter_id === auth()->id())
+                                    @endif --}}
+                                    @if (
+                                        $proposal->status->value === 'draft' &&
+                                            (auth()->user()->hasRole('admin lppm') || $proposal->submitter_id === auth()->id()))
                                         <button type="button" class="btn btn-icon btn-ghost-danger" title="Hapus"
                                             wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
                                             <x-lucide-trash class="icon" />
@@ -216,11 +220,8 @@
     </div>
 
     <!-- Delete Proposal Confirmation Modal -->
-    @if ($confirmingDeleteProposalId)
-        <x-tabler.modal-confirmation id="deleteProposalModal" title="Hapus Proposal?"
-            message="Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan."
-            confirm-text="Ya, Hapus Proposal" cancel-text="Batal" variant="danger" icon="trash"
-            component-id="{{ $this->id }}" component-id="deleteProposalModal"
-            on-confirm="deleteProposal('{{ $confirmingDeleteProposalId }}')" on-cancel="cancelDeleteProposal" />
-    @endif
+    <x-tabler.modal-confirmation id="deleteProposalModal" title="Hapus Proposal?"
+        message="Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan."
+        confirm-text="Ya, Hapus Proposal" cancel-text="Batal" variant="danger" icon="trash"
+        component-id="{{ $this->getId() }}" on-confirm="deleteProposal" on-cancel="cancelDeleteProposal" />
 </div>
