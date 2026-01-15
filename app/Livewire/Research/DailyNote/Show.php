@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Research\DailyNote;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\DailyNote;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Show extends Component
 {
+    use HasToast;
     use WithFileUploads;
 
     public Proposal $proposal;
@@ -90,16 +92,16 @@ class Show extends Component
         $this->activity_date = date('Y-m-d');
         $this->dispatch('note-saved');
         $this->dispatch('close-modal', modalId: 'daily-note-modal');
-        session()->flash('success', 'Catatan harian berhasil disimpan.');
+        $this->toastSuccess('Catatan harian berhasil disimpan.');
     }
 
     public function edit(string $id): void
     {
         $note = DailyNote::findOrFail($id);
-        
+
         // Authorization check (optional but recommended)
-        if($note->proposal_id !== $this->proposal->id) {
-             abort(403);
+        if ($note->proposal_id !== $this->proposal->id) {
+            abort(403);
         }
 
         $this->editingId = $id;
@@ -107,30 +109,30 @@ class Show extends Component
         $this->activity_description = $note->activity_description;
         $this->progress_percentage = $note->progress_percentage;
         $this->notes = $note->notes ?? '';
-        
+
         $this->dispatch('open-modal', modalId: 'daily-note-modal');
     }
 
     public function delete(string $id): void
     {
         $note = DailyNote::findOrFail($id);
-        if($note->proposal_id !== $this->proposal->id) {
-             abort(403);
+        if ($note->proposal_id !== $this->proposal->id) {
+            abort(403);
         }
         $note->delete();
-        session()->flash('success', 'Catatan harian berhasil dihapus.');
+        $this->toastSuccess('Catatan harian berhasil dihapus.');
     }
 
     public function deleteEvidence(string $mediaId): void
     {
         $media = Media::findOrFail($mediaId);
-        
+
         // Check if the media belongs to a note in this proposal
         $note = DailyNote::find($media->model_id);
-        
+
         if ($note && $note->proposal_id === $this->proposal->id) {
             $media->delete();
-            session()->flash('success', 'File bukti berhasil dihapus.');
+            $this->toastSuccess('File bukti berhasil dihapus.');
         } else {
             abort(403);
         }

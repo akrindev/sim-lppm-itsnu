@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Research\FinalReport;
 
 use App\Enums\ProposalStatus;
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ReportForm;
 use App\Livewire\Traits\HasFileUploads;
 use App\Livewire\Traits\ReportAccess;
@@ -19,6 +20,7 @@ use Livewire\WithFileUploads;
 class Show extends Component
 {
     use HasFileUploads;
+    use HasToast;
     use ReportAccess;
     use ReportAuthorization;
     use WithFileUploads;
@@ -83,7 +85,7 @@ class Show extends Component
                 // Save report via form
                 $report = $this->form->save($this->progressReport);
                 $this->progressReport = $report;
-                
+
                 // Mark as existing draft
                 $this->isFinalReportDraft = true;
 
@@ -97,12 +99,12 @@ class Show extends Component
             });
 
             $this->dispatch('report-saved');
-            session()->flash('success', 'Laporan akhir berhasil disimpan.');
+            $this->toastSuccess('Laporan akhir berhasil disimpan.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Let Livewire handle validation errors
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan laporan: '.$e->getMessage());
+            $this->toastError('Gagal menyimpan laporan: '.$e->getMessage());
         }
     }
 
@@ -241,18 +243,18 @@ class Show extends Component
 
         try {
             $this->validateMandatoryFile((int) $key);
-            
+
             $this->form->tempMandatoryFiles[$key] = $value;
             $this->form->saveMandatoryOutputWithFile((int) $key, validate: false);
-            
+
             // Sync report
             $this->progressReport = $this->form->progressReport;
-            
+
             unset($this->tempMandatoryFiles[$key]);
-            
-            session()->flash('success', 'File luaran wajib berhasil disimpan.');
+
+            $this->toastSuccess('File luaran wajib berhasil disimpan.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            $this->toastError('Gagal mengunggah file: '.$e->getMessage());
         }
     }
 
@@ -267,17 +269,17 @@ class Show extends Component
 
         try {
             $this->validateAdditionalFile((int) $key);
-            
+
             $this->form->tempAdditionalFiles[$key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
-            
+
             $this->progressReport = $this->form->progressReport;
-            
+
             unset($this->tempAdditionalFiles[$key]);
-            
-            session()->flash('success', 'File luaran tambahan berhasil disimpan.');
+
+            $this->toastSuccess('File luaran tambahan berhasil disimpan.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            $this->toastError('Gagal mengunggah file: '.$e->getMessage());
         }
     }
 
@@ -292,17 +294,17 @@ class Show extends Component
 
         try {
             $this->validateAdditionalCert((int) $key);
-            
+
             $this->form->tempAdditionalCerts[$key] = $value;
             $this->form->saveAdditionalOutputWithFile((int) $key, validate: false);
-            
+
             $this->progressReport = $this->form->progressReport;
-            
+
             unset($this->tempAdditionalCerts[$key]);
-            
-            session()->flash('success', 'Sertifikat berhasil disimpan.');
+
+            $this->toastSuccess('Sertifikat berhasil disimpan.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal mengunggah file: '.$e->getMessage());
+            $this->toastError('Gagal mengunggah file: '.$e->getMessage());
         }
     }
 
@@ -317,7 +319,7 @@ class Show extends Component
 
         if ($this->progressReport) {
             $this->progressReport->clearMediaCollection('substance_file');
-            session()->flash('success', 'File substansi berhasil dihapus.');
+            $this->toastSuccess('File substansi berhasil dihapus.');
         }
     }
 
@@ -332,7 +334,7 @@ class Show extends Component
 
         if ($this->progressReport) {
             $this->progressReport->clearMediaCollection('realization_file');
-            session()->flash('success', 'File realisasi berhasil dihapus.');
+            $this->toastSuccess('File realisasi berhasil dihapus.');
         }
     }
 
@@ -347,7 +349,7 @@ class Show extends Component
 
         if ($this->progressReport) {
             $this->progressReport->clearMediaCollection('presentation_file');
-            session()->flash('success', 'File presentasi berhasil dihapus.');
+            $this->toastSuccess('File presentasi berhasil dihapus.');
         }
     }
 
@@ -370,7 +372,7 @@ class Show extends Component
 
         $this->form->saveMandatoryOutput($proposalOutputId);
         $this->dispatch('close-modal', modalId: 'modalMandatoryOutput');
-        session()->flash('success', 'Data luaran wajib berhasil disimpan.');
+        $this->toastSuccess('Data luaran wajib berhasil disimpan.');
     }
 
     /**
@@ -403,14 +405,14 @@ class Show extends Component
             // Save via form
             $this->form->saveAdditionalOutputWithFile($proposalOutputId);
 
-            session()->flash('success', 'Data luaran tambahan berhasil disimpan.');
+            $this->toastSuccess('Data luaran tambahan berhasil disimpan.');
             $this->dispatch('close-modal', modalId: 'modalAdditionalOutput');
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan: '.$e->getMessage());
+            $this->toastError('Gagal menyimpan: '.$e->getMessage());
         }
     }
 

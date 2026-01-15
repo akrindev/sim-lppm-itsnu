@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings\Tabs;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\NationalPriority;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -9,16 +10,16 @@ use Livewire\WithPagination;
 
 class NationalPriorityManager extends Component
 {
-    use WithPagination;
+    use HasToast, WithPagination;
 
     #[Validate('required|min:3|max:255')]
     public string $name = '';
 
-    public ?int $editingId = null;
+    public ?string $editingId = null;
 
     public string $modalTitle = 'Prioritas Nasional';
 
-    public ?int $deleteItemId = null;
+    public ?string $deleteItemId = null;
 
     public string $deleteItemName = '';
 
@@ -45,7 +46,7 @@ class NationalPriorityManager extends Component
             NationalPriority::create(['name' => $this->name]);
         }
 
-        session()->flash('success', $this->editingId ? 'Prioritas Nasional berhasil diubah' : 'Prioritas Nasional berhasil ditambahkan');
+        $this->toastSuccess($this->editingId ? 'Prioritas Nasional berhasil diubah' : 'Prioritas Nasional berhasil ditambahkan');
 
         // close modal
         $this->dispatch('close-modal', detail: ['modalId' => 'modal-national-priority']);
@@ -64,7 +65,7 @@ class NationalPriorityManager extends Component
         $nationalPriority->delete();
 
         $this->resetForm();
-        session()->flash('success', 'Prioritas Nasional berhasil dihapus');
+        $this->toastSuccess('Prioritas Nasional berhasil dihapus');
     }
 
     public function resetForm(): void
@@ -77,7 +78,7 @@ class NationalPriorityManager extends Component
         if ($this->deleteItemId) {
             NationalPriority::findOrFail($this->deleteItemId)->delete();
 
-            session()->flash('success', 'Prioritas Nasional berhasil dihapus');
+            $this->toastSuccess('Prioritas Nasional berhasil dihapus');
             $this->resetConfirmDelete();
         }
     }
@@ -87,7 +88,7 @@ class NationalPriorityManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(string|int $id, string $name): void
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = $name;

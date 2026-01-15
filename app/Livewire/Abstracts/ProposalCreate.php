@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Abstracts;
 
+use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ProposalForm;
 use App\Livewire\Traits\WithProposalWizard;
 use App\Livewire\Traits\WithStepWizard;
@@ -16,6 +17,7 @@ use Livewire\WithFileUploads;
 
 abstract class ProposalCreate extends Component
 {
+    use HasToast;
     use WithFileUploads;
     use WithProposalWizard;
     use WithStepWizard;
@@ -205,7 +207,7 @@ abstract class ProposalCreate extends Component
         $this->form->substance_file = null;
         $this->fileInputIteration++;
 
-        session()->flash('success', 'Draft proposal berhasil disimpan.');
+        $this->toastSuccess('Draft proposal berhasil disimpan.');
     }
 
     #[Computed]

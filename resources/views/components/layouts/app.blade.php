@@ -22,6 +22,9 @@
     </head>
 
     <body>
+        <!-- Toast Container for notifications -->
+        <x-tabler.toast-container />
+        
         <!-- BEGIN GLOBAL THEME SCRIPT -->
         {{-- @vite(['resources/js/theme-config.js']) --}}
         <!-- END GLOBAL THEME SCRIPT -->
