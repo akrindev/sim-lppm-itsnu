@@ -114,11 +114,18 @@ class ReportForm extends Form
         $this->summaryUpdate = $report->summary_update ?? '';
         $this->keywordsInput = $report->keywords->pluck('name')->implode('; ');
         $this->reportingYear = (int) $report->reporting_year;
-        $this->reportingPeriod = $report->reporting_period;
+
+        // Determine if we are cloning from a previous period
+        $isCloning = false;
 
         // Force final period if type is final
         if ($this->type === 'final') {
             $this->reportingPeriod = 'final';
+            if ($report->reporting_period !== 'final') {
+                $isCloning = true;
+            }
+        } else {
+            $this->reportingPeriod = $report->reporting_period;
         }
 
         // Load mandatory outputs
@@ -128,7 +135,7 @@ class ReportForm extends Form
             }
 
             $data = [
-                'id' => $output->id,
+                'id' => $isCloning ? null : $output->id, // If cloning, reset ID to create new record
                 'status_type' => $output->status_type,
                 'author_status' => $output->author_status,
                 // Journal
@@ -162,14 +169,16 @@ class ReportForm extends Form
                 'platform' => $output->platform,
                 'product_name' => $output->product_name,
                 'description' => $output->description,
-                'partner_name' => $output->partner_name ?? null, // Check schema if column exists, otherwise generic description
+                'partner_name' => $output->partner_name ?? null,
                 'indicator_type' => $output->indicator_type ?? null,
                 'improvement_value' => $output->improvement_value ?? null,
             ];
 
             // Add file status for final reports
             if ($this->type === 'final') {
-                $data['document_file'] = $output->getFirstMedia('journal_article') ? true : false;
+                // If cloning, reset file status to force re-upload for final report
+                // But retain metadata
+                $data['document_file'] = $isCloning ? false : ($output->getFirstMedia('journal_article') ? true : false);
             }
 
             $this->mandatoryOutputs[$output->proposal_output_id] = $data;
@@ -182,7 +191,7 @@ class ReportForm extends Form
             }
 
             $data = [
-                'id' => $output->id,
+                'id' => $isCloning ? null : $output->id, // If cloning, reset ID
                 'status' => $output->status,
                 // Book
                 'book_title' => $output->book_title,
@@ -214,8 +223,8 @@ class ReportForm extends Form
 
             // Add file status for final reports
             if ($this->type === 'final') {
-                $data['document_file'] = $output->getFirstMedia('book_document') ? true : false;
-                $data['publication_certificate'] = $output->getFirstMedia('publication_certificate') ? true : false;
+                $data['document_file'] = $isCloning ? false : ($output->getFirstMedia('book_document') ? true : false);
+                $data['publication_certificate'] = $isCloning ? false : ($output->getFirstMedia('publication_certificate') ? true : false);
             }
 
             $this->additionalOutputs[$output->proposal_output_id] = $data;
@@ -368,31 +377,25 @@ class ReportForm extends Form
             $rules["mandatoryOutputs.{$outputId}.journal_url"] = 'nullable|url';
             $rules["mandatoryOutputs.{$outputId}.article_url"] = 'nullable|url';
             $rules["mandatoryOutputs.{$outputId}.doi"] = 'nullable|string|max:255';
-        } 
-        elseif (str_contains($type, 'buku') || str_contains($group, 'buku') || str_contains($type, 'modul') || str_contains($type, 'pedoman')) {
+        } elseif (str_contains($type, 'buku') || str_contains($group, 'buku') || str_contains($type, 'modul') || str_contains($type, 'pedoman')) {
             $rules["mandatoryOutputs.{$outputId}.book_title"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.publisher"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.isbn"] = 'nullable|string|max:20';
-        }
-        elseif (str_contains($type, 'hki') || str_contains($type, 'paten') || str_contains($type, 'hak cipta') || str_contains($group, 'hki')) {
+        } elseif (str_contains($type, 'hki') || str_contains($type, 'paten') || str_contains($type, 'hak cipta') || str_contains($group, 'hki')) {
             $rules["mandatoryOutputs.{$outputId}.hki_type"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.registration_number"] = 'nullable|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.inventors"] = 'nullable|string|max:255';
-        }
-        elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
+        } elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
             $rules["mandatoryOutputs.{$outputId}.media_name"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.media_url"] = 'required|url';
             $rules["mandatoryOutputs.{$outputId}.publication_date"] = 'required|date';
-        }
-        elseif (str_contains($type, 'video') || str_contains($group, 'video')) {
+        } elseif (str_contains($type, 'video') || str_contains($group, 'video')) {
             $rules["mandatoryOutputs.{$outputId}.video_url"] = 'required|url';
             $rules["mandatoryOutputs.{$outputId}.platform"] = 'nullable|string|max:50';
-        }
-        elseif (str_contains($type, 'produk') || str_contains($type, 'jasa') || str_contains($group, 'produk')) {
+        } elseif (str_contains($type, 'produk') || str_contains($type, 'jasa') || str_contains($type, 'sistem') || str_contains($type, 'ttg') || str_contains($type, 'purwarupa') || str_contains($type, 'prototipe') || str_contains($type, 'model') || str_contains($group, 'produk')) {
             $rules["mandatoryOutputs.{$outputId}.product_name"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.description"] = 'nullable|string';
-        }
-        elseif (str_contains($type, 'pemberdayaan') || str_contains($group, 'pemberdayaan')) {
+        } elseif (str_contains($type, 'pemberdayaan') || str_contains($type, ' mitra') || str_contains($group, 'pemberdayaan')) {
             $rules["mandatoryOutputs.{$outputId}.partner_name"] = 'required|string|max:255';
             $rules["mandatoryOutputs.{$outputId}.indicator_type"] = 'required|string|max:50';
         }
@@ -420,16 +423,13 @@ class ReportForm extends Form
             $rules["additionalOutputs.{$outputId}.total_pages"] = 'nullable|integer|min:1';
             $rules["additionalOutputs.{$outputId}.publisher_url"] = 'nullable|url';
             $rules["additionalOutputs.{$outputId}.book_url"] = 'nullable|url';
-        }
-        elseif (str_contains($type, 'jurnal') || str_contains($group, 'jurnal')) {
+        } elseif (str_contains($type, 'jurnal') || str_contains($group, 'jurnal')) {
             $rules["additionalOutputs.{$outputId}.journal_title"] = 'required|string|max:255';
             $rules["additionalOutputs.{$outputId}.issn"] = 'nullable|string|max:20';
             $rules["additionalOutputs.{$outputId}.doi"] = 'nullable|string|max:255';
-        }
-        elseif (str_contains($type, 'hki') || str_contains($group, 'hki')) {
+        } elseif (str_contains($type, 'hki') || str_contains($group, 'hki')) {
             $rules["additionalOutputs.{$outputId}.hki_type"] = 'required|string|max:255';
-        }
-        elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
+        } elseif (str_contains($type, 'media') || str_contains($group, 'media')) {
             $rules["additionalOutputs.{$outputId}.media_name"] = 'required|string|max:255';
             $rules["additionalOutputs.{$outputId}.media_url"] = 'required|url';
         }
@@ -457,10 +457,13 @@ class ReportForm extends Form
                 'reporting_period' => $this->reportingPeriod,
             ];
 
-            if ($existingReport) {
+            // Check if existing report matches the target period
+            // If we are saving 'final' but existing is 'semester_1', we MUST create new
+            if ($existingReport && $existingReport->reporting_period === $this->reportingPeriod) {
                 $existingReport->update($reportData);
                 $report = $existingReport;
             } else {
+                // Create NEW report if periods differ (or no existing)
                 $report = ProgressReport::create(array_merge($reportData, [
                     'proposal_id' => $this->proposal->id,
                     'status' => 'draft',
@@ -473,6 +476,9 @@ class ReportForm extends Form
             $this->saveAdditionalOutputs();
 
             $this->saveReportFiles($report);
+
+            // Reload report to sync IDs and state
+            $this->setReport($report);
 
             DB::commit();
 
@@ -531,8 +537,7 @@ class ReportForm extends Form
             }
 
             $outputData = [
-                'progress_report_id' => $this->progressReport->id,
-                'proposal_output_id' => $proposalOutputId,
+                // 'progress_report_id' and 'proposal_output_id' are in the lookup array
                 'status_type' => !empty($data['status_type']) ? $data['status_type'] : null,
                 'author_status' => !empty($data['author_status']) ? $data['author_status'] : null,
                 'journal_title' => $data['journal_title'] ?? null,
@@ -548,14 +553,32 @@ class ReportForm extends Form
                 'page_end' => ! empty($data['page_end']) ? (int) $data['page_end'] : null,
                 'article_url' => $data['article_url'] ?? null,
                 'doi' => $data['doi'] ?? null,
+                // Book
+                'book_title' => $data['book_title'] ?? null,
+                'isbn' => $data['isbn'] ?? null,
+                'publisher' => $data['publisher'] ?? null,
+                'total_pages' => ! empty($data['total_pages']) ? (int) $data['total_pages'] : null,
+                // HKI
+                'hki_type' => $data['hki_type'] ?? null,
+                'registration_number' => $data['registration_number'] ?? null,
+                'inventors' => $data['inventors'] ?? null,
+                // Media / Video / Product
+                'media_name' => $data['media_name'] ?? null,
+                'media_url' => $data['media_url'] ?? null,
+                'publication_date' => !empty($data['publication_date']) ? $data['publication_date'] : null,
+                'video_url' => $data['video_url'] ?? null,
+                'platform' => $data['platform'] ?? null,
+                'product_name' => $data['product_name'] ?? null,
+                'description' => $data['description'] ?? null,
             ];
 
-            if (isset($data['id']) && $data['id']) {
-                $mandatoryOutput = MandatoryOutput::find($data['id']);
-                $mandatoryOutput->update($outputData);
-            } else {
-                $mandatoryOutput = MandatoryOutput::create($outputData);
-            }
+            MandatoryOutput::updateOrCreate(
+                [
+                    'progress_report_id' => $this->progressReport->id,
+                    'proposal_output_id' => $proposalOutputId,
+                ],
+                $outputData
+            );
         }
     }
 
@@ -571,8 +594,7 @@ class ReportForm extends Form
             }
 
             $outputData = [
-                'progress_report_id' => $this->progressReport->id,
-                'proposal_output_id' => $proposalOutputId,
+                // Lookup keys
                 'status' => !empty($data['status']) ? $data['status'] : null,
                 'book_title' => $data['book_title'] ?? null,
                 'publisher_name' => $data['publisher_name'] ?? null,
@@ -581,14 +603,33 @@ class ReportForm extends Form
                 'total_pages' => ! empty($data['total_pages']) ? (int) $data['total_pages'] : null,
                 'publisher_url' => $data['publisher_url'] ?? null,
                 'book_url' => $data['book_url'] ?? null,
+                // Journal
+                'journal_title' => $data['journal_title'] ?? null,
+                'issn' => $data['issn'] ?? null,
+                'eissn' => $data['eissn'] ?? null,
+                'volume' => $data['volume'] ?? null,
+                'issue_number' => $data['issue_number'] ?? null,
+                'doi' => $data['doi'] ?? null,
+                // HKI / Media
+                'hki_type' => $data['hki_type'] ?? null,
+                'registration_number' => $data['registration_number'] ?? null,
+                'inventors' => $data['inventors'] ?? null,
+                'media_name' => $data['media_name'] ?? null,
+                'media_url' => $data['media_url'] ?? null,
+                'publication_date' => !empty($data['publication_date']) ? $data['publication_date'] : null,
+                'video_url' => $data['video_url'] ?? null,
+                'platform' => $data['platform'] ?? null,
+                'product_name' => $data['product_name'] ?? null,
+                'description' => $data['description'] ?? null,
             ];
 
-            if (isset($data['id']) && $data['id']) {
-                $additionalOutput = AdditionalOutput::find($data['id']);
-                $additionalOutput->update($outputData);
-            } else {
-                $additionalOutput = AdditionalOutput::create($outputData);
-            }
+            AdditionalOutput::updateOrCreate(
+                [
+                    'progress_report_id' => $this->progressReport->id,
+                    'proposal_output_id' => $proposalOutputId,
+                ],
+                $outputData
+            );
         }
     }
 
@@ -799,14 +840,14 @@ class ReportForm extends Form
             // I'll skip saving those missing fields for now to avoid crash, or map them to 'description'.
 
             if (isset($data['partner_name'])) {
-               // $outputData['description'] = ($outputData['description'] ? $outputData['description'] . "\n" : "") . "Mitra: " . $data['partner_name'];
-               // Actually, let's just not save them if they don't exist to prevent crash.
-               // Users can put it in description.
-               // Or I can add them to description programmatically if I really want to save them.
-               // For now, I'll comment out the non-existent keys.
-               unset($outputData['partner_name']);
-               unset($outputData['indicator_type']);
-               unset($outputData['improvement_value']);
+                // $outputData['description'] = ($outputData['description'] ? $outputData['description'] . "\n" : "") . "Mitra: " . $data['partner_name'];
+                // Actually, let's just not save them if they don't exist to prevent crash.
+                // Users can put it in description.
+                // Or I can add them to description programmatically if I really want to save them.
+                // For now, I'll comment out the non-existent keys.
+                unset($outputData['partner_name']);
+                unset($outputData['indicator_type']);
+                unset($outputData['improvement_value']);
             }
 
             if ($output) {

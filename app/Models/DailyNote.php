@@ -48,7 +48,6 @@ class DailyNote extends Model implements HasMedia
      */
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('evidence')
-            ->singleFile();
+        $this->addMediaCollection('evidence');
     }
 }

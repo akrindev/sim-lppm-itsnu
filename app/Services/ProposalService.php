@@ -27,10 +27,10 @@ class ProposalService
         });
     }
 
-    public function updateProposal(Proposal $proposal, ProposalForm $form): void
+    public function updateProposal(Proposal $proposal, ProposalForm $form, bool $validate = true): void
     {
         $form->proposal = $proposal;
-        $form->update();
+        $form->update($validate);
     }
 
     public function deleteProposal(Proposal $proposal): void

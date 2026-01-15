@@ -20,6 +20,30 @@
 ">
     <x-tabler.alert />
 
+    <!-- Alert Info Workflow -->
+    <div class="alert alert-info" role="alert">
+        <div class="d-flex">
+            <div>
+                <x-lucide-info class="icon alert-icon" />
+            </div>
+            <div>
+                <h4 class="alert-title">Panduan Pengisian Laporan Kemajuan</h4>
+                <div class="text-secondary">
+                    <p class="mb-2">
+                        Data ringkasan awal diambil dari Proposal. Silakan sesuaikan dengan kemajuan terkini.
+                    </p>
+                    <ol class="mb-0 ps-3">
+                        <li>Lengkapi <strong>Ringkasan & Kata Kunci</strong> serta upload dokumen laporan kemajuan.</li>
+                        <li>Klik tombol <strong>Simpan Draft</strong> untuk menyimpan data sementara.</li>
+                        <li>Setelah draft tersimpan, kolom upload <strong>Luaran Wajib</strong> dan <strong>Luaran Tambahan</strong> akan muncul.</li>
+                        <li>Upload bukti luaran yang diperlukan pada bagian tersebut.</li>
+                        <li>Jika semua data sudah lengkap, klik <strong>Ajukan Laporan</strong> untuk mengirim laporan.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Ringkasan & Kata Kunci -->
     <div class="card mb-3">
         <div class="card-header">
@@ -699,7 +723,7 @@
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
                                                 <small class="text-muted">File yang sudah diunggah:</small><br>
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>
@@ -881,7 +905,7 @@
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
                                                 <small class="text-muted">File yang sudah diunggah:</small><br>
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>
@@ -940,7 +964,7 @@
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
                                                 <small class="text-muted">File yang sudah diunggah:</small><br>
-                                                <strong>{{ $media->file_name }}</strong>
+                                                <strong>{{ $media->name }}</strong>
                                                 <small class="text-muted">({{ number_format($media->size / 1024, 2) }}
                                                     KB)</small>
                                             </div>

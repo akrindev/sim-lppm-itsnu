@@ -24,6 +24,8 @@ abstract class ProposalCreate extends Component
 
     public int $currentStep = 1;
 
+    public int $fileInputIteration = 0;
+
     public string $author_name = '';
 
     public array $budgetValidationErrors = [];
@@ -60,6 +62,32 @@ abstract class ProposalCreate extends Component
     abstract protected function getShowRoute(string $proposalId): string;
 
     abstract protected function getStep2Rules(): array;
+
+    public function validationAttributes(): array
+    {
+        return [
+            'form.title' => 'Judul',
+            'form.research_scheme_id' => 'Skema Penelitian',
+            'form.focus_area_id' => 'Bidang Fokus',
+            'form.theme_id' => 'Tema',
+            'form.topic_id' => 'Topik',
+            'form.national_priority_id' => 'Prioritas Riset Nasional',
+            'form.cluster_level1_id' => 'Rumpun Ilmu Level 1',
+            'form.cluster_level2_id' => 'Rumpun Ilmu Level 2',
+            'form.cluster_level3_id' => 'Rumpun Ilmu Level 3',
+            'form.sbk_value' => 'Nilai SBK',
+            'form.duration_in_years' => 'Lama Kegiatan',
+            'form.start_year' => 'Tahun Usulan',
+            'form.summary' => 'Ringkasan',
+            'form.author_tasks' => 'Tugas Ketua',
+            'form.tkt_type' => 'Jenis TKT',
+            'form.macro_research_group_id' => 'Kelompok Makro Riset',
+            'form.substance_file' => 'Substansi Usulan (PDF)',
+            'form.outputs' => 'Luaran Target Capaian',
+            'form.budget_items' => 'RAB',
+            'form.partner_ids' => 'Mitra',
+        ];
+    }
 
     protected function getProposalTypeForValidation(): string
     {
@@ -136,6 +164,48 @@ abstract class ProposalCreate extends Component
         }
 
         $this->redirect($this->getShowRoute($proposal->id));
+    }
+
+    public function saveDraft(): void
+    {
+        // Validate only the current step
+        $rules = $this->getStepValidationRules($this->currentStep);
+        if (! empty($rules)) {
+            $this->validate($rules);
+        }
+
+        // Additional validation for budget in step 3 if items are present
+        if ($this->currentStep === 3 && ! empty($this->form->budget_items)) {
+            app(BudgetValidationService::class)->validateBudgetGroupPercentages(
+                $this->form->budget_items,
+                $this->getProposalType()
+            );
+
+            app(BudgetValidationService::class)->validateBudgetCap(
+                $this->form->budget_items,
+                $this->getProposalType()
+            );
+        }
+
+        if ($this->form->proposal) {
+            app(ProposalService::class)->updateProposal(
+                $this->form->proposal,
+                $this->form,
+                false // Disable global validation
+            );
+        } else {
+            $proposal = app(ProposalService::class)->createProposal(
+                $this->form,
+                $this->getProposalType()
+            );
+            $this->form->proposal = $proposal;
+        }
+
+        // Force clear file input and reset iteration to clear frontend state
+        $this->form->substance_file = null;
+        $this->fileInputIteration++;
+
+        session()->flash('success', 'Draft proposal berhasil disimpan.');
     }
 
     #[Computed]
