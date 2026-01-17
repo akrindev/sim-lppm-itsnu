@@ -158,12 +158,17 @@ abstract class ProposalCreate extends Component
                 $this->form
             );
             $proposal = $this->form->proposal;
+            $message = 'Proposal berhasil diperbarui.';
         } else {
             $proposal = app(ProposalService::class)->createProposal(
                 $this->form,
                 $this->getProposalType()
             );
+            $message = 'Proposal berhasil dibuat.';
         }
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
 
         $this->redirect($this->getShowRoute($proposal->id));
     }
@@ -207,7 +212,9 @@ abstract class ProposalCreate extends Component
         $this->form->substance_file = null;
         $this->fileInputIteration++;
 
-        $this->toastSuccess('Draft proposal berhasil disimpan.');
+        $message = 'Draft proposal berhasil disimpan.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     #[Computed]

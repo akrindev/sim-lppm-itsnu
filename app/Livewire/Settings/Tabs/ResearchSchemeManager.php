@@ -55,12 +55,13 @@ class ResearchSchemeManager extends Component
         }
 
         $message = $this->editingId ? 'Skema Penelitian berhasil diubah' : 'Skema Penelitian berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-research-scheme');
         $this->reset(['name', 'strata', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(ResearchScheme $researchScheme): void

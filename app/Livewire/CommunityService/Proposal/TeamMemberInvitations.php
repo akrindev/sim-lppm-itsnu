@@ -2,6 +2,7 @@
 
 namespace App\Livewire\CommunityService\Proposal;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -10,6 +11,8 @@ use Livewire\Component;
 
 class TeamMemberInvitations extends Component
 {
+    use HasToast;
+
     public string $proposalId = '';
 
     public function mount(string $proposalId): void
@@ -68,13 +71,13 @@ class TeamMemberInvitations extends Component
             ->first();
 
         if (! $member) {
-            $this->dispatch('error', message: 'Anda bukan anggota proposal ini');
+            $this->toastError('Anda bukan anggota proposal ini');
 
             return;
         }
 
         if ($member->pivot->status === 'accepted') {
-            $this->dispatch('info', message: 'Anda sudah menerima undangan');
+            $this->toastInfo('Anda sudah menerima undangan');
 
             return;
         }
@@ -82,7 +85,8 @@ class TeamMemberInvitations extends Component
         $proposal->teamMembers()
             ->updateExistingPivot($user->id, ['status' => 'accepted']);
 
-        $this->dispatch('success', message: 'Undangan diterima');
+        session()->flash('success', 'Undangan diterima');
+        $this->toastSuccess('Undangan diterima');
         $this->dispatch('team-member-action');
     }
 
@@ -96,7 +100,8 @@ class TeamMemberInvitations extends Component
             ->first();
 
         if (! $member) {
-            $this->dispatch('error', message: 'Anda bukan anggota proposal ini');
+            session()->flash('error', 'Anda bukan anggota proposal ini');
+            $this->toastError('Anda bukan anggota proposal ini');
 
             return;
         }
@@ -104,7 +109,8 @@ class TeamMemberInvitations extends Component
         $proposal->teamMembers()
             ->updateExistingPivot($user->id, ['status' => 'rejected']);
 
-        $this->dispatch('success', message: 'Undangan ditolak');
+        session()->flash('success', 'Undangan ditolak');
+        $this->toastSuccess('Undangan ditolak');
         $this->dispatch('team-member-action');
     }
 

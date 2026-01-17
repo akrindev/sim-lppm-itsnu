@@ -163,10 +163,22 @@
                         <a href="{{ route('settings.profile') }}" class="dropdown-item">Profile</a>
                         <a href="#" class="dropdown-item">Feedback</a>
                         <div class="dropdown-divider"></div> --}}
-                        <a href="{{ route('settings') }}" class="dropdown-item">Settings</a>
+                        <a href="{{ route('settings') }}" class="dropdown-item">
+                            @include('components.layouts.partials.menu.icon', [
+                                'name' => 'settings',
+                                'class' => 'icon icon-2 icon-inline me-1',
+                            ])
+                            Settings
+                        </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-100 text-start dropdown-item">Logout</button>
+                            <button type="submit" class="w-100 text-start dropdown-item">
+                                @include('components.layouts.partials.menu.icon', [
+                                    'name' => 'logout',
+                                    'class' => 'icon icon-2 icon-inline me-1',
+                                ])
+                                Logout
+                            </button>
                         </form>
                     </div>
                 </div>

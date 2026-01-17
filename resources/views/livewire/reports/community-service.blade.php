@@ -1,10 +1,10 @@
 <div>
     <x-slot:pageHeader>
         <div class="mb-2 text-secondary">
-            {{ __('Akses khusus Admin LPPM dan Rektor untuk memantau perkembangan laporan penelitian.') }}
+            {{ __('Akses khusus Admin LPPM dan Rektor untuk memantau perkembangan laporan Pengabdian Masyarakat (PKM).') }}
         </div>
         <div class="text-muted small">
-            {{ __('Pilih periode untuk melihat statistik dan daftar penelitian.') }}
+            {{ __('Pilih periode untuk melihat statistik dan daftar PKM.') }}
         </div>
     </x-slot:pageHeader>
 
@@ -54,7 +54,7 @@
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">{{ __('Distribusi Skema') }}</h3>
+                    <h3 class="card-title">{{ __('Distribusi Skema PKM') }}</h3>
                 </div>
                 <div class="p-0 card-body overflow-auto" style="max-height: 300px;">
                     <table class="card-table table table-vcenter">
@@ -92,7 +92,7 @@
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">{{ __('Bidang Fokus Utama') }}</h3>
+                    <h3 class="card-title">{{ __('Bidang Fokus PKM') }}</h3>
                 </div>
                 <div class="p-0 card-body overflow-auto" style="max-height: 300px;">
                     <table class="card-table table table-vcenter">
@@ -103,15 +103,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php $totalResearch = $schemes->sum('count'); @endphp
+                            @php $totalPkm = $schemes->sum('count'); @endphp
                             @forelse ($focusAreas as $area)
                                 <tr>
                                     <td>
                                         <div class="fw-semibold">{{ $area['name'] }}</div>
-                                        <div class="text-muted small">{{ $area['count'] }} {{ __('Penelitian') }}</div>
+                                        <div class="text-muted small">{{ $area['count'] }} {{ __('PKM') }}</div>
                                     </td>
                                     <td class="text-center">
-                                        @php $percent = $totalResearch > 0 ? round(($area['count'] / $totalResearch) * 100) : 0; @endphp
+                                        @php $percent = $totalPkm > 0 ? round(($area['count'] / $totalPkm) * 100) : 0; @endphp
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="progress progress-xs flex-fill" style="min-width: 50px;">
                                                 <div class="progress-bar bg-primary" style="width: {{ $percent }}%"></div>
@@ -137,7 +137,7 @@
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">{{ __('Produktivitas Fakultas') }}</h3>
+                    <h3 class="card-title">{{ __('Produktivitas Fakultas (PKM)') }}</h3>
                 </div>
                 <div class="p-0 card-body overflow-auto" style="max-height: 300px;">
                     <table class="card-table table table-vcenter">
@@ -176,7 +176,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">{{ __('Analitik Luaran Penelitian') }} — {{ $period }}</h3>
+                    <h3 class="card-title">{{ __('Analitik Luaran PKM') }} — {{ $period }}</h3>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -212,12 +212,12 @@
         </div>
     </div>
 
-    <!-- Recent Research Section -->
+    <!-- Recent PKM Section -->
     <div class="row row-cards">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">{{ __('Daftar Penelitian Terbaru') }} — {{ $period }}</h3>
+                    <h3 class="card-title">{{ __('Daftar PKM Terbaru') }} — {{ $period }}</h3>
                 </div>
                 <div class="p-0 card-body">
                     <div class="table-responsive">
@@ -229,36 +229,36 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($recentResearch as $research)
+                                @forelse ($recentPkm as $pkm)
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <span class="avatar avatar-sm avatar-rounded me-2" style="background-image: url({{ $research->submitter->profile_picture }})"></span>
+                                                <span class="avatar avatar-sm avatar-rounded me-2" style="background-image: url({{ $pkm->submitter->profile_picture }})"></span>
                                                 <div class="flex-fill">
-                                                    <div class="font-weight-medium text-truncate" style="max-width: 500px;" title="{{ $research->title }}">
-                                                        <a href="{{ route('research.proposal.show', $research) }}" class="text-reset" wire:navigate>
-                                                            {{ $research->title }}
+                                                    <div class="font-weight-medium text-truncate" style="max-width: 500px;" title="{{ $pkm->title }}">
+                                                        <a href="{{ route('community-service.proposal.show', $pkm) }}" class="text-reset" wire:navigate>
+                                                            {{ $pkm->title }}
                                                         </a>
                                                     </div>
                                                     <div class="text-muted small">
-                                                        {{ $research->submitter->name }}
+                                                        {{ $pkm->submitter->name }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="text-muted small mb-1">
-                                                {{ $research->researchScheme->name ?? '-' }}
+                                                {{ $pkm->researchScheme->name ?? '-' }}
                                             </div>
-                                            <x-tabler.badge :color="$research->status->color()">
-                                                {{ $research->status->label() }}
+                                            <x-tabler.badge :color="$pkm->status->color()">
+                                                {{ $pkm->status->label() }}
                                             </x-tabler.badge>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="2" class="py-5 text-center text-muted">
-                                            {{ __('Belum ada data penelitian untuk periode ini.') }}
+                                            {{ __('Belum ada data PKM untuk periode ini.') }}
                                         </td>
                                     </tr>
                                 @endforelse
@@ -266,10 +266,10 @@
                         </table>
                     </div>
                 </div>
-                @if($recentResearch->count() > 0)
+                @if($recentPkm->count() > 0)
                     <div class="card-footer d-flex align-items-center">
                         <p class="m-0 text-muted small">
-                            {{ __('Menampilkan :count data terbaru', ['count' => $recentResearch->count()]) }}
+                            {{ __('Menampilkan :count data terbaru', ['count' => $recentPkm->count()]) }}
                         </p>
                     </div>
                 @endif

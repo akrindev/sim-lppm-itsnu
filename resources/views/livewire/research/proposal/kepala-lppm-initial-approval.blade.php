@@ -19,10 +19,6 @@
                 Setujui & Lanjutkan ke Reviewer
             </button>
         </div>
-    @else
-        {{-- <div class="alert alert-warning" role="alert">
-            Proposal belum dapat disetujui. Pastikan Dekan telah menyetujui proposal terlebih dahulu.
-        </div> --}}
     @endif
 
     <x-tabler.alert />

@@ -66,7 +66,7 @@
                                                     @endif
                                                 </div>
                                                 @if ($review->review_notes)
-                                                    <p class="text-dark small mb-0" style="white-space: pre-line;">
+                                                    <p class="text-body small mb-0" style="white-space: pre-line;">
                                                         {{ $review->review_notes }}</p>
                                                 @endif
                                             </div>
@@ -89,7 +89,7 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="bg-light-lt rounded-3 py-5 text-center">
+                    <div class="bg-surface-secondary rounded-3 py-5 text-center">
                         <x-lucide-users class="icon icon-lg text-muted mb-2" />
                         <div class="text-secondary">Belum ada reviewer yang ditugaskan.</div>
                     </div>
@@ -148,8 +148,8 @@
                                                                 </div>
                                                             </div>
                                                             @if ($log->review_notes)
-                                                                <div class="rounded-2 bg-light my-2 p-2">
-                                                                    <p class="text-dark small mb-0" style="white-space: pre-line;">
+                                                                <div class="rounded-2 bg-body-tertiary my-2 p-2">
+                                                                    <p class="text-body small mb-0" style="white-space: pre-line;">
                                                                         {{ $log->review_notes }}
                                                                     </p>
                                                                 </div>
@@ -220,7 +220,7 @@
                 </div>
 
                 @if ($this->myReview)
-                    <div class="card-body bg-light-lt py-3">
+                    <div class="card-body bg-surface-secondary py-3">
                         <div class="row g-3 align-items-center">
                             <div class="col-auto">
                                 <div class="small text-secondary">Status Anda:</div>
@@ -232,7 +232,7 @@
                             @if ($this->deadline)
                                 <div class="col-auto ps-3" style="border-left: 1px solid var(--tblr-border-color);">
                                     <div class="small text-secondary">Batas Waktu:</div>
-                                    <div class="fw-bold {{ $this->isOverdue ? 'text-danger' : 'text-dark' }}">
+                                    <div class="fw-bold {{ $this->isOverdue ? 'text-danger' : 'text-body' }}">
                                         <x-lucide-calendar class="icon me-1" />
                                         {{ $this->deadline->format('d M Y') }}
                                         @if ($this->isOverdue)

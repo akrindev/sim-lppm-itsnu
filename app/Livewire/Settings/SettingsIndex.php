@@ -13,6 +13,10 @@ class SettingsIndex extends Component
      */
     public function setActiveTab(string $tab): void
     {
+        if ($tab === 'appearance' && ! auth()->user()->hasRole('admin lppm')) {
+            return;
+        }
+
         $this->activeTab = $tab;
     }
 

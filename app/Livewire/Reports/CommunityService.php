@@ -11,8 +11,8 @@ use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.app', ['title' => 'Laporan Penelitian', 'pageTitle' => 'Laporan Penelitian'])]
-class Research extends Component
+#[Layout('components.layouts.app', ['title' => 'Laporan PKM', 'pageTitle' => 'Laporan PKM'])]
+class CommunityService extends Component
 {
     public string $period;
 
@@ -34,15 +34,37 @@ class Research extends Component
      */
     public function render(): View
     {
-        return view('livewire.reports.research', [
+        return view('livewire.reports.community-service', [
             'periods' => $this->availablePeriods(),
             'summary' => $this->summaryMetrics(),
-            'schemes' => $this->researchByScheme(),
-            'focusAreas' => $this->researchByFocusArea(),
-            'faculties' => $this->researchByFaculty(),
+            'schemes' => $this->pkmByScheme(),
+            'focusAreas' => $this->pkmByFocusArea(),
+            'faculties' => $this->pkmByFaculty(),
             'outputStats' => $this->outputAnalytics(),
-            'recentResearch' => $this->recentResearch(),
+            'recentPkm' => $this->recentPkm(),
         ]);
+    }
+
+    /**
+     * Group PKM by focus area for the current period.
+     */
+    protected function pkmByFocusArea(): Collection
+    {
+        return Proposal::query()
+            ->where('detailable_type', 'App\Models\CommunityService')
+            ->where('start_year', $this->period)
+            ->with('focusArea')
+            ->get()
+            ->groupBy('focus_area_id')
+            ->map(function ($proposals) {
+                $first = $proposals->first();
+
+                return [
+                    'name' => $first->focusArea->name ?? __('Lainnya'),
+                    'count' => $proposals->count(),
+                ];
+            })
+            ->sortByDesc('count');
     }
 
     /**
@@ -65,7 +87,7 @@ class Research extends Component
     protected function summaryMetrics(): array
     {
         $query = Proposal::query()
-            ->where('detailable_type', 'App\Models\Research')
+            ->where('detailable_type', 'App\Models\CommunityService')
             ->where('start_year', $this->period);
 
         $totalApproved = (clone $query)
@@ -108,7 +130,7 @@ class Research extends Component
     protected function outputAnalytics(): Collection
     {
         $proposalIds = Proposal::query()
-            ->where('detailable_type', 'App\Models\Research')
+            ->where('detailable_type', 'App\Models\CommunityService')
             ->where('start_year', $this->period)
             ->pluck('id');
 
@@ -150,12 +172,12 @@ class Research extends Component
     }
 
     /**
-     * Group research by scheme for the current period.
+     * Group PKM by scheme for the current period.
      */
-    protected function researchByScheme(): Collection
+    protected function pkmByScheme(): Collection
     {
         return Proposal::query()
-            ->where('detailable_type', 'App\Models\Research')
+            ->where('detailable_type', 'App\Models\CommunityService')
             ->where('start_year', $this->period)
             ->with('researchScheme')
             ->get()
@@ -173,34 +195,12 @@ class Research extends Component
     }
 
     /**
-     * Group research by focus area for the current period.
+     * Group PKM by faculty for the current period.
      */
-    protected function researchByFocusArea(): Collection
+    protected function pkmByFaculty(): Collection
     {
         return Proposal::query()
-            ->where('detailable_type', 'App\Models\Research')
-            ->where('start_year', $this->period)
-            ->with('focusArea')
-            ->get()
-            ->groupBy('focus_area_id')
-            ->map(function ($proposals) {
-                $first = $proposals->first();
-
-                return [
-                    'name' => $first->focusArea->name ?? __('Lainnya'),
-                    'count' => $proposals->count(),
-                ];
-            })
-            ->sortByDesc('count');
-    }
-
-    /**
-     * Group research by faculty for the current period.
-     */
-    protected function researchByFaculty(): Collection
-    {
-        return Proposal::query()
-            ->where('detailable_type', 'App\Models\Research')
+            ->where('detailable_type', 'App\Models\CommunityService')
             ->where('start_year', $this->period)
             ->with(['submitter.identity.faculty'])
             ->get()
@@ -217,12 +217,12 @@ class Research extends Component
     }
 
     /**
-     * Get recent research proposals for the current period.
+     * Get recent PKM proposals for the current period.
      */
-    protected function recentResearch(): Collection
+    protected function recentPkm(): Collection
     {
         return Proposal::query()
-            ->where('detailable_type', 'App\Models\Research')
+            ->where('detailable_type', 'App\Models\CommunityService')
             ->where('start_year', $this->period)
             ->with(['submitter', 'researchScheme'])
             ->latest()

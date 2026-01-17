@@ -47,12 +47,13 @@ class KeywordManager extends Component
         }
 
         $message = $this->editingId ? 'Kata Kunci berhasil diubah' : 'Kata Kunci berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-keyword');
         $this->reset(['name', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(Keyword $keyword): void

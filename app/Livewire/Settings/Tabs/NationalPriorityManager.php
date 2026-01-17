@@ -47,12 +47,13 @@ class NationalPriorityManager extends Component
         }
 
         $message = $this->editingId ? 'Prioritas Nasional berhasil diubah' : 'Prioritas Nasional berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-national-priority');
         $this->reset(['name', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(NationalPriority $nationalPriority): void

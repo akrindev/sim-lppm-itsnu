@@ -26,14 +26,16 @@
                             Autentikasi Dua Faktor
                         </button> --}}
                     </div>
-                    <h4 class="mt-4 subheader">Pengaturan Sistem</h4>
-                    <div class="list-group list-group-transparent">
-                        <button wire:click="setActiveTab('appearance')"
-                            class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'appearance' ? 'active' : '' }}">
-                            <x-lucide-palette class="me-2 icon" />
-                            Tampilan
-                        </button>
-                    </div>
+                    @role('admin lppm')
+                        <h4 class="mt-4 subheader">Pengaturan Sistem</h4>
+                        <div class="list-group list-group-transparent">
+                            <button wire:click="setActiveTab('appearance')"
+                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'appearance' ? 'active' : '' }}">
+                                <x-lucide-palette class="me-2 icon" />
+                                Tampilan
+                            </button>
+                        </div>
+                    @endrole
                 </div>
             </div>
 

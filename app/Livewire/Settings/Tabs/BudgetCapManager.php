@@ -88,12 +88,13 @@ class BudgetCapManager extends Component
         }
 
         $message = $this->editingId ? 'Pengaturan Anggaran berhasil diubah' : 'Pengaturan Anggaran berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-budget-cap');
         $this->reset(['year', 'research_budget_cap', 'community_service_budget_cap', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(BudgetCap $budgetCap): void

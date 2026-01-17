@@ -216,7 +216,7 @@
                                         @php $review = $researchReviewerStats->where('proposal_id', $research->id)->first(); @endphp
                                         <tr>
                                             <td>
-                                                <div class="font-weight-medium text-dark text-wrap mb-1" style="max-width: 300px;">{{ $research->title }}</div>
+                                                <div class="font-weight-medium text-body text-wrap mb-1" style="max-width: 300px;">{{ $research->title }}</div>
                                                 <div class="text-muted small d-flex align-items-center">
                                                     <x-lucide-user class="icon icon-inline me-1" />
                                                     {{ $research->submitter->name }}
@@ -267,7 +267,7 @@
                                         @php $review = $communityServiceReviewerStats->where('proposal_id', $pkm->id)->first(); @endphp
                                         <tr>
                                             <td>
-                                                <div class="font-weight-medium text-dark text-wrap mb-1" style="max-width: 300px;">{{ $pkm->title }}</div>
+                                                <div class="font-weight-medium text-body text-wrap mb-1" style="max-width: 300px;">{{ $pkm->title }}</div>
                                                 <div class="text-muted small d-flex align-items-center">
                                                     <x-lucide-user class="icon icon-inline me-1" />
                                                     {{ $pkm->submitter->name }}

@@ -211,7 +211,7 @@ class Proposal extends Model
      */
     public function reviewers(): HasMany
     {
-        return $this->hasMany(ProposalReviewer::class);
+        return $this->hasMany(ProposalReviewer::class)->orderBy('round', 'desc')->orderBy('assigned_at', 'desc');
     }
 
     /**
@@ -235,7 +235,7 @@ class Proposal extends Model
      */
     public function statusLogs(): HasMany
     {
-        return $this->hasMany(ProposalStatusLog::class);
+        return $this->hasMany(ProposalStatusLog::class)->orderBy('at', 'desc');
     }
 
     /**

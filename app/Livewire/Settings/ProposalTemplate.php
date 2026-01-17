@@ -31,6 +31,7 @@ class ProposalTemplate extends Component
 
         $this->research_template = null;
         unset($this->researchTemplateMedia); // Invalidate computed property
+
         $message = 'Template penelitian berhasil diunggah.';
         session()->flash('success', $message);
         $this->toastSuccess($message);
@@ -51,6 +52,7 @@ class ProposalTemplate extends Component
 
         $this->community_service_template = null;
         unset($this->communityServiceTemplateMedia); // Invalidate computed property
+
         $message = 'Template pengabdian berhasil diunggah.';
         session()->flash('success', $message);
         $this->toastSuccess($message);

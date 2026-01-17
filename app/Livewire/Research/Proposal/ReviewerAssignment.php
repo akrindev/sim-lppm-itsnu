@@ -3,6 +3,7 @@
 namespace App\Livewire\Research\Proposal;
 
 use App\Livewire\Actions\AssignReviewersAction;
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\View\View;
@@ -12,6 +13,8 @@ use Livewire\Component;
 
 class ReviewerAssignment extends Component
 {
+    use HasToast;
+
     public string $proposalId = '';
 
     public string $confirmingRemoveReviewerId = '';
@@ -57,11 +60,13 @@ class ReviewerAssignment extends Component
         $result = $action->execute($proposal, $this->selectedReviewer);
 
         if ($result['success']) {
-            $this->dispatch('success', message: $result['message']);
+            session()->flash('success', $result['message']);
+            $this->toastSuccess($result['message']);
             $this->dispatch('reviewers-assigned', proposalId: $proposal->id);
             $this->selectedReviewer = '';
         } else {
-            $this->dispatch('error', message: $result['message']);
+            session()->flash('error', $result['message']);
+            $this->toastError($result['message']);
         }
     }
 
@@ -73,7 +78,8 @@ class ReviewerAssignment extends Component
 
         if ($reviewer) {
             $reviewer->delete();
-            $this->dispatch('success', message: 'Reviewer berhasil dihapus');
+            session()->flash('success', 'Reviewer berhasil dihapus');
+            $this->toastSuccess('Reviewer berhasil dihapus');
         }
     }
 

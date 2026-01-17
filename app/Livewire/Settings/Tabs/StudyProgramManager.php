@@ -63,12 +63,13 @@ class StudyProgramManager extends Component
         }
 
         $message = $this->editingId ? 'Program Studi berhasil diubah' : 'Program Studi berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-study-program');
         $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(StudyProgram $studyProgram): void

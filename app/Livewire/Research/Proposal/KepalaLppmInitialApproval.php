@@ -38,7 +38,7 @@ class KepalaLppmInitialApproval extends Component
     public function canApprove(): bool
     {
         $user = Auth::user();
-        $isKepalaLppm = $user->hasRole(['kepala lppm', 'rektor']);
+        $isKepalaLppm = $user->hasRole(['kepala lppm']);
         $proposal = $this->proposal;
 
         return $isKepalaLppm && $proposal->status === ProposalStatus::APPROVED;

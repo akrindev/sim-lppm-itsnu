@@ -630,14 +630,14 @@
             @endif
 
             <!-- Kepala LPPM Initial Approval -->
-            @if (auth()->user()->hasRole(['kepala lppm', 'rektor']) && $proposal->status->value === 'approved')
+            @if (auth()->user()->hasRole(['kepala lppm']) && $proposal->status->value === 'approved')
                 <div class="mb-3">
                     <livewire:research.proposal.kepala-lppm-initial-approval :proposalId="$proposal->id" :key="'initial-approval-' . $proposal->id" />
                 </div>
             @endif
 
             <!-- Kepala LPPM Final Decision -->
-            @if (auth()->user()->hasRole(['kepala lppm', 'rektor']) && $proposal->status->value === 'reviewed')
+            @if (auth()->user()->hasRole(['kepala lppm']) && $proposal->status->value === 'reviewed')
                 <div class="mb-3">
                     <livewire:research.proposal.kepala-lppm-final-decision :proposalId="$proposal->id" :key="'final-decision-' . $proposal->id" />
                 </div>
@@ -684,7 +684,7 @@
                                 </div>
                             @endif
 
-                            @if ($proposal->status->value !== 'completed' && $proposal->submitter_id === auth()->id())
+                            @if ($this->canDelete && $proposal->submitter_id === auth()->id())
                                 <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
                                     data-bs-target="#deleteModal">
                                     <x-lucide-trash-2 class="icon" />
