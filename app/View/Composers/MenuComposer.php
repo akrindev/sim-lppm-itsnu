@@ -178,6 +178,11 @@ class MenuComposer
                         'route' => 'reports.research',
                     ],
                     [
+                        'title' => 'Laporan PKM',
+                        'icon' => 'report',
+                        'route' => 'reports.pkm',
+                    ],
+                    [
                         'title' => 'Laporan Luaran',
                         'icon' => 'award',
                         'route' => 'reports.outputs',

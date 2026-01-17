@@ -29,6 +29,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.research');
 
+    Route::get('laporan-pkm', \App\Livewire\Reports\CommunityService::class)
+        ->middleware(['role:admin lppm|rektor|kepala lppm'])
+        ->name('reports.pkm');
+
     Route::get('laporan-luaran', \App\Livewire\Reports\OutputReports::class)
         ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.outputs');
