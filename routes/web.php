@@ -130,7 +130,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::redirect('settings/profile', '/settings')->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
-    Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
+    Route::get('settings/appearance', Appearance::class)
+        ->middleware(['role:admin lppm'])
+        ->name('settings.appearance');
 
     Route::middleware(['role:admin lppm'])->group(function () {
         Route::get('settings/master-data', MasterData::class)->name('settings.master-data');

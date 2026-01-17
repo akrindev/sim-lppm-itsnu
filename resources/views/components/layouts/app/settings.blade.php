@@ -1,3 +1,4 @@
+@role('admin lppm')
 <div class="settings">
     <a href="#" class="btn-floating btn btn-icon btn-primary" data-bs-toggle="offcanvas"
         data-bs-target="#offcanvasSettings" aria-controls="offcanvasSettings" aria-label="Theme Settings">
@@ -230,3 +231,4 @@
         </div>
     </form>
 </div>
+@endrole
