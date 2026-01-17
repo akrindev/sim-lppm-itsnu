@@ -3,6 +3,7 @@
 namespace App\Livewire\Traits;
 
 use App\Enums\ProposalStatus;
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 trait WithApproval
 {
+    use HasToast;
+
     public string $approvalDecision = '';
 
     public string $approvalNotes = '';
@@ -53,6 +56,12 @@ trait WithApproval
             }
         });
 
+        $message = $this->approvalDecision === 'approved'
+            ? 'Proposal berhasil disetujui.'
+            : 'Proposal telah ditolak.';
+
+        session()->flash($this->approvalDecision === 'approved' ? 'success' : 'error', $message);
+        $this->toastSuccess($message);
         $this->cancelApproval();
     }
 
@@ -108,6 +117,22 @@ trait WithApproval
             }
         });
 
+        $message = match ($this->approvalDecision) {
+            'approved' => 'Proposal berhasil disetujui dan diteruskan ke Kepala LPPM.',
+            'need_fix' => 'Proposal dikembalikan ke pengusul untuk perbaikan.',
+            'rejected' => 'Proposal telah ditolak.',
+            default => 'Keputusan berhasil disimpan.',
+        };
+
+        $flashType = match ($this->approvalDecision) {
+            'approved' => 'success',
+            'need_fix' => 'warning',
+            'rejected' => 'error',
+            default => 'success',
+        };
+
+        session()->flash($flashType, $message);
+        $this->toastSuccess($message);
         $this->cancelApproval();
     }
 

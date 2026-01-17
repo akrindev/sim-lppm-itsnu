@@ -2,12 +2,15 @@
 
 namespace App\Livewire\Traits;
 
+use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 
 trait WithTeamManagement
 {
+    use HasToast;
+
     protected function teamNotificationService(): NotificationService
     {
         return app(NotificationService::class);
@@ -29,6 +32,9 @@ trait WithTeamManagement
                 $member
             );
         });
+
+        session()->flash('success', 'Undangan tim berhasil diterima.');
+        $this->toastSuccess('Undangan tim berhasil diterima.');
     }
 
     public function rejectMember(string $userId): void
@@ -51,6 +57,9 @@ trait WithTeamManagement
                 $proposal->update(['status' => 'need_assignment']);
             }
         });
+
+        session()->flash('warning', 'Undangan tim telah ditolak.');
+        $this->toastSuccess('Undangan tim telah ditolak.');
     }
 
     abstract protected function getProposal(): Proposal;

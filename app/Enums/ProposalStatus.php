@@ -62,7 +62,7 @@ enum ProposalStatus: string
             self::DRAFT => in_array($newStatus, [self::SUBMITTED]),
             self::SUBMITTED => in_array($newStatus, [self::APPROVED, self::NEED_ASSIGNMENT, self::REJECTED]),
             self::NEED_ASSIGNMENT => in_array($newStatus, [self::SUBMITTED]),
-            self::APPROVED => in_array($newStatus, [self::WAITING_REVIEWER, self::REJECTED]),
+            self::APPROVED => in_array($newStatus, [self::WAITING_REVIEWER, self::UNDER_REVIEW, self::REJECTED]),
             self::WAITING_REVIEWER => in_array($newStatus, [self::UNDER_REVIEW]),
             self::UNDER_REVIEW => in_array($newStatus, [self::REVIEWED]),
             self::REVIEWED => in_array($newStatus, [self::COMPLETED, self::REVISION_NEEDED, self::REJECTED]),
