@@ -11,18 +11,40 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <div class="dropdown">
-                        <a href="#" class="btn-outline-primary btn dropdown-toggle" data-bs-toggle="dropdown">
-                            <x-lucide-calendar class="me-2 icon" />
-                            Tahun: {{ $selectedYear }}
-                        </a>
-                        <div class="dropdown-menu">
-                            @foreach ($availableYears as $year)
-                                <a href="#" class="dropdown-item {{ $selectedYear == $year ? 'active' : '' }}"
-                                    wire:click="$set('selectedYear', {{ $year }})">
-                                    {{ $year }}
+                    <div class="d-flex gap-2">
+                        <div class="dropdown">
+                            <a href="#" class="btn-outline-primary btn dropdown-toggle" data-bs-toggle="dropdown">
+                                <x-lucide-calendar class="me-2 icon" />
+                                Tahun: {{ $selectedYear }}
+                            </a>
+                            <div class="dropdown-menu">
+                                @foreach ($availableYears as $year)
+                                    <a href="#" class="dropdown-item {{ $selectedYear == $year ? 'active' : '' }}"
+                                        wire:click="$set('selectedYear', {{ $year }})">
+                                        {{ $year }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <a href="#" class="btn-outline-primary btn dropdown-toggle" data-bs-toggle="dropdown">
+                                <x-lucide-layers class="me-2 icon" />
+                                Semester: {{ $selectedSemester === 'all' ? 'Semua' : 'Semester ' . $selectedSemester }}
+                            </a>
+                            <div class="dropdown-menu">
+                                <a href="#" class="dropdown-item {{ $selectedSemester === 'all' ? 'active' : '' }}"
+                                    wire:click="$set('selectedSemester', 'all')">
+                                    Semua
                                 </a>
-                            @endforeach
+                                <a href="#" class="dropdown-item {{ $selectedSemester === '1' ? 'active' : '' }}"
+                                    wire:click="$set('selectedSemester', '1')">
+                                    Semester 1 (Jan-Jun)
+                                </a>
+                                <a href="#" class="dropdown-item {{ $selectedSemester === '2' ? 'active' : '' }}"
+                                    wire:click="$set('selectedSemester', '2')">
+                                    Semester 2 (Jul-Des)
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -79,6 +101,66 @@
                                 @endphp
                                 <div class="bg-success progress-bar" x-data :style="'width: ' + {{ $p }} + '%'"></div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 row row-cards">
+                <!-- Ringkasan Periode -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Ringkasan Pengajuan per Periode</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="card-table table table-vcenter table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tahun / Semester</th>
+                                        <th class="text-center">Total Penelitian</th>
+                                        <th class="text-center">Penelitian Disetujui</th>
+                                        <th class="text-center">Total PKM</th>
+                                        <th class="text-center">PKM Disetujui</th>
+                                        <th class="text-center">Tingkat Kelolosan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($periodicSummary as $item)
+                                        <tr>
+                                            <td>
+                                                <div class="font-weight-medium">{{ $item['year'] }}</div>
+                                                <div class="text-muted small">Semester {{ $item['semester'] }}</div>
+                                            </td>
+                                            <td class="text-center">{{ $item['research_total'] }}</td>
+                                            <td class="text-center">
+                                                <span class="text-success">{{ $item['research_approved'] }}</span>
+                                            </td>
+                                            <td class="text-center">{{ $item['pkm_total'] }}</td>
+                                            <td class="text-center">
+                                                <span class="text-success">{{ $item['pkm_approved'] }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                @php
+                                                    $total = $item['research_total'] + $item['pkm_total'];
+                                                    $approved = $item['research_approved'] + $item['pkm_approved'];
+                                                    $rate = $total > 0 ? round(($approved / $total) * 100, 1) : 0;
+                                                @endphp
+                                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                                    <div class="progress progress-xs w-50">
+                                                        <div class="progress-bar bg-primary" style="width: {{ $rate }}%"></div>
+                                                    </div>
+                                                    <span class="font-weight-bold">{{ $rate }}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="py-4 text-muted text-center">Tidak ada data historis tersedia</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
