@@ -60,7 +60,7 @@ class CommunityServiceSeeder extends Seeder
             ],
         ];
 
-        $flatTitles = array_reduce($pkamTitles, fn ($carry, $category) => array_merge($carry, $category), []);
+        $flatTitles = array_reduce($pkamTitles, fn($carry, $category) => array_merge($carry, $category), []);
 
         $validStatuses = [
             ProposalStatus::DRAFT,
@@ -87,8 +87,8 @@ class CommunityServiceSeeder extends Seeder
 
                 $partner = $partners->isNotEmpty() ? $partners->random() : \App\Models\Partner::factory()->create();
 
-                // Base Date: 40 days ago
-                $baseCreatedAt = Carbon::now()->subDays(40)->addHours(rand(1, 23));
+                // Base Date: 10 days ago
+                $baseCreatedAt = Carbon::now()->subDays(10)->addHours(rand(1, 23));
 
                 $communityService = CommunityService::factory()->create([
                     'partner_id' => $partner->id,
@@ -129,7 +129,7 @@ class CommunityServiceSeeder extends Seeder
 
                 // Team
                 $proposal->teamMembers()->attach($submitter->id, [
-                    'role' => 'ketua', 
+                    'role' => 'ketua',
                     'status' => 'accepted',
                     'created_at' => $baseCreatedAt,
                     'updated_at' => $baseCreatedAt,
@@ -176,10 +176,10 @@ class CommunityServiceSeeder extends Seeder
         if ($reviewerUsers->isEmpty()) return;
 
         $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
-        
+
         // Find assignment date from logs
-        $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at') 
-                      ?? $proposal->created_at->addDays(3);
+        $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at')
+            ?? $proposal->created_at->addDays(3);
 
         foreach ($reviewers as $reviewer) {
             $isCompleted = ($status !== ProposalStatus::UNDER_REVIEW);
@@ -200,9 +200,9 @@ class CommunityServiceSeeder extends Seeder
 
     protected function seedReports($proposal, $mandatoryTarget, $submitter): void
     {
-        $completionDate = $proposal->statusLogs()->where('status_after', ProposalStatus::COMPLETED)->value('at') 
-                          ?? $proposal->statusLogs()->where('status_after', ProposalStatus::REVIEWED)->value('at')
-                          ?? Carbon::now();
+        $completionDate = $proposal->statusLogs()->where('status_after', ProposalStatus::COMPLETED)->value('at')
+            ?? $proposal->statusLogs()->where('status_after', ProposalStatus::REVIEWED)->value('at')
+            ?? Carbon::now();
 
         $report = ProgressReport::create([
             'proposal_id' => $proposal->id,

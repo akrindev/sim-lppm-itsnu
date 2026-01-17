@@ -75,7 +75,7 @@ class ResearchSeeder extends Seeder
             ],
         ];
 
-        $flatTitles = array_reduce($researchTitles, fn ($carry, $category) => array_merge($carry, $category), []);
+        $flatTitles = array_reduce($researchTitles, fn($carry, $category) => array_merge($carry, $category), []);
 
         $validStatuses = [
             ProposalStatus::DRAFT,
@@ -110,8 +110,8 @@ class ResearchSeeder extends Seeder
                 $cluster2 = $cluster3 ? \App\Models\ScienceCluster::find($cluster3->parent_id) : null;
                 $cluster1 = $cluster2 ? \App\Models\ScienceCluster::find($cluster2->parent_id) : null;
 
-                // Base Date: 40 days ago
-                $baseCreatedAt = Carbon::now()->subDays(40)->addHours(rand(1, 23));
+                // Base Date: 10 days ago
+                $baseCreatedAt = Carbon::now()->subDays(10)->addHours(rand(1, 23));
 
                 $research = Research::factory()->create([
                     'macro_research_group_id' => \App\Models\MacroResearchGroup::inRandomOrder()->first()?->id,
@@ -237,14 +237,14 @@ class ResearchSeeder extends Seeder
 
         $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
         $round = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
-        
+
         // Find assignment date from logs
-        $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at') 
-                      ?? $proposal->created_at->addDays(3);
+        $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at')
+            ?? $proposal->created_at->addDays(3);
 
         foreach ($reviewers as $reviewer) {
             $isCompleted = ($status !== ProposalStatus::UNDER_REVIEW);
-            
+
             ProposalReviewer::create([
                 'proposal_id' => $proposal->id,
                 'user_id' => $reviewer->id,
@@ -262,9 +262,9 @@ class ResearchSeeder extends Seeder
 
     protected function seedReports($proposal, $mandatoryTarget, $submitter): void
     {
-        $completionDate = $proposal->statusLogs()->where('status_after', ProposalStatus::COMPLETED)->value('at') 
-                          ?? $proposal->statusLogs()->where('status_after', ProposalStatus::REVIEWED)->value('at')
-                          ?? Carbon::now();
+        $completionDate = $proposal->statusLogs()->where('status_after', ProposalStatus::COMPLETED)->value('at')
+            ?? $proposal->statusLogs()->where('status_after', ProposalStatus::REVIEWED)->value('at')
+            ?? Carbon::now();
 
         // Semester 1 Report (10 days after completion/review)
         $report = ProgressReport::create([
