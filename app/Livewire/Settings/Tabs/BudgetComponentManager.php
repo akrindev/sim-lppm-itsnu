@@ -68,12 +68,13 @@ class BudgetComponentManager extends Component
         }
 
         $message = $this->editingId ? 'Komponen Anggaran berhasil diubah' : 'Komponen Anggaran berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-budget-component');
         $this->reset(['budgetGroupId', 'code', 'name', 'unit', 'description', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(BudgetComponent $budgetComponent): void

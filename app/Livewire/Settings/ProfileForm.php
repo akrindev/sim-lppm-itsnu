@@ -178,11 +178,11 @@ class ProfileForm extends Component
             $identityData
         );
 
+        $this->dispatch('profile-updated', name: $user->name);
+
         $message = 'Profile berhasil diperbarui.';
         session()->flash('success', $message);
         $this->toastSuccess($message);
-
-        $this->dispatch('profile-updated', name: $user->name);
     }
 
     /**

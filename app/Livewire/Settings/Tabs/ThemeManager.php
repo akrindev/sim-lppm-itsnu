@@ -57,12 +57,13 @@ class ThemeManager extends Component
         }
 
         $message = $this->editingId ? 'Tema berhasil diubah' : 'Tema berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-theme');
         $this->reset(['name', 'focusAreaId', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(Theme $theme): void

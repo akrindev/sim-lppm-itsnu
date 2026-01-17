@@ -106,10 +106,12 @@ class TktManager extends Component
         }
 
         $message = $this->editingId ? 'Kategori TKT berhasil diubah' : 'Kategori TKT berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+
         $this->dispatch('close-modal', modalId: 'modal-type');
         $this->resetForm();
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function deleteType($type)
@@ -141,10 +143,12 @@ class TktManager extends Component
         TktLevel::find($this->editingId)->update(['description' => $this->levelDescription]);
 
         $message = 'Level TKT berhasil diperbarui';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+
         $this->dispatch('close-modal', modalId: 'modal-level');
         $this->resetForm();
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     // --- Indicators CRUD ---
@@ -189,10 +193,12 @@ class TktManager extends Component
         }
 
         $message = $this->editingId ? 'Indikator berhasil diubah' : 'Indikator berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+
         $this->dispatch('close-modal', modalId: 'modal-indicator');
         $this->resetForm();
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function deleteIndicator($id)

@@ -76,12 +76,13 @@ class ScienceClusterManager extends Component
         }
 
         $message = $this->editingId ? 'Klaster Sains berhasil diubah' : 'Klaster Sains berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-science-cluster');
         $this->reset(['name', 'parentId', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(ScienceCluster $scienceCluster): void

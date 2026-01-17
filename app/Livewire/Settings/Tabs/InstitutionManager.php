@@ -47,12 +47,13 @@ class InstitutionManager extends Component
         }
 
         $message = $this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-institution');
         $this->reset(['name', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(Institution $institution): void

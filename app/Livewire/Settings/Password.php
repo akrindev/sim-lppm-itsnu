@@ -39,13 +39,13 @@ class Password extends Component
             'password' => Hash::make($validated['password']),
         ]);
 
-        $message = 'Kata sandi berhasil diperbarui.';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
-
         $this->reset('current_password', 'password', 'password_confirmation');
 
         $this->dispatch('password-updated');
+
+        $message = 'Kata sandi berhasil diperbarui.';
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     /**

@@ -57,12 +57,13 @@ class TopicManager extends Component
         }
 
         $message = $this->editingId ? 'Topik berhasil diubah' : 'Topik berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-topic');
         $this->reset(['name', 'themeId', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(Topic $topic): void

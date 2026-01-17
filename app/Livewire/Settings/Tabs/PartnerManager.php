@@ -59,12 +59,13 @@ class PartnerManager extends Component
         }
 
         $message = $this->editingId ? 'Mitra berhasil diubah' : 'Mitra berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-partner');
         $this->reset(['name', 'type', 'address', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(Partner $partner): void

@@ -61,12 +61,13 @@ class FacultyManager extends Component
         }
 
         $message = $this->editingId ? 'Fakultas berhasil diubah' : 'Fakultas berhasil ditambahkan';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-faculty');
         $this->reset(['name', 'code', 'institutionId', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function edit(Faculty $faculty): void
