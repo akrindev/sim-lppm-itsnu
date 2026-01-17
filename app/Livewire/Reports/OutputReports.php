@@ -65,71 +65,57 @@ class OutputReports extends Component
     public function render(): View
     {
         return view('livewire.reports.output-reports', [
-            'mandatoryOutputs' => $this->getMandatoryOutputs(),
-            'additionalOutputs' => $this->getAdditionalOutputs(),
+            'proposals' => $this->getProposalsWithOutputs(),
             'statistics' => $this->getStatistics(),
         ]);
     }
 
     /**
-     * Get mandatory outputs based on active tab and filters
+     * Get proposals with their outputs based on active tab and filters
      */
-    protected function getMandatoryOutputs(): Collection
+    protected function getProposalsWithOutputs()
     {
-        if ($this->outputType === 'additional') {
-            return collect();
-        }
-
         $detailableType = $this->activeTab === 'research' ? 'App\\Models\\Research' : 'App\\Models\\CommunityService';
 
-        $query = MandatoryOutput::query()
-            ->with(['progressReport.proposal.user', 'proposalOutput'])
-            ->whereHas('progressReport.proposal', function (Builder $query) use ($detailableType) {
-                $query->where('detailable_type', $detailableType);
+        $query = Proposal::query()
+            ->with(['user', 'progressReports.mandatoryOutputs.proposalOutput', 'progressReports.additionalOutputs.proposalOutput'])
+            ->where('detailable_type', $detailableType)
+            ->where(function (Builder $query) {
+                $query->whereHas('progressReports.mandatoryOutputs')
+                    ->orWhereHas('progressReports.additionalOutputs');
             });
 
         // Apply search filter
         if ($this->search) {
             $query->where(function (Builder $q) {
-                $q->where('journal_title', 'like', "%{$this->search}%")
-                    ->orWhere('article_title', 'like', "%{$this->search}%")
-                    ->orWhere('book_title', 'like', "%{$this->search}%")
-                    ->orWhere('isbn', 'like', "%{$this->search}%")
-                    ->orWhere('product_name', 'like', "%{$this->search}%");
+                $q->where('title', 'like', "%{$this->search}%")
+                    ->orWhereHas('user', function (Builder $u) {
+                        $u->where('name', 'like', "%{$this->search}%");
+                    })
+                    ->orWhereHas('progressReports.mandatoryOutputs', function (Builder $m) {
+                        $m->where('journal_title', 'like', "%{$this->search}%")
+                            ->orWhere('article_title', 'like', "%{$this->search}%")
+                            ->orWhere('book_title', 'like', "%{$this->search}%")
+                            ->orWhere('isbn', 'like', "%{$this->search}%")
+                            ->orWhere('product_name', 'like', "%{$this->search}%");
+                    })
+                    ->orWhereHas('progressReports.additionalOutputs', function (Builder $a) {
+                        $a->where('book_title', 'like', "%{$this->search}%")
+                            ->orWhere('journal_title', 'like', "%{$this->search}%")
+                            ->orWhere('isbn', 'like', "%{$this->search}%")
+                            ->orWhere('product_name', 'like', "%{$this->search}%");
+                    });
             });
         }
 
-        return $query->latest()->get();
-    }
-
-    /**
-     * Get additional outputs based on active tab and filters
-     */
-    protected function getAdditionalOutputs(): Collection
-    {
+        // Filter by output type if needed
         if ($this->outputType === 'mandatory') {
-            return collect();
+            $query->whereHas('progressReports.mandatoryOutputs');
+        } elseif ($this->outputType === 'additional') {
+            $query->whereHas('progressReports.additionalOutputs');
         }
 
-        $detailableType = $this->activeTab === 'research' ? 'App\\Models\\Research' : 'App\\Models\\CommunityService';
-
-        $query = AdditionalOutput::query()
-            ->with(['progressReport.proposal.user', 'proposalOutput'])
-            ->whereHas('progressReport.proposal', function (Builder $query) use ($detailableType) {
-                $query->where('detailable_type', $detailableType);
-            });
-
-        // Apply search filter
-        if ($this->search) {
-            $query->where(function (Builder $q) {
-                $q->where('book_title', 'like', "%{$this->search}%")
-                    ->orWhere('journal_title', 'like', "%{$this->search}%")
-                    ->orWhere('isbn', 'like', "%{$this->search}%")
-                    ->orWhere('product_name', 'like', "%{$this->search}%");
-            });
-        }
-
-        return $query->latest()->get();
+        return $query->latest()->paginate(10);
     }
 
     /**
@@ -172,6 +158,7 @@ class OutputReports extends Component
     public function viewMandatoryOutput(string $id): void
     {
         $this->viewingMandatoryId = $id;
+        $this->dispatch('open-modal', modalId: 'modalMandatoryOutput');
     }
 
     public function closeMandatoryModal(): void
@@ -196,6 +183,7 @@ class OutputReports extends Component
     public function viewAdditionalOutput(string $id): void
     {
         $this->viewingAdditionalId = $id;
+        $this->dispatch('open-modal', modalId: 'modalAdditionalOutput');
     }
 
     public function closeAdditionalModal(): void
