@@ -195,7 +195,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="py-8 text-center bg-light-lt">
+                            <td colspan="4" class="py-8 text-center bg-surface-secondary">
                                 <div class="mb-3">
                                     <x-lucide-inbox class="text-muted icon icon-lg" />
                                 </div>

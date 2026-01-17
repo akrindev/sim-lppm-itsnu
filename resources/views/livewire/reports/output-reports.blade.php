@@ -96,7 +96,7 @@
                 <!-- Grouped Outputs by Proposal -->
                 @forelse ($proposals as $proposal)
                     <div class="card mb-4 border-0 shadow-sm overflow-hidden">
-                        <div class="card-header bg-light-lt py-3 border-bottom">
+                        <div class="card-header bg-surface-secondary py-3 border-bottom">
                             <div class="d-flex align-items-start justify-content-between">
                                 <div class="flex-fill">
                                     <div class="mb-1">
@@ -128,7 +128,7 @@
                         </div>
                         <div class="table-responsive">
                             <table class="table-vcenter card-table table">
-                                <thead class="bg-light-lt">
+                                <thead class="bg-surface-secondary">
                                     <tr>
                                         <th style="width: 120px;">{{ __('Kategori') }}</th>
                                         <th>{{ __('Jenis & Judul Luaran') }}</th>
@@ -156,7 +156,7 @@
                                                         </small>
                                                     </td>
                                                     <td>
-                                                        <div class="fw-medium text-dark">
+                                                        <div class="fw-medium text-body">
                                                             {{ $output->article_title ?? ($output->book_title ?? ($output->product_name ?? '-')) }}
                                                         </div>
                                                         <small class="text-secondary">
@@ -211,7 +211,7 @@
                                                         </small>
                                                     </td>
                                                     <td>
-                                                        <div class="fw-medium text-dark">
+                                                        <div class="fw-medium text-body">
                                                             {{ $output->book_title ?? ($output->journal_title ?? ($output->product_name ?? '-')) }}
                                                         </div>
                                                         <small class="text-secondary">
@@ -373,7 +373,7 @@
                     @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
                         <div class="col-12">
                             <label class="form-label">Dokumen</label>
-                            <div class="bg-light-lt rounded border p-2">
+                            <div class="bg-surface-secondary rounded border p-2">
                                 <div class="d-flex align-items-center">
                                     <x-lucide-file-text class="text-primary icon me-2" />
                                     <div class="flex-fill">
@@ -483,7 +483,7 @@
                     @if ($media = $additionalOutput->getFirstMedia('book_document'))
                         <div class="col-12">
                             <label class="form-label">Dokumen</label>
-                            <div class="bg-light-lt rounded border p-2">
+                            <div class="bg-surface-secondary rounded border p-2">
                                 <div class="d-flex align-items-center">
                                     <x-lucide-file-text class="text-primary icon me-2" />
                                     <div class="flex-fill">

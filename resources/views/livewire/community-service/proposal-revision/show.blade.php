@@ -274,7 +274,7 @@
                                             <x-lucide-message-square class="icon icon-sm" />
                                             Catatan Review:
                                         </label>
-                                        <div class="p-3 bg-light rounded">
+                                        <div class="p-3 bg-body-tertiary rounded">
                                             <p class="mb-0 text-reset">{{ $reviewer->review_notes }}</p>
                                         </div>
                                     </div>

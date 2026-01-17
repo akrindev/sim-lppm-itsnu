@@ -229,7 +229,7 @@
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.budget_items.{{ $index }}.unit"
-                                        class="bg-light form-control form-control-sm disabled" placeholder="Satuan"
+                                        class="bg-body-tertiary form-control form-control-sm disabled" placeholder="Satuan"
                                         readonly disabled>
                                 </td>
                                 <td>

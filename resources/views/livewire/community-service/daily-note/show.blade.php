@@ -183,7 +183,7 @@
                                     <div class="row g-2">
                                         @foreach($evidence as $file)
                                             <div class="col-12">
-                                                <div class="d-flex align-items-center gap-2 p-2 border rounded bg-white">
+                                                <div class="d-flex align-items-center gap-2 p-2 border rounded bg-body-tertiary">
                                                     @if(str_starts_with($file->getMimeType(), 'image/'))
                                                         <img src="{{ $file->temporaryUrl() }}" class="rounded object-cover" style="width: 40px; height: 40px;">
                                                     @else

@@ -648,7 +648,7 @@
                             {{-- Show existing saved file --}}
                             @if ($mandatoryOutput = $this->mandatoryOutput())
                                 @if ($media = $mandatoryOutput->getFirstMedia('journal_article'))
-                                    <div class="bg-light mt-2 rounded border p-2">
+                                    <div class="bg-body-tertiary mt-2 rounded border p-2">
                                         <div class="d-flex align-items-center">
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
@@ -937,7 +937,7 @@
                             {{-- Show existing saved file --}}
                             @if ($additionalOutput = $this->additionalOutput())
                                 @if ($media = $additionalOutput->getFirstMedia('book_document'))
-                                    <div class="bg-light mt-2 rounded border p-2">
+                                    <div class="bg-body-tertiary mt-2 rounded border p-2">
                                         <div class="d-flex align-items-center">
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
@@ -992,7 +992,7 @@
                             {{-- Show existing saved file --}}
                             @if ($additionalOutput = $this->additionalOutput())
                                 @if ($media = $additionalOutput->getFirstMedia('publication_certificate'))
-                                    <div class="bg-light mt-2 rounded border p-2">
+                                    <div class="bg-body-tertiary mt-2 rounded border p-2">
                                         <div class="d-flex align-items-center">
                                             <x-lucide-file-text class="text-primary icon me-2" />
                                             <div class="flex-fill">
