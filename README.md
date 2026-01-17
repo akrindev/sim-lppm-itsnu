@@ -76,6 +76,42 @@ Untuk mendapatkan salinan lokal dan menjalankannya, ikuti langkah-langkah sederh
     ```
     Aplikasi Anda akan tersedia di `http://127.0.0.1:8000`.
 
+## Konfigurasi Antrean (Supervisor)
+
+Untuk menjalankan worker antrean secara otomatis di latar belakang pada server produksi, sangat disarankan menggunakan **Supervisor**.
+
+### 1. Instalasi Supervisor
+```sh
+sudo apt-get update
+sudo apt-get install supervisor
+```
+
+### 2. Buat File Konfigurasi
+Buat file baru di `/etc/supervisor/conf.d/sim-lppm.conf`:
+```ini
+[program:sim-lppm-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /home/salju/Workspace/sim-lppm-itsnu/artisan queue:work database --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=salju
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/home/salju/Workspace/sim-lppm-itsnu/storage/logs/worker.log
+stopwaitsecs=3600
+```
+
+> **Catatan:** Sesuaikan `user` dan path `/home/salju/Workspace/sim-lppm-itsnu` dengan username dan direktori proyek Anda yang sebenarnya.
+
+### 3. Aktifkan Konfigurasi
+```sh
+sudo reread
+sudo update
+sudo supervisorctl start sim-lppm-worker:*
+```
+
 ## Lisensi
 
 Didistribusikan di bawah Lisensi MIT.
