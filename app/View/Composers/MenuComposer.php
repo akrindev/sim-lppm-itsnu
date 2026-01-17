@@ -29,7 +29,7 @@ class MenuComposer
             [
                 'title' => 'Penelitian',
                 'icon' => 'puzzle',
-                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan'],
+                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan', 'superadmin'],
                 'children' => [
                     [
                         'title' => 'Usulan',
@@ -61,7 +61,7 @@ class MenuComposer
             [
                 'title' => 'Pengabdian',
                 'icon' => 'gift',
-                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan'],
+                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan', 'superadmin'],
                 'children' => [
                     [
                         'title' => 'Usulan',
@@ -103,32 +103,32 @@ class MenuComposer
                 'title' => 'Persetujuan Dekan',
                 'icon' => 'clipboard-check',
                 'route' => 'dekan.proposals.index',
-                'roles' => ['dekan'],
+                'roles' => ['dekan', 'superadmin'],
             ],
             [
                 'title' => 'Riwayat Persetujuan',
                 'icon' => 'history',
                 'route' => 'dekan.approval-history',
-                'roles' => ['dekan'],
+                'roles' => ['dekan', 'superadmin'],
             ],
             // Kepala LPPM menus
             [
                 'title' => 'Persetujuan Awal',
                 'icon' => 'checkbox',
                 'route' => 'kepala-lppm.initial-approval',
-                'roles' => ['kepala lppm', 'rektor'],
+                'roles' => ['kepala lppm', 'superadmin'],
             ],
             [
                 'title' => 'Persetujuan Akhir',
                 'icon' => 'circle-check',
                 'route' => 'kepala-lppm.final-decision',
-                'roles' => ['kepala lppm', 'rektor'],
+                'roles' => ['kepala lppm', 'superadmin'],
             ],
             // Admin LPPM - Reviewer Management Group
             [
                 'title' => 'Reviewer',
                 'icon' => 'user-check',
-                'roles' => ['admin lppm'],
+                'roles' => ['admin lppm', 'superadmin'],
                 'children' => [
                     [
                         'title' => 'Penugasan Reviewer',
@@ -152,25 +152,25 @@ class MenuComposer
                 'title' => 'Review Penelitian',
                 'icon' => 'lifebuoy',
                 'route' => 'review.research',
-                'roles' => ['reviewer'],
+                'roles' => ['reviewer', 'superadmin'],
             ],
             [
                 'title' => 'Review Pengabdian',
                 'icon' => 'lifebuoy',
                 'route' => 'review.community-service',
-                'roles' => ['reviewer'],
+                'roles' => ['reviewer', 'superadmin'],
             ],
             [
                 'title' => 'Riwayat Review',
                 'icon' => 'history',
                 'route' => 'review.review-history',
-                'roles' => ['reviewer'],
+                'roles' => ['reviewer', 'superadmin'],
             ],
             // Laporan - Reports menu (+ kepala lppm for decision-making)
             [
                 'title' => 'Laporan',
                 'icon' => 'file-analytics',
-                'roles' => ['admin lppm', 'rektor', 'kepala lppm'],
+                'roles' => ['admin lppm', 'rektor', 'kepala lppm', 'superadmin'],
                 'children' => [
                     [
                         'title' => 'Laporan Penelitian',
@@ -188,7 +188,7 @@ class MenuComposer
             [
                 'title' => 'Kelola Pengguna',
                 'icon' => 'users',
-                'roles' => ['admin lppm'],
+                'roles' => ['admin lppm', 'superadmin'],
                 'children' => [
                     [
                         'title' => 'Daftar Pengguna',
@@ -214,7 +214,7 @@ class MenuComposer
             [
                 'title' => 'Pengaturan',
                 'icon' => 'settings',
-                'roles' => ['admin lppm'],
+                'roles' => ['admin lppm', 'superadmin'],
                 'children' => [
                     [
                         'title' => 'Master Data',

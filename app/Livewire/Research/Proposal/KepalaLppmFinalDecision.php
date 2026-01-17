@@ -39,7 +39,7 @@ class KepalaLppmFinalDecision extends Component
     public function canDecide(): bool
     {
         $user = Auth::user();
-        $isKepalaLppm = $user->hasRole(['kepala lppm', 'rektor']);
+        $isKepalaLppm = $user->hasRole(['kepala lppm']);
         $proposal = $this->proposal;
 
         return $isKepalaLppm && $proposal->status === ProposalStatus::REVIEWED && $proposal->allReviewsCompleted();
