@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use App\Enums\ProposalStatus;
+use App\Models\AdditionalOutput;
+use App\Models\BudgetComponent;
+use App\Models\BudgetGroup;
+use App\Models\BudgetItem;
 use App\Models\DailyNote;
 use App\Models\MandatoryOutput;
 use App\Models\ProgressReport;
@@ -212,8 +216,11 @@ class ResearchSeeder extends Seeder
 
                 // Progress Reports & Realization
                 if (in_array($statusEnum, [ProposalStatus::REVIEWED, ProposalStatus::COMPLETED])) {
-                    $this->seedReports($proposal, $mandatoryTarget, $submitter);
+                    $this->seedReports($proposal, $mandatoryTarget, $additionalTarget, $submitter);
                 }
+
+                // Budget (RAB)
+                $this->seedBudget($proposal);
 
                 // Daily Notes (Must be after approval/completion)
                 if ($statusEnum === ProposalStatus::COMPLETED) {
@@ -231,6 +238,47 @@ class ResearchSeeder extends Seeder
         }
 
         $this->command->info('ResearchSeeder completed successfully.');
+    }
+
+    protected function seedBudget($proposal): void
+    {
+        $groups = BudgetGroup::all();
+        if ($groups->isEmpty()) {
+            return;
+        }
+
+        $totalSbk = $proposal->sbk_value ?: 20000000;
+        $remainingBudget = $totalSbk;
+
+        foreach ($groups as $group) {
+            $components = BudgetComponent::where('budget_group_id', $group->id)->inRandomOrder()->take(2)->get();
+            
+            foreach ($components as $component) {
+                $targetPercentage = $group->percentage / 2 / 100; // Divide group percentage by number of components
+                $amount = round($totalSbk * $targetPercentage);
+                
+                if ($amount > $remainingBudget) {
+                    $amount = $remainingBudget;
+                }
+
+                if ($amount <= 0) continue;
+
+                BudgetItem::create([
+                    'proposal_id' => $proposal->id,
+                    'year' => 1,
+                    'budget_group_id' => $group->id,
+                    'budget_component_id' => $component->id,
+                    'group' => $group->name,
+                    'component' => $component->name,
+                    'item_description' => 'Kebutuhan ' . $component->name,
+                    'volume' => 1,
+                    'unit_price' => $amount,
+                    'total_price' => $amount,
+                ]);
+
+                $remainingBudget -= $amount;
+            }
+        }
     }
 
     protected function seedReviewers($proposal, $status, $reviewerUsers, $submitter, $teamMembers): void
@@ -264,7 +312,7 @@ class ResearchSeeder extends Seeder
         }
     }
 
-    protected function seedReports($proposal, $mandatoryTarget, $submitter): void
+    protected function seedReports($proposal, $mandatoryTarget, $additionalTarget, $submitter): void
     {
         $completionDate = $proposal->statusLogs()->where('status_after', ProposalStatus::COMPLETED)->value('at')
             ?? $proposal->statusLogs()->where('status_after', ProposalStatus::REVIEWED)->value('at')
@@ -292,6 +340,18 @@ class ResearchSeeder extends Seeder
             'volume' => '12',
             'issue_number' => '3',
             'doi' => '10.1234/ai.'.rand(100, 999),
+        ]);
+
+        // Realize Additional Output
+        AdditionalOutput::create([
+            'progress_report_id' => $report->id,
+            'proposal_output_id' => $additionalTarget->id,
+            'status' => 'published',
+            'book_title' => 'Buku Hasil Penelitian: '.$proposal->title,
+            'publisher_name' => 'ITSNU Press',
+            'isbn' => fake()->isbn13(),
+            'publication_year' => (int) date('Y'),
+            'total_pages' => rand(50, 200),
         ]);
 
         if ($proposal->status === ProposalStatus::COMPLETED) {
