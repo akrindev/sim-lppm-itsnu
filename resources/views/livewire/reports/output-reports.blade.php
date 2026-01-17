@@ -144,7 +144,7 @@
                                         {{-- Mandatory Outputs --}}
                                         @if($outputType !== 'additional')
                                             @foreach ($report->mandatoryOutputs as $output)
-                                                <tr>
+                                                <tr wire:key="mandatory-{{ $output->id }}">
                                                     <td>
                                                         <div class="mb-1">
                                                             <x-tabler.badge color="primary">
@@ -188,6 +188,7 @@
                                                     <td>
                                                         <button type="button"
                                                             wire:click="viewMandatoryOutput('{{ $output->id }}')"
+                                                            wire:loading.attr="disabled"
                                                             class="btn btn-sm btn-icon btn-outline-info" title="Lihat Detail">
                                                             <x-lucide-eye class="icon" />
                                                         </button>
@@ -199,7 +200,7 @@
                                         {{-- Additional Outputs --}}
                                         @if($outputType !== 'mandatory')
                                             @foreach ($report->additionalOutputs as $output)
-                                                <tr>
+                                                <tr wire:key="additional-{{ $output->id }}">
                                                     <td>
                                                         <div class="mb-1">
                                                             <x-tabler.badge color="info">
@@ -240,6 +241,7 @@
                                                     <td>
                                                         <button type="button"
                                                             wire:click="viewAdditionalOutput('{{ $output->id }}')"
+                                                            wire:loading.attr="disabled"
                                                             class="btn btn-sm btn-icon btn-outline-info" title="Lihat Detail">
                                                             <x-lucide-eye class="icon" />
                                                         </button>
@@ -272,6 +274,7 @@
     </div>
     <!-- Modal: View Mandatory Output -->
     <x-tabler.modal id="modalMandatoryOutput" title="Lihat Luaran Wajib" size="xl" scrollable wire:ignore.self
+        wire:key="modal-mandatory"
         onHide="closeMandatoryModal">
         <x-slot:body>
             @if ($mandatoryOutput = $this->mandatoryOutput())
@@ -394,6 +397,7 @@
 
     <!-- Modal: View Additional Output -->
     <x-tabler.modal id="modalAdditionalOutput" title="Lihat Luaran Tambahan" size="xl" scrollable
+        wire:key="modal-additional"
         wire:ignore.self onHide="closeAdditionalModal">
         <x-slot:body>
             @if ($additionalOutput = $this->additionalOutput())

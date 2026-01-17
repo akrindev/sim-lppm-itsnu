@@ -434,7 +434,7 @@
                                 @endforeach
                             </tbody>
                             <tfoot>
-                                <tr class="table-light">
+                                <tr>
                                     <th colspan="{{ $duration > 1 ? 7 : 6 }}" class="text-end">Total Anggaran:</th>
                                     <th class="text-end">Rp
                                         {{ number_format($proposal->budgetItems->sum('total_price'), 0, ',', '.') }}

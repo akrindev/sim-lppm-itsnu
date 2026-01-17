@@ -4,7 +4,7 @@
         <div class="mb-4">
             <div class="table-responsive">
                 <table class="table-hover table-sm table">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>NAMA / NIDN</th>
                             <th>Tugas</th>

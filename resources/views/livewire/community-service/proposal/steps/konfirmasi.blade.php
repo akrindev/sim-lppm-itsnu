@@ -216,7 +216,7 @@
                                 @endforeach
                             </tbody>
                             <tfoot>
-                                <tr class="table-light">
+                                <tr>
                                     <th colspan="{{ $duration > 1 ? 6 : 5 }}" class="text-end">Total Anggaran:</th>
                                     <th class="text-end">Rp {{ number_format($budgetItems->sum('total'), 0, ',', '.') }}</th>
                                 </tr>
