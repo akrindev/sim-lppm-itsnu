@@ -4,21 +4,26 @@ namespace Database\Seeders;
 
 use App\Enums\ProposalStatus;
 use App\Models\CommunityService;
+use App\Models\MandatoryOutput;
+use App\Models\ProgressReport;
 use App\Models\Proposal;
+use App\Models\ProposalReviewer;
 use App\Models\ProposalStatusLog;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class CommunityServiceSeeder extends Seeder
 {
     public function run(): void
     {
-        // Retrieve all dosen users by role
         $dosenUsers = User::role('dosen')->get();
+        $dekanUsers = User::role('dekan')->get();
+        $kepalaLppm = User::role('kepala lppm')->first();
+        $adminLppm = User::role('admin lppm')->first();
 
         if ($dosenUsers->count() < 2) {
-            $this->command->warn('Tidak cukup dosen untuk membuat proposal pengabdian masyarakat');
-
+            $this->command->warn('Tidak cukup dosen untuk membuat proposal PKM');
             return;
         }
 
@@ -29,49 +34,33 @@ class CommunityServiceSeeder extends Seeder
         $partners = \App\Models\Partner::all();
 
         if ($keywords->isEmpty() || $researchSchemes->isEmpty() || $focusAreas->isEmpty()) {
-            $this->command->warn('Master data tidak lengkap untuk membuat proposal pengabdian');
-
+            $this->command->warn('Master data tidak lengkap untuk membuat proposal PKM');
             return;
         }
 
-        // Indonesian PKM (Pengabdian Kepada Masyarakat) titles organized by category
         $pkamTitles = [
             'Digital Transformation' => [
-                'Pengabdian Masyarakat: Program Literasi Digital untuk UMKM di Kota Pekalongan',
+                'Program Literasi Digital untuk UMKM di Kota Pekalongan',
                 'Pelatihan Sistem Informasi Keuangan untuk Koperasi Simpan Pinjam Desa Jepara',
                 'Workshop Platform E-Commerce untuk Pengrajin Batik Tradisional',
                 'Program Pelatihan Digital Marketing dan Social Media untuk Pengusaha Muda',
             ],
-            'Cybersecurity & IT Support' => [
-                'Pengabdian Masyarakat: Workshop Cybersecurity untuk Instansi Pemerintah Lokal',
-                'Pelatihan Keamanan Data dan Privacy Protection untuk ASN',
-                'Pendampingan Teknis Infrastruktur IT untuk Sekolah Negeri',
-                'Workshop Perlindungan Privasi Digital untuk Generasi Muda',
-            ],
             'Pertanian & Lingkungan' => [
-                'Pengabdian Masyarakat: Pendampingan Teknologi Precision Agriculture untuk Petani Modern',
+                'Pendampingan Teknologi Precision Agriculture untuk Petani Modern',
                 'Program Pelatihan Budidaya Organik Berkelanjutan untuk Petani Pekalongan',
                 'Workshop Pengelolaan Limbah Pertanian Menjadi Produk Bernilai Tambah',
                 'Pendampingan Sistem Irigasi Pintar untuk Optimasi Penggunaan Air',
             ],
             'Pendidikan & Pemberdayaan' => [
-                'Pengabdian Masyarakat: Program Coding dan Robotika untuk Anak Kurang Mampu',
+                'Program Coding dan Robotika untuk Anak Kurang Mampu',
                 'Pelatihan Keterampilan STEM untuk Siswa SMP di Daerah Terpencil',
                 'Workshop Kewirausahaan dan Business Plan untuk Anak Muda Pengangguran',
                 'Program Mentoring Soft Skills dan Leadership untuk Mahasiswa Kurang Mampu',
             ],
-            'Kesehatan & Kesejahteraan' => [
-                'Pengabdian Masyarakat: Sosialisasi Kesehatan Reproduksi di Pesantren Tradisional',
-                'Program Edukasi Gizi dan Kesehatan Preventif untuk Komunitas Nelayan',
-                'Pelatihan First Aid dan Disaster Management untuk Relawan Bencana',
-                'Workshop Mental Health Awareness untuk Karyawan Industri Manufaktur',
-            ],
         ];
 
-        // Flatten titles array
         $flatTitles = array_reduce($pkamTitles, fn ($carry, $category) => array_merge($carry, $category), []);
 
-        // Valid initial statuses (exclude REJECTED, REVISION_NEEDED, NEED_ASSIGNMENT)
         $validStatuses = [
             ProposalStatus::DRAFT,
             ProposalStatus::SUBMITTED,
@@ -83,277 +72,222 @@ class CommunityServiceSeeder extends Seeder
             ProposalStatus::COMPLETED,
             ProposalStatus::REJECTED,
         ];
+
         $titleIndex = 0;
 
-        // For each dosen, create proposals covering valid statuses
-        foreach ($dosenUsers as $dosenIndex => $submitter) {
+        foreach ($dosenUsers->take(5) as $submitter) {
             foreach ($validStatuses as $statusEnum) {
-                // Create 2 proposals for each status
-                for ($proposalCount = 0; $proposalCount < 2; $proposalCount++) {
-                    // Select focus area and related data
-                    $focusArea = $focusAreas->random();
-                    $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
+                $focusArea = $focusAreas->random();
+                $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
 
-                    // Select a valid hierarchical science cluster
-                    $cluster3 = \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first();
-                    $cluster2 = $cluster3 ? \App\Models\ScienceCluster::find($cluster3->parent_id) : null;
-                    $cluster1 = $cluster2 ? \App\Models\ScienceCluster::find($cluster2->parent_id) : null;
+                $cluster3 = \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first();
+                $cluster2 = $cluster3 ? \App\Models\ScienceCluster::find($cluster3->parent_id) : null;
+                $cluster1 = $cluster2 ? \App\Models\ScienceCluster::find($cluster2->parent_id) : null;
 
-                    // Select or create partner
-                    $partner = $partners->isNotEmpty()
-                        ? $partners->random()
-                        : \App\Models\Partner::factory()->create();
+                $partner = $partners->isNotEmpty() ? $partners->random() : \App\Models\Partner::factory()->create();
 
-                    // Create CommunityService detail first
-                    $communityService = CommunityService::factory()->create([
-                        'partner_id' => $partner->id,
+                // Base Date: 40 days ago
+                $baseCreatedAt = Carbon::now()->subDays(40)->addHours(rand(1, 23));
+
+                $communityService = CommunityService::factory()->create([
+                    'partner_id' => $partner->id,
+                    'created_at' => $baseCreatedAt,
+                    'updated_at' => $baseCreatedAt,
+                ]);
+
+                $title = $flatTitles[$titleIndex % count($flatTitles)];
+                $titleIndex++;
+
+                $proposal = Proposal::factory()->create([
+                    'title' => 'Pengabdian Masyarakat: ' . $title,
+                    'detailable_type' => CommunityService::class,
+                    'detailable_id' => $communityService->id,
+                    'submitter_id' => $submitter->id,
+                    'research_scheme_id' => $researchSchemes->random()->id,
+                    'focus_area_id' => $focusArea->id,
+                    'theme_id' => $theme->id,
+                    'cluster_level1_id' => $cluster1?->id,
+                    'cluster_level2_id' => $cluster2?->id,
+                    'cluster_level3_id' => $cluster3?->id,
+                    'status' => $statusEnum,
+                    'duration_in_years' => rand(1, 2),
+                    'start_year' => (int) date('Y'),
+                    'sbk_value' => rand(20, 150) * 1000000,
+                    'summary' => fake()->paragraph(3),
+                    'created_at' => $baseCreatedAt,
+                    'updated_at' => $baseCreatedAt,
+                ]);
+
+                $this->createStatusLogHistory($proposal, $statusEnum, $submitter, $dekanUsers, $kepalaLppm, $adminLppm);
+
+                // Update proposal updated_at to match last log
+                $lastLog = $proposal->statusLogs()->latest('at')->first();
+                if ($lastLog) {
+                    $proposal->update(['updated_at' => $lastLog->at]);
+                }
+
+                // Team
+                $proposal->teamMembers()->attach($submitter->id, [
+                    'role' => 'ketua', 
+                    'status' => 'accepted',
+                    'created_at' => $baseCreatedAt,
+                    'updated_at' => $baseCreatedAt,
+                ]);
+                $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED]) ? 'pending' : 'accepted';
+                $availableMembers = $dosenUsers->where('id', '!=', $submitter->id)->random(min(rand(2, 3), $dosenUsers->count() - 1));
+
+                foreach ($availableMembers as $member) {
+                    $proposal->teamMembers()->attach($member->id, [
+                        'role' => 'anggota',
+                        'status' => $teamMemberStatus,
+                        'tasks' => fake()->sentence(10),
+                        'created_at' => $baseCreatedAt,
+                        'updated_at' => $baseCreatedAt,
                     ]);
+                }
 
-                    // Create title (cycle through available titles)
-                    $title = $flatTitles[$titleIndex % count($flatTitles)];
-                    $titleIndex++;
+                // Targets
+                $mandatoryTarget = \App\Models\ProposalOutput::factory()->create([
+                    'proposal_id' => $proposal->id,
+                    'category' => 'Wajib',
+                    'type' => 'Video Kegiatan (Youtube)',
+                    'target_status' => 'Uploaded',
+                    'output_year' => 1,
+                ]);
 
-                    // Create Proposal with CommunityService polymorphic relationship
-                    $proposal = Proposal::factory()->create([
-                        'title' => $title,
-                        'detailable_type' => CommunityService::class,
-                        'detailable_id' => $communityService->id,
-                        'submitter_id' => $submitter->id,
-                        'research_scheme_id' => $researchSchemes->random()->id,
-                        'focus_area_id' => $focusArea->id,
-                        'theme_id' => $theme->id,
-                        'cluster_level1_id' => $cluster1?->id,
-                        'cluster_level2_id' => $cluster2?->id,
-                        'cluster_level3_id' => $cluster3?->id,
-                        'status' => $statusEnum,
-                        'duration_in_years' => rand(1, 2),
-                        'start_year' => (int) date('Y'),
-                        'sbk_value' => rand(20, 150) * 1000000, // 20-150 juta
-                        'summary' => fake()->paragraph(3),
-                    ]);
+                // Reviewers
+                if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED, ProposalStatus::REVISION_NEEDED, ProposalStatus::COMPLETED])) {
+                    $this->seedReviewers($proposal, $statusEnum, $dosenUsers, $submitter, $availableMembers);
+                }
 
-                    // Create comprehensive status log history based on final status
-                    $this->createStatusLogHistory($proposal, $statusEnum, $submitter, $dosenUsers);
-
-                    // Attach keywords (2-4 per proposal)
-                    if ($keywords->isNotEmpty()) {
-                        $proposal->keywords()->attach(
-                            $keywords->random(min(rand(2, 4), $keywords->count()))->pluck('id')
-                        );
-                    }
-
-                    // Attach team members (anggota are also dosen, 3-5 per proposal for PKM)
-                    $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED])
-                        ? 'pending'
-                        : 'accepted';
-
-                    $availableMembers = $dosenUsers
-                        ->where('id', '!=', $submitter->id)
-                        ->random(min(rand(3, 5), $dosenUsers->count() - 1));
-
-                    foreach ($availableMembers as $member) {
-                        $proposal->teamMembers()->attach($member->id, [
-                            'role' => 'anggota',
-                            'status' => $teamMemberStatus,
-                            'tasks' => fake()->sentence(10),
-                        ]);
-                    }
-
-                    // Create related data for PKM
-                    // Mandatory outputs (Luaran Wajib)
-                    \App\Models\ProposalOutput::factory()->create([
-                        'proposal_id' => $proposal->id,
-                        'category' => 'Wajib',
-                        'type' => 'Video Kegiatan (Youtube/Media Sosial)',
-                        'target_status' => 'Uploaded',
-                        'output_year' => rand(1, $proposal->duration_in_years),
-                    ]);
-
-                    \App\Models\ProposalOutput::factory()->create([
-                        'proposal_id' => $proposal->id,
-                        'category' => 'Wajib',
-                        'type' => 'Publikasi Media Massa (Cetak/Elektronik)',
-                        'target_status' => 'Published',
-                        'output_year' => rand(1, $proposal->duration_in_years),
-                    ]);
-
-                    \App\Models\ProposalOutput::factory()->create([
-                        'proposal_id' => $proposal->id,
-                        'category' => 'Wajib',
-                        'type' => 'Jurnal Pengabdian Masyarakat (Sinta 1-6)',
-                        'target_status' => 'Accepted/Published',
-                        'output_year' => $proposal->duration_in_years,
-                    ]);
-
-                    // Additional outputs (Luaran Tambahan)
-                    if (rand(0, 1)) {
-                        \App\Models\ProposalOutput::factory()->create([
-                            'proposal_id' => $proposal->id,
-                            'category' => 'Tambahan',
-                            'type' => 'HKI Hak Cipta (Modul/Panduan)',
-                            'target_status' => 'Registered',
-                            'output_year' => rand(1, $proposal->duration_in_years),
-                        ]);
-                    }
-
-                    \App\Models\BudgetItem::factory(rand(4, 7))->create([
-                        'proposal_id' => $proposal->id,
-                        'year' => rand(1, $proposal->duration_in_years),
-                    ]);
-                    \App\Models\ActivitySchedule::factory(rand(8, 15))->create([
-                        'proposal_id' => $proposal->id,
-                        'year' => rand(1, $proposal->duration_in_years),
-                    ]);
-
-                    // Create reviewers based on proposal status
-                    if (in_array($statusEnum, [
-                        ProposalStatus::UNDER_REVIEW,
-                        ProposalStatus::REVIEWED,
-                        ProposalStatus::REVISION_NEEDED,
-                        ProposalStatus::COMPLETED,
-                    ])) {
-                        $excludedIds = $availableMembers->pluck('id')->push($submitter->id)->toArray();
-                        $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
-
-                        if ($potentialReviewers->isNotEmpty()) {
-                            $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
-                            $isMultiRound = in_array($statusEnum, [ProposalStatus::COMPLETED]) && fake()->boolean(30); // 30% chance of multi-round
-                            $round = $isMultiRound ? rand(2, 3) : 1;
-
-                            $assignedAt = $proposal->created_at->addDays(3);
-                            $deadlineAt = $assignedAt->copy()->addDays(14);
-
-                            foreach ($reviewers as $reviewer) {
-                                // Determine reviewer status based on proposal status
-                                if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW])) {
-                                    // Under review: reviewers are pending
-                                    \App\Models\ProposalReviewer::create([
-                                        'proposal_id' => $proposal->id,
-                                        'user_id' => $reviewer->id,
-                                        'status' => 'pending',
-                                        'review_notes' => null,
-                                        'recommendation' => null,
-                                        'round' => 1,
-                                        'assigned_at' => $assignedAt,
-                                        'deadline_at' => $deadlineAt,
-                                    ]);
-                                } elseif (in_array($statusEnum, [ProposalStatus::REVIEWED, ProposalStatus::COMPLETED, ProposalStatus::REVISION_NEEDED])) {
-                                    // Reviewed: reviewers completed
-                                    $startedAt = $assignedAt->copy()->addDays(rand(1, 7));
-                                    $completedAt = $startedAt->copy()->addDays(rand(3, 10));
-
-                                    // For multi-round, simulate revision cycle
-                                    if ($round > 1) {
-                                        $revisionCompletedAt = $completedAt->copy()->addDays(rand(7, 14));
-                                        $completedAt = $revisionCompletedAt->copy()->addDays(rand(3, 7));
-                                    }
-
-                                    \App\Models\ProposalReviewer::create([
-                                        'proposal_id' => $proposal->id,
-                                        'user_id' => $reviewer->id,
-                                        'status' => 'completed',
-                                        'review_notes' => fake()->paragraph(5),
-                                        'recommendation' => fake()->randomElement(['approved', 'revision_needed', 'rejected']),
-                                        'round' => $round,
-                                        'assigned_at' => $assignedAt,
-                                        'deadline_at' => $deadlineAt,
-                                        'started_at' => $startedAt,
-                                        'completed_at' => $completedAt,
-                                    ]);
-                                }
-                            }
-                        }
-                    }
-
-                    // $this->command->line("✓ Proposal pengabdian masyarakat dibuat: {$proposal->title} (Status: {$statusEnum->label()})");
+                // Reports
+                if (in_array($statusEnum, [ProposalStatus::REVIEWED, ProposalStatus::COMPLETED])) {
+                    $this->seedReports($proposal, $mandatoryTarget, $submitter);
                 }
             }
         }
 
-        $totalPkamProposals = Proposal::where('detailable_type', CommunityService::class)->count();
-        $this->command->info("Total proposal pengabdian masyarakat berhasil dibuat: {$totalPkamProposals}");
+        $this->command->info('CommunityServiceSeeder completed successfully.');
     }
 
-    /**
-     * Create comprehensive status log history based on final status
-     */
-    protected function createStatusLogHistory(
-        Proposal $proposal,
-        ProposalStatus $finalStatus,
-        User $submitter,
-        \Illuminate\Database\Eloquent\Collection $dosenUsers
-    ): void {
-        $logs = [];
-        $baseTime = $proposal->created_at->copy();
+    protected function seedReviewers($proposal, $status, $dosenUsers, $submitter, $teamMembers): void
+    {
+        $excludedIds = $teamMembers->pluck('id')->push($submitter->id)->toArray();
+        $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
+        if ($potentialReviewers->isEmpty()) return;
 
-        // Get users for different roles
-        $dekan = $dosenUsers->firstWhere('id', '!=', $submitter->id) ?? $dosenUsers->first();
-        $kepalaLppm = $dosenUsers->random(1)->first();
-        $adminLppm = $dosenUsers->random(1)->first();
+        $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
+        
+        // Find assignment date from logs
+        $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at') 
+                      ?? $proposal->created_at->addDays(3);
 
-        // Define transition paths based on final status
-        $transitions = match ($finalStatus) {
+        foreach ($reviewers as $reviewer) {
+            $isCompleted = ($status !== ProposalStatus::UNDER_REVIEW);
+            ProposalReviewer::create([
+                'proposal_id' => $proposal->id,
+                'user_id' => $reviewer->id,
+                'status' => $isCompleted ? 'completed' : 'pending',
+                'review_notes' => $isCompleted ? fake()->paragraph(3) : null,
+                'recommendation' => $isCompleted ? ($status === ProposalStatus::REVISION_NEEDED ? 'revision_needed' : 'approved') : null,
+                'round' => 1,
+                'assigned_at' => $assignedAt,
+                'started_at' => $isCompleted ? Carbon::parse($assignedAt)->addDays(1) : null,
+                'completed_at' => $isCompleted ? Carbon::parse($assignedAt)->addDays(4) : null,
+                'deadline_at' => Carbon::parse($assignedAt)->addDays(14),
+            ]);
+        }
+    }
+
+    protected function seedReports($proposal, $mandatoryTarget, $submitter): void
+    {
+        $completionDate = $proposal->statusLogs()->where('status_after', ProposalStatus::COMPLETED)->value('at') 
+                          ?? $proposal->statusLogs()->where('status_after', ProposalStatus::REVIEWED)->value('at')
+                          ?? Carbon::now();
+
+        $report = ProgressReport::create([
+            'proposal_id' => $proposal->id,
+            'reporting_year' => date('Y'),
+            'reporting_period' => 'semester_1',
+            'status' => 'submitted',
+            'summary_update' => fake()->paragraph(2),
+            'submitted_by' => $submitter->id,
+            'submitted_at' => Carbon::parse($completionDate)->addDays(10),
+        ]);
+
+        MandatoryOutput::create([
+            'progress_report_id' => $report->id,
+            'proposal_output_id' => $mandatoryTarget->id,
+            'status_type' => 'published',
+            'video_url' => 'https://youtube.com/watch?v=' . fake()->uuid,
+            'platform' => 'YouTube',
+            'publication_year' => date('Y'),
+            'journal_title' => '-', // Dummy to satisfy DB
+            'article_title' => 'Video Kegiatan: ' . $proposal->title, // Satisfy DB
+        ]);
+    }
+
+    protected function createStatusLogHistory($proposal, $finalStatus, $submitter, $dekanUsers, $kepalaLppm, $adminLppm): void
+    {
+        $baseTime = Carbon::parse($proposal->created_at);
+        $facultyId = $submitter->identity?->faculty_id;
+        $dekan = $dekanUsers->first(fn($u) => $u->identity?->faculty_id === $facultyId) ?? $dekanUsers->first();
+
+        $path = match ($finalStatus) {
             ProposalStatus::DRAFT => [],
-            ProposalStatus::SUBMITTED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-            ],
+            ProposalStatus::SUBMITTED => [['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0]],
             ProposalStatus::APPROVED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
             ],
             ProposalStatus::WAITING_REVIEWER => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
             ],
             ProposalStatus::UNDER_REVIEW => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
             ],
             ProposalStatus::REVIEWED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
-                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4], // Auto-transition
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
+                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 12],
             ],
             ProposalStatus::REVISION_NEEDED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
-                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4],
-                ['from' => ProposalStatus::REVIEWED, 'to' => ProposalStatus::REVISION_NEEDED, 'user' => $kepalaLppm, 'offset' => 5],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
+                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 12],
+                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::REVISION_NEEDED, 'u' => $kepalaLppm, 'd' => 13],
             ],
             ProposalStatus::COMPLETED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
-                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4],
-                ['from' => ProposalStatus::REVIEWED, 'to' => ProposalStatus::COMPLETED, 'user' => $kepalaLppm, 'offset' => 5],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
+                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 12],
+                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::COMPLETED, 'u' => $kepalaLppm, 'd' => 15],
             ],
             ProposalStatus::REJECTED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::REJECTED, 'user' => $dekan, 'offset' => 1],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::REJECTED, 'u' => $dekan, 'd' => 2],
             ],
+            default => []
         };
 
-        // Create logs with appropriate timestamps
-        foreach ($transitions as $transition) {
-            $transitionTime = $baseTime->copy()->addDays($transition['offset']);
-
-            // For auto-transitions (user is null), use admin LPPM
-            $userId = $transition['user']?->id ?? $adminLppm->id;
-
+        foreach ($path as $step) {
             ProposalStatusLog::create([
                 'proposal_id' => $proposal->id,
-                'user_id' => $userId,
-                'status_before' => $transition['from'],
-                'status_after' => $transition['to'],
-                'at' => $transitionTime,
+                'user_id' => $step['u']?->id ?? $adminLppm->id,
+                'status_before' => $step['f'],
+                'status_after' => $step['t'],
+                'at' => $baseTime->copy()->addDays($step['d']),
             ]);
         }
     }

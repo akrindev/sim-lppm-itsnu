@@ -22,6 +22,7 @@ use App\Models\ScienceCluster;
 use App\Models\Theme;
 use App\Models\Topic;
 use App\Models\User;
+use App\Services\ProposalService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -530,5 +531,24 @@ class ProposalWorkflowTest extends TestCase
         $this->assertEquals(ReviewStatus::RE_REVIEW_REQUESTED, $review->fresh()->status);
         $this->assertEquals(2, $review->fresh()->round);
         $this->assertNull($review->fresh()->review_notes);
+    }
+
+    public function test_cannot_delete_proposal_if_not_draft()
+    {
+        $research = Research::factory()->create();
+        $proposal = Proposal::factory()->create([
+            'submitter_id' => $this->dosen->id,
+            'detailable_id' => $research->id,
+            'detailable_type' => Research::class,
+            'status' => ProposalStatus::SUBMITTED,
+        ]);
+
+        $this->actingAs($this->dosen);
+        $proposalService = app(ProposalService::class);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Hanya proposal dengan status draft yang dapat dihapus.');
+
+        $proposalService->deleteProposal($proposal);
     }
 }

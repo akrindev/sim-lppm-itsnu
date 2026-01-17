@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Abstracts;
 
+use App\Enums\ProposalStatus;
 use App\Livewire\Forms\ProposalForm;
 use App\Livewire\Traits\WithApproval;
 use App\Livewire\Traits\WithTeamManagement;
@@ -44,6 +45,10 @@ abstract class ProposalShow extends Component
 
     public function delete(): void
     {
+        if (! $this->canDelete) {
+            abort(403, 'Hanya proposal dengan status draft yang dapat dihapus.');
+        }
+
         $this->proposalService->deleteProposal($this->proposal);
 
         $this->redirectRoute($this->getIndexRoute());
@@ -74,13 +79,13 @@ abstract class ProposalShow extends Component
     #[Computed]
     public function canEdit(): bool
     {
-        return $this->proposal->status?->value === 'draft';
+        return $this->proposal->status === ProposalStatus::DRAFT;
     }
 
     #[Computed]
     public function canDelete(): bool
     {
-        return $this->proposal->status?->value === 'draft';
+        return $this->proposal->status === ProposalStatus::DRAFT;
     }
 
     public function render()

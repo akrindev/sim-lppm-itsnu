@@ -35,6 +35,10 @@ class ProposalService
 
     public function deleteProposal(Proposal $proposal): void
     {
+        if ($proposal->status !== ProposalStatus::DRAFT) {
+            throw new \Exception('Hanya proposal dengan status draft yang dapat dihapus.');
+        }
+
         DB::transaction(function () use ($proposal) {
             $proposal->teamMembers()->detach();
             $proposal->detailable?->delete();

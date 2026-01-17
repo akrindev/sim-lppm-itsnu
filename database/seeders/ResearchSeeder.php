@@ -3,22 +3,29 @@
 namespace Database\Seeders;
 
 use App\Enums\ProposalStatus;
+use App\Models\DailyNote;
+use App\Models\MandatoryOutput;
+use App\Models\ProgressReport;
 use App\Models\Proposal;
+use App\Models\ProposalReviewer;
 use App\Models\ProposalStatusLog;
 use App\Models\Research;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class ResearchSeeder extends Seeder
 {
     public function run(): void
     {
-        // Retrieve all dosen users by role
+        // Retrieve all necessary roles
         $dosenUsers = User::role('dosen')->get();
+        $dekanUsers = User::role('dekan')->get();
+        $kepalaLppm = User::role('kepala lppm')->first();
+        $adminLppm = User::role('admin lppm')->first();
 
         if ($dosenUsers->count() < 2) {
             $this->command->warn('Tidak cukup dosen untuk membuat proposal penelitian');
-
             return;
         }
 
@@ -28,15 +35,12 @@ class ResearchSeeder extends Seeder
         $themes = \App\Models\Theme::all();
         $topics = \App\Models\Topic::all();
         $nationalPriorities = \App\Models\NationalPriority::all();
-        $scienceClusters = \App\Models\ScienceCluster::where('level', 1)->get();
 
         if ($keywords->isEmpty() || $researchSchemes->isEmpty() || $focusAreas->isEmpty()) {
             $this->command->warn('Master data tidak lengkap untuk membuat proposal');
-
             return;
         }
 
-        // Indonesian research titles organized by category
         $researchTitles = [
             'Artificial Intelligence & Machine Learning' => [
                 'Pengembangan Model Machine Learning untuk Prediksi Penyakit Berbasis Data Klinis',
@@ -70,10 +74,8 @@ class ResearchSeeder extends Seeder
             ],
         ];
 
-        // Flatten titles array
         $flatTitles = array_reduce($researchTitles, fn ($carry, $category) => array_merge($carry, $category), []);
 
-        // Valid initial statuses
         $validStatuses = [
             ProposalStatus::DRAFT,
             ProposalStatus::SUBMITTED,
@@ -85,263 +87,287 @@ class ResearchSeeder extends Seeder
             ProposalStatus::COMPLETED,
             ProposalStatus::REJECTED,
         ];
+
         $titleIndex = 0;
 
-        // For each dosen, create proposals covering valid statuses
-        foreach ($dosenUsers as $dosenIndex => $submitter) {
+        foreach ($dosenUsers->take(5) as $submitter) {
             foreach ($validStatuses as $statusEnum) {
-                // Create 2 proposals for each status
-                for ($proposalCount = 0; $proposalCount < 2; $proposalCount++) {
-                    // Select focus area and related data
-                    $focusArea = $focusAreas->random();
-                    $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
-                    $topic = $topics->where('theme_id', $theme->id)->first() ?? $topics->random();
+                // Determine TKT based on scheme strata
+                $scheme = $researchSchemes->random();
+                $tktTarget = match ($scheme->strata) {
+                    'Dasar' => rand(1, 3),
+                    'Terapan' => rand(4, 6),
+                    'Pengembangan' => rand(7, 9),
+                    default => rand(1, 3)
+                };
 
-                    // Select a valid hierarchical science cluster
-                    $cluster3 = \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first();
-                    $cluster2 = $cluster3 ? \App\Models\ScienceCluster::find($cluster3->parent_id) : null;
-                    $cluster1 = $cluster2 ? \App\Models\ScienceCluster::find($cluster2->parent_id) : null;
+                $focusArea = $focusAreas->random();
+                $theme = $themes->where('focus_area_id', $focusArea->id)->first() ?? $themes->random();
+                $topic = $topics->where('theme_id', $theme->id)->first() ?? $topics->random();
 
-                    // Create Research detail first
-                    $research = Research::factory()->create();
+                $cluster3 = \App\Models\ScienceCluster::where('level', 3)->inRandomOrder()->first();
+                $cluster2 = $cluster3 ? \App\Models\ScienceCluster::find($cluster3->parent_id) : null;
+                $cluster1 = $cluster2 ? \App\Models\ScienceCluster::find($cluster2->parent_id) : null;
 
-                    // Create title (cycle through available titles)
-                    $title = $flatTitles[$titleIndex % count($flatTitles)];
-                    $titleIndex++;
+                // Base Date: 40 days ago
+                $baseCreatedAt = Carbon::now()->subDays(40)->addHours(rand(1, 23));
 
-                    // Create Proposal with Research polymorphic relationship
-                    $proposal = Proposal::factory()->create([
-                        'title' => $title,
-                        'detailable_type' => Research::class,
-                        'detailable_id' => $research->id,
-                        'submitter_id' => $submitter->id,
-                        'research_scheme_id' => $researchSchemes->random()->id,
-                        'focus_area_id' => $focusArea->id,
-                        'theme_id' => $theme->id,
-                        'topic_id' => $topic->id,
-                        'national_priority_id' => $nationalPriorities->isNotEmpty() ? $nationalPriorities->random()->id : null,
-                        'cluster_level1_id' => $cluster1?->id,
-                        'cluster_level2_id' => $cluster2?->id,
-                        'cluster_level3_id' => $cluster3?->id,
-                        'status' => $statusEnum,
-                        'duration_in_years' => rand(1, 3),
-                        'start_year' => (int) date('Y'),
-                        'sbk_value' => rand(50, 300) * 1000000, // 50-300 juta
-                        'summary' => fake()->paragraph(3),
+                $research = Research::factory()->create([
+                    'macro_research_group_id' => \App\Models\MacroResearchGroup::inRandomOrder()->first()?->id,
+                    'created_at' => $baseCreatedAt,
+                    'updated_at' => $baseCreatedAt,
+                ]);
+
+                // Attach TKT Level
+                $tktLevel = \App\Models\TktLevel::where('level', $tktTarget)->first();
+                if ($tktLevel) {
+                    $research->tktLevels()->attach($tktLevel->id, ['percentage' => 100]);
+                }
+
+                $title = $flatTitles[$titleIndex % count($flatTitles)];
+                $titleIndex++;
+
+                $proposal = Proposal::factory()->create([
+                    'title' => $title,
+                    'detailable_type' => Research::class,
+                    'detailable_id' => $research->id,
+                    'submitter_id' => $submitter->id,
+                    'research_scheme_id' => $scheme->id,
+                    'focus_area_id' => $focusArea->id,
+                    'theme_id' => $theme->id,
+                    'topic_id' => $topic->id,
+                    'national_priority_id' => $nationalPriorities->isNotEmpty() ? $nationalPriorities->random()->id : null,
+                    'cluster_level1_id' => $cluster1?->id,
+                    'cluster_level2_id' => $cluster2?->id,
+                    'cluster_level3_id' => $cluster3?->id,
+                    'status' => $statusEnum,
+                    'duration_in_years' => rand(1, 3),
+                    'start_year' => (int) date('Y'),
+                    'sbk_value' => rand(50, 300) * 1000000,
+                    'summary' => fake()->paragraph(3),
+                    'created_at' => $baseCreatedAt,
+                    'updated_at' => $baseCreatedAt,
+                ]);
+
+                // Create Status Log History (Sequential)
+                $this->createStatusLogHistory($proposal, $statusEnum, $submitter, $dekanUsers, $kepalaLppm, $adminLppm);
+
+                // Update proposal updated_at to match last log
+                $lastLog = $proposal->statusLogs()->latest('at')->first();
+                if ($lastLog) {
+                    $proposal->update(['updated_at' => $lastLog->at]);
+                }
+
+                // Team Members (Ketua + Members)
+                $proposal->teamMembers()->attach($submitter->id, [
+                    'role' => 'ketua',
+                    'status' => 'accepted',
+                    'tasks' => 'Penanggung jawab utama penelitian.',
+                    'created_at' => $baseCreatedAt,
+                    'updated_at' => $baseCreatedAt,
+                ]);
+
+                $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED]) ? 'pending' : 'accepted';
+                $availableMembers = $dosenUsers->where('id', '!=', $submitter->id)->random(min(rand(1, 2), $dosenUsers->count() - 1));
+
+                foreach ($availableMembers as $member) {
+                    $proposal->teamMembers()->attach($member->id, [
+                        'role' => 'anggota',
+                        'status' => $teamMemberStatus,
+                        'tasks' => fake()->sentence(10),
+                        'created_at' => $baseCreatedAt,
+                        'updated_at' => $baseCreatedAt,
                     ]);
+                }
 
-                    // Create comprehensive status log history based on final status
-                    $this->createStatusLogHistory($proposal, $statusEnum, $submitter, $dosenUsers);
+                // Targets
+                $mandatoryTarget = \App\Models\ProposalOutput::factory()->create([
+                    'proposal_id' => $proposal->id,
+                    'category' => 'Wajib',
+                    'type' => $scheme->strata === 'Terapan' ? 'Purwarupa/Prototipe' : 'Jurnal Nasional Sinta 1-2',
+                    'target_status' => 'Published',
+                    'output_year' => $proposal->duration_in_years,
+                ]);
 
-                    // Attach keywords (3-5 per proposal)
-                    if ($keywords->isNotEmpty()) {
-                        $proposal->keywords()->attach(
-                            $keywords->random(min(rand(3, 5), $keywords->count()))->pluck('id')
-                        );
-                    }
+                $additionalTarget = \App\Models\ProposalOutput::factory()->create([
+                    'proposal_id' => $proposal->id,
+                    'category' => 'Tambahan',
+                    'type' => 'Prosiding Seminar Internasional',
+                    'target_status' => 'Accepted',
+                    'output_year' => 1,
+                ]);
 
-                    // Attach team members (anggota are also dosen, 2-4 per proposal)
-                    $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED])
-                        ? 'pending'
-                        : 'accepted';
+                // Reviewers & Rounds
+                if (in_array($statusEnum, [
+                    ProposalStatus::UNDER_REVIEW,
+                    ProposalStatus::REVIEWED,
+                    ProposalStatus::REVISION_NEEDED,
+                    ProposalStatus::COMPLETED,
+                ])) {
+                    $this->seedReviewers($proposal, $statusEnum, $dosenUsers, $submitter, $availableMembers);
+                }
 
-                    $availableMembers = $dosenUsers
-                        ->where('id', '!=', $submitter->id)
-                        ->random(min(rand(2, 4), $dosenUsers->count() - 1));
+                // Progress Reports & Realization
+                if (in_array($statusEnum, [ProposalStatus::REVIEWED, ProposalStatus::COMPLETED])) {
+                    $this->seedReports($proposal, $mandatoryTarget, $submitter);
+                }
 
-                    foreach ($availableMembers as $member) {
-                        $proposal->teamMembers()->attach($member->id, [
-                            'role' => 'anggota',
-                            'status' => $teamMemberStatus,
-                            'tasks' => fake()->sentence(10),
-                        ]);
-                    }
-
-                    // Create related data
-                    // Mandatory outputs (Luaran Wajib)
-                    \App\Models\ProposalOutput::factory()->create([
-                        'proposal_id' => $proposal->id,
-                        'category' => 'Wajib',
-                        'type' => $proposal->researchScheme->strata === 'Terapan'
-                            ? 'Purwarupa/Prototipe TRL 4-6'
-                            : 'Jurnal Nasional Terakreditasi (Sinta 1-2)',
-                        'target_status' => 'Accepted/Published',
-                        'output_year' => $proposal->duration_in_years,
-                    ]);
-
-                    // Additional outputs (Luaran Tambahan)
-                    \App\Models\ProposalOutput::factory(rand(1, 2))->create([
-                        'proposal_id' => $proposal->id,
-                        'category' => 'Tambahan',
-                        'output_year' => rand(1, $proposal->duration_in_years),
-                    ]);
-
-                    \App\Models\BudgetItem::factory(rand(5, 8))->create([
-                        'proposal_id' => $proposal->id,
-                        'year' => rand(1, $proposal->duration_in_years),
-                    ]);
-                    \App\Models\ActivitySchedule::factory(rand(6, 12))->create([
-                        'proposal_id' => $proposal->id,
-                        'year' => rand(1, $proposal->duration_in_years),
-                    ]);
-
-                    // Create research stages with team members as person in charge
-                    if ($availableMembers->isNotEmpty()) {
-                        \App\Models\ResearchStage::factory(rand(2, 4))->create([
+                // Daily Notes (Must be after approval/completion)
+                if ($statusEnum === ProposalStatus::COMPLETED) {
+                    $approvalDate = $proposal->statusLogs()->where('status_after', ProposalStatus::APPROVED)->value('at') ?? $baseCreatedAt;
+                    for ($i = 0; $i < 5; $i++) {
+                        DailyNote::create([
                             'proposal_id' => $proposal->id,
-                            'person_in_charge_id' => $availableMembers->random()->id,
+                            'activity_date' => Carbon::parse($approvalDate)->addDays(rand(1, 20)),
+                            'activity_description' => fake()->sentence(20),
+                            'progress_percentage' => ($i + 1) * 20,
                         ]);
                     }
-
-                    // Create reviewers based on proposal status
-                    if (in_array($statusEnum, [
-                        ProposalStatus::UNDER_REVIEW,
-                        ProposalStatus::REVIEWED,
-                        ProposalStatus::REVISION_NEEDED,
-                        ProposalStatus::COMPLETED,
-                    ])) {
-                        $excludedIds = $availableMembers->pluck('id')->push($submitter->id)->toArray();
-                        $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
-
-                        if ($potentialReviewers->isNotEmpty()) {
-                            $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
-                            $isMultiRound = in_array($statusEnum, [ProposalStatus::COMPLETED]) && fake()->boolean(30); // 30% chance of multi-round
-                            $round = $isMultiRound ? rand(2, 3) : 1;
-
-                            $assignedAt = $proposal->created_at->addDays(3);
-                            $deadlineAt = $assignedAt->copy()->addDays(14);
-
-                            foreach ($reviewers as $reviewer) {
-                                // Determine reviewer status based on proposal status
-                                if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW])) {
-                                    // Under review: reviewers are pending
-                                    \App\Models\ProposalReviewer::create([
-                                        'proposal_id' => $proposal->id,
-                                        'user_id' => $reviewer->id,
-                                        'status' => 'pending',
-                                        'review_notes' => null,
-                                        'recommendation' => null,
-                                        'round' => 1,
-                                        'assigned_at' => $assignedAt,
-                                        'deadline_at' => $deadlineAt,
-                                    ]);
-                                } elseif (in_array($statusEnum, [ProposalStatus::REVIEWED, ProposalStatus::COMPLETED, ProposalStatus::REVISION_NEEDED])) {
-                                    // Reviewed: reviewers completed
-                                    $startedAt = $assignedAt->copy()->addDays(rand(1, 7));
-                                    $completedAt = $startedAt->copy()->addDays(rand(3, 10));
-
-                                    // For multi-round, simulate revision cycle
-                                    if ($round > 1) {
-                                        $revisionCompletedAt = $completedAt->copy()->addDays(rand(7, 14));
-                                        $completedAt = $revisionCompletedAt->copy()->addDays(rand(3, 7));
-                                    }
-
-                                    \App\Models\ProposalReviewer::create([
-                                        'proposal_id' => $proposal->id,
-                                        'user_id' => $reviewer->id,
-                                        'status' => 'completed',
-                                        'review_notes' => fake()->paragraph(5),
-                                        'recommendation' => fake()->randomElement(['approved', 'revision_needed', 'rejected']),
-                                        'round' => $round,
-                                        'assigned_at' => $assignedAt,
-                                        'deadline_at' => $deadlineAt,
-                                        'started_at' => $startedAt,
-                                        'completed_at' => $completedAt,
-                                    ]);
-                                }
-                            }
-                        }
-                    }
-
-                    // $this->command->line("✓ Proposal penelitian dibuat: {$proposal->title} (Status: {$statusEnum->label()})");
                 }
             }
         }
 
-        $totalResearchProposals = Proposal::where('detailable_type', Research::class)->count();
-        $this->command->info("Total proposal penelitian berhasil dibuat: {$totalResearchProposals}");
+        $this->command->info('ResearchSeeder completed successfully.');
     }
 
-    /**
-     * Create comprehensive status log history based on final status
-     */
-    protected function createStatusLogHistory(
-        Proposal $proposal,
-        ProposalStatus $finalStatus,
-        User $submitter,
-        \Illuminate\Database\Eloquent\Collection $dosenUsers
-    ): void {
-        $logs = [];
-        $baseTime = $proposal->created_at->copy();
+    protected function seedReviewers($proposal, $status, $dosenUsers, $submitter, $teamMembers): void
+    {
+        $excludedIds = $teamMembers->pluck('id')->push($submitter->id)->toArray();
+        $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
+        
+        if ($potentialReviewers->isEmpty()) return;
 
-        // Get users for different roles
-        $dekan = $dosenUsers->firstWhere('id', '!=', $submitter->id) ?? $dosenUsers->first();
-        $kepalaLppm = $dosenUsers->random(1)->first();
-        $adminLppm = $dosenUsers->random(1)->first();
+        $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
+        $round = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
+        
+        // Find assignment date from logs
+        $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at') 
+                      ?? $proposal->created_at->addDays(3);
 
-        // Define transition paths based on final status
-        $transitions = match ($finalStatus) {
+        foreach ($reviewers as $reviewer) {
+            $isCompleted = ($status !== ProposalStatus::UNDER_REVIEW);
+            
+            ProposalReviewer::create([
+                'proposal_id' => $proposal->id,
+                'user_id' => $reviewer->id,
+                'status' => $isCompleted ? 'completed' : 'pending',
+                'review_notes' => $isCompleted ? fake()->paragraph(3) : null,
+                'recommendation' => $isCompleted ? ($status === ProposalStatus::REVISION_NEEDED ? 'revision_needed' : 'approved') : null,
+                'round' => $round,
+                'assigned_at' => $assignedAt,
+                'started_at' => $isCompleted ? Carbon::parse($assignedAt)->addDays(1) : null,
+                'completed_at' => $isCompleted ? Carbon::parse($assignedAt)->addDays(4) : null,
+                'deadline_at' => Carbon::parse($assignedAt)->addDays(14),
+            ]);
+        }
+    }
+
+    protected function seedReports($proposal, $mandatoryTarget, $submitter): void
+    {
+        $completionDate = $proposal->statusLogs()->where('status_after', ProposalStatus::COMPLETED)->value('at') 
+                          ?? $proposal->statusLogs()->where('status_after', ProposalStatus::REVIEWED)->value('at')
+                          ?? Carbon::now();
+
+        // Semester 1 Report (10 days after completion/review)
+        $report = ProgressReport::create([
+            'proposal_id' => $proposal->id,
+            'reporting_year' => date('Y'),
+            'reporting_period' => 'semester_1',
+            'status' => 'submitted',
+            'summary_update' => fake()->paragraph(2),
+            'submitted_by' => $submitter->id,
+            'submitted_at' => Carbon::parse($completionDate)->addDays(10),
+        ]);
+
+        // Realize Mandatory Output
+        MandatoryOutput::create([
+            'progress_report_id' => $report->id,
+            'proposal_output_id' => $mandatoryTarget->id,
+            'status_type' => 'published',
+            'journal_title' => 'International Journal of AI',
+            'article_title' => 'Advanced implementation of ' . $proposal->title,
+            'publication_year' => date('Y'),
+            'volume' => '12',
+            'issue_number' => '3',
+            'doi' => '10.1234/ai.' . rand(100, 999),
+        ]);
+
+        if ($proposal->status === ProposalStatus::COMPLETED) {
+            // Final Report (20 days after completion)
+            ProgressReport::create([
+                'proposal_id' => $proposal->id,
+                'reporting_year' => date('Y'),
+                'reporting_period' => 'final',
+                'status' => 'submitted',
+                'summary_update' => 'Penelitian telah diselesaikan dengan hasil memuaskan.',
+                'submitted_by' => $submitter->id,
+                'submitted_at' => Carbon::parse($completionDate)->addDays(20),
+            ]);
+        }
+    }
+
+    protected function createStatusLogHistory($proposal, $finalStatus, $submitter, $dekanUsers, $kepalaLppm, $adminLppm): void
+    {
+        $baseTime = Carbon::parse($proposal->created_at);
+        $facultyId = $submitter->identity?->faculty_id;
+        $dekan = $dekanUsers->first(fn($u) => $u->identity?->faculty_id === $facultyId) ?? $dekanUsers->first();
+
+        $path = match ($finalStatus) {
             ProposalStatus::DRAFT => [],
             ProposalStatus::SUBMITTED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0]
             ],
             ProposalStatus::APPROVED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2]
             ],
             ProposalStatus::WAITING_REVIEWER => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4]
             ],
             ProposalStatus::UNDER_REVIEW => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5]
             ],
             ProposalStatus::REVIEWED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
-                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4], // Auto-transition
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
+                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 15]
             ],
             ProposalStatus::REVISION_NEEDED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
-                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4],
-                ['from' => ProposalStatus::REVIEWED, 'to' => ProposalStatus::REVISION_NEEDED, 'user' => $kepalaLppm, 'offset' => 5],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
+                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 15],
+                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::REVISION_NEEDED, 'u' => $kepalaLppm, 'd' => 16]
             ],
             ProposalStatus::COMPLETED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::APPROVED, 'user' => $dekan, 'offset' => 1],
-                ['from' => ProposalStatus::APPROVED, 'to' => ProposalStatus::WAITING_REVIEWER, 'user' => $kepalaLppm, 'offset' => 2],
-                ['from' => ProposalStatus::WAITING_REVIEWER, 'to' => ProposalStatus::UNDER_REVIEW, 'user' => $adminLppm, 'offset' => 3],
-                ['from' => ProposalStatus::UNDER_REVIEW, 'to' => ProposalStatus::REVIEWED, 'user' => null, 'offset' => 4],
-                ['from' => ProposalStatus::REVIEWED, 'to' => ProposalStatus::COMPLETED, 'user' => $kepalaLppm, 'offset' => 5],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
+                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 15],
+                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::COMPLETED, 'u' => $kepalaLppm, 'd' => 18]
             ],
             ProposalStatus::REJECTED => [
-                ['from' => ProposalStatus::DRAFT, 'to' => ProposalStatus::SUBMITTED, 'user' => $submitter, 'offset' => 0],
-                ['from' => ProposalStatus::SUBMITTED, 'to' => ProposalStatus::REJECTED, 'user' => $dekan, 'offset' => 1],
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::REJECTED, 'u' => $dekan, 'd' => 2]
             ],
         };
 
-        // Create logs with appropriate timestamps
-        foreach ($transitions as $transition) {
-            $transitionTime = $baseTime->copy()->addDays($transition['offset']);
-
-            // For auto-transitions (user is null), use admin LPPM
-            $userId = $transition['user']?->id ?? $adminLppm->id;
-
+        foreach ($path as $step) {
             ProposalStatusLog::create([
                 'proposal_id' => $proposal->id,
-                'user_id' => $userId,
-                'status_before' => $transition['from'],
-                'status_after' => $transition['to'],
-                'at' => $transitionTime,
+                'user_id' => $step['u']?->id ?? $adminLppm->id,
+                'status_before' => $step['f'],
+                'status_after' => $step['t'],
+                'at' => $baseTime->copy()->addDays($step['d']),
             ]);
         }
     }
