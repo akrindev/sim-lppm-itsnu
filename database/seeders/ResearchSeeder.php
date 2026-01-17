@@ -252,16 +252,18 @@ class ResearchSeeder extends Seeder
 
         foreach ($groups as $group) {
             $components = BudgetComponent::where('budget_group_id', $group->id)->inRandomOrder()->take(2)->get();
-            
+
             foreach ($components as $component) {
                 $targetPercentage = $group->percentage / 2 / 100; // Divide group percentage by number of components
                 $amount = round($totalSbk * $targetPercentage);
-                
+
                 if ($amount > $remainingBudget) {
                     $amount = $remainingBudget;
                 }
 
-                if ($amount <= 0) continue;
+                if ($amount <= 0) {
+                    continue;
+                }
 
                 BudgetItem::create([
                     'proposal_id' => $proposal->id,
@@ -270,7 +272,7 @@ class ResearchSeeder extends Seeder
                     'budget_component_id' => $component->id,
                     'group' => $group->name,
                     'component' => $component->name,
-                    'item_description' => 'Kebutuhan ' . $component->name,
+                    'item_description' => 'Kebutuhan '.$component->name,
                     'volume' => 1,
                     'unit_price' => $amount,
                     'total_price' => $amount,

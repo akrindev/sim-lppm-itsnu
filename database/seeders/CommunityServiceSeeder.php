@@ -223,7 +223,7 @@ class CommunityServiceSeeder extends Seeder
                     'budget_component_id' => $component->id,
                     'group' => $group->name,
                     'component' => $component->name,
-                    'item_description' => 'Kebutuhan ' . $component->name,
+                    'item_description' => 'Kebutuhan '.$component->name,
                     'volume' => 1,
                     'unit_price' => $amount,
                     'total_price' => $amount,
