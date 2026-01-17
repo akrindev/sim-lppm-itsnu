@@ -86,8 +86,6 @@ class CompleteReviewAction
     {
         $recipients = collect()
             ->push($proposal->submitter) // Submitter
-            ->push(User::role('kepala lppm')->first()) // Kepala LPPM
-            ->push(User::role('admin lppm')->first()) // Admin LPPM
             ->merge($proposal->teamMembers) // Team Members
             ->filter(fn ($user) => $user && $user->id !== $reviewer->id) // Exclude reviewer
             ->unique('id')

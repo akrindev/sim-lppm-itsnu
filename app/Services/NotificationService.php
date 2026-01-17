@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Proposal;
-use App\Models\Research;
 use App\Models\User;
 use App\Notifications\DailySummaryReport;
 use App\Notifications\DekanApprovalDecision;
@@ -116,13 +115,8 @@ class NotificationService
         $stakeholders->push($proposal->submitter);
 
         // Add all team members
-        $stakeholders = $stakeholders->merge($proposal->teamMembers);
-
-        // Get relevant admins based on proposal type
-        if ($proposal->detailable instanceof Research) {
-            $stakeholders = $stakeholders->merge(
-                User::role(['admin lppm', 'kepala lppm'])->get()
-            );
+        if ($proposal->teamMembers) {
+            $stakeholders = $stakeholders->merge($proposal->teamMembers);
         }
 
         // Remove duplicates
@@ -185,9 +179,7 @@ class NotificationService
     {
         $recipients = collect([
             $proposal->submitter,
-        ])->merge(
-            $this->getUsersByRole(['admin lppm'])
-        )->unique('id')->values();
+        ])->unique('id')->values();
 
         $notification = new TeamInvitationAccepted($proposal, $acceptedMember, $acceptedBy);
         $this->sendToMany($recipients, $notification);
@@ -200,9 +192,7 @@ class NotificationService
     {
         $recipients = collect([
             $proposal->submitter,
-        ])->merge(
-            $this->getUsersByRole(['admin lppm'])
-        )->unique('id')->values();
+        ])->unique('id')->values();
 
         $notification = new TeamInvitationRejected($proposal, $rejectedMember, $rejectedBy);
         $this->sendToMany($recipients, $notification);
