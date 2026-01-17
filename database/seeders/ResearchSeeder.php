@@ -20,6 +20,7 @@ class ResearchSeeder extends Seeder
     {
         // Retrieve all necessary roles
         $dosenUsers = User::role('dosen')->get();
+        $reviewerUsers = User::role('reviewer')->get();
         $dekanUsers = User::role('dekan')->get();
         $kepalaLppm = User::role('kepala lppm')->first();
         $adminLppm = User::role('admin lppm')->first();
@@ -204,7 +205,7 @@ class ResearchSeeder extends Seeder
                     ProposalStatus::REVISION_NEEDED,
                     ProposalStatus::COMPLETED,
                 ])) {
-                    $this->seedReviewers($proposal, $statusEnum, $dosenUsers, $submitter, $availableMembers);
+                    $this->seedReviewers($proposal, $statusEnum, $reviewerUsers, $submitter, $availableMembers);
                 }
 
                 // Progress Reports & Realization
@@ -230,14 +231,11 @@ class ResearchSeeder extends Seeder
         $this->command->info('ResearchSeeder completed successfully.');
     }
 
-    protected function seedReviewers($proposal, $status, $dosenUsers, $submitter, $teamMembers): void
+    protected function seedReviewers($proposal, $status, $reviewerUsers, $submitter, $teamMembers): void
     {
-        $excludedIds = $teamMembers->pluck('id')->push($submitter->id)->toArray();
-        $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
-        
-        if ($potentialReviewers->isEmpty()) return;
+        if ($reviewerUsers->isEmpty()) return;
 
-        $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
+        $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
         $round = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
         
         // Find assignment date from logs

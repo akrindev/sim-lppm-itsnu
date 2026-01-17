@@ -50,7 +50,11 @@ class UserSeeder extends Seeder
                 continue;
             }
 
-            $count = $role->name === 'dosen' ? 5 : 1;
+            $count = match ($role->name) {
+                'dosen' => 5,
+                'reviewer' => 3,
+                default => 1,
+            };
 
             for ($i = 0; $i < $count; $i++) {
                 // Distribute users across faculties (cycling through available faculties)

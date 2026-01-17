@@ -18,6 +18,7 @@ class CommunityServiceSeeder extends Seeder
     public function run(): void
     {
         $dosenUsers = User::role('dosen')->get();
+        $reviewerUsers = User::role('reviewer')->get();
         $dekanUsers = User::role('dekan')->get();
         $kepalaLppm = User::role('kepala lppm')->first();
         $adminLppm = User::role('admin lppm')->first();
@@ -157,7 +158,7 @@ class CommunityServiceSeeder extends Seeder
 
                 // Reviewers
                 if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED, ProposalStatus::REVISION_NEEDED, ProposalStatus::COMPLETED])) {
-                    $this->seedReviewers($proposal, $statusEnum, $dosenUsers, $submitter, $availableMembers);
+                    $this->seedReviewers($proposal, $statusEnum, $reviewerUsers, $submitter, $availableMembers);
                 }
 
                 // Reports
@@ -170,13 +171,11 @@ class CommunityServiceSeeder extends Seeder
         $this->command->info('CommunityServiceSeeder completed successfully.');
     }
 
-    protected function seedReviewers($proposal, $status, $dosenUsers, $submitter, $teamMembers): void
+    protected function seedReviewers($proposal, $status, $reviewerUsers, $submitter, $teamMembers): void
     {
-        $excludedIds = $teamMembers->pluck('id')->push($submitter->id)->toArray();
-        $potentialReviewers = $dosenUsers->whereNotIn('id', $excludedIds);
-        if ($potentialReviewers->isEmpty()) return;
+        if ($reviewerUsers->isEmpty()) return;
 
-        $reviewers = $potentialReviewers->random(min(2, $potentialReviewers->count()));
+        $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
         
         // Find assignment date from logs
         $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at') 
