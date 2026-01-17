@@ -16,21 +16,8 @@ class InstitutionFactory extends Factory
      */
     public function definition(): array
     {
-        $institutions = [
-            'Institut Teknologi dan Sains Nahdlatul Ulama Pekalongan',
-            'Universitas Islam Negeri Walisongo Semarang',
-            'Universitas Diponegoro',
-            'Institut Teknologi Bandung',
-            'Universitas Gadjah Mada',
-            'Universitas Indonesia',
-            'Institut Teknologi Sepuluh Nopember',
-            'Universitas Airlangga',
-            'Universitas Brawijaya',
-            'Universitas Sebelas Maret',
-        ];
-
         return [
-            'name' => fake()->unique()->randomElement($institutions),
+            'name' => 'Institut Teknologi dan Sains Nahdlatul Ulama Pekalongan',
         ];
     }
 }
