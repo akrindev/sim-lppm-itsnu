@@ -10,8 +10,8 @@ use App\Models\Proposal;
 use App\Models\ProposalReviewer;
 use App\Models\ProposalStatusLog;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class CommunityServiceSeeder extends Seeder
 {
@@ -25,6 +25,7 @@ class CommunityServiceSeeder extends Seeder
 
         if ($dosenUsers->count() < 2) {
             $this->command->warn('Tidak cukup dosen untuk membuat proposal PKM');
+
             return;
         }
 
@@ -36,6 +37,7 @@ class CommunityServiceSeeder extends Seeder
 
         if ($keywords->isEmpty() || $researchSchemes->isEmpty() || $focusAreas->isEmpty()) {
             $this->command->warn('Master data tidak lengkap untuk membuat proposal PKM');
+
             return;
         }
 
@@ -60,7 +62,7 @@ class CommunityServiceSeeder extends Seeder
             ],
         ];
 
-        $flatTitles = array_reduce($pkamTitles, fn($carry, $category) => array_merge($carry, $category), []);
+        $flatTitles = array_reduce($pkamTitles, fn ($carry, $category) => array_merge($carry, $category), []);
 
         $validStatuses = [
             ProposalStatus::DRAFT,
@@ -100,7 +102,7 @@ class CommunityServiceSeeder extends Seeder
                 $titleIndex++;
 
                 $proposal = Proposal::factory()->create([
-                    'title' => 'Pengabdian Masyarakat: ' . $title,
+                    'title' => 'Pengabdian Masyarakat: '.$title,
                     'detailable_type' => CommunityService::class,
                     'detailable_id' => $communityService->id,
                     'submitter_id' => $submitter->id,
@@ -173,7 +175,9 @@ class CommunityServiceSeeder extends Seeder
 
     protected function seedReviewers($proposal, $status, $reviewerUsers, $submitter, $teamMembers): void
     {
-        if ($reviewerUsers->isEmpty()) return;
+        if ($reviewerUsers->isEmpty()) {
+            return;
+        }
 
         $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
 
@@ -218,11 +222,11 @@ class CommunityServiceSeeder extends Seeder
             'progress_report_id' => $report->id,
             'proposal_output_id' => $mandatoryTarget->id,
             'status_type' => 'published',
-            'video_url' => 'https://youtube.com/watch?v=' . fake()->uuid,
+            'video_url' => 'https://youtube.com/watch?v='.fake()->uuid,
             'platform' => 'YouTube',
             'publication_year' => date('Y'),
             'journal_title' => '-', // Dummy to satisfy DB
-            'article_title' => 'Video Kegiatan: ' . $proposal->title, // Satisfy DB
+            'article_title' => 'Video Kegiatan: '.$proposal->title, // Satisfy DB
         ]);
     }
 
@@ -230,7 +234,7 @@ class CommunityServiceSeeder extends Seeder
     {
         $baseTime = Carbon::parse($proposal->created_at);
         $facultyId = $submitter->identity?->faculty_id;
-        $dekan = $dekanUsers->first(fn($u) => $u->identity?->faculty_id === $facultyId) ?? $dekanUsers->first();
+        $dekan = $dekanUsers->first(fn ($u) => $u->identity?->faculty_id === $facultyId) ?? $dekanUsers->first();
 
         $path = match ($finalStatus) {
             ProposalStatus::DRAFT => [],

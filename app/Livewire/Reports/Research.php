@@ -2,11 +2,10 @@
 
 namespace App\Livewire\Reports;
 
-use App\Models\Proposal;
-use App\Models\MandatoryOutput;
-use App\Models\AdditionalOutput;
 use App\Enums\ProposalStatus;
-use Illuminate\Support\Arr;
+use App\Models\AdditionalOutput;
+use App\Models\MandatoryOutput;
+use App\Models\Proposal;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
@@ -56,7 +55,7 @@ class Research extends Component
             ->whereNotNull('start_year')
             ->orderBy('start_year', 'desc')
             ->pluck('start_year')
-            ->map(fn($year) => (string) $year)
+            ->map(fn ($year) => (string) $year)
             ->toArray() ?: [(string) date('Y')];
     }
 
@@ -90,7 +89,7 @@ class Research extends Component
             ],
             [
                 'label' => __('Total Anggaran'),
-                'value' => 'Rp ' . number_format($totalBudget, 0, ',', '.'),
+                'value' => 'Rp '.number_format($totalBudget, 0, ',', '.'),
                 'icon' => 'currency-dollar',
                 'variant' => 'bg-blue-lt text-blue',
             ],
@@ -114,21 +113,21 @@ class Research extends Component
             ->pluck('id');
 
         $mandatory = MandatoryOutput::query()
-            ->whereHas('progressReport', fn($q) => $q->whereIn('proposal_id', $proposalIds))
+            ->whereHas('progressReport', fn ($q) => $q->whereIn('proposal_id', $proposalIds))
             ->with('proposalOutput')
             ->get();
 
         $additional = AdditionalOutput::query()
-            ->whereHas('progressReport', fn($q) => $q->whereIn('proposal_id', $proposalIds))
+            ->whereHas('progressReport', fn ($q) => $q->whereIn('proposal_id', $proposalIds))
             ->with('proposalOutput')
             ->get();
 
         return $mandatory->concat($additional)
-            ->groupBy(fn($output) => $output->proposalOutput->category ?? 'Lainnya')
-            ->map(fn($group, $key) => [
+            ->groupBy(fn ($output) => $output->proposalOutput->category ?? 'Lainnya')
+            ->map(fn ($group, $key) => [
                 'category' => $this->translateCategory($key),
                 'count' => $group->count(),
-                'published' => $group->filter(fn($o) => in_array($o->status_type ?? $o->status, ['published', 'terbit', 'granted']))->count(),
+                'published' => $group->filter(fn ($o) => in_array($o->status_type ?? $o->status, ['published', 'terbit', 'granted']))->count(),
             ])
             ->sortByDesc('count');
     }
@@ -163,6 +162,7 @@ class Research extends Component
             ->groupBy('research_scheme_id')
             ->map(function ($proposals) {
                 $first = $proposals->first();
+
                 return [
                     'name' => $first->researchScheme->name ?? __('Tanpa Skema'),
                     'count' => $proposals->count(),
@@ -185,6 +185,7 @@ class Research extends Component
             ->groupBy('focus_area_id')
             ->map(function ($proposals) {
                 $first = $proposals->first();
+
                 return [
                     'name' => $first->focusArea->name ?? __('Lainnya'),
                     'count' => $proposals->count(),
@@ -203,9 +204,10 @@ class Research extends Component
             ->where('start_year', $this->period)
             ->with(['submitter.identity.faculty'])
             ->get()
-            ->groupBy(fn($p) => $p->submitter?->identity?->faculty_id)
+            ->groupBy(fn ($p) => $p->submitter?->identity?->faculty_id)
             ->map(function ($proposals) {
                 $first = $proposals->first();
+
                 return [
                     'name' => $first->submitter?->identity?->faculty?->name ?? __('Pusat/Lainnya'),
                     'count' => $proposals->count(),

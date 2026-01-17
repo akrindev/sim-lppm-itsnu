@@ -6,7 +6,6 @@ use App\Models\AdditionalOutput;
 use App\Models\MandatoryOutput;
 use App\Models\Proposal;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;

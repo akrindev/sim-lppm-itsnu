@@ -11,8 +11,8 @@ use App\Models\ProposalReviewer;
 use App\Models\ProposalStatusLog;
 use App\Models\Research;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ResearchSeeder extends Seeder
 {
@@ -27,6 +27,7 @@ class ResearchSeeder extends Seeder
 
         if ($dosenUsers->count() < 2) {
             $this->command->warn('Tidak cukup dosen untuk membuat proposal penelitian');
+
             return;
         }
 
@@ -39,6 +40,7 @@ class ResearchSeeder extends Seeder
 
         if ($keywords->isEmpty() || $researchSchemes->isEmpty() || $focusAreas->isEmpty()) {
             $this->command->warn('Master data tidak lengkap untuk membuat proposal');
+
             return;
         }
 
@@ -75,7 +77,7 @@ class ResearchSeeder extends Seeder
             ],
         ];
 
-        $flatTitles = array_reduce($researchTitles, fn($carry, $category) => array_merge($carry, $category), []);
+        $flatTitles = array_reduce($researchTitles, fn ($carry, $category) => array_merge($carry, $category), []);
 
         $validStatuses = [
             ProposalStatus::DRAFT,
@@ -233,7 +235,9 @@ class ResearchSeeder extends Seeder
 
     protected function seedReviewers($proposal, $status, $reviewerUsers, $submitter, $teamMembers): void
     {
-        if ($reviewerUsers->isEmpty()) return;
+        if ($reviewerUsers->isEmpty()) {
+            return;
+        }
 
         $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
         $round = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
@@ -283,11 +287,11 @@ class ResearchSeeder extends Seeder
             'proposal_output_id' => $mandatoryTarget->id,
             'status_type' => 'published',
             'journal_title' => 'International Journal of AI',
-            'article_title' => 'Advanced implementation of ' . $proposal->title,
+            'article_title' => 'Advanced implementation of '.$proposal->title,
             'publication_year' => date('Y'),
             'volume' => '12',
             'issue_number' => '3',
-            'doi' => '10.1234/ai.' . rand(100, 999),
+            'doi' => '10.1234/ai.'.rand(100, 999),
         ]);
 
         if ($proposal->status === ProposalStatus::COMPLETED) {
@@ -308,34 +312,34 @@ class ResearchSeeder extends Seeder
     {
         $baseTime = Carbon::parse($proposal->created_at);
         $facultyId = $submitter->identity?->faculty_id;
-        $dekan = $dekanUsers->first(fn($u) => $u->identity?->faculty_id === $facultyId) ?? $dekanUsers->first();
+        $dekan = $dekanUsers->first(fn ($u) => $u->identity?->faculty_id === $facultyId) ?? $dekanUsers->first();
 
         $path = match ($finalStatus) {
             ProposalStatus::DRAFT => [],
             ProposalStatus::SUBMITTED => [
-                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0]
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
             ],
             ProposalStatus::APPROVED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
-                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2]
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
             ],
             ProposalStatus::WAITING_REVIEWER => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
                 ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
-                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4]
+                ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
             ],
             ProposalStatus::UNDER_REVIEW => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
                 ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
                 ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
-                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5]
+                ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
             ],
             ProposalStatus::REVIEWED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
                 ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],
                 ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
                 ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
-                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 15]
+                ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 15],
             ],
             ProposalStatus::REVISION_NEEDED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
@@ -343,7 +347,7 @@ class ResearchSeeder extends Seeder
                 ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
                 ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
                 ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 15],
-                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::REVISION_NEEDED, 'u' => $kepalaLppm, 'd' => 16]
+                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::REVISION_NEEDED, 'u' => $kepalaLppm, 'd' => 16],
             ],
             ProposalStatus::COMPLETED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
@@ -351,11 +355,11 @@ class ResearchSeeder extends Seeder
                 ['f' => ProposalStatus::APPROVED, 't' => ProposalStatus::WAITING_REVIEWER, 'u' => $kepalaLppm, 'd' => 4],
                 ['f' => ProposalStatus::WAITING_REVIEWER, 't' => ProposalStatus::UNDER_REVIEW, 'u' => $adminLppm, 'd' => 5],
                 ['f' => ProposalStatus::UNDER_REVIEW, 't' => ProposalStatus::REVIEWED, 'u' => $adminLppm, 'd' => 15],
-                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::COMPLETED, 'u' => $kepalaLppm, 'd' => 18]
+                ['f' => ProposalStatus::REVIEWED, 't' => ProposalStatus::COMPLETED, 'u' => $kepalaLppm, 'd' => 18],
             ],
             ProposalStatus::REJECTED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
-                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::REJECTED, 'u' => $dekan, 'd' => 2]
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::REJECTED, 'u' => $dekan, 'd' => 2],
             ],
         };
 
