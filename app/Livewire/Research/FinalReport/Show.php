@@ -507,6 +507,9 @@ class Show extends Component
     {
         return view('livewire.research.final-report.show', [
             'allKeywords' => $this->getAllKeywords(),
+            'editingMandatoryId' => $this->form->editingMandatoryId,
+            'editingAdditionalId' => $this->form->editingAdditionalId,
+            'isFinalReportDraft' => $this->isFinalReportDraft,
         ]);
     }
 }
