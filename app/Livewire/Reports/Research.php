@@ -2,24 +2,31 @@
 
 namespace App\Livewire\Reports;
 
+use App\Models\Proposal;
+use App\Models\MandatoryOutput;
+use App\Models\AdditionalOutput;
+use App\Enums\ProposalStatus;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('components.layouts.app', ['title' => 'Laporan Penelitian', 'pageTitle' => 'Laporan Penelitian'])]
 class Research extends Component
 {
-    public string $period = '2025';
+    public string $period;
+
+    public function mount()
+    {
+        $this->period = (string) date('Y');
+    }
 
     /**
      * Update the selected reporting period.
      */
     public function setPeriod(string $period): void
     {
-        if (! Arr::exists($this->reportTimeline(), $period)) {
-            return;
-        }
-
         $this->period = $period;
     }
 
@@ -29,10 +36,28 @@ class Research extends Component
     public function render(): View
     {
         return view('livewire.reports.research', [
-            'periods' => array_keys($this->reportTimeline()),
+            'periods' => $this->availablePeriods(),
             'summary' => $this->summaryMetrics(),
-            'milestones' => $this->milestonesForPeriod($this->period),
+            'schemes' => $this->researchByScheme(),
+            'focusAreas' => $this->researchByFocusArea(),
+            'faculties' => $this->researchByFaculty(),
+            'outputStats' => $this->outputAnalytics(),
+            'recentResearch' => $this->recentResearch(),
         ]);
+    }
+
+    /**
+     * Get available years from proposals.
+     */
+    protected function availablePeriods(): array
+    {
+        return Proposal::query()
+            ->distinct()
+            ->whereNotNull('start_year')
+            ->orderBy('start_year', 'desc')
+            ->pluck('start_year')
+            ->map(fn($year) => (string) $year)
+            ->toArray() ?: [(string) date('Y')];
     }
 
     /**
@@ -40,24 +65,38 @@ class Research extends Component
      */
     protected function summaryMetrics(): array
     {
-        $timeline = collect($this->reportTimeline())->collapse();
+        $query = Proposal::query()
+            ->where('detailable_type', 'App\Models\Research')
+            ->where('start_year', $this->period);
+
+        $totalApproved = (clone $query)
+            ->whereIn('status', [ProposalStatus::APPROVED, ProposalStatus::COMPLETED, ProposalStatus::WAITING_REVIEWER, ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED])
+            ->count();
+
+        $totalBudget = (clone $query)
+            ->whereIn('status', [ProposalStatus::APPROVED, ProposalStatus::COMPLETED])
+            ->sum('sbk_value');
+
+        $reportsCount = (clone $query)
+            ->whereHas('progressReports')
+            ->count();
 
         return [
             [
                 'label' => __('Proposal Disetujui'),
-                'value' => $timeline->where('metric', 'approved')->sum('value'),
+                'value' => $totalApproved,
                 'icon' => 'check',
                 'variant' => 'bg-green-lt text-green',
             ],
             [
-                'label' => __('Proposal Berjalan'),
-                'value' => $timeline->where('metric', 'ongoing')->sum('value'),
-                'icon' => 'clock',
+                'label' => __('Total Anggaran'),
+                'value' => 'Rp ' . number_format($totalBudget, 0, ',', '.'),
+                'icon' => 'currency-dollar',
                 'variant' => 'bg-blue-lt text-blue',
             ],
             [
                 'label' => __('Laporan Terkumpul'),
-                'value' => $timeline->where('metric', 'submitted_report')->sum('value'),
+                'value' => $reportsCount,
                 'icon' => 'file-text',
                 'variant' => 'bg-yellow-lt text-yellow',
             ],
@@ -65,33 +104,127 @@ class Research extends Component
     }
 
     /**
-     * Retrieve milestones for a specific period.
+     * Aggregate output statistics for the current period.
      */
-    protected function milestonesForPeriod(string $period): Collection
+    protected function outputAnalytics(): Collection
     {
-        $milestones = collect($this->reportTimeline()[$period] ?? [])
-            ->where('type', 'milestone')
-            ->sortBy('order');
+        $proposalIds = Proposal::query()
+            ->where('detailable_type', 'App\Models\Research')
+            ->where('start_year', $this->period)
+            ->pluck('id');
 
-        return $milestones->values();
+        $mandatory = MandatoryOutput::query()
+            ->whereHas('progressReport', fn($q) => $q->whereIn('proposal_id', $proposalIds))
+            ->with('proposalOutput')
+            ->get();
+
+        $additional = AdditionalOutput::query()
+            ->whereHas('progressReport', fn($q) => $q->whereIn('proposal_id', $proposalIds))
+            ->with('proposalOutput')
+            ->get();
+
+        return $mandatory->concat($additional)
+            ->groupBy(fn($output) => $output->proposalOutput->category ?? 'Lainnya')
+            ->map(fn($group, $key) => [
+                'category' => $this->translateCategory($key),
+                'count' => $group->count(),
+                'published' => $group->filter(fn($o) => in_array($o->status_type ?? $o->status, ['published', 'terbit', 'granted']))->count(),
+            ])
+            ->sortByDesc('count');
     }
 
     /**
-     * Example reporting data.
+     * Simple category translation.
      */
-    protected function reportTimeline(): array
+    protected function translateCategory(string $key): string
     {
-        return [
-            '2025' => [
-                ['type' => 'milestone', 'order' => 1, 'title' => __('Januari'), 'description' => __('Periode pengumpulan laporan kemajuan gelombang 1.'), 'metric' => 'submitted_report', 'value' => 12],
-                ['type' => 'milestone', 'order' => 2, 'title' => __('Mei'), 'description' => __('Evaluasi tengah tahun oleh tim reviewer internal.'), 'metric' => 'ongoing', 'value' => 18],
-                ['type' => 'milestone', 'order' => 3, 'title' => __('September'), 'description' => __('Penetapan penerima dana tambahan riset strategis.'), 'metric' => 'approved', 'value' => 7],
-            ],
-            '2024' => [
-                ['type' => 'milestone', 'order' => 1, 'title' => __('Februari'), 'description' => __('Review laporan akhir tahun sebelumnya.'), 'metric' => 'submitted_report', 'value' => 15],
-                ['type' => 'milestone', 'order' => 2, 'title' => __('Juni'), 'description' => __('Workshop peningkatan mutu laporan penelitian.'), 'metric' => 'ongoing', 'value' => 10],
-                ['type' => 'milestone', 'order' => 3, 'title' => __('Oktober'), 'description' => __('Publikasi hasil penelitian unggulan fakultas.'), 'metric' => 'approved', 'value' => 5],
-            ],
+        $categories = [
+            'journal' => __('Jurnal'),
+            'book' => __('Buku'),
+            'hki' => __('HKI'),
+            'product' => __('Produk'),
+            'media' => __('Media Massa'),
+            'video' => __('Video'),
         ];
+
+        return $categories[strtolower($key)] ?? ucfirst($key);
+    }
+
+    /**
+     * Group research by scheme for the current period.
+     */
+    protected function researchByScheme(): Collection
+    {
+        return Proposal::query()
+            ->where('detailable_type', 'App\Models\Research')
+            ->where('start_year', $this->period)
+            ->with('researchScheme')
+            ->get()
+            ->groupBy('research_scheme_id')
+            ->map(function ($proposals) {
+                $first = $proposals->first();
+                return [
+                    'name' => $first->researchScheme->name ?? __('Tanpa Skema'),
+                    'count' => $proposals->count(),
+                    'budget' => $proposals->sum('sbk_value'),
+                ];
+            })
+            ->sortByDesc('count');
+    }
+
+    /**
+     * Group research by focus area for the current period.
+     */
+    protected function researchByFocusArea(): Collection
+    {
+        return Proposal::query()
+            ->where('detailable_type', 'App\Models\Research')
+            ->where('start_year', $this->period)
+            ->with('focusArea')
+            ->get()
+            ->groupBy('focus_area_id')
+            ->map(function ($proposals) {
+                $first = $proposals->first();
+                return [
+                    'name' => $first->focusArea->name ?? __('Lainnya'),
+                    'count' => $proposals->count(),
+                ];
+            })
+            ->sortByDesc('count');
+    }
+
+    /**
+     * Group research by faculty for the current period.
+     */
+    protected function researchByFaculty(): Collection
+    {
+        return Proposal::query()
+            ->where('detailable_type', 'App\Models\Research')
+            ->where('start_year', $this->period)
+            ->with(['submitter.identity.faculty'])
+            ->get()
+            ->groupBy(fn($p) => $p->submitter?->identity?->faculty_id)
+            ->map(function ($proposals) {
+                $first = $proposals->first();
+                return [
+                    'name' => $first->submitter?->identity?->faculty?->name ?? __('Pusat/Lainnya'),
+                    'count' => $proposals->count(),
+                ];
+            })
+            ->sortByDesc('count');
+    }
+
+    /**
+     * Get recent research proposals for the current period.
+     */
+    protected function recentResearch(): Collection
+    {
+        return Proposal::query()
+            ->where('detailable_type', 'App\Models\Research')
+            ->where('start_year', $this->period)
+            ->with(['submitter', 'researchScheme'])
+            ->latest()
+            ->take(10)
+            ->get();
     }
 }

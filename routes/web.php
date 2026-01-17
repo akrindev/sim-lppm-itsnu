@@ -25,7 +25,7 @@ Route::get('dashboard', Dashboard::class)
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-    Route::view('laporan-penelitian', 'reports.research')
+    Route::get('laporan-penelitian', \App\Livewire\Reports\Research::class)
         ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.research');
 
