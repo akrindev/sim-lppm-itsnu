@@ -34,7 +34,7 @@
 
                     {{-- Add Category Form --}}
                     @if ($addingCategory)
-                        <div class="mb-2 p-2 border rounded bg-light">
+                        <div class="mb-2 p-2 border rounded">
                             <div class="mb-2">
                                 <input type="text" class="form-control form-control-sm @error('newCategoryName') is-invalid @enderror"
                                     wire:model="newCategoryName" placeholder="Nama kategori baru..."
@@ -201,7 +201,7 @@
                                     </div>
                                 </div>
                             @else
-                                <div class="p-3 bg-light rounded border">
+                                <div class="p-3 rounded border">
                                     {{ $this->selectedLevel->description ?: 'Belum ada deskripsi' }}
                                 </div>
                             @endif
@@ -225,7 +225,7 @@
 
                             {{-- Add Indicator Form --}}
                             @if ($addingIndicator)
-                                <div class="p-3 mb-3 border rounded bg-light">
+                                <div class="p-3 mb-3 border rounded">
                                     <div class="row g-2">
                                         <div class="col-md-2">
                                             <label class="form-label">Kode</label>
