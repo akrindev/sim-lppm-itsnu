@@ -30,7 +30,7 @@ class Show extends Component
     #[Validate('nullable|string')]
     public string $notes = '';
 
-    #[Validate(['evidence.*' => 'file|max:5120'])] // 5MB max per file
+    #[Validate(['evidence.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120'])] // 5MB max per file
     public $evidence = [];
 
     public ?string $editingId = null;

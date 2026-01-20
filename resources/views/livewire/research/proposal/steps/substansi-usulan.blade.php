@@ -42,11 +42,11 @@
                     <input id="substance_file" type="file"
                         wire:key="substance-file-{{ $fileInputIteration }}"
                         class="form-control @error('form.substance_file') is-invalid @enderror"
-                        wire:model="form.substance_file" accept=".pdf">
+                        wire:model="form.substance_file" accept=".pdf,.doc,.docx">
                     @error('form.substance_file')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
-                    <small class="text-muted">Maksimal 10MB, format PDF</small>
+                    <small class="text-muted">Maksimal 10MB, format PDF, DOC, DOCX</small>
 
                     @if ($form->substance_file)
                         <div class="mt-2">

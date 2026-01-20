@@ -160,9 +160,9 @@
                     <div class="mb-3">
                         <label class="form-label">Bukti Dukung (Foto/Dokumen)</label>
                         <input type="file" class="form-control @error('evidence.*') is-invalid @enderror" 
-                            wire:model="evidence" multiple>
+                            wire:model="evidence" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                         @error('evidence.*') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        <small class="text-muted">Bisa upload lebih dari satu file (Max 5MB/file)</small>
+                        <small class="text-muted">Bisa upload lebih dari satu file (Max 5MB/file). Format: PDF, DOC, DOCX, JPG, PNG</small>
                         
                         <div wire:loading wire:target="evidence" class="mt-2">
                             <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
