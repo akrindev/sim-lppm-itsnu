@@ -3,6 +3,23 @@
 <x-slot:pageSubtitle>Daftar proposal yang telah Anda selesai review.</x-slot:pageSubtitle>
 
 <div>
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <div class="d-flex">
+            <div>
+                <x-lucide-info class="alert-icon icon me-2" />
+            </div>
+            <div>
+                <h4 class="alert-title">Tentang Siklus Review</h4>
+                <div class="text-secondary">
+                    Siklus review menunjukkan putaran evaluasi proposal. 
+                    <strong>Siklus #1</strong> adalah review awal. Jika proposal memerlukan perbaikan, 
+                    <strong>Siklus #2</strong> dan seterusnya menunjukkan proses review ulang setelah dosen pengusul melakukan revisi.
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     {{-- Stats Cards --}}
     <div class="row mb-4">
         <div class="col-sm-6 col-lg-3">
