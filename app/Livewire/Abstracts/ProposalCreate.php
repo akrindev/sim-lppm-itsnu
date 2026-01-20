@@ -342,7 +342,7 @@ abstract class ProposalCreate extends Component
                 'form.start_year' => 'required|integer|min:2020|max:2050',
                 'form.summary' => 'required|string|min:100',
                 'form.author_tasks' => 'required|string',
-                'form.tkt_type' => $type === 'research' ? 'required|string|max:255' : 'nullable',
+                'form.tkt_type' => $type === 'research' ? ['required', 'string', 'max:255', \Illuminate\Validation\Rule::in(app(\App\Services\MasterDataService::class)->tktTypes()->toArray())] : 'nullable',
                 'form.tkt_results' => $type === 'research' ? ['nullable', 'array', function ($attribute, $value, $fail) {
                     if (empty($value)) {
                         return;
@@ -409,35 +409,17 @@ abstract class ProposalCreate extends Component
                 }],
             ] : []),
             3 => [
-                'form.budget_items' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
-                    foreach ($value as $index => $item) {
-                        $rowNum = $index + 1;
-                        $errors = [];
-
-                        if (empty($item['budget_group_id'])) {
-                            $errors[] = 'Kelompok RAB';
-                        }
-                        if (empty($item['budget_component_id'])) {
-                            $errors[] = 'Komponen';
-                        }
-                        if (empty($item['item'])) {
-                            $errors[] = 'Item';
-                        }
-                        if (empty($item['volume']) || (float) $item['volume'] <= 0) {
-                            $errors[] = 'Volume';
-                        }
-                        if (empty($item['unit_price']) || (float) $item['unit_price'] <= 0) {
-                            $errors[] = 'Harga Satuan';
-                        }
-
-                        if (! empty($errors)) {
-                            $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
-                        }
-                    }
-                }],
+                'form.budget_items' => ['required', 'array', 'min:1'],
+                'form.budget_items.*.year' => 'required|integer|min:1|max:10',
+                'form.budget_items.*.budget_group_id' => 'required|exists:budget_groups,id',
+                'form.budget_items.*.budget_component_id' => 'required|exists:budget_components,id',
+                'form.budget_items.*.item' => 'required|string|max:255',
+                'form.budget_items.*.volume' => 'required|numeric|min:0.01',
+                'form.budget_items.*.unit_price' => 'required|numeric|min:1',
             ],
             4 => [
                 'form.partner_ids' => 'nullable|array',
+                'form.partner_ids.*' => 'exists:partners,id',
             ],
             default => [],
         };

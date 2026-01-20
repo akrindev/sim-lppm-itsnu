@@ -98,37 +98,7 @@
             </div>
         @else
             @php
-                $outputTypes = [
-                    'jurnal' => [
-                        'Jurnal Int. Bereputasi (Q1-Q2)',
-                        'Jurnal Int. Bereputasi (Q3-Q4)',
-                        'Jurnal Internasional (Terindeks)',
-                        'Jurnal Nas. Terakreditasi (Sinta 1-2)',
-                        'Jurnal Nas. Terakreditasi (Sinta 3-6)',
-                    ],
-                    'prosiding' => [
-                        'Prosiding Sem. Int. Terindeks (Scopus/WoS)',
-                        'Prosiding Seminar Nasional',
-                    ],
-                    'buku' => [
-                        'Buku Referensi (ISBN)',
-                        'Buku Monograf (ISBN)',
-                        'Chapter dalam Buku Internasional',
-                    ],
-                    'hki' => [
-                        'Paten (Granted/Terdaftar)',
-                        'Paten Sederhana (Granted/Terdaftar)',
-                        'Hak Cipta',
-                        'Desain Industri',
-                        'PVT',
-                        'DTLST',
-                    ],
-                    'lainnya' => [
-                        'Naskah Kebijakan (Policy Brief)',
-                        'Visiting Lecturer',
-                        'Keynote Speaker',
-                    ],
-                ];
+                $outputTypes = \App\Constants\ProposalConstants::RESEARCH_OUTPUT_TYPES;
             @endphp
             <div class="table-responsive">
                 <table class="table-bordered table">

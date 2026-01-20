@@ -8,6 +8,7 @@ use App\Models\Research;
 use App\Models\ResearchScheme;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -617,6 +618,17 @@ class ProposalForm extends Form
         // }
 
         $rules['members'] = 'nullable|array';
+
+        // Strict validation for array inputs to prevent injection
+        $rules['outputs.*.year'] = 'required|integer|min:1|max:10';
+        $rules['outputs.*.category'] = ['required', Rule::in(\App\Constants\ProposalConstants::OUTPUT_CATEGORIES)];
+        // Group and Type validated in step-specific rules in components for better context
+
+        $rules['budget_items.*.year'] = 'required|integer|min:1|max:10';
+        $rules['budget_items.*.budget_group_id'] = 'required|exists:budget_groups,id';
+        $rules['budget_items.*.budget_component_id'] = 'required|exists:budget_components,id';
+        $rules['budget_items.*.volume'] = 'required|numeric|min:0.01';
+        $rules['budget_items.*.unit_price'] = 'required|numeric|min:1';
 
         return $rules;
     }

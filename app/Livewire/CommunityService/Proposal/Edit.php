@@ -2,22 +2,11 @@
 
 namespace App\Livewire\CommunityService\Proposal;
 
+use App\Constants\ProposalConstants;
 use App\Livewire\Abstracts\ProposalCreate;
 
 class Edit extends ProposalCreate
 {
-    public string $componentId = '';
-
-    public function mount(?string $proposalId = null, ?\App\Models\Proposal $proposal = null): void
-    {
-        if ($proposalId === null && $proposal === null) {
-            abort(404);
-        }
-
-        parent::mount($proposalId, $proposal);
-        $this->componentId = $proposal ? $proposal->id : $proposalId;
-    }
-
     protected function getProposalType(): string
     {
         return 'community-service';
@@ -46,6 +35,7 @@ class Edit extends ProposalCreate
         if ($step === 4) {
             return [
                 'form.partner_ids' => 'required|array|min:1',
+                'form.partner_ids.*' => 'exists:partners,id',
             ];
         }
 
@@ -67,30 +57,22 @@ class Edit extends ProposalCreate
                 if ($wajibCount < 1) {
                     $fail('Minimal harus ada 1 luaran wajib untuk proposal pengabdian masyarakat.');
                 }
-
-                // Validate each row has required fields
-                foreach ($value as $index => $item) {
-                    $rowNum = $index + 1;
-                    $errors = [];
-
-                    if (empty($item['group'])) {
-                        $errors[] = 'Kategori Luaran';
-                    }
-                    if (empty($item['type'])) {
-                        $errors[] = 'Luaran';
-                    }
-                    if (empty($item['status'])) {
-                        $errors[] = 'Status';
-                    }
-                    if (empty($item['description'])) {
-                        $errors[] = 'Keterangan (URL)';
-                    }
-
-                    if (! empty($errors)) {
-                        $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
+            }],
+            'form.outputs.*.year' => 'required|integer|min:1|max:10',
+            'form.outputs.*.category' => ['required', \Illuminate\Validation\Rule::in(ProposalConstants::OUTPUT_CATEGORIES)],
+            'form.outputs.*.group' => ['required', \Illuminate\Validation\Rule::in(ProposalConstants::PKM_OUTPUT_GROUPS)],
+            'form.outputs.*.type' => ['required', 'string', function ($attribute, $value, $fail) {
+                // Validate type matches group
+                $index = explode('.', $attribute)[2];
+                $group = $this->form->outputs[$index]['group'] ?? null;
+                if ($group && isset(ProposalConstants::PKM_OUTPUT_TYPES[$group])) {
+                    if (! in_array($value, ProposalConstants::PKM_OUTPUT_TYPES[$group])) {
+                        $fail('Luaran baris '.($index + 1).' tidak valid untuk kategori yang dipilih.');
                     }
                 }
             }],
+            'form.outputs.*.status' => 'required|string|max:255',
+            'form.outputs.*.description' => 'required|string|max:255',
         ];
     }
 }

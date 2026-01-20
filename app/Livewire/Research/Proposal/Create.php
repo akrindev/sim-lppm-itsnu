@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Research\Proposal;
 
+use App\Constants\ProposalConstants;
 use App\Livewire\Abstracts\ProposalCreate;
 
 class Create extends ProposalCreate
@@ -36,30 +37,22 @@ class Create extends ProposalCreate
                 if ($wajibCount < 1) {
                     $fail('Minimal harus ada 1 luaran wajib untuk proposal penelitian.');
                 }
-
-                // Validate each row has required fields
-                foreach ($value as $index => $item) {
-                    $rowNum = $index + 1;
-                    $errors = [];
-
-                    if (empty($item['group'])) {
-                        $errors[] = 'Kategori Luaran';
-                    }
-                    if (empty($item['type'])) {
-                        $errors[] = 'Luaran';
-                    }
-                    if (empty($item['status'])) {
-                        $errors[] = 'Status';
-                    }
-                    if (empty($item['description'])) {
-                        $errors[] = 'Keterangan (URL)';
-                    }
-
-                    if (! empty($errors)) {
-                        $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
+            }],
+            'form.outputs.*.year' => 'required|integer|min:1|max:10',
+            'form.outputs.*.category' => ['required', \Illuminate\Validation\Rule::in(ProposalConstants::OUTPUT_CATEGORIES)],
+            'form.outputs.*.group' => ['required', \Illuminate\Validation\Rule::in(ProposalConstants::RESEARCH_OUTPUT_GROUPS)],
+            'form.outputs.*.type' => ['required', 'string', function ($attribute, $value, $fail) {
+                // Validate type matches group
+                $index = explode('.', $attribute)[2];
+                $group = $this->form->outputs[$index]['group'] ?? null;
+                if ($group && isset(ProposalConstants::RESEARCH_OUTPUT_TYPES[$group])) {
+                    if (! in_array($value, ProposalConstants::RESEARCH_OUTPUT_TYPES[$group])) {
+                        $fail('Luaran baris '.($index + 1).' tidak valid untuk kategori yang dipilih.');
                     }
                 }
             }],
+            'form.outputs.*.status' => 'required|string|max:255',
+            'form.outputs.*.description' => 'required|string|max:255',
         ];
     }
 

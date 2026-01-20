@@ -152,11 +152,9 @@
         <label class="form-label">Jenis Mitra <span class="text-danger">*</span></label>
         <select wire:model="form.new_partner.type" class="form-select @error('form.new_partner.type') is-invalid @enderror" required>
             <option value="">-- Pilih Jenis Mitra --</option>
-            <option value="Pemerintah">Pemerintah</option>
-            <option value="Swasta">Swasta</option>
-            <option value="UMKM">UMKM</option>
-            <option value="Yayasan">Yayasan</option>
-            <option value="Organisasi Masyarakat">Organisasi Masyarakat</option>
+            @foreach(\App\Constants\ProposalConstants::PARTNER_TYPES as $type)
+                <option value="{{ $type }}">{{ $type }}</option>
+            @endforeach
         </select>
         @error('form.new_partner.type')
             <div class="invalid-feedback">{{ $message }}</div>

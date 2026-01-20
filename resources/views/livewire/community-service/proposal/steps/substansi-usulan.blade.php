@@ -97,34 +97,7 @@
             </div>
         @else
             <div class="table-responsive" x-data="{
-                typesMap: {
-                    'pemberdayaan': [
-                        'Peningkatan Omzet (Rp/%)',
-                        'Peningkatan Kualitas (Sertifikasi/PIRT)',
-                        'Perbaikan Tata Kelola/Manajemen',
-                        'Peningkatan Kompetensi SDM'
-                    ],
-                    'jurnal': [
-                        'Jurnal PKM (Sinta 1-6)',
-                        'Jurnal PKM (Ber-ISSN/Non-Sinta)'
-                    ],
-                    'media': [
-                        'Media Massa Nasional (Cetak/Elektronik)',
-                        'Media Massa Lokal (Cetak/Elektronik)'
-                    ],
-                    'video': [
-                        'Video Kegiatan (Publikasi Youtube/Medsos)'
-                    ],
-                    'produk': [
-                        'Teknologi Tepat Guna (TTG)',
-                        'Model/Sistem/Rekayasa Sosial',
-                        'Produk Tersertifikasi'
-                    ],
-                    'hki_buku': [
-                        'Hak Cipta (Modul/Panduan)',
-                        'Buku Pedoman/Panduan Penerapan'
-                    ]
-                }
+                typesMap: @js(\App\Constants\ProposalConstants::PKM_OUTPUT_TYPES)
             }">
                 <table class="table-bordered table">
                     @php
