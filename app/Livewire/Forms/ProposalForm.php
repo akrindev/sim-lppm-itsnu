@@ -675,6 +675,7 @@ class ProposalForm extends Form
                     'group' => $output['group'] ?? '',
                     'type' => $output['type'] ?? '',
                     'target_status' => $output['status'] ?? '',
+                    'description' => $output['description'] ?? null,
                 ]);
             }
         }

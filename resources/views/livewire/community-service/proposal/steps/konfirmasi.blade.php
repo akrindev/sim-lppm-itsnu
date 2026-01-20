@@ -49,25 +49,63 @@
                         <td><strong>Klaster Sains Level 1</strong></td>
                         <td>{{ $this->scienceClusters->find($form->cluster_level1_id)?->name ?? '-' }}</td>
                     </tr>
+                    @if($form->cluster_level2_id)
+                    <tr>
+                        <td><strong>Klaster Sains Level 2</strong></td>
+                        <td>{{ $this->scienceClusters->find($form->cluster_level2_id)?->name ?? '-' }}</td>
+                    </tr>
+                    @endif
+                    @if($form->cluster_level3_id)
+                    <tr>
+                        <td><strong>Klaster Sains Level 3</strong></td>
+                        <td>{{ $this->scienceClusters->find($form->cluster_level3_id)?->name ?? '-' }}</td>
+                    </tr>
+                    @endif
+                    @if($form->national_priority_id)
+                    <tr>
+                        <td><strong>Prioritas Nasional</strong></td>
+                        <td>{{ $this->nationalPriorities->find($form->national_priority_id)?->name ?? '-' }}</td>
+                    </tr>
+                    @endif
+                    @if($form->sbk_value > 0)
+                    <tr>
+                        <td><strong>Nilai SBK</strong></td>
+                        <td>Rp {{ number_format($form->sbk_value, 0, ',', '.') }}</td>
+                    </tr>
+                    @endif
                      <tr>
                         <td><strong>Ringkasan</strong></td>
-                        <td>{{ Str::limit($form->summary, 200) }}</td>
+                        <td>{{ Str::limit($form->summary, 500) }}</td>
                     </tr>
                     <tr>
                         <td><strong>Masalah Mitra</strong></td>
-                        <td>{{ Str::limit($form->partner_issue_summary, 200) }}</td>
+                        <td>{{ Str::limit($form->partner_issue_summary, 500) }}</td>
                     </tr>
                     <tr>
                         <td><strong>Solusi</strong></td>
-                        <td>{{ Str::limit($form->solution_offered, 200) }}</td>
+                        <td>{{ Str::limit($form->solution_offered, 500) }}</td>
                     </tr>
                     <tr>
                         <td><strong>Ketua Peneliti</strong></td>
                         <td>{{ $author_name }}</td>
                     </tr>
                     <tr>
-                        <td><strong>Jumlah Anggota</strong></td>
-                        <td>{{ count($form->members) }} orang</td>
+                        <td><strong>Tugas Ketua</strong></td>
+                        <td>{{ $form->author_tasks }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Anggota Tim</strong></td>
+                        <td>
+                            @if(empty($form->members))
+                                <span class="text-muted">Tidak ada anggota</span>
+                            @else
+                                <ul class="mb-0 ps-3">
+                                    @foreach($form->members as $member)
+                                        <li>{{ $member['name'] }} ({{ $member['nidn'] }}) - {{ $member['tugas'] }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -110,9 +148,9 @@
                                     <th>Tahun</th>
                                     <th>Jenis</th>
                                     <th>Kategori Luaran</th>
-                                    <th>Luaran</th>
+                                     <th>Luaran</th>
                                     <th>Status</th>
-                                    <th>Keterangan</th>
+                                    <th>Keterangan (URL)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -244,23 +282,37 @@
                 @if (empty($form->partner_ids))
                     <p class="text-muted">Belum ada mitra yang ditambahkan</p>
                 @else
-                    <p><strong>Jumlah Mitra:</strong> {{ count($form->partner_ids) }} mitra</p>
-                    <ul class="list-unstyled">
-                        @foreach ($form->partner_ids as $partnerId)
-                            @php
-                                $partner = $this->partners->find($partnerId);
-                            @endphp
-                            @if ($partner)
-                                <li class="mb-2">
-                                    <x-lucide-check class="text-success icon" />
-                                    {{ $partner->name }}
-                                    @if ($partner->institution)
-                                        ({{ $partner->institution }})
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Nama Mitra</th>
+                                    <th>Email</th>
+                                    <th>Institusi</th>
+                                    <th>Tipe</th>
+                                    <th>Negara</th>
+                                    <th>Alamat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($form->partner_ids as $partnerId)
+                                    @php
+                                        $partner = $this->partners->find($partnerId);
+                                    @endphp
+                                    @if ($partner)
+                                        <tr>
+                                            <td>{{ $partner->name }}</td>
+                                            <td>{{ $partner->email ?? '-' }}</td>
+                                            <td>{{ $partner->institution ?? '-' }}</td>
+                                            <td>{{ $partner->type ?? '-' }}</td>
+                                            <td>{{ $partner->country ?? '-' }}</td>
+                                            <td>{{ $partner->address ?? '-' }}</td>
+                                        </tr>
                                     @endif
-                                </li>
-                            @endif
-                        @endforeach
-                    </ul>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @endif
             </div>
         </div>

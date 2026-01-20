@@ -254,6 +254,7 @@
                                         <th>Kelompok</th>
                                         <th>Luaran</th>
                                         <th>Status</th>
+                                        <th>Keterangan (URL)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -267,6 +268,7 @@
                                             <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
                                             <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
                                             <td>{{ $output->target_status }}</td>
+                                            <td>{{ $output->description ?? '-' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -289,6 +291,7 @@
                                         <th>Kelompok</th>
                                         <th>Luaran</th>
                                         <th>Status</th>
+                                        <th>Keterangan (URL)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -302,6 +305,7 @@
                                             <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
                                             <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
                                             <td>{{ $output->target_status }}</td>
+                                            <td>{{ $output->description ?? '-' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
