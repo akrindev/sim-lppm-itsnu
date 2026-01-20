@@ -164,7 +164,9 @@ class ReportForm extends Form
                 // Media / Video / Product
                 'media_name' => $output->media_name,
                 'media_url' => $output->media_url,
-                'publication_date' => $output->publication_date ? $output->publication_date->format('Y-m-d') : null,
+                'publication_date' => $output->publication_date
+                    ? (is_string($output->publication_date) ? $output->publication_date : $output->publication_date->format('Y-m-d'))
+                    : null,
                 'video_url' => $output->video_url,
                 'platform' => $output->platform,
                 'product_name' => $output->product_name,
@@ -214,7 +216,9 @@ class ReportForm extends Form
                 'inventors' => $output->inventors,
                 'media_name' => $output->media_name,
                 'media_url' => $output->media_url,
-                'publication_date' => $output->publication_date ? $output->publication_date->format('Y-m-d') : null,
+                'publication_date' => $output->publication_date
+                    ? (is_string($output->publication_date) ? $output->publication_date : $output->publication_date->format('Y-m-d'))
+                    : null,
                 'video_url' => $output->video_url,
                 'platform' => $output->platform,
                 'product_name' => $output->product_name,
