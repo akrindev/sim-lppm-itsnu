@@ -63,11 +63,11 @@
                                         @endif
                                         <small class="text-muted"> - {{ $group->description }}</small>
                                     </div>
-                                    @if ($totalBudget > 0)
-                                        <span class="badge {{ $isOver || $isBelowMinimum ? 'bg-danger' : 'bg-success' }}">
+                                     @if ($totalBudget > 0)
+                                        <x-tabler.badge :color="$isOver || $isBelowMinimum ? 'danger' : 'success'">
                                             {{ number_format($percentageUsed, 1) }}%
                                             (Rp {{ number_format($groupTotal, 0, ',', '.') }})
-                                        </span>
+                                        </x-tabler.badge>
                                     @endif
                                 </div>
                                 @if ($researchCap > 0 && $totalBudget > 0)

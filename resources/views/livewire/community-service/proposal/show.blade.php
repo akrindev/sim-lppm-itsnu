@@ -485,10 +485,10 @@
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <span class="badge bg-blue-lt">
+                                             <td>
+                                                <x-tabler.badge color="blue">
                                                     {{ $partner->type ?? 'External' }}
-                                                </span>
+                                                </x-tabler.badge>
                                             </td>
                                             <td>
                                                 @if ($partner->hasMedia('commitment_letter'))
@@ -498,10 +498,10 @@
                                                         Unduh
                                                     </a>
                                                 @else
-                                                    <span class="badge bg-yellow-lt text-yellow-fg">
+                                                    <x-tabler.badge color="yellow">
                                                         <x-lucide-file-x class="icon me-1" />
                                                         Tidak Ada
-                                                    </span>
+                                                    </x-tabler.badge>
                                                 @endif
                                             </td>
                                         </tr>
