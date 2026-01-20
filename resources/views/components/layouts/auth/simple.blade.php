@@ -15,6 +15,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
     <title>{{ $title ?? 'Sign in' }}</title>
+    
+    <link rel="preconnect" href="https://challenges.cloudflare.com">
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- END PLUGINS STYLES -->
     <!-- BEGIN DEMO STYLES -->
@@ -25,6 +28,13 @@
         @import url("https://rsms.me/inter/inter.css");
     </style>
     <!-- END CUSTOM FONT -->
+
+    {{-- Cloudflareturnstile --}}
+    <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer
+    ></script>
 </head>
 
 <body>

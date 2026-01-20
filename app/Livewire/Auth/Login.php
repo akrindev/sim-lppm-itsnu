@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use App\Rules\Turnstile;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -23,6 +24,8 @@ class Login extends Component
     #[Validate('required|string')]
     public string $password = '';
 
+    public string $captcha = '';
+
     public bool $remember = false;
 
     /**
@@ -30,7 +33,11 @@ class Login extends Component
      */
     public function login(): void
     {
-        $this->validate();
+        $this->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+            'captcha' => ['required', new Turnstile],
+        ]);
 
         $this->ensureIsNotRateLimited();
 
