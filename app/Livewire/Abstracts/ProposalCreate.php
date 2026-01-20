@@ -45,9 +45,14 @@ abstract class ProposalCreate extends Component
             }
 
             $this->form->setProposal($proposalToLoad);
-        } elseif ($proposalId) {
-            // Fallback if find failed but ID was provided (should have been caught by model binding usually)
-            abort(404);
+        } else {
+            // Initial values for new proposals
+            $this->form->start_year = date('Y');
+
+            // Add initial empty budget row
+            if (empty($this->form->budget_items)) {
+                $this->addBudgetItem();
+            }
         }
     }
 
@@ -88,6 +93,13 @@ abstract class ProposalCreate extends Component
             'form.outputs' => 'Luaran Target Capaian',
             'form.budget_items' => 'RAB',
             'form.partner_ids' => 'Mitra',
+            'form.new_partner.name' => 'Nama Mitra',
+            'form.new_partner.email' => 'Email Mitra',
+            'form.new_partner.institution' => 'Institusi Mitra',
+            'form.new_partner.country' => 'Negara Mitra',
+            'form.new_partner.type' => 'Jenis Mitra',
+            'form.new_partner.address' => 'Alamat Mitra',
+            'form.new_partner_commitment_file' => 'Surat Kesanggupan Mitra',
         ];
     }
 

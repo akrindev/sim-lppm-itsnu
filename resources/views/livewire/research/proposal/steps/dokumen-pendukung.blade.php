@@ -149,6 +149,21 @@
     </div>
 
     <div class="mb-3">
+        <label class="form-label">Jenis Mitra <span class="text-danger">*</span></label>
+        <select wire:model="form.new_partner.type" class="form-select @error('form.new_partner.type') is-invalid @enderror" required>
+            <option value="">-- Pilih Jenis Mitra --</option>
+            <option value="Pemerintah">Pemerintah</option>
+            <option value="Swasta">Swasta</option>
+            <option value="UMKM">UMKM</option>
+            <option value="Yayasan">Yayasan</option>
+            <option value="Organisasi Masyarakat">Organisasi Masyarakat</option>
+        </select>
+        @error('form.new_partner.type')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
         <label class="form-label">Negara <span class="text-danger">*</span></label>
         <input type="text" wire:model="form.new_partner.country"
             class="form-control @error('form.new_partner.country') is-invalid @enderror"

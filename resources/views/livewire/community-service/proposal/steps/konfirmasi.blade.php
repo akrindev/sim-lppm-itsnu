@@ -49,9 +49,17 @@
                         <td><strong>Klaster Sains Level 1</strong></td>
                         <td>{{ $this->scienceClusters->find($form->cluster_level1_id)?->name ?? '-' }}</td>
                     </tr>
-                    <tr>
+                     <tr>
                         <td><strong>Ringkasan</strong></td>
                         <td>{{ Str::limit($form->summary, 200) }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Masalah Mitra</strong></td>
+                        <td>{{ Str::limit($form->partner_issue_summary, 200) }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Solusi</strong></td>
+                        <td>{{ Str::limit($form->solution_offered, 200) }}</td>
                     </tr>
                     <tr>
                         <td><strong>Ketua Peneliti</strong></td>

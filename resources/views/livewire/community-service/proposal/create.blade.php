@@ -1,8 +1,8 @@
-<x-slot:title>Usulan Penelitian Baru</x-slot:title>
-<x-slot:pageTitle>Usulan Penelitian Baru</x-slot:pageTitle>
-<x-slot:pageSubtitle>Buat proposal penelitian baru dengan mengisi form di bawah ini.</x-slot:pageSubtitle>
+<x-slot:title>Usulan PKM Baru</x-slot:title>
+<x-slot:pageTitle>Usulan PKM Baru</x-slot:pageTitle>
+<x-slot:pageSubtitle>Buat proposal pengabdian kepada masyarakat baru dengan mengisi form di bawah ini.</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    <a href="{{ route('research.proposal.index') }}" class="btn-outline-secondary btn">
+    <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn">
         <x-lucide-arrow-left class="icon" />
         Kembali ke Daftar
     </a>
@@ -74,7 +74,7 @@
                         Sebelumnya
                     </button>
                 @else
-                    <a href="{{ route('research.proposal.index') }}" class="btn-outline-secondary btn">
+                    <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn">
                         <x-lucide-x class="icon" />
                         Batal
                     </a>

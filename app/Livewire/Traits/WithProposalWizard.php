@@ -6,22 +6,6 @@ use Illuminate\Support\Facades\DB;
 
 trait WithProposalWizard
 {
-    public array $outputs = [];
-
-    public array $budget_items = [];
-
-    public array $partner_ids = [];
-
-    public array $new_partner = [
-        'name' => '',
-        'email' => '',
-        'institution' => '',
-        'country' => '',
-        'address' => '',
-    ];
-
-    public $new_partner_commitment_file;
-
     public function addOutput(): void
     {
         $this->form->outputs[] = [
@@ -71,60 +55,66 @@ trait WithProposalWizard
 
     public function saveNewPartner(): void
     {
+        $isPkm = $this->getProposalTypeForValidation() === 'community-service';
+
         $this->validate([
-            'new_partner.name' => 'required|string|max:255',
-            'new_partner.email' => 'required|email|max:255',
-            'new_partner.institution' => 'required|string|max:255',
-            'new_partner.country' => 'required|string|max:255',
-            'new_partner.address' => 'required|string',
-            'new_partner_commitment_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'form.new_partner.name' => 'required|string|max:255',
+            'form.new_partner.email' => 'nullable|email|max:255',
+            'form.new_partner.institution' => 'required|string|max:255',
+            'form.new_partner.country' => 'required|string|max:255',
+            'form.new_partner.type' => 'required|string|max:255',
+            'form.new_partner.address' => 'nullable|string',
+            'form.new_partner_commitment_file' => ($isPkm ? 'required' : 'nullable').'|file|mimes:pdf|max:5120',
         ]);
 
         DB::transaction(function () {
             $partner = \App\Models\Partner::create([
-                'name' => $this->new_partner['name'],
-                'email' => $this->new_partner['email'],
-                'institution' => $this->new_partner['institution'],
-                'country' => $this->new_partner['country'],
-                'address' => $this->new_partner['address'],
+                'name' => $this->form->new_partner['name'],
+                'email' => $this->form->new_partner['email'],
+                'institution' => $this->form->new_partner['institution'],
+                'country' => $this->form->new_partner['country'],
+                'type' => $this->form->new_partner['type'],
+                'address' => $this->form->new_partner['address'],
             ]);
 
-            if ($this->new_partner_commitment_file) {
+            if ($this->form->new_partner_commitment_file) {
                 $partner
-                    ->addMedia($this->new_partner_commitment_file->getRealPath())
-                    ->usingName($this->new_partner_commitment_file->getClientOriginalName())
-                    ->usingFileName($this->new_partner_commitment_file->hashName())
-                    ->toMediaCollection('commitment_file');
+                    ->addMedia($this->form->new_partner_commitment_file->getRealPath())
+                    ->usingName($this->form->new_partner_commitment_file->getClientOriginalName())
+                    ->usingFileName($this->form->new_partner_commitment_file->hashName())
+                    ->toMediaCollection('commitment_letter');
             }
 
-            $this->partner_ids[] = $partner->id;
+            $this->form->partner_ids[] = $partner->id;
 
-            $this->new_partner = [
+            $this->form->new_partner = [
                 'name' => '',
                 'email' => '',
                 'institution' => '',
                 'country' => '',
+                'type' => '',
                 'address' => '',
             ];
 
-            $this->new_partner_commitment_file = null;
+            $this->form->new_partner_commitment_file = null;
         });
 
         $this->dispatch('partner-created');
+        $this->dispatch('modal-close', id: 'modal-partner');
     }
 
     public function validateBudgetRealtime(): void
     {
         try {
-            if (! empty($this->budget_items)) {
+            if (! empty($this->form->budget_items)) {
                 app(\App\Services\BudgetValidationService::class)->validateBudgetGroupPercentages(
-                    $this->budget_items,
+                    $this->form->budget_items,
                     $this->getProposalTypeForValidation(),
                     (int) date('Y')
                 );
 
                 app(\App\Services\BudgetValidationService::class)->validateBudgetCap(
-                    $this->budget_items,
+                    $this->form->budget_items,
                     $this->getProposalTypeForValidation(),
                     (int) date('Y')
                 );

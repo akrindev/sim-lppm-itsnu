@@ -87,17 +87,6 @@
                             <p class="text-reset">{{ $proposal->submitter?->name }}</p>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label"><x-lucide-mail class="icon me-2" />Email</label>
-                            <p class="text-reset">{{ $proposal->submitter?->email }}</p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-clipboard-list class="icon me-2" />Skema</label>
-                            <p class="text-reset">{{ $proposal->communityServiceScheme?->name ?? '—' }}</p>
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label"><x-lucide-calendar class="icon me-2" />Periode Pelaksanaan</label>
                             <p class="text-reset">
                                 @if ($proposal->start_year && $proposal->duration_in_years)
@@ -133,18 +122,22 @@
                             <label class="form-label"><x-lucide-hash class="icon me-2" />Topik</label>
                             <p class="text-reset">{{ $proposal->topic?->name ?? '—' }}</p>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-star class="icon me-2" />Prioritas Nasional</label>
-                            <p class="text-reset">{{ $proposal->nationalPriority?->name ?? '—' }}</p>
-                        </div>
+                        @if ($proposal->nationalPriority)
+                            <div class="col-md-6">
+                                <label class="form-label"><x-lucide-star class="icon me-2" />Prioritas Nasional</label>
+                                <p class="text-reset">{{ $proposal->nationalPriority->name }}</p>
+                            </div>
+                        @endif
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-dollar-sign class="icon me-2" />Nilai SBK</label>
-                            <p class="text-reset">{{ number_format($proposal->sbk_value, 2) ?? '—' }}</p>
+                    @if ($proposal->sbk_value > 0)
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label"><x-lucide-dollar-sign class="icon me-2" />Nilai SBK</label>
+                                <p class="text-reset">Rp {{ number_format($proposal->sbk_value, 0, ',', '.') }}</p>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -154,15 +147,15 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <label class="form-label">Level 1</label>
                             <p class="text-reset">{{ $proposal->clusterLevel1?->name ?? '—' }}</p>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <label class="form-label">Level 2</label>
                             <p class="text-reset">{{ $proposal->clusterLevel2?->name ?? '—' }}</p>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <label class="form-label">Level 3</label>
                             <p class="text-reset">{{ $proposal->clusterLevel3?->name ?? '—' }}</p>
                         </div>
@@ -172,39 +165,28 @@
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title">1.4 Ringkasan</h3>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <p class="text-reset">{{ $proposal->summary ?? '—' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3 class="card-title">1.5 Detail Pengabdian</h3>
+                    <h3 class="card-title">1.4 Ringkasan & Masalah Mitra</h3>
                 </div>
                 <div class="card-body">
                     @php $communityService = $proposal->detailable; @endphp
-                    <div class="mb-3">
-                        <label class="form-label">Lokasi Kegiatan</label>
-                        <p class="text-reset">{{ $communityService?->activity_location ?? '—' }}</p>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Ringkasan Proposal</label>
+                        <p class="text-reset" style="text-align: justify;">{{ $proposal->summary ?? '—' }}</p>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Latar Belakang</label>
-                        <p class="text-reset">{{ $communityService?->background ?? '—' }}</p>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Masalah Mitra</label>
+                        <p class="text-reset" style="text-align: justify;">{{ $communityService?->partner_issue_summary ?? '—' }}</p>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Metodologi</label>
-                        <p class="text-reset">{{ $communityService?->methodology ?? '—' }}</p>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold">Solusi yang Ditawarkan</label>
+                        <p class="text-reset" style="text-align: justify;">{{ $communityService?->solution_offered ?? '—' }}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Team Members Management -->
             <div class="mb-3">
-                <livewire:community-service.proposal.team-member-form :proposalId="$proposal->id" :key="'team-form-' . $proposal->id" />
+                <livewire:community-service.proposal.team-member-form :proposalId="$proposal->id" :key="'team-form-'.$proposal->id" />
             </div>
         </div>
 
@@ -212,140 +194,121 @@
         <div id="section-substansi" x-show="currentStep === 2">
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title">2.1 Kelompok Makro Riset</h3>
+                    <h3 class="card-title">2.1 Substansi Usulan</h3>
                 </div>
                 <div class="card-body">
                     @php $communityService = $proposal->detailable; @endphp
-                    <div class="mb-3">
-                        <label class="form-label">Kelompok Makro Riset</label>
-                        <p class="text-reset">{{ $communityService?->macroResearchGroup?->name ?? '—' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3 class="card-title">2.2 File Substansi</h3>
-                </div>
-                <div class="card-body">
-                    @php $communityService = $proposal->detailable; @endphp
-                    <div class="mb-3">
-                        <label class="form-label">File Substansi</label>
-                        @if ($communityService && $communityService->hasMedia('substance_file'))
-                            @php
-                                $media = $communityService->getFirstMedia('substance_file');
-                            @endphp
-                            <div class="alert alert-info mb-0">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <x-lucide-file-text class="icon text-primary me-2" />
-                                        <strong>{{ $media->name }}</strong>
-                                        <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Kelompok Makro Riset</label>
+                            <p class="text-reset">{{ $communityService?->macroResearchGroup?->name ?? '—' }}</p>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">File Substansi</label>
+                            @if ($communityService && $communityService->hasMedia('substance_file'))
+                                @php
+                                    $media = $communityService->getFirstMedia('substance_file');
+                                @endphp
+                                <div class="alert alert-info mb-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <x-lucide-file-text class="icon text-primary me-2" />
+                                            <strong>{{ $media->name }}</strong>
+                                            <small class="text-muted ms-2">({{ $media->human_readable_size }})</small>
+                                        </div>
+                                        <a href="{{ $media->getUrl() }}" target="_blank"
+                                            class="btn-outline-primary btn btn-sm">
+                                            <x-lucide-download class="icon" />
+                                            Download
+                                        </a>
                                     </div>
-                                    <a href="{{ $media->getUrl() }}" target="_blank"
-                                        class="btn-outline-primary btn btn-sm">
-                                        <x-lucide-download class="icon" />
-                                        Download
-                                    </a>
                                 </div>
-                            </div>
-                        @else
-                            <p class="text-muted text-reset">Tidak ada file</p>
-                        @endif
+                            @else
+                                <p class="text-muted text-reset">Tidak ada file</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Section 2.3.1: Luaran Wajib --}}
+            {{-- Section 2.2: Luaran Target Capaian --}}
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title">2.3.1 Luaran Wajib</h3>
+                    <h3 class="card-title">2.2 Luaran Target Capaian</h3>
                 </div>
-                @php
-                    $requiredOutputs = $proposal->outputs->where('category', 'Wajib');
-                @endphp
-                @if ($requiredOutputs->isEmpty())
-                    <div class="card-body">
-                        <p class="text-muted">Belum ada luaran wajib</p>
-                    </div>
-                @else
+                <div class="card-body">
+                    <h5 class="mb-2">2.2.1 Luaran Wajib</h5>
                     @php
+                        $requiredOutputs = $proposal->outputs->where('category', 'Wajib');
                         $startYear = (int) ($proposal->start_year ?? date('Y'));
                         $duration = (int) ($proposal->duration_in_years ?? 1);
                     @endphp
-                    <div class="table-responsive">
-                        <table class="table-bordered table-sm table">
-                            <thead>
-                                <tr>
-                                    <th>Tahun Ke-</th>
-                                    <th>Kelompok</th>
-                                    <th>Luaran</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($requiredOutputs as $output)
-                                    @php
-                                        $outputYear = $output->output_year ?? 1;
-                                        $displayYear = $startYear + $outputYear - 1;
-                                    @endphp
+                    @if ($requiredOutputs->isEmpty())
+                        <p class="text-muted small">Belum ada luaran wajib</p>
+                    @else
+                        <div class="table-responsive mb-4">
+                            <table class="table-bordered table-sm table">
+                                <thead>
                                     <tr>
-                                        <td>{{ $outputYear }} ({{ $displayYear }})</td>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
-                                        <td>{{ $output->target_status }}</td>
+                                        <th>Tahun Ke-</th>
+                                        <th>Kelompok</th>
+                                        <th>Luaran</th>
+                                        <th>Status</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
+                                </thead>
+                                <tbody>
+                                    @foreach ($requiredOutputs as $output)
+                                        @php
+                                            $outputYear = $output->output_year ?? 1;
+                                            $displayYear = $startYear + $outputYear - 1;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $outputYear }} ({{ $displayYear }})</td>
+                                            <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
+                                            <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
+                                            <td>{{ $output->target_status }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
 
-            {{-- Section 2.3.2: Luaran Tambahan --}}
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3 class="card-title">2.3.2 Luaran Tambahan</h3>
-                </div>
-                @php
-                    $additionalOutputs = $proposal->outputs->where('category', 'Tambahan');
-                @endphp
-                @if ($additionalOutputs->isEmpty())
-                    <div class="card-body">
-                        <p class="text-muted">Belum ada luaran tambahan</p>
-                    </div>
-                @else
+                    <h5 class="mb-2">2.2.2 Luaran Tambahan</h5>
                     @php
-                        $startYear = (int) ($proposal->start_year ?? date('Y'));
-                        $duration = (int) ($proposal->duration_in_years ?? 1);
+                        $additionalOutputs = $proposal->outputs->where('category', 'Tambahan');
                     @endphp
-                    <div class="table-responsive">
-                        <table class="table-bordered table-sm table">
-                            <thead>
-                                <tr>
-                                    <th>Tahun Ke-</th>
-                                    <th>Kelompok</th>
-                                    <th>Luaran</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($additionalOutputs as $output)
-                                    @php
-                                        $outputYear = $output->output_year ?? 1;
-                                        $displayYear = $startYear + $outputYear - 1;
-                                    @endphp
+                    @if ($additionalOutputs->isEmpty())
+                        <p class="text-muted small">Belum ada luaran tambahan</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table-bordered table-sm table">
+                                <thead>
                                     <tr>
-                                        <td>{{ $outputYear }} ({{ $displayYear }})</td>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
-                                        <td>{{ $output->target_status }}</td>
+                                        <th>Tahun Ke-</th>
+                                        <th>Kelompok</th>
+                                        <th>Luaran</th>
+                                        <th>Status</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
+                                </thead>
+                                <tbody>
+                                    @foreach ($additionalOutputs as $output)
+                                        @php
+                                            $outputYear = $output->output_year ?? 1;
+                                            $displayYear = $startYear + $outputYear - 1;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $outputYear }} ({{ $displayYear }})</td>
+                                            <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
+                                            <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
+                                            <td>{{ $output->target_status }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 

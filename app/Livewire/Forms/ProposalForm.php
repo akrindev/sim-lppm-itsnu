@@ -108,6 +108,7 @@ class ProposalForm extends Form
         'email' => '',
         'institution' => '',
         'country' => '',
+        'type' => '',
         'address' => '',
     ];
 
@@ -175,6 +176,7 @@ class ProposalForm extends Form
                 $this->solution_offered = '';
             } elseif ($detailable instanceof CommunityService) {
                 // CommunityService-specific fields
+                $this->macro_research_group_id = (string) ($detailable->macro_research_group_id ?? '');
                 $this->partner_id = $detailable->partner_id ?? '';
                 $this->partner_issue_summary = $detailable->partner_issue_summary ?? '';
                 $this->solution_offered = $detailable->solution_offered ?? '';
@@ -347,6 +349,7 @@ class ProposalForm extends Form
         // This prevents double-validation and maintains form data integrity
 
         $communityService = CommunityService::create([
+            'macro_research_group_id' => $this->macro_research_group_id ?: null,
             'partner_id' => $this->partner_id ?: null,
             'partner_issue_summary' => $this->partner_issue_summary ?: null,
             'solution_offered' => $this->solution_offered ?: null,
@@ -450,6 +453,7 @@ class ProposalForm extends Form
                 } elseif ($detailable instanceof CommunityService) {
                     // Update CommunityService-specific fields
                     $detailable->update([
+                        'macro_research_group_id' => $this->macro_research_group_id ?: null,
                         'partner_id' => $this->partner_id ?: null,
                         'partner_issue_summary' => $this->partner_issue_summary ?: null,
                         'solution_offered' => $this->solution_offered ?: null,

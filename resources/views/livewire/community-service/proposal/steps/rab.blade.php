@@ -156,12 +156,12 @@
                     <thead>
                         <tr>
                             <th width="8%">Tahun Ke-</th>
-                            <th width="13%">Kelompok RAB</th>
-                            <th width="13%">Komponen</th>
-                            <th width="18%">Item</th>
+                            <th width="13%">Kelompok RAB <span class="text-danger">*</span></th>
+                            <th width="13%">Komponen <span class="text-danger">*</span></th>
+                            <th width="18%">Item <span class="text-danger">*</span></th>
                             <th width="8%">Satuan</th>
-                            <th width="8%">Volume</th>
-                            <th width="12%">Harga Satuan</th>
+                            <th width="8%">Volume <span class="text-danger">*</span></th>
+                            <th width="12%">Harga Satuan <span class="text-danger">*</span></th>
                             <th width="13%">Total</th>
                             <th width="5%">Aksi</th>
                         </tr>

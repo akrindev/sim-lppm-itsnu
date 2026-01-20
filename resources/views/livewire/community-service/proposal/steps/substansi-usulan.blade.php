@@ -9,12 +9,13 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label" for="macro_research_group">Kelompok Makro Riset</label>
+                    <label class="form-label" for="macro_research_group">Kelompok Makro Riset <span
+                            class="text-danger">*</span></label>
                     <div wire:ignore>
                         <select id="macro_research_group"
                             class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
                             wire:model="form.macro_research_group_id" x-data="tomSelect"
-                            placeholder="Pilih kelompok makro riset">
+                            placeholder="Pilih kelompok makro riset" required>
                             <option value="">-- Pilih Kelompok Makro Riset --</option>
                             @foreach ($this->macroResearchGroups as $group)
                                 <option value="{{ $group->id }}">{{ $group->name }}</option>
@@ -30,7 +31,7 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label d-flex justify-content-between align-items-center" for="substance_file">
-                        <span>Unggah Substansi Laporan (PDF)</span>
+                        <span>Unggah Substansi Laporan (PDF) <span class="text-danger">*</span></span>
                         @if ($this->templateUrl)
                             <a href="{{ $this->templateUrl }}" target="_blank" class="text-primary text-decoration-none"
                                 style="font-size: 0.875rem;">
