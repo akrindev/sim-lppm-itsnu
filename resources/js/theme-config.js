@@ -6,7 +6,7 @@ const THEME_CONFIG = {
 	'theme-base': 'neutral',
 	'theme-font': 'sans-serif',
 	'theme-primary': 'green',
-	'theme-radius': '2',
+	'theme-radius': '1',
 };
 
 /**

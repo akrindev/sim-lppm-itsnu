@@ -45,45 +45,46 @@
             {{ $researchSchemes->links() }}
         </div>
     </div>
-    <x-tabler.modal id="modal-research-scheme" :title="$modalTitle" onHide="resetForm">
-        <x-slot:body>
-            <form wire:submit="save" id="form-research-scheme">
-                <div class="mb-3">
-                    <label class="form-label">Nama</label>
-                    <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
-                    @error('name')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Strata</label>
-                    <select wire:model="strata" class="form-control">
-                        <option value="">Select strata</option>
-                        <option value="Dasar">Dasar</option>
-                        <option value="Terapan">Terapan</option>
-                        <option value="Pengembangan">Pengembangan</option>
-                    </select>
-                    @error('strata')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </form>
-        </x-slot:body>
-        <x-slot:footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" form="form-research-scheme" class="btn btn-primary">Simpan</button>
-        </x-slot:footer>
-    </x-tabler.modal>
+    @teleport('body')
+        <x-tabler.modal id="modal-research-scheme" :title="$modalTitle" onHide="resetForm">
+            <x-slot:body>
+                <form wire:submit="save" id="form-research-scheme">
+                    <div class="mb-3">
+                        <label class="form-label">Nama</label>
+                        <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
+                        @error('name')
+                            <div class="d-block invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Strata</label>
+                        <select wire:model="strata" class="form-control">
+                            <option value="">Select strata</option>
+                            <option value="Dasar">Dasar</option>
+                            <option value="Terapan">Terapan</option>
+                            <option value="Pengembangan">Pengembangan</option>
+                        </select>
+                        @error('strata')
+                            <div class="d-block invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </form>
+            </x-slot:body>
+            <x-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="form-research-scheme" class="btn btn-primary">Simpan</button>
+            </x-slot:footer>
+        </x-tabler.modal>
 
-    <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
-        <x-slot:body>
-            <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
-        </x-slot:body>
-        <x-slot:footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
-                data-bs-dismiss="modal">Ya, Hapus</button>
-        </x-slot:footer>
-    </x-tabler.modal>
-
+        <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
+            <x-slot:body>
+                <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
+            </x-slot:body>
+            <x-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
+                    data-bs-dismiss="modal">Ya, Hapus</button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
 </div>

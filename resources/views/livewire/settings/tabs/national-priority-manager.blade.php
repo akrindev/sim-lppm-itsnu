@@ -44,33 +44,34 @@
             {{ $nationalPriorities->links() }}
         </div>
     </div>
-    <x-tabler.modal id="modal-national-priority" :title="$modalTitle" onHide="resetForm">
-        <x-slot:body>
-            <form wire:submit="save" id="form-national-priority">
-                <div class="mb-3">
-                    <label class="form-label">Nama</label>
-                    <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
-                    @error('name')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </form>
-        </x-slot:body>
-        <x-slot:footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" form="form-national-priority" class="btn btn-primary">Simpan</button>
-        </x-slot:footer>
-    </x-tabler.modal>
+    @teleport('body')
+        <x-tabler.modal id="modal-national-priority" :title="$modalTitle" onHide="resetForm">
+            <x-slot:body>
+                <form wire:submit="save" id="form-national-priority">
+                    <div class="mb-3">
+                        <label class="form-label">Nama</label>
+                        <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
+                        @error('name')
+                            <div class="d-block invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </form>
+            </x-slot:body>
+            <x-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="form-national-priority" class="btn btn-primary">Simpan</button>
+            </x-slot:footer>
+        </x-tabler.modal>
 
-    <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
-        <x-slot:body>
-            <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
-        </x-slot:body>
-        <x-slot:footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
-                data-bs-dismiss="modal">Ya, Hapus</button>
-        </x-slot:footer>
-    </x-tabler.modal>
-
+        <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
+            <x-slot:body>
+                <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
+            </x-slot:body>
+            <x-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
+                    data-bs-dismiss="modal">Ya, Hapus</button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
 </div>

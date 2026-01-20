@@ -195,10 +195,8 @@
                 <button type="button" class="btn btn-primary" wire:click="saveType">Simpan</button>
             </x-slot:footer>
         </x-tabler.modal>
-    @endteleport
 
-    <!-- Modal Level -->
-    @teleport('body')
+        <!-- Modal Level -->
         <x-tabler.modal id="modal-level" title="Edit Level">
             <x-slot:body>
                 <div class="mb-3">
@@ -215,10 +213,8 @@
                 <button type="button" class="btn btn-primary" wire:click="saveLevel">Simpan</button>
             </x-slot:footer>
         </x-tabler.modal>
-    @endteleport
 
-    <!-- Modal Indicator -->
-    @teleport('body')
+        <!-- Modal Indicator -->
         <x-tabler.modal id="modal-indicator" title="{{ $editingId ? 'Edit Indikator' : 'Tambah Indikator' }}">
             <x-slot:body>
                 <div class="mb-3">
@@ -242,5 +238,5 @@
                 <button type="button" class="btn btn-primary" wire:click="saveIndicator">Simpan</button>
             </x-slot:footer>
         </x-tabler.modal>
-    @endteleport>
+    @endteleport
 </div>

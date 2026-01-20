@@ -66,59 +66,60 @@
         </div>
     </div>
 
-    <x-tabler.modal id="modal-budget-cap" :title="$modalTitle" onHide="resetForm">
-        <x-slot:body>
-            <form wire:submit="save" id="form-budget-cap">
-                <div class="mb-3">
-                    <label class="form-label required">Tahun Anggaran</label>
-                    <input type="number" wire:model="year" class="form-control" placeholder="2025" min="2000"
-                        max="2100">
-                    @error('year')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Batas Anggaran Penelitian</label>
-                    <div class="input-group">
-                        <span class="input-group-text">Rp</span>
-                        <input type="number" wire:model="research_budget_cap" class="form-control"
-                            placeholder="50000000" step="1000" min="0">
+    @teleport('body')
+        <x-tabler.modal id="modal-budget-cap" :title="$modalTitle" onHide="resetForm">
+            <x-slot:body>
+                <form wire:submit="save" id="form-budget-cap">
+                    <div class="mb-3">
+                        <label class="form-label required">Tahun Anggaran</label>
+                        <input type="number" wire:model="year" class="form-control" placeholder="2025" min="2000"
+                            max="2100">
+                        @error('year')
+                            <div class="d-block invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <small class="form-hint">Kosongkan jika tidak ada batasan anggaran untuk penelitian.</small>
-                    @error('research_budget_cap')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Batas Anggaran Pengabdian Masyarakat</label>
-                    <div class="input-group">
-                        <span class="input-group-text">Rp</span>
-                        <input type="number" wire:model="community_service_budget_cap" class="form-control"
-                            placeholder="30000000" step="1000" min="0">
+                    <div class="mb-3">
+                        <label class="form-label">Batas Anggaran Penelitian</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="number" wire:model="research_budget_cap" class="form-control"
+                                placeholder="50000000" step="1000" min="0">
+                        </div>
+                        <small class="form-hint">Kosongkan jika tidak ada batasan anggaran untuk penelitian.</small>
+                        @error('research_budget_cap')
+                            <div class="d-block invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <small class="form-hint">Kosongkan jika tidak ada batasan anggaran untuk pengabdian.</small>
-                    @error('community_service_budget_cap')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </form>
-        </x-slot:body>
-        <x-slot:footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" form="form-budget-cap" class="btn btn-primary">Simpan</button>
-        </x-slot:footer>
-    </x-tabler.modal>
+                    <div class="mb-3">
+                        <label class="form-label">Batas Anggaran Pengabdian Masyarakat</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="number" wire:model="community_service_budget_cap" class="form-control"
+                                placeholder="30000000" step="1000" min="0">
+                        </div>
+                        <small class="form-hint">Kosongkan jika tidak ada batasan anggaran untuk pengabdian.</small>
+                        @error('community_service_budget_cap')
+                            <div class="d-block invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </form>
+            </x-slot:body>
+            <x-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="form-budget-cap" class="btn btn-primary">Simpan</button>
+            </x-slot:footer>
+        </x-tabler.modal>
 
-    <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
-        <x-slot:body>
-            <p>Apakah Anda yakin ingin menghapus pengaturan anggaran untuk tahun
-                <strong>{{ $deleteItemYear ?? '' }}</strong>?</p>
-        </x-slot:body>
-        <x-slot:footer>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
-                data-bs-dismiss="modal">Ya, Hapus</button>
-        </x-slot:footer>
-    </x-tabler.modal>
-
+        <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
+            <x-slot:body>
+                <p>Apakah Anda yakin ingin menghapus pengaturan anggaran untuk tahun
+                    <strong>{{ $deleteItemYear ?? '' }}</strong>?</p>
+            </x-slot:body>
+            <x-slot:footer>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
+                    data-bs-dismiss="modal">Ya, Hapus</button>
+            </x-slot:footer>
+        </x-tabler.modal>
+    @endteleport
 </div>
