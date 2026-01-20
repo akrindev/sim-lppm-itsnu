@@ -76,6 +76,52 @@ Untuk mendapatkan salinan lokal dan menjalankannya, ikuti langkah-langkah sederh
     ```
     Aplikasi Anda akan tersedia di `http://127.0.0.1:8000`.
 
+### 9. Menggunakan Docker (Opsional - Rekomendasi Dev)
+
+Jika ingin menjalankan proyek menggunakan Docker:
+
+1.  **Salin .env dan sesuaikan host database/redis**
+2.  **Jalankan Docker Compose**
+    ```sh
+    docker compose up -d
+    ```
+3.  **Setup Awal di dalam Container**
+    ```sh
+    docker compose exec app composer install
+    docker compose exec app php artisan key:generate
+    docker compose exec app php artisan migrate --seed
+    ```
+    Aplikasi akan tersedia di `http://localhost:8000`.
+
+### 10. Integrasi dengan Reverse Proxy (VPS)
+
+Jika VPS sudah memiliki Nginx/Apache/Caddy, jangan arahkan Docker ke port 80/443. Gunakan port default `8000` dan buatlah *Reverse Proxy*.
+
+#### Contoh Nginx (Host):
+```nginx
+server {
+    listen 80;
+    server_name sim-lppm.itsnu.ac.id;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+#### Contoh Caddy (Host):
+```caddy
+sim-lppm.itsnu.ac.id {
+    reverse_proxy localhost:8000
+}
+```
+
+> **Catatan Keamanan:** Database (port 33060) dan Redis (port 63790) pada Docker ini hanya di-bind ke `127.0.0.1` secara default agar tidak bisa diakses langsung dari internet, sehingga tidak akan bentrok dengan MySQL/MariaDB yang mungkin sudah ada di host VPS Anda.
+
 ## Konfigurasi Antrean (Supervisor)
 
 Untuk menjalankan worker antrean secara otomatis di latar belakang pada server produksi, sangat disarankan menggunakan **Supervisor**.
@@ -190,6 +236,24 @@ pm.min_spare_servers = 5
 pm.max_spare_servers = 15
 pm.max_requests = 1000
 ```
+
+## CI/CD dengan GitHub Actions
+
+Proyek ini dilengkapi dengan pipeline CI/CD otomatis melalui GitHub Actions yang berjalan pada branch `main`:
+
+1.  **Test Job:** Melakukan unit & feature tests menggunakan Pest.
+2.  **Build Job:** Melakukan build Docker image dengan assets yang sudah dikompilasi Bun, lalu melakukan push ke **GitHub Container Registry (GHCR)**.
+3.  **Deploy Job:** Melakukan SSH ke VPS, login ke GHCR, menarik image terbaru, dan melakukan restart container.
+
+### Konfigurasi GitHub Secrets
+(hanya untuk deploy)
+
+Agar pipeline berjalan, tambahkan secret berikut di repositori GitHub Anda:
+
+*   `GHCR_TOKEN`: Personal Access Token (PAT) GitHub dengan scope `read:packages` (digunakan oleh VPS untuk pull image).
+*   `VPS_HOST`: IP atau Domain VPS.
+*   `VPS_USERNAME`: User SSH VPS.
+*   `VPS_SSH_KEY`: Private Key SSH untuk akses ke VPS.
 
 ## Lisensi
 
