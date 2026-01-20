@@ -112,6 +112,85 @@ sudo update
 sudo supervisorctl start sim-lppm-worker:*
 ```
 
+## Konfigurasi Server Produksi (Optimal)
+
+Untuk performa terbaik pada PHP 8.4 dan dukungan upload file besar (hingga 100MB), gunakan konfigurasi berikut:
+
+### 1. Nginx Configuration
+Simpan di `/etc/nginx/sites-available/sim-lppm.conf`:
+```nginx
+server {
+    listen 80;
+    server_name sim-lppm.example.com;
+    root /home/user/sim-lppm-itsnu/public;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    index index.php;
+    charset utf-8;
+
+    # Kapasitas upload 100MB
+    client_max_body_size 100M;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+        
+        # Timeout lebih lama untuk upload file besar
+        fastcgi_read_timeout 300;
+        fastcgi_connect_timeout 300;
+        fastcgi_send_timeout 300;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+
+### 2. PHP 8.4 Configuration (php.ini)
+Sesuaikan nilai berikut pada `/etc/php/8.4/fpm/php.ini`:
+```ini
+; Upload & Resource Limits
+upload_max_filesize = 100M
+post_max_size = 105M
+memory_limit = 512M
+max_execution_time = 300
+max_input_time = 300
+
+; OpCache & JIT (Essential for PHP 8.4)
+opcache.enable=1
+opcache.memory_consumption=192
+opcache.interned_strings_buffer=16
+opcache.max_accelerated_files=10000
+opcache.validate_timestamps=0
+opcache.save_comments=1
+opcache.jit=tracing
+opcache.jit_buffer_size=128M
+```
+
+### 3. PHP-FPM Pool Configuration (www.conf)
+Optimasi worker pada `/etc/php/8.4/fpm/pool.d/www.conf`:
+```ini
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 10
+pm.min_spare_servers = 5
+pm.max_spare_servers = 15
+pm.max_requests = 1000
+```
+
 ## Lisensi
 
 Didistribusikan di bawah Lisensi MIT.
