@@ -312,9 +312,9 @@
                                 <tr>
                                     <th>Tahun Ke-</th>
                                     <th>Kelompok</th>
-                                    <th>Luaran</th>
+                                     <th>Luaran</th>
                                     <th>Status</th>
-                                    <th>Keterangan</th>
+                                    <th>Keterangan (URL)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -360,9 +360,9 @@
                                 <tr>
                                     <th>Tahun Ke-</th>
                                     <th>Kelompok</th>
-                                    <th>Luaran</th>
+                                     <th>Luaran</th>
                                     <th>Status</th>
-                                    <th>Keterangan</th>
+                                    <th>Keterangan (URL)</th>
                                 </tr>
                             </thead>
                             <tbody>

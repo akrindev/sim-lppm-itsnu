@@ -1,12 +1,17 @@
 import "@tabler/core/dist/libs/nouislider/dist/nouislider.min.js";
 import TomSelect from "@tabler/core/dist/libs/tom-select/dist/js/tom-select.base.js";
 import * as Tabler from "@tabler/core/js/tabler";
+import NProgress from "nprogress";
 import "./theme-config";
 
 window.tabler = Tabler;
 window.bootstrap = Tabler.bootstrap;
 // Make TomSelect available globally
 window.TomSelect = TomSelect;
+
+// NProgress Configuration
+NProgress.configure({ showSpinner: false });
+window.NProgress = NProgress;
 
 /**
  * Configuration items for menu and layout settings
@@ -284,4 +289,19 @@ document.addEventListener("shown.bs.modal", (event) => {
 // Fallback: Initialize on first page load
 document.addEventListener("DOMContentLoaded", () => {
     initializeSettings();
+});
+
+// Livewire Global Progress Bar
+document.addEventListener("livewire:init", () => {
+    Livewire.hook("request", ({ fail, respond, succeed }) => {
+        NProgress.start();
+
+        respond(() => {
+            NProgress.done();
+        });
+
+        fail(() => {
+            NProgress.done();
+        });
+    });
 });

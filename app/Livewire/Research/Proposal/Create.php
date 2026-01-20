@@ -51,6 +51,9 @@ class Create extends ProposalCreate
                     if (empty($item['status'])) {
                         $errors[] = 'Status';
                     }
+                    if (empty($item['description'])) {
+                        $errors[] = 'Keterangan (URL)';
+                    }
 
                     if (! empty($errors)) {
                         $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
