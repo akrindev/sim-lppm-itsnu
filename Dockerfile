@@ -40,8 +40,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy application files
+# Copy application files (excluding built assets)
 COPY . .
+RUN rm -rf public/build
 
 # Copy built assets from builder stage
 COPY --from=asset-builder /app/public/build ./public/build

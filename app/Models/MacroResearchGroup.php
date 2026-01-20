@@ -23,4 +23,12 @@ class MacroResearchGroup extends Model
     {
         return $this->hasMany(Research::class);
     }
+
+    /**
+     * Get all community services associated with this macro research group.
+     */
+    public function communityServices(): HasMany
+    {
+        return $this->hasMany(CommunityService::class);
+    }
 }

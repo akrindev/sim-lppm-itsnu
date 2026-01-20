@@ -63,7 +63,7 @@ class Edit extends ProposalCreate
                 }
             }],
             'form.outputs.*.status' => 'required|string|max:255',
-            'form.outputs.*.description' => 'required|string|max:255',
+            'form.outputs.*.description' => 'required|string|max:2000',
         ];
 
         $rules['form.tkt_type'] = 'nullable|string';

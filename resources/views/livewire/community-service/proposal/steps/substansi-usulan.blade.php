@@ -118,11 +118,12 @@
                     <tbody>
                         @foreach ($form->outputs as $index => $output)
                             <tr wire:key="output-{{ $index }}" x-data="{
-                                group: $wire.entangle('form.outputs.{{ $index }}.group')
+                                group: $wire.entangle('form.outputs.{{ $index }}.group'),
+                                type: $wire.entangle('form.outputs.{{ $index }}.type')
                             }">
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.year"
-                                        class="form-select form-select-sm @error('form.outputs.'.$index.'.year') is-invalid @enderror">
+                                        class="form-select form-select-sm @error('form.outputs.' . $index . '.year') is-invalid @enderror">
                                         @for ($y = 1; $y <= $duration; $y++)
                                             <option value="{{ $y }}">{{ $y }}
                                                 ({{ $startYear + $y - 1 }})</option>
@@ -131,13 +132,14 @@
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.category"
-                                        class="form-select-sm form-select @error('form.outputs.'.$index.'.category') is-invalid @enderror">
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.category') is-invalid @enderror">
                                         <option value="Wajib">Wajib</option>
                                         <option value="Tambahan">Tambahan</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <select x-model="group" class="form-select-sm form-select @error('form.outputs.'.$index.'.group') is-invalid @enderror">
+                                    <select x-model="group"
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.group') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
                                         <option value="pemberdayaan">Pemberdayaan</option>
                                         <option value="jurnal">Jurnal</option>
@@ -148,11 +150,11 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="form.outputs.{{ $index }}.type"
-                                        class="form-select-sm form-select @error('form.outputs.'.$index.'.type') is-invalid @enderror">
+                                    <select x-model="type"
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.type') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
                                         <template x-for="typeOption in (typesMap[group] || [])">
-                                            <option x-text="typeOption" :value="typeOption" :selected="typeOption == $wire.get('form.outputs.{{ $index }}.type')"></option>
+                                            <option x-text="typeOption" :value="typeOption"></option>
                                         </template>
                                     </select>
                                 </td>

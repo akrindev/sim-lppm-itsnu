@@ -52,7 +52,7 @@ class Create extends ProposalCreate
                 }
             }],
             'form.outputs.*.status' => 'required|string|max:255',
-            'form.outputs.*.description' => 'required|string|max:255',
+            'form.outputs.*.description' => 'required|string|max:2000',
         ];
     }
 
@@ -83,9 +83,9 @@ class Create extends ProposalCreate
             // Pemula / Internal -> Sinta 1-2 (Safe default, or user changes to 3-6)
             $output = [
                 'year' => 1,
-                'category' => 'Wajib',
+                'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'jurnal',
-                'type' => 'Jurnal Nas. Terakreditasi (Sinta 1-2)',
+                'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['jurnal'][3],
                 'status' => 'Published',
                 'description' => 'Target publikasi jurnal nasional',
             ];
@@ -93,9 +93,9 @@ class Create extends ProposalCreate
             // Terapan -> Produk / Prototipe
             $output = [
                 'year' => 1,
-                'category' => 'Wajib',
+                'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'produk',
-                'type' => 'Purwarupa/Prototipe TRL 4-6',
+                'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['produk'][0] ?? 'Purwarupa/Prototipe TRL 4-6',
                 'status' => 'Draft',
                 'description' => 'Target prototipe produk',
             ];
@@ -103,9 +103,9 @@ class Create extends ProposalCreate
             // Default (Dasar, Fundamental, Pascasarjana) -> Jurnal Internasional Bereputasi
             $output = [
                 'year' => 1,
-                'category' => 'Wajib',
+                'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'jurnal',
-                'type' => 'Jurnal Int. Bereputasi (Q1-Q2)',
+                'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['jurnal'][0],
                 'status' => 'Submitted',
                 'description' => 'Target publikasi jurnal internasional bereputasi',
             ];

@@ -16,9 +16,9 @@ class Create extends ProposalCreate
             if (empty($this->form->outputs)) {
                 $this->form->outputs[] = [
                     'year' => 1,
-                    'category' => 'Wajib',
+                    'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                     'group' => 'jurnal',
-                    'type' => 'Jurnal PKM (Sinta 1-2)',
+                    'type' => ProposalConstants::PKM_OUTPUT_TYPES['jurnal'][0],
                     'status' => 'Published',
                     'description' => 'Target publikasi jurnal PKM',
                 ];
@@ -91,7 +91,7 @@ class Create extends ProposalCreate
                 }
             }],
             'form.outputs.*.status' => 'required|string|max:255',
-            'form.outputs.*.description' => 'required|string|max:255',
+            'form.outputs.*.description' => 'required|string|max:2000',
         ];
     }
 }
