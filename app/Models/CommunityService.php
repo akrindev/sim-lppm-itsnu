@@ -26,10 +26,19 @@ class CommunityService extends Model implements HasMedia
     public $incrementing = false;
 
     protected $fillable = [
+        'macro_research_group_id',
         'partner_id',
         'partner_issue_summary',
         'solution_offered',
     ];
+
+    /**
+     * Get the macro research group for the community service.
+     */
+    public function macroResearchGroup(): BelongsTo
+    {
+        return $this->belongsTo(MacroResearchGroup::class);
+    }
 
     /**
      * Get the partner for the community service.

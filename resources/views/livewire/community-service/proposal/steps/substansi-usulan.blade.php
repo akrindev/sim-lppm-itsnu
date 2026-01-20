@@ -9,12 +9,13 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label" for="macro_research_group">Kelompok Makro Riset</label>
+                    <label class="form-label" for="macro_research_group">Kelompok Makro Riset <span
+                            class="text-danger">*</span></label>
                     <div wire:ignore>
                         <select id="macro_research_group"
                             class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
                             wire:model="form.macro_research_group_id" x-data="tomSelect"
-                            placeholder="Pilih kelompok makro riset">
+                            placeholder="Pilih kelompok makro riset" required>
                             <option value="">-- Pilih Kelompok Makro Riset --</option>
                             @foreach ($this->macroResearchGroups as $group)
                                 <option value="{{ $group->id }}">{{ $group->name }}</option>
@@ -30,7 +31,7 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label d-flex justify-content-between align-items-center" for="substance_file">
-                        <span>Unggah Substansi Laporan (PDF)</span>
+                        <span>Unggah Substansi Laporan (PDF) <span class="text-danger">*</span></span>
                         @if ($this->templateUrl)
                             <a href="{{ $this->templateUrl }}" target="_blank" class="text-primary text-decoration-none"
                                 style="font-size: 0.875rem;">
@@ -95,7 +96,9 @@
                 Belum ada luaran target. Klik tombol "Tambah Luaran" untuk menambahkan.
             </div>
         @else
-            <div class="table-responsive">
+            <div class="table-responsive" x-data="{
+                typesMap: @js(\App\Constants\ProposalConstants::PKM_OUTPUT_TYPES)
+            }">
                 <table class="table-bordered table">
                     @php
                         $duration = (int) ($form->duration_in_years ?? 1);
@@ -103,12 +106,12 @@
                     @endphp
                     <thead>
                         <tr>
-                            <th style="width: 100px;">Tahun Ke-</th>
-                            <th width="15%">Jenis</th>
-                            <th width="20%">Kategori Luaran</th>
-                            <th width="20%">Luaran</th>
-                            <th width="15%">Status</th>
-                            <th width="20%">Keterangan</th>
+                            <th style="width: 100px;">Tahun Ke- <span class="text-danger">*</span></th>
+                            <th width="15%">Jenis <span class="text-danger">*</span></th>
+                            <th width="20%">Kategori Luaran <span class="text-danger">*</span></th>
+                            <th width="20%">Luaran <span class="text-danger">*</span></th>
+                            <th width="15%">Status <span class="text-danger">*</span></th>
+                            <th width="20%">Keterangan (URL) <span class="text-danger">*</span></th>
                             <th width="5%">Aksi</th>
                         </tr>
                     </thead>
@@ -116,38 +119,11 @@
                         @foreach ($form->outputs as $index => $output)
                             <tr wire:key="output-{{ $index }}" x-data="{
                                 group: $wire.entangle('form.outputs.{{ $index }}.group'),
-                                types: {
-                                    'pemberdayaan': [
-                                        'Peningkatan Omzet (Rp/%)',
-                                        'Peningkatan Kualitas (Sertifikasi/PIRT)',
-                                        'Perbaikan Tata Kelola/Manajemen',
-                                        'Peningkatan Kompetensi SDM'
-                                    ],
-                                    'jurnal': [
-                                        'Jurnal PKM (Sinta 1-6)',
-                                        'Jurnal PKM (Ber-ISSN/Non-Sinta)'
-                                    ],
-                                    'media': [
-                                        'Media Massa Nasional (Cetak/Elektronik)',
-                                        'Media Massa Lokal (Cetak/Elektronik)'
-                                    ],
-                                    'video': [
-                                        'Video Kegiatan (Publikasi Youtube/Medsos)'
-                                    ],
-                                    'produk': [
-                                        'Teknologi Tepat Guna (TTG)',
-                                        'Model/Sistem/Rekayasa Sosial',
-                                        'Produk Tersertifikasi'
-                                    ],
-                                    'hki_buku': [
-                                        'Hak Cipta (Modul/Panduan)',
-                                        'Buku Pedoman/Panduan Penerapan'
-                                    ]
-                                }
+                                type: $wire.entangle('form.outputs.{{ $index }}.type')
                             }">
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.year"
-                                        class="form-select form-select-sm">
+                                        class="form-select form-select-sm @error('form.outputs.' . $index . '.year') is-invalid @enderror">
                                         @for ($y = 1; $y <= $duration; $y++)
                                             <option value="{{ $y }}">{{ $y }}
                                                 ({{ $startYear + $y - 1 }})</option>
@@ -156,14 +132,14 @@
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.category"
-                                        class="form-select-sm form-select">
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.category') is-invalid @enderror">
                                         <option value="Wajib">Wajib</option>
                                         <option value="Tambahan">Tambahan</option>
                                     </select>
                                 </td>
-
                                 <td>
-                                    <select x-model="group" class="form-select-sm form-select">
+                                    <select x-model="group"
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.group') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
                                         <option value="pemberdayaan">Pemberdayaan</option>
                                         <option value="jurnal">Jurnal</option>
@@ -174,21 +150,22 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="form.outputs.{{ $index }}.type"
-                                        class="form-select-sm form-select">
+                                    <select x-model="type"
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.type') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
-                                        <template x-for="type in (types[group] || [])">
-                                            <option x-text="type" :value="type"></option>
+                                        <template x-for="typeOption in (typesMap[group] || [])">
+                                            <option x-text="typeOption" :value="typeOption"></option>
                                         </template>
                                     </select>
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.status"
-                                        class="form-control form-control-sm" placeholder="Status">
+                                        class="form-control form-control-sm @error('form.outputs.'.$index.'.status') is-invalid @enderror" placeholder="Status">
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.description"
-                                        class="form-control form-control-sm" placeholder="Keterangan">
+                                        class="form-control form-control-sm @error('form.outputs.'.$index.'.description') is-invalid @enderror"
+                                        placeholder="Keterangan (URL)">
                                 </td>
                                 <td>
                                     <button type="button" wire:click="removeOutput({{ $index }})"

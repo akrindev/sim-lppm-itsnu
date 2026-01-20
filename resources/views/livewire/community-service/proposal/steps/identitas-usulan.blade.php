@@ -186,32 +186,48 @@
                 </div>
             </div>
 
-                    @error('form.cluster_level2_id')
-                        <div class="d-block invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
 
-<!-- Section: Ringkasan -->
+<!-- Section: Ringkasan & Masalah -->
 <div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
             <x-lucide-file-text class="icon me-3" />
-            <h3 class="card-title mb-0">1.3 Ringkasan Proposal</h3>
+            <h3 class="card-title mb-0">1.3 Ringkasan & Masalah Mitra</h3>
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="summary">Ringkasan <span class="text-danger">*</span></label>
+            <label class="form-label" for="summary">Ringkasan Proposal <span class="text-danger">*</span></label>
             <textarea id="summary" class="form-control @error('form.summary') is-invalid @enderror" wire:model="form.summary"
                 rows="4" placeholder="Masukkan ringkasan proposal (minimal 100 karakter)" required></textarea>
             @error('form.summary')
                 <div class="d-block invalid-feedback">{{ $message }}</div>
             @enderror
             <small class="text-muted">Minimum 100 karakter</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="partner_issue_summary">Masalah Mitra <span class="text-danger">*</span></label>
+            <textarea id="partner_issue_summary" class="form-control @error('form.partner_issue_summary') is-invalid @enderror"
+                wire:model="form.partner_issue_summary" rows="4" placeholder="Jelaskan masalah yang dihadapi mitra (minimal 50 karakter)"
+                required></textarea>
+            @error('form.partner_issue_summary')
+                <div class="d-block invalid-feedback">{{ $message }}</div>
+            @enderror
+            <small class="text-muted">Minimum 50 karakter</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="solution_offered">Solusi yang Ditawarkan <span class="text-danger">*</span></label>
+            <textarea id="solution_offered" class="form-control @error('form.solution_offered') is-invalid @enderror"
+                wire:model="form.solution_offered" rows="4" placeholder="Jelaskan solusi yang ditawarkan (minimal 50 karakter)"
+                required></textarea>
+            @error('form.solution_offered')
+                <div class="d-block invalid-feedback">{{ $message }}</div>
+            @enderror
+            <small class="text-muted">Minimum 50 karakter</small>
         </div>
     </div>
 </div>

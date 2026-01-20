@@ -312,9 +312,9 @@
                                 <tr>
                                     <th>Tahun Ke-</th>
                                     <th>Kelompok</th>
-                                    <th>Luaran</th>
+                                     <th>Luaran</th>
                                     <th>Status</th>
-                                    <th>Keterangan</th>
+                                    <th>Keterangan (URL)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -360,9 +360,9 @@
                                 <tr>
                                     <th>Tahun Ke-</th>
                                     <th>Kelompok</th>
-                                    <th>Luaran</th>
+                                     <th>Luaran</th>
                                     <th>Status</th>
-                                    <th>Keterangan</th>
+                                    <th>Keterangan (URL)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -554,10 +554,10 @@
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <span class="bg-blue-lt badge">
+                                             <td>
+                                                <x-tabler.badge color="blue">
                                                     {{ $partner->type ?? 'External' }}
-                                                </span>
+                                                </x-tabler.badge>
                                             </td>
                                             <td>
                                                 @if ($partner->hasMedia('commitment_letter'))
@@ -567,10 +567,10 @@
                                                         Unduh
                                                     </a>
                                                 @else
-                                                    <span class="bg-yellow-lt text-yellow-fg badge">
+                                                    <x-tabler.badge color="yellow">
                                                         <x-lucide-file-x class="icon me-1" />
                                                         Tidak Ada
-                                                    </span>
+                                                    </x-tabler.badge>
                                                 @endif
                                             </td>
                                         </tr>

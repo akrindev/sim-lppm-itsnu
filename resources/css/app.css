@@ -8,7 +8,19 @@
 @import '@tabler/core/dist/css/tabler-vendors.min.css';
 @import '@tabler/core/dist/css/tabler-marketing.min.css';
 @import '@tabler/core/dist/css/tabler-themes.min.css';
+@import 'nprogress/nprogress.css';
 
 .ts-dropdown {
     z-index: 10500; /* Ensure dropdowns appear above other elements */
+}
+
+/* Custom NProgress Color */
+#nprogress .bar {
+    background: #206bc4 !important; /* tabler-primary */
+    height: 3px !important;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: #206bc4 !important;
+    border-left-color: #206bc4 !important;
 }

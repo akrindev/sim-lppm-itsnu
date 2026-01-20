@@ -83,9 +83,15 @@
                     <tr>
                         <td><strong>File Substansi</strong></td>
                         <td>
-                            @if ($form->substance_file)
+                            @if ($form->substance_file && !is_string($form->substance_file))
                                 <x-lucide-file-check class="text-success icon" />
-                                {{ is_string($form->substance_file) ? basename($form->substance_file) : $form->substance_file->getClientOriginalName() }}
+                                {{ $form->substance_file->getClientOriginalName() }}
+                            @elseif ($form->proposal && $form->proposal->detailable && $form->proposal->detailable->hasMedia('substance_file'))
+                                @php
+                                    $media = $form->proposal->detailable->getFirstMedia('substance_file');
+                                @endphp
+                                <x-lucide-file-check class="text-success icon" />
+                                {{ $media->name }} <small class="text-muted">(Lama)</small>
                             @else
                                 <span class="text-muted">Tidak ada file</span>
                             @endif
@@ -106,9 +112,9 @@
                                     <th>Tahun</th>
                                     <th>Jenis</th>
                                     <th>Kategori Luaran</th>
-                                    <th>Luaran</th>
+                                     <th>Luaran</th>
                                     <th>Status</th>
-                                    <th>Keterangan</th>
+                                    <th>Keterangan (URL)</th>
                                 </tr>
                             </thead>
                             <tbody>

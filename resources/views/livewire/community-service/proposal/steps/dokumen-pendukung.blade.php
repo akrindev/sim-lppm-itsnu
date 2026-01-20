@@ -15,9 +15,18 @@
         @if (empty($form->partner_ids))
             <div class="alert alert-info">
                 <x-lucide-info class="icon me-2" />
-                Belum ada mitra yang ditambahkan.
+                Belum ada mitra yang ditambahkan. Untuk proposal Pengabdian Masyarakat, minimal wajib menambahkan 1 mitra.
             </div>
-        @else
+        @endif
+
+        @error('form.partner_ids')
+            <div class="alert alert-danger">
+                <x-lucide-alert-circle class="icon me-2" />
+                {{ $message }}
+            </div>
+        @enderror
+
+        @if (!empty($form->partner_ids))
             <div class="table-responsive">
                 <table class="table table-vcenter">
                     <thead>
@@ -149,6 +158,19 @@
     </div>
 
     <div class="mb-3">
+        <label class="form-label">Jenis Mitra <span class="text-danger">*</span></label>
+        <select wire:model="form.new_partner.type" class="form-select @error('form.new_partner.type') is-invalid @enderror" required>
+            <option value="">-- Pilih Jenis Mitra --</option>
+            @foreach(\App\Constants\ProposalConstants::PARTNER_TYPES as $type)
+                <option value="{{ $type }}">{{ $type }}</option>
+            @endforeach
+        </select>
+        @error('form.new_partner.type')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
         <label class="form-label">Negara <span class="text-danger">*</span></label>
         <input type="text" wire:model="form.new_partner.country"
             class="form-control @error('form.new_partner.country') is-invalid @enderror"
@@ -169,7 +191,7 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">File Surat Kesanggupan Mitra (PDF)</label>
+        <label class="form-label">File Surat Kesanggupan Mitra (PDF) <span class="text-danger">*</span></label>
         <input type="file" wire:model="form.new_partner_commitment_file"
             class="form-control @error('form.new_partner_commitment_file') is-invalid @enderror"
             accept=".pdf">

@@ -98,48 +98,18 @@
             </div>
         @else
             @php
-                $outputTypes = [
-                    'jurnal' => [
-                        'Jurnal Int. Bereputasi (Q1-Q2)',
-                        'Jurnal Int. Bereputasi (Q3-Q4)',
-                        'Jurnal Internasional (Terindeks)',
-                        'Jurnal Nas. Terakreditasi (Sinta 1-2)',
-                        'Jurnal Nas. Terakreditasi (Sinta 3-6)',
-                    ],
-                    'prosiding' => [
-                        'Prosiding Sem. Int. Terindeks (Scopus/WoS)',
-                        'Prosiding Seminar Nasional',
-                    ],
-                    'buku' => [
-                        'Buku Referensi (ISBN)',
-                        'Buku Monograf (ISBN)',
-                        'Chapter dalam Buku Internasional',
-                    ],
-                    'hki' => [
-                        'Paten (Granted/Terdaftar)',
-                        'Paten Sederhana (Granted/Terdaftar)',
-                        'Hak Cipta',
-                        'Desain Industri',
-                        'PVT',
-                        'DTLST',
-                    ],
-                    'lainnya' => [
-                        'Naskah Kebijakan (Policy Brief)',
-                        'Visiting Lecturer',
-                        'Keynote Speaker',
-                    ],
-                ];
+                $outputTypes = \App\Constants\ProposalConstants::RESEARCH_OUTPUT_TYPES;
             @endphp
             <div class="table-responsive">
                 <table class="table-bordered table">
                     <thead>
                         <tr>
-                            <th width="10%">Tahun Ke-</th>
-                            <th width="12%">Jenis</th>
-                            <th width="18%">Kategori Luaran</th>
-                            <th width="20%">Luaran</th>
-                            <th width="15%">Status</th>
-                            <th width="20%">Keterangan</th>
+                            <th width="10%">Tahun Ke- <span class="text-danger">*</span></th>
+                            <th width="12%">Jenis <span class="text-danger">*</span></th>
+                            <th width="18%">Kategori Luaran <span class="text-danger">*</span></th>
+                            <th width="20%">Luaran <span class="text-danger">*</span></th>
+                            <th width="15%">Status <span class="text-danger">*</span></th>
+                            <th width="20%">Keterangan (URL) <span class="text-danger">*</span></th>
                             <th width="5%">Aksi</th>
                         </tr>
                     </thead>
@@ -151,9 +121,9 @@
                                 $currentGroup = $form->outputs[$index]['group'] ?? '';
                             @endphp
                             <tr wire:key="output-{{ $index }}">
-                                <td>
+                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.year"
-                                        class="form-select-sm form-select">
+                                        class="form-select-sm form-select @error('form.outputs.'.$index.'.year') is-invalid @enderror">
                                         @for ($y = 1; $y <= $duration; $y++)
                                             <option value="{{ $y }}">{{ $y }} ({{ $startYear + $y - 1 }})</option>
                                         @endfor
@@ -161,7 +131,7 @@
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.category"
-                                        class="form-select-sm form-select">
+                                        class="form-select-sm form-select @error('form.outputs.'.$index.'.category') is-invalid @enderror">
                                         <option value="Wajib">Wajib</option>
                                         <option value="Tambahan">Tambahan</option>
                                     </select>
@@ -169,7 +139,7 @@
 
                                 <td>
                                     <select wire:model.live="form.outputs.{{ $index }}.group"
-                                        class="form-select-sm form-select">
+                                        class="form-select-sm form-select @error('form.outputs.'.$index.'.group') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
                                         <option value="jurnal">Jurnal</option>
                                         <option value="prosiding">Prosiding</option>
@@ -180,7 +150,7 @@
                                 </td>
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.type"
-                                        class="form-select-sm form-select">
+                                        class="form-select-sm form-select @error('form.outputs.'.$index.'.type') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
                                         @if (!empty($currentGroup) && isset($outputTypes[$currentGroup]))
                                             @foreach ($outputTypes[$currentGroup] as $typeOption)
@@ -191,11 +161,11 @@
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.status"
-                                        class="form-control form-control-sm" placeholder="Status">
+                                        class="form-control form-control-sm @error('form.outputs.'.$index.'.status') is-invalid @enderror" placeholder="Status">
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.description"
-                                        class="form-control form-control-sm" placeholder="Keterangan">
+                                        class="form-control form-control-sm @error('form.outputs.'.$index.'.description') is-invalid @enderror" placeholder="Keterangan (URL)">
                                 </td>
                                 <td>
                                     <button type="button" wire:click="removeOutput({{ $index }})"

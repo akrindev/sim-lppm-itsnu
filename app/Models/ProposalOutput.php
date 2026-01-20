@@ -18,6 +18,7 @@ class ProposalOutput extends Model
         'group',
         'type',
         'target_status',
+        'description',
     ];
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Research\Proposal;
 
+use App\Constants\ProposalConstants;
 use App\Livewire\Abstracts\ProposalCreate;
 
 class Create extends ProposalCreate
@@ -36,27 +37,22 @@ class Create extends ProposalCreate
                 if ($wajibCount < 1) {
                     $fail('Minimal harus ada 1 luaran wajib untuk proposal penelitian.');
                 }
-
-                // Validate each row has required fields
-                foreach ($value as $index => $item) {
-                    $rowNum = $index + 1;
-                    $errors = [];
-
-                    if (empty($item['group'])) {
-                        $errors[] = 'Kategori Luaran';
-                    }
-                    if (empty($item['type'])) {
-                        $errors[] = 'Luaran';
-                    }
-                    if (empty($item['status'])) {
-                        $errors[] = 'Status';
-                    }
-
-                    if (! empty($errors)) {
-                        $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
+            }],
+            'form.outputs.*.year' => 'required|integer|min:1|max:10',
+            'form.outputs.*.category' => ['required', \Illuminate\Validation\Rule::in(ProposalConstants::OUTPUT_CATEGORIES)],
+            'form.outputs.*.group' => ['required', \Illuminate\Validation\Rule::in(ProposalConstants::RESEARCH_OUTPUT_GROUPS)],
+            'form.outputs.*.type' => ['required', 'string', function ($attribute, $value, $fail) {
+                // Validate type matches group
+                $index = explode('.', $attribute)[2];
+                $group = $this->form->outputs[$index]['group'] ?? null;
+                if ($group && isset(ProposalConstants::RESEARCH_OUTPUT_TYPES[$group])) {
+                    if (! in_array($value, ProposalConstants::RESEARCH_OUTPUT_TYPES[$group])) {
+                        $fail('Luaran baris '.($index + 1).' tidak valid untuk kategori yang dipilih.');
                     }
                 }
             }],
+            'form.outputs.*.status' => 'required|string|max:255',
+            'form.outputs.*.description' => 'required|string|max:2000',
         ];
     }
 
@@ -87,9 +83,9 @@ class Create extends ProposalCreate
             // Pemula / Internal -> Sinta 1-2 (Safe default, or user changes to 3-6)
             $output = [
                 'year' => 1,
-                'category' => 'Wajib',
+                'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'jurnal',
-                'type' => 'Jurnal Nas. Terakreditasi (Sinta 1-2)',
+                'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['jurnal'][3],
                 'status' => 'Published',
                 'description' => 'Target publikasi jurnal nasional',
             ];
@@ -97,9 +93,9 @@ class Create extends ProposalCreate
             // Terapan -> Produk / Prototipe
             $output = [
                 'year' => 1,
-                'category' => 'Wajib',
+                'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'produk',
-                'type' => 'Purwarupa/Prototipe TRL 4-6',
+                'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['produk'][0] ?? 'Purwarupa/Prototipe TRL 4-6',
                 'status' => 'Draft',
                 'description' => 'Target prototipe produk',
             ];
@@ -107,9 +103,9 @@ class Create extends ProposalCreate
             // Default (Dasar, Fundamental, Pascasarjana) -> Jurnal Internasional Bereputasi
             $output = [
                 'year' => 1,
-                'category' => 'Wajib',
+                'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'jurnal',
-                'type' => 'Jurnal Int. Bereputasi (Q1-Q2)',
+                'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['jurnal'][0],
                 'status' => 'Submitted',
                 'description' => 'Target publikasi jurnal internasional bereputasi',
             ];

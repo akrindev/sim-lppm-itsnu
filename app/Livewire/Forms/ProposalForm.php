@@ -8,6 +8,7 @@ use App\Models\Research;
 use App\Models\ResearchScheme;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -108,6 +109,7 @@ class ProposalForm extends Form
         'email' => '',
         'institution' => '',
         'country' => '',
+        'type' => '',
         'address' => '',
     ];
 
@@ -175,6 +177,7 @@ class ProposalForm extends Form
                 $this->solution_offered = '';
             } elseif ($detailable instanceof CommunityService) {
                 // CommunityService-specific fields
+                $this->macro_research_group_id = (string) ($detailable->macro_research_group_id ?? '');
                 $this->partner_id = $detailable->partner_id ?? '';
                 $this->partner_issue_summary = $detailable->partner_issue_summary ?? '';
                 $this->solution_offered = $detailable->solution_offered ?? '';
@@ -347,6 +350,7 @@ class ProposalForm extends Form
         // This prevents double-validation and maintains form data integrity
 
         $communityService = CommunityService::create([
+            'macro_research_group_id' => $this->macro_research_group_id ?: null,
             'partner_id' => $this->partner_id ?: null,
             'partner_issue_summary' => $this->partner_issue_summary ?: null,
             'solution_offered' => $this->solution_offered ?: null,
@@ -450,6 +454,7 @@ class ProposalForm extends Form
                 } elseif ($detailable instanceof CommunityService) {
                     // Update CommunityService-specific fields
                     $detailable->update([
+                        'macro_research_group_id' => $this->macro_research_group_id ?: null,
                         'partner_id' => $this->partner_id ?: null,
                         'partner_issue_summary' => $this->partner_issue_summary ?: null,
                         'solution_offered' => $this->solution_offered ?: null,
@@ -614,6 +619,17 @@ class ProposalForm extends Form
 
         $rules['members'] = 'nullable|array';
 
+        // Strict validation for array inputs to prevent injection
+        $rules['outputs.*.year'] = 'required|integer|min:1|max:10';
+        $rules['outputs.*.category'] = ['required', Rule::in(\App\Constants\ProposalConstants::OUTPUT_CATEGORIES)];
+        // Group and Type validated in step-specific rules in components for better context
+
+        $rules['budget_items.*.year'] = 'required|integer|min:1|max:10';
+        $rules['budget_items.*.budget_group_id'] = 'required|exists:budget_groups,id';
+        $rules['budget_items.*.budget_component_id'] = 'required|exists:budget_components,id';
+        $rules['budget_items.*.volume'] = 'required|numeric|min:0.01';
+        $rules['budget_items.*.unit_price'] = 'required|numeric|min:1';
+
         return $rules;
     }
 
@@ -671,6 +687,7 @@ class ProposalForm extends Form
                     'group' => $output['group'] ?? '',
                     'type' => $output['type'] ?? '',
                     'target_status' => $output['status'] ?? '',
+                    'description' => $output['description'] ?? null,
                 ]);
             }
         }

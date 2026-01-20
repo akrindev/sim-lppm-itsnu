@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Constants\ProposalConstants;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,23 +17,15 @@ class ProposalOutputFactory extends Factory
      */
     public function definition(): array
     {
+        $group = fake()->randomElement(ProposalConstants::RESEARCH_OUTPUT_GROUPS);
+        $types = ProposalConstants::RESEARCH_OUTPUT_TYPES[$group] ?? ['Lainnya'];
+
         return [
             'proposal_id' => \App\Models\Proposal::factory(),
             'output_year' => fake()->numberBetween(1, 3),
-            'category' => fake()->randomElement(['Wajib', 'Tambahan']),
-            'type' => fake()->randomElement([
-                'Jurnal Internasional Bereputasi',
-                'Jurnal Internasional',
-                'Jurnal Nasional Terakreditasi (Sinta 1-2)',
-                'Jurnal Nasional Terakreditasi (Sinta 3-6)',
-                'Prosiding Internasional Terindeks',
-                'Prosiding Nasional',
-                'HKI (Paten/Paten Sederhana)',
-                'HKI (Hak Cipta/Merek/Desain Industri)',
-                'Buku Ber-ISBN',
-                'Purwarupa/Prototipe TRL 4-6',
-                'Model/Purwarupa Sosial',
-            ]),
+            'category' => fake()->randomElement(ProposalConstants::OUTPUT_CATEGORIES),
+            'group' => $group,
+            'type' => fake()->randomElement($types),
             'target_status' => fake()->randomElement([
                 'Accepted/Published',
                 'Under Review',
