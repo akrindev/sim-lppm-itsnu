@@ -5,216 +5,495 @@ namespace App\Livewire\Settings\Tabs;
 use App\Livewire\Concerns\HasToast;
 use App\Models\TktIndicator;
 use App\Models\TktLevel;
+use Illuminate\Support\Collection;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
- * TKT Manager Component
- * Manages TKT Types, Levels, and Indicators with tabbed navigation
+ * TKT Manager Component - Master-Detail Split Panel
+ * Manages TKT Types, Levels, and Indicators with tree navigation
  */
 class TktManager extends Component
 {
     use HasToast;
 
-    // Tab navigation
-    public $currentTab = 'types'; // types, levels, indicators
+    // Navigation state
+    #[Url(as: 'type')]
+    public ?string $selectedType = null;
 
-    public $selectedType;
+    #[Url(as: 'level')]
+    public ?int $selectedLevelId = null;
 
-    public $selectedLevel;
+    public string $search = '';
 
-    // Form properties
-    public $typeName;
+    // Expanded types in tree view (track which categories are expanded)
+    public array $expandedTypes = [];
 
-    public $levelDescription;
+    // Inline editing state
+    public bool $editingLevelDesc = false;
 
-    public $indicatorCode;
+    public string $levelDescriptionInput = '';
 
-    public $indicatorText;
+    public ?int $editingIndicatorId = null;
 
-    public $editingId;
+    public string $indicatorCodeInput = '';
+
+    public string $indicatorTextInput = '';
+
+    // Adding new indicator
+    public bool $addingIndicator = false;
+
+    public string $newIndicatorCode = '';
+
+    public string $newIndicatorText = '';
+
+    // Category management
+    public bool $addingCategory = false;
+
+    public string $newCategoryName = '';
+
+    public ?string $editingCategoryName = null;
+
+    public string $categoryNameInput = '';
+
+    public function mount(): void
+    {
+        // Auto-expand and select first type if none selected
+        if ($this->selectedType === null) {
+            $firstType = TktLevel::select('type')->distinct()->orderBy('type')->first()?->type;
+            if ($firstType) {
+                $this->selectedType = $firstType;
+                $this->expandedTypes = [$firstType];
+
+                // Auto-select first level
+                $firstLevel = TktLevel::where('type', $firstType)->orderBy('level')->first();
+                if ($firstLevel) {
+                    $this->selectedLevelId = $firstLevel->id;
+                }
+            }
+        } else {
+            // Ensure selected type is expanded
+            $this->expandedTypes = [$this->selectedType];
+        }
+    }
 
     public function render()
     {
-        $data = [];
+        return view('livewire.settings.tabs.tkt-manager');
+    }
 
-        if ($this->currentTab === 'types') {
-            $data['types'] = TktLevel::select('type')->distinct()->get()->pluck('type');
-        } elseif ($this->currentTab === 'levels' && $this->selectedType) {
-            $data['levels'] = TktLevel::where('type', $this->selectedType)->orderBy('level')->get();
-        } elseif ($this->currentTab === 'indicators' && $this->selectedLevel) {
-            $level = TktLevel::find($this->selectedLevel);
-            $data['indicators'] = $level ? $level->indicators : collect();
-            $data['levelInfo'] = $level;
+    // =====================
+    // COMPUTED PROPERTIES
+    // =====================
+
+    #[Computed]
+    public function types(): Collection
+    {
+        $query = TktLevel::select('type')
+            ->distinct()
+            ->orderBy('type');
+
+        if ($this->search) {
+            $query->where('type', 'like', '%'.$this->search.'%');
         }
 
-        return view('livewire.settings.tabs.tkt-manager', $data);
+        return $query->pluck('type');
     }
 
-    // --- Tab Navigation ---
-
-    public function viewTypes()
+    #[Computed]
+    public function typesWithLevels(): Collection
     {
-        $this->currentTab = 'types';
-        $this->selectedType = null;
-        $this->selectedLevel = null;
+        $query = TktLevel::query()
+            ->with('indicators')
+            ->orderBy('type')
+            ->orderBy('level');
+
+        if ($this->search) {
+            $query->where('type', 'like', '%'.$this->search.'%');
+        }
+
+        return $query->get()->groupBy('type');
     }
 
-    public function viewLevels($type)
+    #[Computed]
+    public function selectedLevel(): ?TktLevel
     {
-        $this->selectedType = $type;
-        $this->currentTab = 'levels';
-        $this->selectedLevel = null;
+        if (! $this->selectedLevelId) {
+            return null;
+        }
+
+        return TktLevel::with('indicators')->find($this->selectedLevelId);
     }
 
-    public function viewIndicators($levelId)
+    #[Computed]
+    public function indicators(): Collection
     {
-        $this->selectedLevel = $levelId;
-        $this->currentTab = 'indicators';
+        if (! $this->selectedLevel) {
+            return collect();
+        }
+
+        return $this->selectedLevel->indicators->sortBy('code');
     }
 
-    // --- Types CRUD ---
+    // =====================
+    // TREE VIEW NAVIGATION
+    // =====================
 
-    public function createType()
+    public function toggleType(string $type): void
     {
-        $this->resetForm();
-        $this->dispatch('open-modal', modalId: 'modal-type');
-    }
-
-    public function editType($type)
-    {
-        $this->typeName = $type;
-        $this->editingId = $type; // Using name as ID for types
-        $this->dispatch('open-modal', modalId: 'modal-type');
-    }
-
-    public function saveType()
-    {
-        $this->validate(['typeName' => 'required|string|max:255']);
-
-        if ($this->editingId) {
-            // Rename
-            TktLevel::where('type', $this->editingId)->update(['type' => $this->typeName]);
+        if (in_array($type, $this->expandedTypes)) {
+            $this->expandedTypes = array_values(array_diff($this->expandedTypes, [$type]));
         } else {
-            // Create new (with 9 levels)
-            for ($i = 1; $i <= 9; $i++) {
-                TktLevel::create([
-                    'type' => $this->typeName,
-                    'level' => $i,
-                    'description' => 'Deskripsi Level '.$i,
-                ]);
-            }
+            $this->expandedTypes[] = $type;
         }
-
-        $message = $this->editingId ? 'Kategori TKT berhasil diubah' : 'Kategori TKT berhasil ditambahkan';
-
-        $this->dispatch('close-modal', modalId: 'modal-type');
-        $this->resetForm();
-
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
     }
 
-    public function deleteType($type)
-    {
-        TktLevel::where('type', $type)->delete();
-        $message = 'Kategori TKT berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
-    }
-
-    // --- Levels CRUD ---
-
-    public function editLevel($levelId)
+    public function selectLevel(int $levelId): void
     {
         $level = TktLevel::find($levelId);
         if (! $level) {
             return;
         }
 
-        $this->editingId = $levelId;
-        $this->levelDescription = $level->description;
-        $this->dispatch('open-modal', modalId: 'modal-level');
+        $this->selectedLevelId = $levelId;
+        $this->selectedType = $level->type;
+
+        // Ensure parent type is expanded
+        if (! in_array($level->type, $this->expandedTypes)) {
+            $this->expandedTypes[] = $level->type;
+        }
+
+        // Reset editing states
+        $this->cancelAllEditing();
     }
 
-    public function saveLevel()
+    public function isTypeExpanded(string $type): bool
     {
-        $this->validate(['levelDescription' => 'required|string']);
-
-        TktLevel::find($this->editingId)->update(['description' => $this->levelDescription]);
-
-        $message = 'Level TKT berhasil diperbarui';
-
-        $this->dispatch('close-modal', modalId: 'modal-level');
-        $this->resetForm();
-
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+        return in_array($type, $this->expandedTypes);
     }
 
-    // --- Indicators CRUD ---
+    // =====================
+    // CATEGORY CRUD
+    // =====================
 
-    public function createIndicator()
+    public function startAddCategory(): void
     {
-        $this->resetForm();
-        $this->dispatch('open-modal', modalId: 'modal-indicator');
+        $this->addingCategory = true;
+        $this->newCategoryName = '';
     }
 
-    public function editIndicator($indicatorId)
+    public function cancelAddCategory(): void
+    {
+        $this->addingCategory = false;
+        $this->newCategoryName = '';
+    }
+
+    public function saveNewCategory(): void
+    {
+        $this->validate([
+            'newCategoryName' => 'required|string|max:255',
+        ], [], [
+            'newCategoryName' => 'Nama Kategori',
+        ]);
+
+        // Check if category already exists
+        $exists = TktLevel::where('type', $this->newCategoryName)->exists();
+        if ($exists) {
+            $this->addError('newCategoryName', 'Kategori dengan nama ini sudah ada.');
+
+            return;
+        }
+
+        // Create 9 levels for new category
+        for ($i = 1; $i <= 9; $i++) {
+            TktLevel::create([
+                'type' => $this->newCategoryName,
+                'level' => $i,
+                'description' => 'Deskripsi Level '.$i,
+            ]);
+        }
+
+        $this->toastSuccess('Kategori TKT berhasil ditambahkan');
+        $this->addingCategory = false;
+        $this->newCategoryName = '';
+
+        // Auto-select the new category
+        $this->selectedType = $this->newCategoryName;
+        $this->expandedTypes[] = $this->newCategoryName;
+
+        $firstLevel = TktLevel::where('type', $this->newCategoryName)->orderBy('level')->first();
+        if ($firstLevel) {
+            $this->selectedLevelId = $firstLevel->id;
+        }
+
+        unset($this->types, $this->typesWithLevels);
+    }
+
+    public function startEditCategory(string $type): void
+    {
+        $this->editingCategoryName = $type;
+        $this->categoryNameInput = $type;
+    }
+
+    public function cancelEditCategory(): void
+    {
+        $this->editingCategoryName = null;
+        $this->categoryNameInput = '';
+    }
+
+    public function saveCategory(): void
+    {
+        $this->validate([
+            'categoryNameInput' => 'required|string|max:255',
+        ], [], [
+            'categoryNameInput' => 'Nama Kategori',
+        ]);
+
+        if ($this->categoryNameInput === $this->editingCategoryName) {
+            $this->cancelEditCategory();
+
+            return;
+        }
+
+        // Check if new name already exists
+        $exists = TktLevel::where('type', $this->categoryNameInput)
+            ->where('type', '!=', $this->editingCategoryName)
+            ->exists();
+
+        if ($exists) {
+            $this->addError('categoryNameInput', 'Kategori dengan nama ini sudah ada.');
+
+            return;
+        }
+
+        TktLevel::where('type', $this->editingCategoryName)
+            ->update(['type' => $this->categoryNameInput]);
+
+        // Update selected type if it was renamed
+        if ($this->selectedType === $this->editingCategoryName) {
+            $this->selectedType = $this->categoryNameInput;
+        }
+
+        // Update expanded types
+        $index = array_search($this->editingCategoryName, $this->expandedTypes);
+        if ($index !== false) {
+            $this->expandedTypes[$index] = $this->categoryNameInput;
+        }
+
+        $this->toastSuccess('Kategori TKT berhasil diubah');
+        $this->cancelEditCategory();
+
+        unset($this->types, $this->typesWithLevels);
+    }
+
+    public function deleteCategory(string $type): void
+    {
+        TktLevel::where('type', $type)->delete();
+
+        // Reset selection if deleted category was selected
+        if ($this->selectedType === $type) {
+            $this->selectedType = null;
+            $this->selectedLevelId = null;
+
+            // Select first available type
+            $firstType = $this->types->first();
+            if ($firstType) {
+                $this->selectedType = $firstType;
+                $this->expandedTypes = [$firstType];
+
+                $firstLevel = TktLevel::where('type', $firstType)->orderBy('level')->first();
+                if ($firstLevel) {
+                    $this->selectedLevelId = $firstLevel->id;
+                }
+            }
+        }
+
+        // Remove from expanded
+        $this->expandedTypes = array_values(array_diff($this->expandedTypes, [$type]));
+
+        $this->toastSuccess('Kategori TKT berhasil dihapus');
+
+        unset($this->types, $this->typesWithLevels);
+    }
+
+    // =====================
+    // LEVEL INLINE EDIT
+    // =====================
+
+    public function startEditLevelDesc(): void
+    {
+        if (! $this->selectedLevel) {
+            return;
+        }
+
+        $this->editingLevelDesc = true;
+        $this->levelDescriptionInput = $this->selectedLevel->description ?? '';
+    }
+
+    public function cancelEditLevelDesc(): void
+    {
+        $this->editingLevelDesc = false;
+        $this->levelDescriptionInput = '';
+    }
+
+    public function saveLevelDesc(): void
+    {
+        if (! $this->selectedLevel) {
+            return;
+        }
+
+        $this->validate([
+            'levelDescriptionInput' => 'required|string',
+        ], [], [
+            'levelDescriptionInput' => 'Deskripsi Level',
+        ]);
+
+        $this->selectedLevel->update([
+            'description' => $this->levelDescriptionInput,
+        ]);
+
+        $this->editingLevelDesc = false;
+        $this->toastSuccess('Deskripsi level berhasil disimpan');
+
+        unset($this->selectedLevel, $this->typesWithLevels);
+    }
+
+    // =====================
+    // INDICATOR CRUD
+    // =====================
+
+    public function startAddIndicator(): void
+    {
+        $this->addingIndicator = true;
+        $this->newIndicatorCode = '';
+        $this->newIndicatorText = '';
+        $this->editingIndicatorId = null;
+    }
+
+    public function cancelAddIndicator(): void
+    {
+        $this->addingIndicator = false;
+        $this->newIndicatorCode = '';
+        $this->newIndicatorText = '';
+    }
+
+    public function saveNewIndicator(): void
+    {
+        if (! $this->selectedLevelId) {
+            return;
+        }
+
+        $this->validate([
+            'newIndicatorCode' => 'nullable|string|max:10',
+            'newIndicatorText' => 'required|string',
+        ], [], [
+            'newIndicatorCode' => 'Kode',
+            'newIndicatorText' => 'Indikator',
+        ]);
+
+        TktIndicator::create([
+            'tkt_level_id' => $this->selectedLevelId,
+            'code' => $this->newIndicatorCode ?: null,
+            'indicator' => $this->newIndicatorText,
+        ]);
+
+        $this->addingIndicator = false;
+        $this->newIndicatorCode = '';
+        $this->newIndicatorText = '';
+
+        $this->toastSuccess('Indikator berhasil ditambahkan');
+
+        unset($this->selectedLevel, $this->indicators, $this->typesWithLevels);
+    }
+
+    public function startEditIndicator(int $indicatorId): void
     {
         $indicator = TktIndicator::find($indicatorId);
         if (! $indicator) {
             return;
         }
 
-        $this->editingId = $indicatorId;
-        $this->indicatorCode = $indicator->code;
-        $this->indicatorText = $indicator->indicator;
-        $this->dispatch('open-modal', modalId: 'modal-indicator');
+        $this->editingIndicatorId = $indicatorId;
+        $this->indicatorCodeInput = $indicator->code ?? '';
+        $this->indicatorTextInput = $indicator->indicator ?? '';
+        $this->addingIndicator = false;
     }
 
-    public function saveIndicator()
+    public function cancelEditIndicator(): void
     {
+        $this->editingIndicatorId = null;
+        $this->indicatorCodeInput = '';
+        $this->indicatorTextInput = '';
+    }
+
+    public function saveIndicator(): void
+    {
+        if (! $this->editingIndicatorId) {
+            return;
+        }
+
         $this->validate([
-            'indicatorCode' => 'nullable|string|max:10',
-            'indicatorText' => 'required|string',
+            'indicatorCodeInput' => 'nullable|string|max:10',
+            'indicatorTextInput' => 'required|string',
+        ], [], [
+            'indicatorCodeInput' => 'Kode',
+            'indicatorTextInput' => 'Indikator',
         ]);
 
-        if ($this->editingId) {
-            TktIndicator::find($this->editingId)->update([
-                'code' => $this->indicatorCode,
-                'indicator' => $this->indicatorText,
-            ]);
-        } else {
-            TktIndicator::create([
-                'tkt_level_id' => $this->selectedLevel,
-                'code' => $this->indicatorCode,
-                'indicator' => $this->indicatorText,
+        $indicator = TktIndicator::find($this->editingIndicatorId);
+        if ($indicator) {
+            $indicator->update([
+                'code' => $this->indicatorCodeInput ?: null,
+                'indicator' => $this->indicatorTextInput,
             ]);
         }
 
-        $message = $this->editingId ? 'Indikator berhasil diubah' : 'Indikator berhasil ditambahkan';
+        $this->editingIndicatorId = null;
+        $this->indicatorCodeInput = '';
+        $this->indicatorTextInput = '';
 
-        $this->dispatch('close-modal', modalId: 'modal-indicator');
-        $this->resetForm();
+        $this->toastSuccess('Indikator berhasil disimpan');
 
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+        unset($this->selectedLevel, $this->indicators, $this->typesWithLevels);
     }
 
-    public function deleteIndicator($id)
+    public function deleteIndicator(int $indicatorId): void
     {
-        TktIndicator::find($id)?->delete();
-        $message = 'Indikator berhasil dihapus';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+        TktIndicator::find($indicatorId)?->delete();
+
+        $this->toastSuccess('Indikator berhasil dihapus');
+
+        unset($this->selectedLevel, $this->indicators, $this->typesWithLevels);
     }
 
-    private function resetForm()
+    // =====================
+    // HELPERS
+    // =====================
+
+    public function cancelAllEditing(): void
     {
-        $this->typeName = '';
-        $this->levelDescription = '';
-        $this->indicatorCode = '';
-        $this->indicatorText = '';
-        $this->editingId = null;
+        $this->editingLevelDesc = false;
+        $this->levelDescriptionInput = '';
+        $this->editingIndicatorId = null;
+        $this->indicatorCodeInput = '';
+        $this->indicatorTextInput = '';
+        $this->addingIndicator = false;
+        $this->newIndicatorCode = '';
+        $this->newIndicatorText = '';
+        $this->addingCategory = false;
+        $this->newCategoryName = '';
+        $this->editingCategoryName = null;
+        $this->categoryNameInput = '';
+    }
+
+    public function updatedSearch(): void
+    {
+        unset($this->types, $this->typesWithLevels);
+    }
+
+    public function getLevelIndicatorCount(int $levelId): int
+    {
+        return TktIndicator::where('tkt_level_id', $levelId)->count();
     }
 }

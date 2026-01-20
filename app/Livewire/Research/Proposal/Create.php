@@ -31,7 +31,7 @@ class Create extends ProposalCreate
 
         return [
             'form.macro_research_group_id' => 'required|exists:macro_research_groups,id',
-            'form.substance_file' => $hasFile ? 'nullable|file|mimes:pdf|max:10240' : 'required|file|mimes:pdf|max:10240',
+            'form.substance_file' => $hasFile ? 'nullable|file|mimes:pdf,doc,docx|max:10240' : 'required|file|mimes:pdf,doc,docx|max:10240',
             'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
                 $wajibCount = collect($value)->where('category', 'Wajib')->count();
                 if ($wajibCount < 1) {

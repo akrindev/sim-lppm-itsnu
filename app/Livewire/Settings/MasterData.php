@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Settings;
 
-use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -33,12 +32,6 @@ class MasterData extends Component
     {
         $this->resetPage();
         $this->activeTab = $tab;
-    }
-
-    #[On('close-modal')]
-    public function refresh(): void
-    {
-        // Just to trigger re-render
     }
 
     public function render()

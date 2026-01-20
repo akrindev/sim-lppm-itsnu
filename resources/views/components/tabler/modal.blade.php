@@ -130,156 +130,145 @@
 @once
     @push('scripts')
         <script>
-            document.addEventListener('livewire:initialized', () => {
-                // Helper function to find the closest Livewire component
-                const findLivewireComponent = (element) => {
-                    // Walk up the DOM tree to find the closest [wire:id] element
-                    let current = element;
-                    while (current && current !== document.body) {
-                        if (current.hasAttribute('wire:id')) {
-                            const wireId = current.getAttribute('wire:id');
-                            return window.Livewire?.find(wireId);
-                        }
-                        current = current.parentElement;
+            const setupTablerModalListeners = () => {
+                document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
+                    if (modalEl.dataset.livewireModalBound === 'true') {
+                        return;
                     }
-                    return null;
-                };
 
-                const setupTablerModalListeners = () => {
-                    document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
-                        if (modalEl.dataset.livewireModalBound === 'true') {
-                            return;
+                    modalEl.dataset.livewireModalBound = 'true';
+
+                    const onShow = modalEl.dataset.livewireOnShow;
+                    const onHide = modalEl.dataset.livewireOnHide;
+
+                    // Helper function to find the closest Livewire component
+                    const findLivewireComponent = (element) => {
+                        let current = element;
+                        while (current && current !== document.body) {
+                            if (current.hasAttribute('wire:id')) {
+                                const wireId = current.getAttribute('wire:id');
+                                return window.Livewire?.find(wireId);
+                            }
+                            current = current.parentElement;
                         }
+                        return null;
+                    };
 
-                        modalEl.dataset.livewireModalBound = 'true';
-
-                        const onShow = modalEl.dataset.livewireOnShow;
-                        const onHide = modalEl.dataset.livewireOnHide;
-
-                        if (onShow) {
-                            modalEl.addEventListener('show.bs.modal', () => {
-                                console.log('Modal show event:', modalEl.id, 'calling:', onShow);
-                                try {
-                                    const livewireComponent = findLivewireComponent(modalEl);
-                                    if (livewireComponent) {
-                                        if (typeof livewireComponent[onShow] === 'function') {
-                                            livewireComponent[onShow]();
-                                        } else {
-                                            livewireComponent.call(onShow);
-                                        }
+                    if (onShow) {
+                        modalEl.addEventListener('show.bs.modal', () => {
+                            try {
+                                const livewireComponent = findLivewireComponent(modalEl);
+                                if (livewireComponent) {
+                                    if (typeof livewireComponent[onShow] === 'function') {
+                                        livewireComponent[onShow]();
                                     } else {
-                                        console.warn('Livewire component not found for modal:', modalEl.id);
+                                        livewireComponent.call(onShow);
                                     }
-                                } catch (error) {
-                                    console.error('Error calling onShow:', error);
                                 }
-                            });
-                        }
+                            } catch (error) {
+                                console.error('Error calling onShow:', error);
+                            }
+                        });
+                    }
 
-                        if (onHide) {
-                            modalEl.addEventListener('hidden.bs.modal', () => {
-                                console.log('Modal hide event:', modalEl.id, 'calling:', onHide);
-                                try {
-                                    const livewireComponent = findLivewireComponent(modalEl);
-                                    if (livewireComponent) {
-                                        if (typeof livewireComponent[onHide] === 'function') {
-                                            livewireComponent[onHide]();
-                                        } else {
-                                            livewireComponent.call(onHide);
-                                        }
+                    if (onHide) {
+                        modalEl.addEventListener('hidden.bs.modal', () => {
+                            try {
+                                const livewireComponent = findLivewireComponent(modalEl);
+                                if (livewireComponent) {
+                                    if (typeof livewireComponent[onHide] === 'function') {
+                                        livewireComponent[onHide]();
                                     } else {
-                                        console.warn('Livewire component not found for modal:', modalEl.id);
+                                        livewireComponent.call(onHide);
                                     }
-                                } catch (error) {
-                                    console.error('Error calling onHide:', error);
                                 }
-                            });
-                        }
-                    });
-                };
+                            } catch (error) {
+                                console.error('Error calling onHide:', error);
+                            }
+                        });
+                    }
+                });
+            };
 
+            const initializeModalSystem = () => {
                 // Set up listeners on initial load
                 setupTablerModalListeners();
 
                 // Re-setup listeners when Livewire updates the DOM using v3 hooks
-                Livewire.hook('morph.updated', setupTablerModalListeners);
-                Livewire.hook('morph.removed', setupTablerModalListeners);
+                if (window.Livewire) {
+                    Livewire.hook('morph.updated', setupTablerModalListeners);
 
-                // Manage aria-hidden attribute based on modal visibility
-                const manageAriaHidden = () => {
-                    document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
-                        const isVisible = modalEl.classList.contains('show');
-                        modalEl.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+                    // Manage aria-hidden attribute based on modal visibility
+                    const manageAriaHidden = () => {
+                        document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
+                            const isVisible = modalEl.classList.contains('show');
+                            modalEl.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+                        });
+                    };
+
+                    document.addEventListener('show.bs.modal', manageAriaHidden);
+                    document.addEventListener('hidden.bs.modal', manageAriaHidden);
+                    manageAriaHidden();
+
+                    // Listen for open-modal dispatch
+                    window.Livewire.on('open-modal', (data) => {
+                        const config = Array.isArray(data) ? data[0] : data;
+                        const modalId = config?.modalId || config?.detail?.modalId;
+
+                        if (modalId) {
+                            const modal = document.getElementById(modalId);
+                            if (modal) {
+                                const bsModal = bootstrap?.Modal?.getOrCreateInstance(modal) ||
+                                               tabler?.Modal?.getOrCreateInstance(modal);
+                                if (bsModal) bsModal.show();
+                            }
+                        }
                     });
-                };
 
-                // Listen for modal visibility changes
-                document.addEventListener('show.bs.modal', manageAriaHidden);
-                document.addEventListener('hidden.bs.modal', manageAriaHidden);
+                    // Listen for close-modal dispatch
+                    window.Livewire.on('close-modal', (data) => {
+                        const config = Array.isArray(data) ? data[0] : data;
+                        const modalId = config?.modalId || config?.detail?.modalId;
 
-                // Set initial state
-                manageAriaHidden();
+                        if (modalId) {
+                            const modal = document.getElementById(modalId);
+                            if (modal) {
+                                let bsModal = bootstrap?.Modal?.getInstance(modal) ||
+                                               tabler?.Modal?.getInstance(modal);
 
-                // Listen for open-modal dispatch from Livewire
-                // Livewire v3 sends dispatch data as array [{ modalId: 'xxx' }]
-                window.Livewire.on('open-modal', (data) => {
-                    // Handle both array format (Livewire v3) and object format
-                    const config = Array.isArray(data) ? data[0] : data;
-                    const modalId = config?.modalId || config?.detail?.modalId;
-                    
-                    console.log('Received open-modal for:', modalId);
-                    if (modalId) {
-                        const modal = document.getElementById(modalId);
-                        if (modal) {
-                            // Try bootstrap first, then tabler
-                            const bsModal = bootstrap?.Modal?.getOrCreateInstance(modal) || 
-                                           tabler?.Modal?.getOrCreateInstance(modal) ||
-                                           new bootstrap.Modal(modal);
-                            if (bsModal) {
-                                bsModal.show();
+                                if (!bsModal && (bootstrap?.Modal || tabler?.Modal)) {
+                                    bsModal = (bootstrap?.Modal || tabler?.Modal).getOrCreateInstance(modal);
+                                }
+
+                                if (bsModal) {
+                                    bsModal.hide();
+
+                                    // Emergency cleanup if morphing happens mid-animation
+                                    setTimeout(() => {
+                                        if (modal.classList.contains('show') || document.querySelector('.modal-backdrop')) {
+                                            modal.classList.remove('show');
+                                            modal.style.display = 'none';
+                                            document.body.classList.remove('modal-open');
+                                            document.body.style.overflow = '';
+                                            document.body.style.paddingRight = '';
+                                            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                                        }
+                                    }, 500);
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
+            };
 
-                // Listen for close-modal dispatch from Livewire
-                // Livewire v3 sends dispatch data as array [{ modalId: 'xxx' }]
-                window.Livewire.on('close-modal', (data) => {
-                    // Handle both array format (Livewire v3) and object format
-                    const config = Array.isArray(data) ? data[0] : data;
-                    const modalId = config?.modalId || config?.detail?.modalId;
-                    
-                    console.log('Received close-modal for:', modalId);
-                    if (modalId) {
-                        const modal = document.getElementById(modalId);
-                        if (modal) {
-                            // Try to get existing instance first
-                            let bsModal = bootstrap?.Modal?.getInstance(modal) || 
-                                           tabler?.Modal?.getInstance(modal);
-                            
-                            // If instance not found, try to get or create (it might be in a weird state)
-                            if (!bsModal && (bootstrap?.Modal || tabler?.Modal)) {
-                                bsModal = (bootstrap?.Modal || tabler?.Modal).getOrCreateInstance(modal);
-                            }
+            if (window.Livewire?.initialized) {
+                initializeModalSystem();
+            } else {
+                document.addEventListener('livewire:initialized', initializeModalSystem);
+            }
 
-                            if (bsModal) {
-                                bsModal.hide();
-                                
-                                // Force remove backdrop and classes if it's still stuck
-                                setTimeout(() => {
-                                    if (modal.classList.contains('show')) {
-                                        console.warn('Modal hide failed via BS, forcing cleanup...');
-                                        modal.classList.remove('show');
-                                        modal.style.display = 'none';
-                                        document.body.classList.remove('modal-open');
-                                        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-                                    }
-                                }, 500);
-                            }
-                        }
-                    }
-                });
-            });
+            // Handle wire:navigate
+            document.addEventListener('livewire:navigated', setupTablerModalListeners);
         </script>
     @endpush
 @endonce

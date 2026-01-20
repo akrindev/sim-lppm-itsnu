@@ -10,6 +10,7 @@ use App\Models\NationalPriority;
 use App\Models\Partner;
 use App\Models\ResearchScheme;
 use App\Models\ScienceCluster;
+use App\Models\Setting;
 use App\Models\Theme;
 use App\Models\TktLevel;
 use App\Models\Topic;
@@ -131,13 +132,25 @@ class MasterDataService
         return $query->orderBy('level')->get();
     }
 
-    public function getTemplateUrl(string $type): string
+    public function getTemplateUrl(string $type): ?string
     {
-        return match ($type) {
-            'research' => asset('storage/templates/proposal_penelitian_template.docx'),
-            'community-service' => asset('storage/templates/proposal_pengabdian_template.docx'),
-            default => '',
+        $key = match ($type) {
+            'research' => 'research_proposal_template',
+            'community-service' => 'community_service_proposal_template',
+            default => null,
         };
+
+        if (! $key) {
+            return null;
+        }
+
+        $setting = Setting::where('key', $key)->first();
+
+        if ($setting && $setting->hasMedia('template')) {
+            return $setting->getFirstMediaUrl('template');
+        }
+
+        return null;
     }
 
     public function clearCache(): void
