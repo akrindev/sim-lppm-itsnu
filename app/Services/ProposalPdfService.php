@@ -26,6 +26,7 @@ class ProposalPdfService
                 'focusArea',
                 'theme',
                 'topic',
+                'clusterLevel1',
                 'keywords',
                 'budgetItems.budgetGroup',
                 'budgetItems.budgetComponent',
