@@ -17,6 +17,7 @@ test('users can authenticate using the login screen', function () {
     $response = Livewire::test(Login::class)
         ->set('email', $user->email)
         ->set('password', 'password')
+        ->set('captcha', 'test-token')
         ->call('login');
 
     $response
@@ -32,6 +33,7 @@ test('users can not authenticate with invalid password', function () {
     $response = Livewire::test(Login::class)
         ->set('email', $user->email)
         ->set('password', 'wrong-password')
+        ->set('captcha', 'test-token')
         ->call('login');
 
     $response->assertHasErrors('email');
@@ -60,6 +62,7 @@ test('users with two factor enabled are redirected to two factor challenge', fun
     $response = Livewire::test(Login::class)
         ->set('email', $user->email)
         ->set('password', 'password')
+        ->set('captcha', 'test-token')
         ->call('login');
 
     $response->assertRedirect(route('two-factor.login'));

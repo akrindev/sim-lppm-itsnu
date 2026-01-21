@@ -24,6 +24,7 @@ class Login extends Component
     #[Validate('required|string')]
     public string $password = '';
 
+    #[Validate(['required', new Turnstile])]
     public string $captcha = '';
 
     public bool $remember = false;
@@ -33,11 +34,7 @@ class Login extends Component
      */
     public function login(): void
     {
-        $this->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-            'captcha' => ['required', new Turnstile],
-        ]);
+        $this->validate();
 
         $this->ensureIsNotRateLimited();
 
