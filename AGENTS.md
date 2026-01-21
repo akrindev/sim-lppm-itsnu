@@ -184,7 +184,29 @@ Route::middleware(['role:reviewer'])->prefix('review')->name('review.')->group(f
     - `Laravel Boost`: Use `search-docs` for version-specific Laravel/Livewire help.
     - `Tinker`: Use for executing PHP or debugging Eloquent models.
 
-## 12. Verification Checklist
+## 12. Documentation Reference
+For deeper understanding of system flows and architecture, refer to these documents in `docs/`:
+
+| Document | Purpose | When to Use |
+|----------|---------|-------------|
+| `01-prd.md` | Product Requirements | Understanding project vision & goals |
+| `02-workflow-lengkap.md` | Business Workflow | High-level process understanding |
+| `03-peran-dan-wewenang.md` | Roles & Permissions | RACI matrix, access control |
+| `04-struktur-data.md` | Data Structure | Research vs PKM differences |
+| `05-transisi-status.md` | Status Transitions | State machine validation rules |
+| `06-master-data.md` | Master Data | Taxonomy, schemes, references |
+| `07-notifikasi.md` | Notification System | Notification triggers & templates |
+| `08-erd.md` | ERD Diagram | Database structure & relations |
+| `09-flow-detail-lengkap.md` | **Detailed Flow** | Component, Action, Route mapping per role |
+| `10-flow-visual-diagram.md` | **Visual Flow Diagrams** | ASCII diagrams for each workflow stage |
+
+### Key Documents for Development:
+- **When implementing new features:** Start with `09-flow-detail-lengkap.md` for component/action mapping
+- **When debugging workflow issues:** Use `10-flow-visual-diagram.md` for visual status transitions
+- **When modifying status logic:** Reference `05-transisi-status.md` for valid transitions
+- **When adding notifications:** Check `07-notifikasi.md` for existing patterns
+
+## 13. Verification Checklist
 - [ ] Code formatted with `vendor/bin/pint --dirty`.
 - [ ] Explicit return types added to all new methods.
 - [ ] Livewire components have a single root element.

@@ -28,5 +28,11 @@ Selamat datang di pusat dokumentasi SIM LPPM ITSNU Pekalongan. Dokumentasi ini d
 8.  **[08. Entity Relationship Diagram (ERD)](08-erd.md)**
     Gambaran teknis struktur basis data dan relasi antar entitas utama.
 
+9.  **[09. Flow Detail Lengkap](09-flow-detail-lengkap.md)**
+    Dokumentasi alur kerja sistem secara mendetail, mencakup Role, Status, Page/URL, Component Livewire, dan Action yang terlibat di setiap tahap.
+
+10. **[10. Flow Visual Diagram](10-flow-visual-diagram.md)**
+    Dokumentasi visual menggunakan ASCII diagram yang menggambarkan alur kerja sistem dari Tahap 1 (Penyusunan Proposal) hingga Tahap 7 (Siklus Revisi), termasuk transisi status dan mapping halaman per role.
+
 ---
 *Gunakan dokumen ini sebagai panduan resmi dalam pengembangan dan operasional SIM LPPM ITSNU.*
