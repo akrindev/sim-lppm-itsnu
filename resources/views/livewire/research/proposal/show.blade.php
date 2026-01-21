@@ -20,6 +20,10 @@
                 Edit
             </a>
         @endif
+        <a href="{{ route('proposals.export-pdf', $proposal) }}" target="_blank" class="btn btn-outline-primary">
+            <x-lucide-download class="icon" />
+            Unduh Proposal (PDF)
+        </a>
     </div>
 </x-slot:pageActions>
 

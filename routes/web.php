@@ -163,6 +163,10 @@ Route::middleware(['auth'])->group(function () {
     // Role Switcher Route
     Route::post('role/switch', [RoleSwitcherController::class, 'switch'])
         ->name('role.switch');
+
+    // PDF Export Route
+    Route::get('proposals/{proposal}/export-pdf', [\App\Http\Controllers\ProposalExportController::class, 'download'])
+        ->name('proposals.export-pdf');
 });
 
 require __DIR__.'/auth.php';
