@@ -34,29 +34,35 @@ class Login extends Component
      */
     public function login(): void
     {
-        $this->validate();
+        try {
+            $this->validate();
 
-        $this->ensureIsNotRateLimited();
+            $this->ensureIsNotRateLimited();
 
-        $user = $this->validateCredentials();
+            $user = $this->validateCredentials();
 
-        if (Features::canManageTwoFactorAuthentication() && $user->hasEnabledTwoFactorAuthentication()) {
-            Session::put([
-                'login.id' => $user->getKey(),
-                'login.remember' => $this->remember,
-            ]);
+            if (Features::canManageTwoFactorAuthentication() && $user->hasEnabledTwoFactorAuthentication()) {
+                Session::put([
+                    'login.id' => $user->getKey(),
+                    'login.remember' => $this->remember,
+                ]);
 
-            $this->redirect(route('two-factor.login'), navigate: false);
+                $this->redirect(route('two-factor.login'), navigate: false);
 
-            return;
+                return;
+            }
+
+            Auth::login($user, $this->remember);
+
+            RateLimiter::clear($this->throttleKey());
+            Session::regenerate();
+
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
+        } catch (ValidationException $e) {
+            $this->captcha = '';
+            $this->dispatch('reset-turnstile');
+            throw $e;
         }
-
-        Auth::login($user, $this->remember);
-
-        RateLimiter::clear($this->throttleKey());
-        Session::regenerate();
-
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
     }
 
     public function devLogin(string $roleName): void
@@ -124,6 +130,6 @@ class Login extends Component
      */
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+        return Str::transliterate(Str::lower($this->email) . '|' . request()->ip());
     }
 }

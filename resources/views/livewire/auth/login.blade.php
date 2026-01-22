@@ -58,7 +58,7 @@
                                         </div>
                                     @enderror
                                 </div>
-                                @if(config('turnstile.site_key'))
+                                @if (config('turnstile.site_key'))
                                     <div class="mb-2" wire:ignore>
                                         <div class="cf-turnstile" style="width: 100%;"
                                             data-sitekey="{{ config('turnstile.site_key') }}"
@@ -71,7 +71,14 @@
                                     @enderror
                                 @else
                                     <div class="alert alert-warning">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v2m0 4v.01" /><path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" /></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24"
+                                            height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M12 9v2m0 4v.01" />
+                                            <path
+                                                d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+                                        </svg>
                                         Turnstile Site Key belum dikonfigurasi. Hubungi administrator.
                                     </div>
                                 @endif
@@ -80,6 +87,12 @@
                                     function onTurnstileSuccess(token) {
                                         @this.set('captcha', token);
                                     }
+
+                                    window.addEventListener('reset-turnstile', () => {
+                                        if (typeof turnstile !== 'undefined') {
+                                            turnstile.reset();
+                                        }
+                                    });
                                 </script>
                                 <div class="mb-2">
                                     <label class="form-check">
