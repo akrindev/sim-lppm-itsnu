@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
@@ -23,7 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'active.role' => ActiveRoleMiddleware::class,
         ]);
 
-        // Add active role middleware to web group
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\ActiveRoleMiddleware::class,
         ]);
