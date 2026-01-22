@@ -288,6 +288,11 @@
                                         </table>
                                     </div>
 
+                                    <div class="mb-3 small text-secondary">
+                                        <x-lucide-info class="icon icon-inline me-1" />
+                                        Total nilai dihitung otomatis: (Skor × Bobot). Passing Grade: 300.
+                                    </div>
+
                                     @if ($reviewer->review_notes)
                                         <div class="mb-0">
                                             <label class="mb-1 form-label fw-bold small">
@@ -344,20 +349,20 @@
 
                                                         <!-- History Scores Small Table -->
                                                         <div class="table-responsive mb-2">
-                                                            <table class="table table-sm table-borderless bg-white rounded border mb-0" style="font-size: 8pt;">
+                                                            <table class="table table-vcenter table-borderless bg-white rounded border mb-0" style="font-size: 9pt;">
                                                                 <thead class="bg-light">
                                                                     <tr>
-                                                                        <th>Kriteria</th>
-                                                                        <th class="text-center">Skor</th>
-                                                                        <th class="text-end">Nilai</th>
+                                                                        <th class="py-1 px-2">Kriteria</th>
+                                                                        <th class="text-center py-1 px-2">Skor</th>
+                                                                        <th class="text-end py-1 px-2">Nilai</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                     @foreach($log->scores as $ls)
                                                                         <tr>
-                                                                            <td>{{ $ls->criteria->criteria }}</td>
-                                                                            <td class="text-center">{{ $ls->score }}</td>
-                                                                            <td class="text-end">{{ number_format($ls->value, 0) }}</td>
+                                                                            <td class="py-1 px-2">{{ $ls->criteria->criteria }}</td>
+                                                                            <td class="text-center py-1 px-2">{{ $ls->score }}</td>
+                                                                            <td class="text-end py-1 px-2 fw-bold">{{ number_format($ls->value, 0) }}</td>
                                                                         </tr>
                                                                     @endforeach
                                                                 </tbody>
