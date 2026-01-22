@@ -161,7 +161,7 @@
                             <th width="18%">Item <span class="text-danger">*</span></th>
                             <th width="8%">Satuan</th>
                             <th width="8%">Volume <span class="text-danger">*</span></th>
-                            <th width="12%">Harga Satuan <span class="text-danger">*</span></th>
+                            <th width="15%">Harga Satuan <span class="text-danger">*</span></th>
                             <th width="13%">Total</th>
                             <th width="5%">Aksi</th>
                         </tr>
@@ -239,16 +239,22 @@
                                         class="form-control form-control-sm" placeholder="0" min="0"
                                         step="0.01">
                                 </td>
-                                <td>
-                                    <input type="number"
-                                        wire:model.live="form.budget_items.{{ $index }}.unit_price"
-                                        wire:change="calculateTotal({{ $index }})"
-                                        class="form-control form-control-sm" placeholder="0" min="0"
-                                        step="0.01">
+                                <td x-data="moneyInput({{ $index }})">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text"
+                                            x-model="display"
+                                            x-ref="input"
+                                            @focus="handleFocus"
+                                            @input="handleInput"
+                                            class="form-control" placeholder="0">
+                                    </div>
                                 </td>
-                                <td>
-                                    <input type="number" wire:model="form.budget_items.{{ $index }}.total"
-                                        class="form-control form-control-sm" placeholder="0" readonly>
+                                <td x-data="{ total: @entangle("form.budget_items.{$index}.total") }">
+                                    <input type="text" 
+                                        class="form-control form-control-sm bg-body-tertiary text-end" 
+                                        :value="new Intl.NumberFormat('id-ID').format(total || 0)" 
+                                        readonly>
                                 </td>
                                 <td>
                                     <button type="button" wire:click="removeBudgetItem({{ $index }})"
@@ -264,7 +270,7 @@
                             <td colspan="7" class="text-end"><strong>Total Anggaran:</strong></td>
                             <td colspan="2">
                                 <strong>Rp
-                                    {{ number_format($totalBudget, 2, ',', '.') }}</strong>
+                                    {{ number_format($totalBudget, 0, ',', '.') }}</strong>
                             </td>
                         </tr>
                     </tfoot>

@@ -701,10 +701,19 @@ class ProposalForm extends Form
             $this->validateBudgetCap($this->getProposalType());
 
             foreach ($this->budget_items as $item) {
+                // Skip entirely empty items (often added as defaults but not filled)
+                if (empty($item['budget_group_id']) && empty($item['item']) && (empty($item['unit_price']) || $item['unit_price'] == 0)) {
+                    continue;
+                }
+
+                // Ensure IDs are null if empty string to avoid DB errors
+                $groupId = ! empty($item['budget_group_id']) ? $item['budget_group_id'] : null;
+                $componentId = ! empty($item['budget_component_id']) ? $item['budget_component_id'] : null;
+
                 $proposal->budgetItems()->create([
                     'year' => $item['year'] ?? 1,
-                    'budget_group_id' => $item['budget_group_id'] ?? null,
-                    'budget_component_id' => $item['budget_component_id'] ?? null,
+                    'budget_group_id' => $groupId,
+                    'budget_component_id' => $componentId,
                     'group' => $item['group'] ?? '',
                     'component' => $item['component'] ?? '',
                     'item_description' => $item['item'] ?? '',

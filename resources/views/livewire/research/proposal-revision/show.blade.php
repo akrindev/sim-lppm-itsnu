@@ -340,64 +340,65 @@
                                                 {{ $item->budgetComponent?->unit ?? '-' }}
                                             </x-tabler.badge>
                                         </td>
-                                        <td class="text-end">Rp
-                                            {{ number_format($item->unit_price, 2, ',', '.') }}
-                                        </td>
-                                        <td class="text-end fw-bold">Rp
-                                            {{ number_format($item->total_price, 2, ',', '.') }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr class="table-active">
-                                    <th colspan="5" class="text-end">Total Anggaran:</th>
-                                    <th class="text-end">
-                                        <span class="text-primary">
-                                            Rp
-                                            {{ number_format($proposal->budgetItems->sum('total_price'), 2, ',', '.') }}
-                                        </span>
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                @endif
-            </div>
+                                         <td class="text-end">Rp
+                                             {{ number_format($item->unit_price, 0, ',', '.') }}
+                                         </td>
+                                         <td class="text-end fw-bold">Rp
+                                             {{ number_format($item->total_price, 0, ',', '.') }}</td>
+                                     </tr>
+                                 @endforeach
+                             </tbody>
+                             <tfoot>
+                                 <tr class="table-active">
+                                     <th colspan="5" class="text-end">Total Anggaran:</th>
+                                     <th class="text-end">
+                                         <span class="text-primary">
+                                             Rp
+                                             {{ number_format($proposal->budgetItems->sum('total_price'), 0, ',', '.') }}
+                                         </span>
+                                     </th>
+                                 </tr>
+                             </tfoot>
+                         </table>
+                     </div>
+                 @endif
+             </div>
+ 
+             <!-- Summary Card -->
+             <div class="mb-3 card">
+                 <div class="card-header">
+                     <h3 class="card-title">Ringkasan Anggaran</h3>
+                 </div>
+                 <div class="card-body">
+                     <div class="row">
+                         <div class="col-md-6">
+                             <div class="mb-3">
+                                 <label class="form-label">Jumlah Item Anggaran</label>
+                                 <p class="text-reset h4">{{ $proposal->budgetItems->count() }} item</p>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="mb-3">
+                                 <label class="form-label">Total Anggaran</label>
+                                 <p class="text-primary text-reset h4">
+                                     Rp {{ number_format($proposal->budgetItems->sum('total_price'), 0, ',', '.') }}
+                                 </p>
+                             </div>
+                         </div>
+                     </div>
+                     @if ($proposal->sbk_value)
+                         <div class="row">
+                             <div class="col-md-12">
+                                 <div class="mb-0">
+                                     <label class="form-label">Nilai SBK</label>
+                                     <p class="text-reset">Rp
+                                         {{ number_format($proposal->sbk_value, 0, ',', '.') }}
+                                     </p>
+                                 </div>
+                             </div>
+                         </div>
+                     @endif
 
-            <!-- Summary Card -->
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">Ringkasan Anggaran</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jumlah Item Anggaran</label>
-                                <p class="text-reset h4">{{ $proposal->budgetItems->count() }} item</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Total Anggaran</label>
-                                <p class="text-primary text-reset h4">
-                                    Rp {{ number_format($proposal->budgetItems->sum('total_price'), 2, ',', '.') }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    @if ($proposal->sbk_value)
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-0">
-                                    <label class="form-label">Nilai SBK</label>
-                                    <p class="text-reset">Rp
-                                        {{ number_format($proposal->sbk_value, 2, ',', '.') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
