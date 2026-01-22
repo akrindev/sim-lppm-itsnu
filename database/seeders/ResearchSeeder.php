@@ -11,7 +11,6 @@ use App\Models\DailyNote;
 use App\Models\MandatoryOutput;
 use App\Models\ProgressReport;
 use App\Models\Proposal;
-use App\Models\ProposalReviewer;
 use App\Models\ProposalStatusLog;
 use App\Models\Research;
 use App\Models\User;
@@ -289,29 +288,87 @@ class ResearchSeeder extends Seeder
             return;
         }
 
+        // Logic for rounds: COMPLETED status implies Round 2 (Round 1 was revision)
+        $currentRound = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
+
         $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
-        $round = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
+        $criterias = \App\Models\ReviewCriteria::where('type', 'research')->where('is_active', true)->get();
 
         // Find assignment date from logs
         $assignedAt = $proposal->statusLogs()->where('status_after', ProposalStatus::UNDER_REVIEW)->value('at')
             ?? $proposal->created_at->addDays(3);
 
         foreach ($reviewers as $reviewer) {
-            $isCompleted = ($status !== ProposalStatus::UNDER_REVIEW);
+            $isCompleted = ! in_array($status, [
+                ProposalStatus::UNDER_REVIEW,
+                ProposalStatus::WAITING_REVIEWER,
+                ProposalStatus::APPROVED,
+                ProposalStatus::SUBMITTED,
+                ProposalStatus::DRAFT,
+            ]);
 
-            ProposalReviewer::create([
+            $recommendation = $isCompleted ? ($status === ProposalStatus::REVISION_NEEDED ? 'revision_needed' : 'approved') : null;
+            $notes = $isCompleted ? fake()->paragraph(2) : null;
+            $completedAt = $isCompleted ? Carbon::parse($assignedAt)->addDays(3) : null;
+
+            $assignment = \App\Models\ProposalReviewer::create([
                 'proposal_id' => $proposal->id,
                 'user_id' => $reviewer->id,
                 'status' => $isCompleted ? 'completed' : 'pending',
-                'review_notes' => $isCompleted ? fake()->paragraph(3) : null,
-                'recommendation' => $isCompleted ? ($status === ProposalStatus::REVISION_NEEDED ? 'revision_needed' : 'approved') : null,
-                'round' => $round,
+                'review_notes' => $notes,
+                'recommendation' => $recommendation,
+                'round' => $currentRound,
                 'assigned_at' => $assignedAt,
                 'started_at' => $isCompleted ? Carbon::parse($assignedAt)->addDays(1) : null,
-                'completed_at' => $isCompleted ? Carbon::parse($assignedAt)->addDays(4) : null,
+                'completed_at' => $completedAt,
                 'deadline_at' => Carbon::parse($assignedAt)->addDays(14),
             ]);
+
+            if ($isCompleted) {
+                $this->createScoresAndLog($assignment, $currentRound, $criterias);
+
+                // If we are in Round 2, we must simulate the previous Round 1 (revision_needed)
+                if ($currentRound === 2) {
+                    $this->createScoresAndLog($assignment, 1, $criterias, 'revision_needed');
+                }
+            }
         }
+    }
+
+    protected function createScoresAndLog($assignment, $round, $criterias, $forcedRecommendation = null): void
+    {
+        $recommendation = $forcedRecommendation ?? $assignment->recommendation ?? 'approved';
+        $notes = ($recommendation === 'revision_needed') ? 'Mohon perbaiki bagian metodologi dan luaran.' : ($assignment->review_notes ?? fake()->paragraph(2));
+        $totalScore = 0;
+
+        foreach ($criterias as $criteria) {
+            // Lower scores for revision_needed, higher for approved
+            $score = ($recommendation === 'approved') ? rand(4, 5) : rand(2, 3);
+            $val = $score * $criteria->weight;
+            $totalScore += $val;
+
+            \App\Models\ReviewScore::create([
+                'proposal_reviewer_id' => $assignment->id,
+                'review_criteria_id' => $criteria->id,
+                'acuan' => fake()->sentence(10),
+                'score' => $score,
+                'weight_snapshot' => $criteria->weight,
+                'value' => $val,
+                'round' => $round,
+            ]);
+        }
+
+        \App\Models\ReviewLog::create([
+            'proposal_reviewer_id' => $assignment->id,
+            'proposal_id' => $assignment->proposal_id,
+            'user_id' => $assignment->user_id,
+            'round' => $round,
+            'review_notes' => $notes,
+            'recommendation' => $recommendation,
+            'total_score' => $totalScore,
+            'started_at' => Carbon::parse($assignment->assigned_at)->subDays(($round == 1 && $assignment->round == 2) ? 10 : 0)->addDay(),
+            'completed_at' => Carbon::parse($assignment->assigned_at)->subDays(($round == 1 && $assignment->round == 2) ? 10 : 0)->addDays(3),
+        ]);
     }
 
     protected function seedReports($proposal, $mandatoryTarget, $additionalTarget, $submitter): void

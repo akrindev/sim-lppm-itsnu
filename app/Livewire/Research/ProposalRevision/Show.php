@@ -58,8 +58,10 @@ class Show extends Component
             'budgetItems.budgetComponent',
             'reviewers' => function ($q) {
                 $q->where('status', 'completed')
-                    ->with('user');
+                    ->with(['user', 'scores.criteria']);
             },
+            'reviewLogs.user',
+            'reviewLogs.scores.criteria',
         ]);
 
         $this->form->setProposal($proposal);

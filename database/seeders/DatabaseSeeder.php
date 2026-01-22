@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             MacroResearchGroupSeeder::class,
             BudgetGroupSeeder::class,
             BudgetComponentSeeder::class,
+            ReviewCriteriaSeeder::class,
 
             // 3. Hierarchical Data (Self-referencing)
             ScienceClusterSeeder::class,

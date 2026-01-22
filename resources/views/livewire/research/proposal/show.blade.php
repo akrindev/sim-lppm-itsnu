@@ -20,6 +20,10 @@
                 Edit
             </a>
         @endif
+        <a href="{{ route('proposals.export-pdf', $proposal) }}" target="_blank" class="btn btn-outline-primary">
+            <x-lucide-download class="icon" />
+            Unduh Proposal (PDF)
+        </a>
     </div>
 </x-slot:pageActions>
 
@@ -143,7 +147,7 @@
                     {{-- <div class="row">
                         <div class="col-md-6">
                             <label class="form-label"><x-lucide-dollar-sign class="me-2 icon" />Nilai SBK</label>
-                            <p class="text-reset">{{ number_format($proposal->sbk_value, 2) ?? '—' }}</p>
+                            <p class="text-reset">{{ number_format($proposal->sbk_value, 0, ',', '.') ?? '—' }}</p>
                         </div>
                     </div> --}}
                 </div>

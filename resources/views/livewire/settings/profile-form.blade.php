@@ -1,4 +1,42 @@
 <div>
+    <h3 class="card-title">Foto Profil</h3>
+    <div class="align-items-center mb-4 row">
+        <div class="col-auto">
+            <!-- Photo Preview -->
+            @if ($photo)
+                <span class="avatar avatar-xl" style="background-image: url({{ $photo->temporaryUrl() }})"></span>
+            @elseif (auth()->user()->profile_picture)
+                <span class="avatar avatar-xl"
+                    style="background-image: url({{ auth()->user()->profile_picture }})"></span>
+            @else
+                <span class="avatar avatar-xl">
+                    {{ auth()->user()->initials() }}
+                </span>
+            @endif
+        </div>
+        <div class="col-auto">
+            <input type="file" class="d-none" wire:model.live="photo" x-ref="photo" accept="image/*">
+
+            <button type="button" class="btn btn-primary" x-on:click.prevent="$refs.photo.click()">
+                Ubah Foto
+            </button>
+        </div>
+        @if (auth()->user()->getFirstMedia('avatar') || auth()->user()->identity?->profile_picture)
+            <div class="col-auto">
+                <button type="button" class="btn btn-ghost-danger" wire:click="removeAvatar"
+                    wire:confirm="Apakah Anda yakin ingin menghapus foto profil?">
+                    Hapus Foto
+                </button>
+            </div>
+        @endif
+
+        <div class="mt-2 col-12">
+            @error('photo')
+                <span class="text-danger small">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
+
     <h3 class="mt-4 card-title">Informasi Dasar</h3>
     <div class="row g-3">
         <div class="col-md">

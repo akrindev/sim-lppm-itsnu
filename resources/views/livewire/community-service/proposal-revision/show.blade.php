@@ -66,7 +66,7 @@
                         <div class="col-md-6">
                             <label class="form-label"><x-lucide-clipboard-list class="me-2 icon" />Skema
                                 Pengabdian</label>
-                            <p class="text-reset">{{ $proposal->communityServiceScheme?->name ?? '—' }}</p>
+                            <p class="text-reset">{{ $proposal->researchScheme?->name ?? '—' }}</p>
                         </div>
                     </div>
                 </div>
@@ -240,81 +240,170 @@
                 </div>
             </div>
 
-            <!-- Reviewer Notes Card -->
+            <!-- Scoring Summary & Reviewer Notes Card -->
             <div class="mb-3 card">
                 <div class="card-header">
-                    <h3 class="card-title">1.4 Catatan dan Rekomendasi Reviewer</h3>
+                    <h3 class="card-title">1.4 Penilaian dan Catatan Reviewer</h3>
                 </div>
                 @php
                     $completedReviewers = $proposal->reviewers->where('status', 'completed');
                 @endphp
                 @if ($completedReviewers->isEmpty())
                     <div class="card-body">
-                        <p class="text-muted">Belum ada catatan dari reviewer</p>
+                        <p class="text-muted">Belum ada penilaian dari reviewer</p>
                     </div>
                 @else
-                    <div class="list-group list-group-flush">
+                    <div class="divide-y">
                         @foreach ($completedReviewers as $reviewer)
-                            <div class="list-group-item">
-                                <div class="mb-2">
-                                    <div class="d-flex align-items-center justify-content-between">
+                            <div class="p-3">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
                                         <div class="d-flex align-items-center">
-                                            <x-lucide-user-circle class="me-2 icon text-primary" />
-                                            <strong>{{ $reviewer->user?->name ?? 'Reviewer' }}</strong>
+                                            <x-lucide-user-circle class="me-2 text-primary icon" />
+                                            <div class="fw-bold">{{ $reviewer->user?->name ?? 'Reviewer' }}</div>
                                         </div>
-                                        <small class="text-muted">
-                                            {{ $reviewer->updated_at?->format('d M Y H:i') }}
-                                        </small>
+                                        <div class="text-end">
+                                            <x-tabler.badge :color="$reviewer->recommendation === 'approved' ? 'success' : ($reviewer->recommendation === 'rejected' ? 'danger' : 'warning')">
+                                                {{ $reviewer->recommendation === 'approved' ? 'Disetujui' : ($reviewer->recommendation === 'rejected' ? 'Ditolak' : 'Perlu Revisi') }}
+                                            </x-tabler.badge>
+                                            <div class="text-muted small mt-1">
+                                                {{ $reviewer->completed_at?->format('d M Y H:i') }}
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <!-- Scoring Details Table -->
+                                    <div class="table-responsive border rounded-2 mb-3">
+                                        <table class="table table-vcenter mb-0 bg-white">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th class="py-2">Kriteria</th>
+                                                    <th class="py-2">Catatan Reviewer</th>
+                                                    <th class="text-center w-1 py-2">Skor</th>
+                                                    <th class="text-center w-1 py-2">Bobot</th>
+                                                    <th class="text-end w-1 py-2">Nilai</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($reviewer->scores()->where('round', $reviewer->round)->with('criteria')->get() as $s)
+                                                    <tr>
+                                                        <td class="py-2 fw-bold" style="font-size: 10pt;">{{ $s->criteria->criteria }}</td>
+                                                        <td class="py-2 italic text-secondary" style="font-size: 10pt;">{{ $s->acuan }}</td>
+                                                        <td class="text-center py-2" style="font-size: 10pt;">{{ $s->score }}</td>
+                                                        <td class="text-center py-2 text-muted" style="font-size: 10pt;">{{ number_format($s->weight_snapshot, 0) }}%</td>
+                                                        <td class="text-end py-2 fw-bold" style="font-size: 10pt;">{{ number_format($s->value, 0) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot class="fw-bold bg-light">
+                                                <tr>
+                                                    <td colspan="2" class="text-end py-2">TOTAL:</td>
+                                                    <td class="text-center py-2">{{ $reviewer->scores()->where('round', $reviewer->round)->sum('score') }}</td>
+                                                    <td class="text-center py-2">{{ number_format($reviewer->scores()->where('round', $reviewer->round)->sum('weight_snapshot'), 0) }}%</td>
+                                                    <td class="text-end text-primary py-2">{{ number_format($reviewer->scores()->where('round', $reviewer->round)->sum('value'), 0) }}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+
+                                    <div class="mb-3 small text-secondary">
+                                        <x-lucide-info class="icon icon-inline me-1" />
+                                        Total nilai dihitung otomatis: (Skor × Bobot). Passing Grade: 300.
+                                    </div>
+
+                                    @if ($reviewer->review_notes)
+                                        <div class="mb-0">
+                                            <label class="mb-1 form-label fw-bold small">
+                                                <x-lucide-message-square class="icon icon-sm" />
+                                                Catatan Review Keseluruhan:
+                                            </label>
+                                            <div class="bg-body-tertiary p-3 rounded border">
+                                                <p class="mb-0 text-reset small" style="white-space: pre-wrap;">{{ $reviewer->review_notes }}</p>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
-
-                                @if ($reviewer->review_notes)
-                                    <div class="mb-2">
-                                        <label class="form-label fw-bold mb-1">
-                                            <x-lucide-message-square class="icon icon-sm" />
-                                            Catatan Review:
-                                        </label>
-                                        <div class="p-3 bg-body-tertiary rounded">
-                                            <p class="mb-0 text-reset">{{ $reviewer->review_notes }}</p>
-                                        </div>
-                                    </div>
-                                @endif
-
-                                @if ($reviewer->recommendation)
-                                    <div class="mb-0">
-                                        <label class="form-label fw-bold mb-1">
-                                            <x-lucide-star class="icon icon-sm" />
-                                            Rekomendasi:
-                                        </label>
-                                        <p class="mb-0">
-                                            @if ($reviewer->recommendation === 'approved')
-                                                <x-tabler.badge color="success">
-                                                    <x-lucide-check class="icon icon-sm" />
-                                                    Disetujui
-                                                </x-tabler.badge>
-                                            @elseif ($reviewer->recommendation === 'revision_needed')
-                                                <x-tabler.badge color="warning">
-                                                    <x-lucide-alert-triangle class="icon icon-sm" />
-                                                    Perlu Revisi
-                                                </x-tabler.badge>
-                                            @elseif ($reviewer->recommendation === 'rejected')
-                                                <x-tabler.badge color="danger">
-                                                    <x-lucide-x class="icon icon-sm" />
-                                                    Ditolak
-                                                </x-tabler.badge>
-                                            @else
-                                                <x-tabler.badge color="secondary">
-                                                    {{ ucfirst(str_replace('_', ' ', $reviewer->recommendation)) }}
-                                                </x-tabler.badge>
-                                            @endif
-                                        </p>
-                                    </div>
-                                @endif
                             </div>
                         @endforeach
                     </div>
                 @endif
             </div>
+
+            <!-- Review History Logs -->
+            @if ($proposal->reviewLogs->isNotEmpty())
+                <div class="mb-3 card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <x-lucide-history class="icon me-2" />
+                            Riwayat Review Sebelumnya
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="accordion" id="reviewHistoryAccordion">
+                            @foreach ($proposal->reviewLogs->groupBy('round') as $round => $logs)
+                                <div class="accordion-item border-0 border-bottom">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed py-2" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#historyRound{{ $round }}">
+                                            <x-lucide-layers class="icon me-2" />
+                                            Round #{{ $round }}
+                                            <span class="badge bg-secondary-lt ms-2">{{ $logs->count() }} review</span>
+                                        </button>
+                                    </h2>
+                                    <div id="historyRound{{ $round }}" class="accordion-collapse collapse" data-bs-parent="#reviewHistoryAccordion">
+                                        <div class="accordion-body p-0">
+                                            <div class="divide-y">
+                                                @foreach ($logs as $log)
+                                                    <div class="p-3 bg-light">
+                                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                                            <div class="fw-bold small">{{ $log->user?->name ?? 'Reviewer' }}</div>
+                                                            <x-tabler.badge :color="$log->recommendation_color" class="small">
+                                                                {{ $log->recommendation_label }}
+                                                            </x-tabler.badge>
+                                                        </div>
+                                                        @if($log->total_score)
+                                                            <div class="small fw-bold text-dark mb-2">Total Skor: {{ number_format($log->total_score, 0) }}</div>
+                                                        @endif
+
+                                                        <!-- History Scores Small Table -->
+                                                        <div class="table-responsive mb-2">
+                                                            <table class="table table-vcenter table-borderless bg-white rounded border mb-0" style="font-size: 9pt;">
+                                                                <thead class="bg-light">
+                                                                    <tr>
+                                                                        <th class="py-1 px-2">Kriteria</th>
+                                                                        <th class="text-center py-1 px-2">Skor</th>
+                                                                        <th class="text-end py-1 px-2">Nilai</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach($log->scores as $ls)
+                                                                        <tr>
+                                                                            <td class="py-1 px-2">{{ $ls->criteria->criteria }}</td>
+                                                                            <td class="text-center py-1 px-2">{{ $ls->score }}</td>
+                                                                            <td class="text-end py-1 px-2 fw-bold">{{ number_format($ls->value, 0) }}</td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                        <div class="bg-white p-2 rounded border small text-muted italic">
+                                                            {{ $log->review_notes }}
+                                                        </div>
+                                                        <div class="text-end mt-1">
+                                                            <small class="text-muted">{{ $log->completed_at?->format('d M Y H:i') }}</small>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Save Button for Submitter -->
             @if ($this->canEdit())
@@ -383,62 +472,63 @@
                                                 {{ $item->budgetComponent?->unit ?? '-' }}
                                             </x-tabler.badge>
                                         </td>
-                                        <td class="text-end">Rp {{ number_format($item->unit_price, 2, ',', '.') }}
-                                        </td>
-                                        <td class="text-end fw-bold">Rp
-                                            {{ number_format($item->total_price, 2, ',', '.') }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr class="table-active">
-                                    <th colspan="5" class="text-end">Total Anggaran:</th>
-                                    <th class="text-end">
-                                        <span class="text-primary">
-                                            Rp
-                                            {{ number_format($proposal->budgetItems->sum('total_price'), 2, ',', '.') }}
-                                        </span>
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                @endif
-            </div>
+                                         <td class="text-end">Rp {{ number_format($item->unit_price, 0, ',', '.') }}
+                                         </td>
+                                         <td class="text-end fw-bold">Rp
+                                             {{ number_format($item->total_price, 0, ',', '.') }}</td>
+                                     </tr>
+                                 @endforeach
+                             </tbody>
+                             <tfoot>
+                                 <tr class="table-active">
+                                     <th colspan="5" class="text-end">Total Anggaran:</th>
+                                     <th class="text-end">
+                                         <span class="text-primary">
+                                             Rp
+                                             {{ number_format($proposal->budgetItems->sum('total_price'), 0, ',', '.') }}
+                                         </span>
+                                     </th>
+                                 </tr>
+                             </tfoot>
+                         </table>
+                     </div>
+                 @endif
+             </div>
+ 
+             <!-- Summary Card -->
+             <div class="mb-3 card">
+                 <div class="card-header">
+                     <h3 class="card-title">Ringkasan Anggaran</h3>
+                 </div>
+                 <div class="card-body">
+                     <div class="row">
+                         <div class="col-md-6">
+                             <div class="mb-3">
+                                 <label class="form-label">Jumlah Item Anggaran</label>
+                                 <p class="text-reset h4">{{ $proposal->budgetItems->count() }} item</p>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="mb-3">
+                                 <label class="form-label">Total Anggaran</label>
+                                 <p class="text-primary text-reset h4">
+                                     Rp {{ number_format($proposal->budgetItems->sum('total_price'), 0, ',', '.') }}
+                                 </p>
+                             </div>
+                         </div>
+                     </div>
+                     @if ($proposal->sbk_value)
+                         <div class="row">
+                             <div class="col-md-12">
+                                 <div class="mb-0">
+                                     <label class="form-label">Nilai SBK</label>
+                                     <p class="text-reset">Rp {{ number_format($proposal->sbk_value, 0, ',', '.') }}
+                                     </p>
+                                 </div>
+                             </div>
+                         </div>
+                     @endif
 
-            <!-- Summary Card -->
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">Ringkasan Anggaran</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jumlah Item Anggaran</label>
-                                <p class="text-reset h4">{{ $proposal->budgetItems->count() }} item</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Total Anggaran</label>
-                                <p class="text-primary text-reset h4">
-                                    Rp {{ number_format($proposal->budgetItems->sum('total_price'), 2, ',', '.') }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    @if ($proposal->sbk_value)
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-0">
-                                    <label class="form-label">Nilai SBK</label>
-                                    <p class="text-reset">Rp {{ number_format($proposal->sbk_value, 2, ',', '.') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

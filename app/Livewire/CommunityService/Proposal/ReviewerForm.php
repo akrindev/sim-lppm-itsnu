@@ -5,12 +5,13 @@ namespace App\Livewire\CommunityService\Proposal;
 use App\Enums\ProposalStatus;
 use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
+use App\Models\ReviewCriteria;
 use App\Models\ReviewLog;
+use App\Models\ReviewScore;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class ReviewerForm extends Component
@@ -21,11 +22,11 @@ class ReviewerForm extends Component
 
     public bool $showForm = false;
 
-    #[Validate('required|min:10')]
     public string $reviewNotes = '';
 
-    #[Validate('required|in:approved,rejected,revision_needed')]
     public string $recommendation = '';
+
+    public array $scores = []; // [criteria_id => ['score' => 1-5, 'acuan' => 'text']]
 
     public function mount(string $proposalId): void
     {
@@ -36,6 +37,25 @@ class ReviewerForm extends Component
         if ($myReview && $myReview->isCompleted()) {
             $this->reviewNotes = $myReview->review_notes ?? '';
             $this->recommendation = $myReview->recommendation ?? '';
+
+            // Load existing scores
+            $existingScores = $myReview->scores()->where('round', $myReview->round)->get();
+            foreach ($existingScores as $score) {
+                $this->scores[$score->review_criteria_id] = [
+                    'score' => $score->score,
+                    'acuan' => $score->acuan,
+                ];
+            }
+        }
+
+        // Initialize empty scores for active criteria if not exists
+        foreach ($this->activeCriterias as $criteria) {
+            if (! isset($this->scores[$criteria->id])) {
+                $this->scores[$criteria->id] = [
+                    'score' => '',
+                    'acuan' => '',
+                ];
+            }
         }
 
         // Mark as started when form is mounted (if reviewer is viewing)
@@ -47,6 +67,36 @@ class ReviewerForm extends Component
         }
     }
 
+    protected function rules(): array
+    {
+        $rules = [
+            'reviewNotes' => 'required|min:10',
+            'recommendation' => 'required|in:approved,rejected,revision_needed',
+        ];
+
+        foreach ($this->activeCriterias as $criteria) {
+            $rules["scores.{$criteria->id}.score"] = 'required|integer|min:1|max:5';
+            $rules["scores.{$criteria->id}.acuan"] = 'required|string|min:3';
+        }
+
+        return $rules;
+    }
+
+    protected function validationAttributes(): array
+    {
+        $attributes = [
+            'reviewNotes' => 'Catatan Review',
+            'recommendation' => 'Rekomendasi',
+        ];
+
+        foreach ($this->activeCriterias as $criteria) {
+            $attributes["scores.{$criteria->id}.score"] = "Skor {$criteria->criteria}";
+            $attributes["scores.{$criteria->id}.acuan"] = "Acuan {$criteria->criteria}";
+        }
+
+        return $attributes;
+    }
+
     /**
      * Mark the review as started when reviewer first opens the form
      */
@@ -56,6 +106,29 @@ class ReviewerForm extends Component
         if ($review && $review->isPending()) {
             $review->markAsStarted();
         }
+    }
+
+    #[Computed]
+    public function activeCriterias()
+    {
+        return ReviewCriteria::where('type', 'community_service')
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->get();
+    }
+
+    #[Computed]
+    public function totalScore(): float
+    {
+        $total = 0;
+        foreach ($this->activeCriterias as $criteria) {
+            $score = $this->scores[$criteria->id]['score'] ?? 0;
+            if (is_numeric($score)) {
+                $total += ($score * $criteria->weight);
+            }
+        }
+
+        return $total;
     }
 
     #[Computed]
@@ -172,6 +245,22 @@ class ReviewerForm extends Component
     }
 
     /**
+     * Get scores for history (by round)
+     */
+    public function getScoresForRound(int $round)
+    {
+        $review = $this->myReview;
+        if (! $review) {
+            return collect();
+        }
+
+        return ReviewScore::where('proposal_reviewer_id', $review->id)
+            ->where('round', $round)
+            ->with('criteria')
+            ->get();
+    }
+
+    /**
      * Get all review logs for this proposal (for showing complete history).
      */
     #[Computed]
@@ -210,11 +299,27 @@ class ReviewerForm extends Component
         }
 
         try {
-            DB::transaction(function (): void {
-                $review = $this->myReview;
-
-                // Complete the review with new method
+            DB::transaction(function () use ($review): void {
+                // Complete the review
                 $review->complete($this->reviewNotes, $this->recommendation);
+
+                // Save individual scores
+                foreach ($this->activeCriterias as $criteria) {
+                    $scoreData = $this->scores[$criteria->id];
+                    ReviewScore::updateOrCreate(
+                        [
+                            'proposal_reviewer_id' => $review->id,
+                            'review_criteria_id' => $criteria->id,
+                            'round' => $review->round,
+                        ],
+                        [
+                            'acuan' => $scoreData['acuan'],
+                            'score' => $scoreData['score'],
+                            'weight_snapshot' => $criteria->weight,
+                            'value' => $scoreData['score'] * $criteria->weight,
+                        ]
+                    );
+                }
 
                 // Create review log for history tracking
                 ReviewLog::create([
@@ -224,18 +329,16 @@ class ReviewerForm extends Component
                     'round' => $review->round ?? 1,
                     'review_notes' => $this->reviewNotes,
                     'recommendation' => $this->recommendation,
+                    'total_score' => $this->totalScore,
                     'started_at' => $review->started_at,
                     'completed_at' => $review->completed_at ?? now(),
                 ]);
 
-                // Refresh the proposal and review from DB to get updated data
+                // Refresh the proposal from DB to get updated data
                 $proposal = $this->proposal->fresh(['reviewers']);
 
                 // Check if all reviews are completed using fresh data
-                $allCompleted = $proposal->allReviewsCompleted();
-
-                if ($allCompleted) {
-                    // Update proposal status to reviewed
+                if ($proposal->allReviewsCompleted()) {
                     $proposal->update(['status' => ProposalStatus::REVIEWED]);
                 }
             });

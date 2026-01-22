@@ -116,6 +116,7 @@
                             <th>Judul</th>
                             <th>Jenis</th>
                             <th>Pengusul</th>
+                            <th>Status</th>
                             <th class="w-1">Aksi</th>
                         </tr>
                 </thead>
@@ -142,6 +143,22 @@
                                         Pengabdian
                                     </x-tabler.badge>
                                 @endif
+                            </td>
+                            <td>
+                                <div>{{ $proposal->submitter->name }}</div>
+                                <div class="small text-secondary">
+                                    {{ $proposal->submitter->identity?->studyProgram?->name ?? '—' }}
+                                </div>
+                            </td>
+                            <td>
+                                <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
+                                    {{ $proposal->status->label() }}
+                                </x-tabler.badge>
+                                <div class="mt-1">
+                                    <small class="text-secondary">
+                                        {{ $proposal->created_at?->format('d M Y') }}
+                                    </small>
+                                </div>
                             </td>
                             <td>
                                 <div class="flex-nowrap btn-list">

@@ -1,9 +1,9 @@
 <!-- Section: Substansi Usulan -->
-<div class="card mb-3">
+<div class="mb-3 card">
     <div class="card-body">
         <div class="d-flex align-items-center mb-4">
-            <x-lucide-book-open class="icon me-3" />
-            <h3 class="card-title mb-0">2.1 Substansi Usulan</h3>
+            <x-lucide-book-open class="me-3 icon" />
+            <h3 class="mb-0 card-title">2.1 Substansi Usulan</h3>
         </div>
 
         <div class="row g-4">
@@ -30,18 +30,17 @@
 
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label d-flex justify-content-between align-items-center" for="substance_file">
-                        <span>Unggah Substansi Laporan (PDF) <span class="text-danger">*</span></span>
+                    <label class="d-flex align-items-center justify-content-between form-label" for="substance_file">
+                        <span>Unggah Substansi (PDF) <span class="text-danger">*</span></span>
                         @if ($this->templateUrl)
                             <a href="{{ $this->templateUrl }}" target="_blank" class="text-primary text-decoration-none"
                                 style="font-size: 0.875rem;">
-                                <x-lucide-download class="icon me-1" style="width: 1rem; height: 1rem;" />
+                                <x-lucide-download class="me-1 icon" style="width: 1rem; height: 1rem;" />
                                 Unduh Template
                             </a>
                         @endif
                     </label>
-                    <input id="substance_file" type="file"
-                        wire:key="substance-file-{{ $fileInputIteration }}"
+                    <input id="substance_file" type="file" wire:key="substance-file-{{ $fileInputIteration }}"
                         class="form-control @error('form.substance_file') is-invalid @enderror"
                         wire:model="form.substance_file" accept=".pdf,.doc,.docx">
                     @error('form.substance_file')
@@ -57,8 +56,8 @@
                     @elseif ($form->proposal && $form->proposal->detailable && $form->proposal->detailable->getFirstMediaUrl('substance_file'))
                         <div class="mt-2">
                             <x-lucide-file-check class="text-success icon" />
-                            <a href="{{ $form->proposal->detailable->getFirstMediaUrl('substance_file') }}" target="_blank"
-                                class="text-decoration-none">
+                            <a href="{{ $form->proposal->detailable->getFirstMediaUrl('substance_file') }}"
+                                target="_blank" class="text-decoration-none">
                                 {{ $form->proposal->detailable->getFirstMedia('substance_file')->name }}
                             </a>
                         </div>
@@ -70,12 +69,12 @@
 </div>
 
 <!-- Section: Luaran Target Capaian -->
-<div class="card mb-3">
+<div class="mb-3 card">
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="d-flex align-items-center">
-                <x-lucide-target class="icon me-3" />
-                <h3 class="card-title mb-0">2.2 Luaran Target Capaian</h3>
+                <x-lucide-target class="me-3 icon" />
+                <h3 class="mb-0 card-title">2.2 Luaran Target Capaian</h3>
             </div>
             <button type="button" wire:click="addOutput" class="btn btn-primary btn-sm">
                 <x-lucide-plus class="icon" />
@@ -84,22 +83,22 @@
         </div>
 
         @error('form.outputs')
-            <div class="alert alert-danger mb-3">
-                <x-lucide-alert-circle class="icon me-2" />
+            <div class="mb-3 alert alert-danger">
+                <x-lucide-alert-circle class="me-2 icon" />
                 {{ $message }}
             </div>
         @enderror
 
         @if (empty($form->outputs))
             <div class="alert alert-info">
-                <x-lucide-info class="icon me-2" />
+                <x-lucide-info class="me-2 icon" />
                 Belum ada luaran target. Klik tombol "Tambah Luaran" untuk menambahkan.
             </div>
         @else
             <div class="table-responsive" x-data="{
                 typesMap: @js(\App\Constants\ProposalConstants::PKM_OUTPUT_TYPES)
             }">
-                <table class="table-bordered table">
+                <table class="table table-bordered">
                     @php
                         $duration = (int) ($form->duration_in_years ?? 1);
                         $startYear = (int) ($form->start_year ?? date('Y'));
@@ -126,7 +125,8 @@
                                         class="form-select form-select-sm @error('form.outputs.' . $index . '.year') is-invalid @enderror">
                                         @for ($y = 1; $y <= $duration; $y++)
                                             <option value="{{ $y }}">{{ $y }}
-                                                ({{ $startYear + $y - 1 }})</option>
+                                                ({{ $startYear + $y - 1 }})
+                                            </option>
                                         @endfor
                                     </select>
                                 </td>
@@ -160,11 +160,12 @@
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.status"
-                                        class="form-control form-control-sm @error('form.outputs.'.$index.'.status') is-invalid @enderror" placeholder="Status">
+                                        class="form-control form-control-sm @error('form.outputs.' . $index . '.status') is-invalid @enderror"
+                                        placeholder="Status">
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.description"
-                                        class="form-control form-control-sm @error('form.outputs.'.$index.'.description') is-invalid @enderror"
+                                        class="form-control form-control-sm @error('form.outputs.' . $index . '.description') is-invalid @enderror"
                                         placeholder="Keterangan (URL)">
                                 </td>
                                 <td>

@@ -65,6 +65,22 @@ class ProposalReviewer extends Model
     }
 
     /**
+     * Get all scores for this reviewer assignment.
+     */
+    public function scores(): HasMany
+    {
+        return $this->hasMany(ReviewScore::class);
+    }
+
+    /**
+     * Get scores for the current round.
+     */
+    public function currentScores(): HasMany
+    {
+        return $this->scores()->where('round', $this->round);
+    }
+
+    /**
      * Get the latest completed review log.
      */
     public function latestLog()

@@ -197,7 +197,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card shadow-sm border-0">
                         <div class="card-header">
-                            <h3 class="card-title">Tugas Penelitian Terbaru</h3>
+                            <h3 class="card-title">Tugas Penelitian (Butuh Review)</h3>
                             <div class="card-actions">
                                 <a href="{{ route('review.research') }}" class="btn btn-link btn-sm" wire:navigate>Lihat Semua</a>
                             </div>
@@ -248,7 +248,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card shadow-sm border-0">
                         <div class="card-header">
-                            <h3 class="card-title">Tugas PKM Terbaru</h3>
+                            <h3 class="card-title">Tugas PKM (Butuh Review)</h3>
                             <div class="card-actions">
                                 <a href="{{ route('review.community-service') }}" class="btn btn-link btn-sm" wire:navigate>Lihat Semua</a>
                             </div>

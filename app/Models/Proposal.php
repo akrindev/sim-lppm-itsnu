@@ -239,6 +239,14 @@ class Proposal extends Model
     }
 
     /**
+     * Get all review logs for the proposal.
+     */
+    public function reviewLogs(): HasMany
+    {
+        return $this->hasMany(ReviewLog::class)->orderBy('round', 'desc')->orderBy('completed_at', 'desc');
+    }
+
+    /**
      * Check if all team members have accepted the invitation.
      */
     public function allTeamMembersAccepted(): bool

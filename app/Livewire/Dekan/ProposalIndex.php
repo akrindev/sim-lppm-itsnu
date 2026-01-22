@@ -72,7 +72,7 @@ class ProposalIndex extends Component
         $this->applyFacultyScope($query);
 
         return $query
-            ->with(['submitter.identity', 'detailable', 'focusArea', 'researchScheme'])
+            ->with(['submitter.identity.studyProgram', 'detailable', 'focusArea', 'researchScheme'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('title', 'like', "%{$this->search}%")

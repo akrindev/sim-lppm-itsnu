@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use App\Rules\Turnstile;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,6 +23,9 @@ class Login extends Component
 
     #[Validate('required|string')]
     public string $password = '';
+
+    #[Validate(['required', new Turnstile])]
+    public string $captcha = '';
 
     public bool $remember = false;
 
