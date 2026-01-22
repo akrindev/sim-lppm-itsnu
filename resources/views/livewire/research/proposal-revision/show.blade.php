@@ -256,33 +256,33 @@
 
                                     <!-- Scoring Details Table -->
                                     <div class="table-responsive border rounded-2 mb-3">
-                                        <table class="table table-sm table-vcenter mb-0 bg-white">
+                                        <table class="table table-vcenter mb-0 bg-white">
                                             <thead class="bg-light">
                                                 <tr>
-                                                    <th>Kriteria</th>
-                                                    <th>Catatan Reviewer</th>
-                                                    <th class="text-center w-1">Skor</th>
-                                                    <th class="text-center w-1">Bobot</th>
-                                                    <th class="text-end w-1">Nilai</th>
+                                                    <th class="py-2">Kriteria</th>
+                                                    <th class="py-2">Catatan Reviewer</th>
+                                                    <th class="text-center w-1 py-2">Skor</th>
+                                                    <th class="text-center w-1 py-2">Bobot</th>
+                                                    <th class="text-end w-1 py-2">Nilai</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($reviewer->scores()->where('round', $reviewer->round)->with('criteria')->get() as $s)
                                                     <tr>
-                                                        <td class="small fw-bold">{{ $s->criteria->criteria }}</td>
-                                                        <td class="small italic text-secondary">{{ $s->acuan }}</td>
-                                                        <td class="text-center small">{{ $s->score }}</td>
-                                                        <td class="text-center small text-muted">{{ number_format($s->weight_snapshot, 0) }}%</td>
-                                                        <td class="text-end small fw-bold">{{ number_format($s->value, 0) }}</td>
+                                                        <td class="py-2 fw-bold" style="font-size: 10pt;">{{ $s->criteria->criteria }}</td>
+                                                        <td class="py-2 italic text-secondary" style="font-size: 10pt;">{{ $s->acuan }}</td>
+                                                        <td class="text-center py-2" style="font-size: 10pt;">{{ $s->score }}</td>
+                                                        <td class="text-center py-2 text-muted" style="font-size: 10pt;">{{ number_format($s->weight_snapshot, 0) }}%</td>
+                                                        <td class="text-end py-2 fw-bold" style="font-size: 10pt;">{{ number_format($s->value, 0) }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
                                             <tfoot class="fw-bold bg-light">
                                                 <tr>
-                                                    <td colspan="2" class="text-end small">TOTAL:</td>
-                                                    <td class="text-center small">{{ $reviewer->scores()->where('round', $reviewer->round)->sum('score') }}</td>
-                                                    <td class="text-center small">{{ number_format($reviewer->scores()->where('round', $reviewer->round)->sum('weight_snapshot'), 0) }}%</td>
-                                                    <td class="text-end text-primary small">{{ number_format($reviewer->scores()->where('round', $reviewer->round)->sum('value'), 0) }}</td>
+                                                    <td colspan="2" class="text-end py-2">TOTAL:</td>
+                                                    <td class="text-center py-2">{{ $reviewer->scores()->where('round', $reviewer->round)->sum('score') }}</td>
+                                                    <td class="text-center py-2">{{ number_format($reviewer->scores()->where('round', $reviewer->round)->sum('weight_snapshot'), 0) }}%</td>
+                                                    <td class="text-end text-primary py-2">{{ number_format($reviewer->scores()->where('round', $reviewer->round)->sum('value'), 0) }}</td>
                                                 </tr>
                                             </tfoot>
                                         </table>
