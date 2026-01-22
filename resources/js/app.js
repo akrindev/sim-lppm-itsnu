@@ -284,7 +284,13 @@ document.addEventListener("alpine:init", () => {
             this.updateDisplay();
             // Watch for external changes to the Livewire model
             this.$watch(
-                `$wire.form.budget_items.${index}.unit_price`,
+                () => {
+                    try {
+                        return this.$wire.get(`form.budget_items.${index}.unit_price`);
+                    } catch (e) {
+                        return null;
+                    }
+                },
                 (value) => {
                     this.updateDisplay(value);
                 },
@@ -292,22 +298,33 @@ document.addEventListener("alpine:init", () => {
         },
 
         updateDisplay(val) {
-            val = val || this.$wire.get(`form.budget_items.${index}.unit_price`);
-            if (val === "" || val === null || val === undefined) {
+            try {
+                val =
+                    val !== undefined
+                        ? val
+                        : this.$wire.get(`form.budget_items.${index}.unit_price`);
+                if (val === "" || val === null || val === undefined) {
+                    this.display = "";
+                    return;
+                }
+                let numericVal = parseInt(val.toString().replace(/[^0-9]/g, ""));
+                if (isNaN(numericVal)) {
+                    this.display = "";
+                    return;
+                }
+                this.display = new Intl.NumberFormat("id-ID").format(
+                    numericVal,
+                );
+            } catch (e) {
                 this.display = "";
-                return;
             }
-            let numericVal = parseInt(val.toString().replace(/[^0-9]/g, ""));
-            if (isNaN(numericVal)) {
-                this.display = "";
-                return;
-            }
-            this.display = new Intl.NumberFormat("id-ID").format(numericVal);
         },
 
         handleFocus() {
             this.$nextTick(() => {
-                this.$refs.input.select();
+                if (this.$refs.input) {
+                    this.$refs.input.select();
+                }
             });
         },
 
@@ -318,8 +335,10 @@ document.addEventListener("alpine:init", () => {
             // Handle empty input
             if (rawValue === "") {
                 this.display = "";
-                this.$wire.set(`form.budget_items.${index}.unit_price`, 0);
-                this.$wire.calculateTotal(index);
+                try {
+                    this.$wire.set(`form.budget_items.${index}.unit_price`, 0);
+                    this.$wire.calculateTotal(index);
+                } catch (e) {}
                 return;
             }
 
@@ -337,12 +356,14 @@ document.addEventListener("alpine:init", () => {
 
             // Update state
             this.display = formattedValue;
-            this.$wire.set(
-                `form.budget_items.${index}.unit_price`,
-                numericVal,
-                false,
-            );
-            this.$wire.calculateTotal(index);
+            try {
+                this.$wire.set(
+                    `form.budget_items.${index}.unit_price`,
+                    numericVal,
+                    false,
+                );
+                this.$wire.calculateTotal(index);
+            } catch (e) {}
 
             // Restore cursor position
             this.$nextTick(() => {

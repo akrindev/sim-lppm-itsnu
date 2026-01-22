@@ -40,7 +40,7 @@
                             </svg>
                         </span>
                         <input id="user-search" type="search" class="form-control"
-                            wire:model.live.live.debounce.400ms="search"
+                            wire:model.live.debounce.400ms="search"
                             placeholder="{{ __('Cari nama, email, atau ID...') }}">
                     </div>
                 </div>

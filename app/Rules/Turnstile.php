@@ -26,13 +26,18 @@ class Turnstile implements ValidationRule
         }
 
         /** @var \Illuminate\Http\Client\Response $response */
-        $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+        $response = Http::asForm()->timeout(10)->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
             'secret' => config('turnstile.secret_key'),
             'response' => $value,
-            'remoteip' => request()->ip(),
         ]);
 
         if (! $response->successful() || ! $response->json('success')) {
+            \Illuminate\Support\Facades\Log::error('Turnstile verification failed', [
+                'status' => $response->status(),
+                'body' => $response->json(),
+                'site_key' => config('turnstile.site_key'),
+                'remoteip' => request()->ip(),
+            ]);
             $fail('Verifikasi keamanan gagal. Silakan muat ulang halaman atau coba lagi.');
         }
     }

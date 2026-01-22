@@ -59,10 +59,34 @@
                                     @enderror
                                 </div>
                                 @if (config('turnstile.site_key'))
-                                    <div class="mb-2" wire:ignore>
-                                        <div class="cf-turnstile" style="width: 100%;"
-                                            data-sitekey="{{ config('turnstile.site_key') }}"
-                                            data-callback="onTurnstileSuccess"></div>
+                                    <div class="mb-2" wire:ignore 
+                                        x-data="{
+                                            widgetId: null,
+                                            init() {
+                                                this.renderTurnstile();
+                                            },
+                                            renderTurnstile() {
+                                                if (typeof turnstile === 'undefined') {
+                                                    setTimeout(() => this.renderTurnstile(), 100);
+                                                    return;
+                                                }
+                                                this.widgetId = turnstile.render($refs.turnstile, {
+                                                    sitekey: '{{ config('turnstile.site_key') }}',
+                                                    callback: (token) => {
+                                                        @this.set('captcha', token, false);
+                                                    },
+                                                    'error-callback': () => {
+                                                        @this.set('captcha', '', false);
+                                                    },
+                                                    'expired-callback': () => {
+                                                        @this.set('captcha', '', false);
+                                                        turnstile.reset(this.widgetId);
+                                                    }
+                                                });
+                                            }
+                                        }"
+                                        x-on:reset-turnstile.window="if (widgetId) turnstile.reset(widgetId)">
+                                        <div x-ref="turnstile" style="width: 100%;"></div>
                                     </div>
                                     @error('captcha')
                                         <div class="invalid-feedback" style="display: block;">
@@ -82,18 +106,6 @@
                                         Turnstile Site Key belum dikonfigurasi. Hubungi administrator.
                                     </div>
                                 @endif
-
-                                <script>
-                                    function onTurnstileSuccess(token) {
-                                        @this.set('captcha', token);
-                                    }
-
-                                    window.addEventListener('reset-turnstile', () => {
-                                        if (typeof turnstile !== 'undefined') {
-                                            turnstile.reset();
-                                        }
-                                    });
-                                </script>
                                 <div class="mb-2">
                                     <label class="form-check">
                                         <input type="checkbox" class="form-check-input" wire:model='remember' />
@@ -101,7 +113,10 @@
                                     </label>
                                 </div>
                                 <div class="form-footer">
-                                    <button type="submit" class="w-100 btn btn-success">Masuk</button>
+                                    <button type="submit" class="w-100 btn btn-success" wire:loading.attr="disabled">
+                                        <span wire:loading class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        Masuk
+                                    </button>
                                 </div>
                             </form>
 

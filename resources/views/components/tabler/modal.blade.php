@@ -135,7 +135,8 @@
                 if (window.LivewireModalInitialized) return;
                 window.LivewireModalInitialized = true;
 
-                const setupTablerModalListeners = () => {
+                // Define function on window to avoid redeclaration issues with const/let
+                window.setupTablerModalListeners = window.setupTablerModalListeners || function() {
                     document.querySelectorAll('[data-livewire-modal]').forEach((modalEl) => {
                         if (modalEl.dataset.livewireModalBound === 'true') {
                             return;
@@ -196,7 +197,9 @@
                 };
 
                 const initializeModalSystem = () => {
-                    setupTablerModalListeners();
+                    if (typeof window.setupTablerModalListeners === 'function') {
+                        window.setupTablerModalListeners();
+                    }
 
                     // Manage aria-hidden attribute based on modal visibility
                     const manageAriaHidden = () => {
@@ -250,7 +253,11 @@
                         });
 
                         // Re-setup on DOM updates
-                        Livewire.hook('morph.updated', setupTablerModalListeners);
+                        Livewire.hook('morph.updated', () => {
+                            if (typeof window.setupTablerModalListeners === 'function') {
+                                window.setupTablerModalListeners();
+                            }
+                        });
                     }
                 };
 
@@ -262,7 +269,11 @@
                 }
 
                 // Handle navigation with wire:navigate
-                document.addEventListener('livewire:navigated', setupTablerModalListeners);
+                document.addEventListener('livewire:navigated', () => {
+                    if (typeof window.setupTablerModalListeners === 'function') {
+                        window.setupTablerModalListeners();
+                    }
+                });
             })();
         </script>
     @endpush
