@@ -13,7 +13,11 @@
             <div class="card">
                 <div class="text-center card-body">
                     <span class="mb-3 avatar avatar-xl"
-                        style="background-image: url('{{ $user->profilePicture }}')"></span>
+                        style="background-image: url('{{ $user->profile_picture }}')">
+                        @if (!$user->getFirstMedia('avatar') && !$user->identity?->profile_picture)
+                            {{ $user->initials() }}
+                        @endif
+                    </span>
                     <h2 class="mb-1">{{ $user->name }}</h2>
                     <p class="text-secondary">{{ $user->email }}</p>
                     <div class="my-3">

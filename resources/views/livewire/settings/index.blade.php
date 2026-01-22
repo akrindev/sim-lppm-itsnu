@@ -44,18 +44,6 @@
                     @if ($activeTab === 'profile')
                         <div>
                             <h2 class="mb-4">Profil Saya</h2>
-                            <h3 class="card-title">Detail Profil</h3>
-                            <div class="align-items-center mb-4 row">
-                                <div class="col-auto">
-                                    <span class="avatar avatar-xl"
-                                        style="background-image: url({{ auth()->user()->profilePicture }})">
-                                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                                    </span>
-                                </div>
-                                <div class="col-auto">
-                                    <span class="text-muted small">Avatar dikelola melalui Gravatar</span>
-                                </div>
-                            </div>
 
                             <livewire:settings.profile-form />
                         </div>

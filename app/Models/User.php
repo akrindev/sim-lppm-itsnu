@@ -14,12 +14,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, HasUuids, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, HasRoles, HasUuids, InteractsWithMedia, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The type of the auto-incrementing ID's primary key.
@@ -126,9 +128,18 @@ class User extends Authenticatable
     public function profilePicture(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->identity()->profile_picture
-                ?? 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s=128&d=identicon',
+            get: fn ($value) => $this->getFirstMediaUrl('avatar') ?: ($this->identity?->profile_picture
+                ?? 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s=128&d=identicon'),
         );
+    }
+
+    /**
+     * Register the media collections.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->singleFile();
     }
 
     /**

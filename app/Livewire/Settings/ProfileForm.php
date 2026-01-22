@@ -11,14 +11,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ProfileForm extends Component
 {
-    use HasToast;
+    use HasToast, WithFileUploads;
 
     public string $name = '';
 
     public string $email = '';
+
+    public $photo;
 
     // Identity fields
     public string $identity_id = '';
@@ -146,6 +149,7 @@ class ProfileForm extends Component
             'institution_id' => ['nullable', 'exists:institutions,id'],
             'faculty_id' => ['nullable', 'exists:faculties,id'],
             'study_program_id' => ['nullable', 'exists:study_programs,id'],
+            'photo' => ['nullable', 'image', 'max:1024'],
         ]);
 
         // Update user data
@@ -159,6 +163,14 @@ class ProfileForm extends Component
         }
 
         $user->save();
+
+        if ($this->photo) {
+            $user->addMedia($this->photo->getRealPath())
+                ->usingFileName($this->photo->getClientOriginalName())
+                ->toMediaCollection('avatar');
+
+            $this->reset('photo');
+        }
 
         // Update or create identity
         $identityData = [
@@ -183,6 +195,27 @@ class ProfileForm extends Component
         $message = 'Profile berhasil diperbarui.';
         session()->flash('success', $message);
         $this->toastSuccess($message);
+    }
+
+    /**
+     * Remove the current user's profile picture.
+     */
+    public function removeAvatar(): void
+    {
+        $user = Auth::user();
+
+        $user->clearMediaCollection('avatar');
+
+        if ($user->identity && $user->identity->profile_picture) {
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($user->identity->profile_picture)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->identity->profile_picture);
+            }
+
+            $user->identity->update(['profile_picture' => null]);
+        }
+
+        $this->dispatch('profile-updated', name: $user->name);
+        $this->toastSuccess('Foto profil berhasil dihapus.');
     }
 
     /**
