@@ -352,6 +352,76 @@ document.addEventListener("alpine:init", () => {
             });
         },
     }));
+
+    /**
+     * Alpine.js component for Money/Rupiah Input (Single Field)
+     * For use with wire:model directly (not in an array)
+     */
+    Alpine.data("moneyInputSingle", (wireModelName) => ({
+        display: "",
+
+        init() {
+            this.updateDisplay();
+            // Watch for external changes to the Livewire model
+            this.$watch(`$wire.${wireModelName}`, (value) => {
+                this.updateDisplay(value);
+            });
+        },
+
+        updateDisplay(val) {
+            val = val || this.$wire.get(wireModelName);
+            if (val === "" || val === null || val === undefined) {
+                this.display = "";
+                return;
+            }
+            let numericVal = parseInt(val.toString().replace(/[^0-9]/g, ""));
+            if (isNaN(numericVal)) {
+                this.display = "";
+                return;
+            }
+            this.display = new Intl.NumberFormat("id-ID").format(numericVal);
+        },
+
+        handleFocus() {
+            this.$nextTick(() => {
+                this.$refs.input.select();
+            });
+        },
+
+        handleInput(e) {
+            let input = e.target;
+            let rawValue = input.value.replace(/[^0-9]/g, "");
+
+            // Handle empty input
+            if (rawValue === "") {
+                this.display = "";
+                this.$wire.set(wireModelName, null);
+                return;
+            }
+
+            // Keep track of cursor position from the END
+            let selectionEnd = input.selectionEnd;
+            let lengthBefore = input.value.length;
+            let offsetFromEnd = lengthBefore - selectionEnd;
+
+            // Format the raw value
+            let numericVal = parseInt(rawValue);
+            let formattedValue = new Intl.NumberFormat("id-ID").format(
+                numericVal,
+            );
+
+            // Update state
+            this.display = formattedValue;
+            this.$wire.set(wireModelName, numericVal, false);
+
+            // Restore cursor position
+            this.$nextTick(() => {
+                let lengthAfter = this.display.length;
+                let newPosition = lengthAfter - offsetFromEnd;
+                input.setSelectionRange(newPosition, newPosition);
+            });
+        },
+    }));
 });
 
 // Fallback: Initialize on page navigation (e.g., wire:navigate)

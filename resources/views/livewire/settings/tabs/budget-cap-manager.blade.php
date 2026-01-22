@@ -80,10 +80,15 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Batas Anggaran Penelitian</label>
-                        <div class="input-group">
+                        <div class="input-group" x-data="moneyInputSingle('research_budget_cap')">
                             <span class="input-group-text">Rp</span>
-                            <input type="number" wire:model="research_budget_cap" class="form-control"
-                                placeholder="50000000" step="1000" min="0">
+                            <input type="text" 
+                                x-model="display"
+                                x-ref="input"
+                                @focus="handleFocus"
+                                @input="handleInput"
+                                class="form-control"
+                                placeholder="50.000.000">
                         </div>
                         <small class="form-hint">Kosongkan jika tidak ada batasan anggaran untuk penelitian.</small>
                         @error('research_budget_cap')
@@ -92,10 +97,15 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Batas Anggaran Pengabdian Masyarakat</label>
-                        <div class="input-group">
+                        <div class="input-group" x-data="moneyInputSingle('community_service_budget_cap')">
                             <span class="input-group-text">Rp</span>
-                            <input type="number" wire:model="community_service_budget_cap" class="form-control"
-                                placeholder="30000000" step="1000" min="0">
+                            <input type="text" 
+                                x-model="display"
+                                x-ref="input"
+                                @focus="handleFocus"
+                                @input="handleInput"
+                                class="form-control"
+                                placeholder="30.000.000">
                         </div>
                         <small class="form-hint">Kosongkan jika tidak ada batasan anggaran untuk pengabdian.</small>
                         @error('community_service_budget_cap')
