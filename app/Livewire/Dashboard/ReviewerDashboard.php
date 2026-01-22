@@ -187,10 +187,11 @@ class ReviewerDashboard extends Component
             ->limit(10)
             ->get();
 
-        // Data penelitian terbaru
+        // Data penelitian terbaru (hanya yang butuh review)
         $this->recentResearch = Proposal::with(['submitter'])
             ->whereHas('reviewers', function ($query) {
-                $query->where('user_id', $this->user->id);
+                $query->where('user_id', $this->user->id)
+                    ->whereIn('status', [ReviewStatus::PENDING, ReviewStatus::IN_PROGRESS, ReviewStatus::RE_REVIEW_REQUESTED]);
             })
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\Research')
@@ -198,10 +199,11 @@ class ReviewerDashboard extends Component
             ->limit(10)
             ->get();
 
-        // Data PKM terbaru
+        // Data PKM terbaru (hanya yang butuh review)
         $this->recentCommunityService = Proposal::with(['submitter'])
             ->whereHas('reviewers', function ($query) {
-                $query->where('user_id', $this->user->id);
+                $query->where('user_id', $this->user->id)
+                    ->whereIn('status', [ReviewStatus::PENDING, ReviewStatus::IN_PROGRESS, ReviewStatus::RE_REVIEW_REQUESTED]);
             })
             ->whereYear('created_at', $yearFilter)
             ->where('detailable_type', 'App\Models\CommunityService')
