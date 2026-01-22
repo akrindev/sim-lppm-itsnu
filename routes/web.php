@@ -167,6 +167,9 @@ Route::middleware(['auth'])->group(function () {
     // PDF Export Route
     Route::get('proposals/{proposal}/export-pdf', [\App\Http\Controllers\ProposalExportController::class, 'download'])
         ->name('proposals.export-pdf');
+
+    Route::get('reviewers/{proposalReviewer}/export-pdf', [\App\Http\Controllers\ReviewExportController::class, 'download'])
+        ->name('reviewers.export-pdf');
 });
 
 require __DIR__.'/auth.php';

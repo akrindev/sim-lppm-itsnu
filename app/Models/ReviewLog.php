@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReviewLog extends Model
 {
@@ -16,6 +17,7 @@ class ReviewLog extends Model
         'round',
         'review_notes',
         'recommendation',
+        'total_score',
         'started_at',
         'completed_at',
     ];
@@ -27,6 +29,7 @@ class ReviewLog extends Model
     {
         return [
             'round' => 'integer',
+            'total_score' => 'integer',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
         ];
@@ -54,6 +57,15 @@ class ReviewLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get scores for this log round.
+     */
+    public function scores(): HasMany
+    {
+        return $this->hasMany(ReviewScore::class, 'proposal_reviewer_id', 'proposal_reviewer_id')
+            ->where('round', $this->round);
     }
 
     /**

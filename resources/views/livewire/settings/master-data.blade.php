@@ -41,13 +41,18 @@
                                 <x-lucide-atom class="icon me-2" />
                                 Klaster Sains
                             </button>
-                            <button wire:click="setActiveTab('tkt')"
-                                class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'tkt' ? 'active' : '' }}">
-                                <x-lucide-ruler class="icon me-2" />
-                                TKT
-                            </button>
-                        </div>
-                    @endif
+                             <button wire:click="setActiveTab('tkt')"
+                                 class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'tkt' ? 'active' : '' }}">
+                                 <x-lucide-ruler class="icon me-2" />
+                                 TKT
+                             </button>
+                             <button wire:click="setActiveTab('review-criteria')"
+                                 class="list-group-item list-group-item-action d-flex align-items-center {{ $activeTab === 'review-criteria' ? 'active' : '' }}">
+                                 <x-lucide-list-checks class="icon me-2" />
+                                 Kriteria Penilaian
+                             </button>
+                         </div>
+                     @endif
 
                     @if ($group === 'academic-structure')
                         <h4 class="subheader">Struktur Akademik</h4>
@@ -182,11 +187,15 @@
                         <div>
                             <livewire:settings.tabs.budget-cap-manager />
                         </div>
-                    @elseif ($activeTab === 'tkt')
-                        <div>
-                            <livewire:settings.tabs.tkt-manager />
-                        </div>
-                    @endif
+                     @elseif ($activeTab === 'tkt')
+                         <div>
+                             <livewire:settings.tabs.tkt-manager />
+                         </div>
+                     @elseif ($activeTab === 'review-criteria')
+                         <div>
+                             <livewire:settings.review-criteria-manager />
+                         </div>
+                     @endif
                 </div>
             </div>
         </div>
