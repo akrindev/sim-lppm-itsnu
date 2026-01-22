@@ -90,8 +90,7 @@
         
         .title-border-box {
             border: 1px solid #000;
-            padding: 10px;
-            margin-left: 20px;
+            padding: 8px;
             margin-bottom: 10px;
             font-weight: bold;
             text-align: justify;
@@ -141,8 +140,10 @@
         Rencana Pelaksanaan {{ $proposal->detailable_type === 'App\Models\Research' ? 'Penelitian' : 'Pengabdian' }} : tahun {{ $proposal->start_year }} s.d. tahun {{ (int)$proposal->start_year + (int)$proposal->duration_in_years - 1 }}
     </div>
 
+    @php $sectionNum = 1; @endphp
+
     {{-- 1. JUDUL --}}
-    <div class="section-title">1. JUDUL {{ $proposal->detailable_type === 'App\Models\Research' ? 'PENELITIAN' : 'PENGABDIAN' }}</div>
+    <div class="section-title">{{ $sectionNum++ }}. JUDUL {{ $proposal->detailable_type === 'App\Models\Research' ? 'PENELITIAN' : 'PENGABDIAN' }}</div>
     <div class="title-border-box">
         {{ $proposal->title }}
     </div>
@@ -175,7 +176,7 @@
     </table>
 
     {{-- 2. IDENTITAS PENGUSUL --}}
-    <div class="section-title">2. IDENTITAS PENGUSUL</div>
+    <div class="section-title">{{ $sectionNum++ }}. IDENTITAS PENGUSUL</div>
     <table>
         <thead>
             <tr>
@@ -239,7 +240,7 @@
     </table>
 
     {{-- 3. IDENTITAS MAHASISWA --}}
-    <div class="section-title">3. IDENTITAS MAHASISWA</div>
+    <div class="section-title">{{ $sectionNum++ }}. IDENTITAS MAHASISWA</div>
     @php 
         $mahasiswaMembers = $proposal->teamMembers->filter(fn($m) => $m->identity?->type === 'mahasiswa');
     @endphp
@@ -275,7 +276,7 @@
 
     {{-- 4. MITRA KERJASAMA --}}
     @if($proposal->partners->count() > 0)
-    <div class="section-title">4. MITRA KERJASAMA</div>
+    <div class="section-title">{{ $sectionNum++ }}. MITRA KERJASAMA</div>
     @foreach($proposal->partners as $index => $partner)
     <div style="margin-bottom: 5px;">
         <strong>Mitra Sasaran {{ $index + 1 }}</strong>
@@ -289,27 +290,27 @@
     @endforeach
     @endif
 
-    {{-- 5. Asta Cita (Skip if empty) --}}
+    {{-- Asta Cita (Skip if empty) --}}
     @if(isset($proposal->asta_cita) && $proposal->asta_cita)
-    <div class="section-title">5. Asta Cita</div>
+    <div class="section-title">{{ $sectionNum++ }}. Asta Cita</div>
     <div style="margin-left: 20px; text-align: justify;">{{ $proposal->asta_cita }}</div>
     @endif
 
-    {{-- 6. SDGs (Skip if empty) --}}
+    {{-- SDGs (Skip if empty) --}}
     @if(isset($proposal->sdgs) && $proposal->sdgs)
-    <div class="section-title">6. (SDGs)</div>
+    <div class="section-title">{{ $sectionNum++ }}. (SDGs)</div>
     <div style="margin-left: 20px; text-align: justify;">{{ $proposal->sdgs }}</div>
     @endif
 
-    {{-- 7. IKU (Skip if empty) --}}
+    {{-- IKU (Skip if empty) --}}
     @if(isset($proposal->iku) && $proposal->iku)
-    <div class="section-title">7. IKU</div>
+    <div class="section-title">{{ $sectionNum++ }}. IKU</div>
     <div style="margin-left: 20px; text-align: justify;">{{ $proposal->iku }}</div>
     @endif
 
-    {{-- 8. LUARAN DIJANJIKAN --}}
+    {{-- Luaran Dijanjikan --}}
     @if($proposal->outputs->count() > 0)
-    <div class="section-title">8. LUARAN DIJANJIKAN</div>
+    <div class="section-title">{{ $sectionNum++ }}. LUARAN DIJANJIKAN</div>
     <table>
         <thead>
             <tr>
@@ -334,7 +335,7 @@
     </table>
     @endif
 
-    {{-- 9. Dokumen Pendukung --}}
+    {{-- Dokumen Pendukung --}}
     @php
         $supportingDocs = [];
         if ($proposal->detailable?->hasMedia('substance_file')) {
@@ -342,7 +343,7 @@
         }
     @endphp
     @if(count($supportingDocs) > 0)
-    <div class="section-title">9. Dokumen Pendukung</div>
+    <div class="section-title">{{ $sectionNum++ }}. Dokumen Pendukung</div>
     <table>
         <thead>
             <tr>
@@ -361,7 +362,7 @@
     </table>
     @endif
 
-    {{-- 10. Dokumen Pendukung Lainnya --}}
+    {{-- Dokumen Pendukung Lainnya --}}
     @php
         $otherDocs = [];
         foreach($proposal->partners as $partner) {
@@ -371,7 +372,7 @@
         }
     @endphp
     @if(count($otherDocs) > 0)
-    <div class="section-title">10. Dokumen Pendukung Lainnya</div>
+    <div class="section-title">{{ $sectionNum++ }}. Dokumen Pendukung Lainnya</div>
     <table>
         <thead>
             <tr>
@@ -392,8 +393,8 @@
     </table>
     @endif
 
-    {{-- 11. ANGGARAN --}}
-    <div class="section-title">11. ANGGARAN</div>
+    {{-- ANGGARAN --}}
+    <div class="section-title">{{ $sectionNum++ }}. ANGGARAN</div>
     <p class="mb-0">Rencana Anggaran Biaya pengabdian mengacu pada PMK dan buku Panduan Penelitian dan Pengabdian kepada Masyarakat yang berlaku.</p>
     @php
         $totalRAB = $proposal->budgetItems->sum('total_price');
