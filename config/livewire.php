@@ -28,17 +28,37 @@ return [
 
     'view_path' => resource_path('views/livewire'),
 
+    'component_layout' => 'layouts::app',
+
     /*
     |---------------------------------------------------------------------------
-    | Layout
+    | Component Locations
     |---------------------------------------------------------------------------
-    | The view that will be used as the layout when rendering a single component
-    | as an entire page via `Route::get('/post/create', CreatePost::class);`.
-    | In this case, the view returned by CreatePost will render into $slot.
+    |
+    | Defines where Livewire looks for single-file and multi-file (view-based)
+    | components.
     |
     */
 
-    'layout' => 'components.layouts.app',
+    'component_locations' => [
+        resource_path('views/components'),
+        resource_path('views/livewire'),
+    ],
+
+    /*
+    |---------------------------------------------------------------------------
+    | Component Namespaces
+    |---------------------------------------------------------------------------
+    |
+    | Creates custom namespaces for organizing view-based components
+    | (e.g., <livewire:pages::dashboard />).
+    |
+    */
+
+    'component_namespaces' => [
+        'layouts' => resource_path('views/layouts'),
+        'pages' => resource_path('views/pages'),
+    ],
 
     /*
     |---------------------------------------------------------------------------
@@ -50,7 +70,7 @@ return [
     |
     */
 
-    'lazy_placeholder' => null,
+    'component_placeholder' => null,
 
     /*
     |---------------------------------------------------------------------------
@@ -170,4 +190,41 @@ return [
     */
 
     'pagination_theme' => 'bootstrap',
+
+    /*
+    |---------------------------------------------------------------------------
+    | Smart wire:key behavior
+    |---------------------------------------------------------------------------
+    |
+    | Now defaults to true. Helps prevent wire:key issues on deeply nested
+    | components.
+    |
+    */
+
+    'smart_wire_keys' => true,
+
+    /*
+    |---------------------------------------------------------------------------
+    | Make Command Defaults
+    |---------------------------------------------------------------------------
+    |
+    | Configure default component format and emoji usage.
+    |
+    */
+
+    'make_command' => [
+        'type' => 'sfc',
+        'emoji' => true,
+    ],
+
+    /*
+    |---------------------------------------------------------------------------
+    | CSP-Safe Mode
+    |---------------------------------------------------------------------------
+    |
+    | Enable Content Security Policy mode to avoid unsafe-eval violations.
+    |
+    */
+
+    'csp_safe' => false,
 ];

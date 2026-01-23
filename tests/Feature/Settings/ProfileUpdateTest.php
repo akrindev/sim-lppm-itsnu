@@ -1,8 +1,11 @@
 <?php
 
-use App\Livewire\Settings\Profile;
+use App\Livewire\Settings\ProfileForm;
 use App\Models\User;
 use Livewire\Livewire;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 test('profile page is displayed', function () {
     $this->actingAs($user = User::factory()->create());
@@ -15,9 +18,11 @@ test('profile information can be updated', function () {
 
     $this->actingAs($user);
 
-    $response = Livewire::test(Profile::class)
+    $response = Livewire::test(ProfileForm::class)
         ->set('name', 'Test User')
         ->set('email', 'test@example.com')
+        ->set('identity_id', '12345678')
+        ->set('type', 'dosen')
         ->call('updateProfileInformation');
 
     $response->assertHasNoErrors();
@@ -34,9 +39,11 @@ test('email verification status is unchanged when email address is unchanged', f
 
     $this->actingAs($user);
 
-    $response = Livewire::test(Profile::class)
+    $response = Livewire::test(ProfileForm::class)
         ->set('name', 'Test User')
         ->set('email', $user->email)
+        ->set('identity_id', '12345678')
+        ->set('type', 'dosen')
         ->call('updateProfileInformation');
 
     $response->assertHasNoErrors();
