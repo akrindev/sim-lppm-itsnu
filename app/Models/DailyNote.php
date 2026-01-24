@@ -16,6 +16,8 @@ class DailyNote extends Model implements HasMedia
 
     protected $fillable = [
         'proposal_id',
+        'budget_group_id',
+        'amount',
         'activity_date',
         'activity_description',
         'progress_percentage',
@@ -32,6 +34,7 @@ class DailyNote extends Model implements HasMedia
         return [
             'activity_date' => 'date',
             'progress_percentage' => 'integer',
+            'amount' => 'decimal:2',
         ];
     }
 
@@ -41,6 +44,14 @@ class DailyNote extends Model implements HasMedia
     public function proposal(): BelongsTo
     {
         return $this->belongsTo(Proposal::class);
+    }
+
+    /**
+     * Get the budget group for the daily note.
+     */
+    public function budgetGroup(): BelongsTo
+    {
+        return $this->belongsTo(BudgetGroup::class);
     }
 
     /**

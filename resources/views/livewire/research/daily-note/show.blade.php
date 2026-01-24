@@ -45,8 +45,10 @@
                     <tr>
                         <th width="15%">Tanggal</th>
                         <th>Aktivitas</th>
-                        <th width="15%">Progres</th>
-                        <th width="15%">Bukti</th>
+                        <th width="12%">Kelompok RAB</th>
+                        <th width="12%">Nominal</th>
+                        <th width="12%">Progres</th>
+                        <th width="12%">Bukti</th>
                         @if ($this->canManage($proposal))
                             <th width="10%">Aksi</th>
                         @endif
@@ -74,6 +76,20 @@
                                     </div>
                                     <span class="small">{{ $note->progress_percentage }}%</span>
                                 </div>
+                            </td>
+                            <td class="align-top">
+                                @if ($note->budgetGroup)
+                                    <span class="bg-blue-lt badge">{{ $note->budgetGroup->name }}</span>
+                                @else
+                                    <span class="text-muted small">Tanpa RAB</span>
+                                @endif
+                            </td>
+                            <td class="align-top">
+                                @if ($note->amount)
+                                    <div class="fw-bold">Rp {{ number_format($note->amount, 0, ',', '.') }}</div>
+                                @else
+                                    <span class="text-muted small">—</span>
+                                @endif
                             </td>
                             <td class="align-top">
                                 @if ($note->media->isNotEmpty())
@@ -129,7 +145,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-4 text-muted text-center">
+                            <td colspan="7" class="py-4 text-muted text-center">
                                 Belum ada catatan aktivitas.
                             </td>
                         </tr>
@@ -153,6 +169,39 @@
                         @enderror
                     </div>
 
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <div class="mb-3">
+                                <label class="form-label">Kelompok RAB (Opsional)</label>
+                                <select class="form-select @error('budget_group_id') is-invalid @enderror"
+                                    wire:model="budget_group_id">
+                                    <option value="">-- Pilih Kelompok RAB --</option>
+                                    @foreach ($budget_groups as $group)
+                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('budget_group_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Pilih jika aktivitas ini menggunakan anggaran RAB</small>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="mb-3">
+                                <label class="form-label">Nominal Digunakan (Rp)</label>
+                                <div class="input-group" x-data="moneyInputSingle('amount')">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" x-model="display" x-ref="input" @focus="handleFocus"
+                                        @input="handleInput"
+                                        class="form-control @error('amount') is-invalid @enderror" placeholder="0">
+                                </div>
+                                @error('amount')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label required">Deskripsi Aktivitas</label>
                         <textarea class="form-control @error('activity_description') is-invalid @enderror" wire:model="activity_description"
@@ -166,8 +215,8 @@
                         <label class="form-label required">Progres (%)</label>
                         <div class="align-items-center row g-2">
                             <div class="col">
-                                <input type="range" class="form-range" min="0" max="100" step="5"
-                                    wire:model.live="progress_percentage">
+                                <input type="range" class="form-range" min="0" max="100"
+                                    step="5" wire:model.live="progress_percentage">
                             </div>
                             <div class="col-auto">
                                 <span class="bg-blue-lt badge">{{ $progress_percentage }}%</span>
