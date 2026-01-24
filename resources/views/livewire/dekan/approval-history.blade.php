@@ -50,7 +50,7 @@
                             <td>
                                 @if($log->proposal)
                                     <a href="{{ $log->proposal->detailable_type === 'App\Models\Research' ? route('research.proposal.show', $log->proposal) : route('community-service.proposal.show', $log->proposal) }}" 
-                                        class="btn btn-sm btn-ghost-primary" wire:navigate>
+                                        class="btn btn-sm btn-ghost-primary" wire:navigate.hover>
                                         Lihat
                                     </a>
                                 @endif

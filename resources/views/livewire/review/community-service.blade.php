@@ -187,7 +187,7 @@
                             </td>
                             <td>
                                 <a href="{{ route('community-service.proposal.show', $proposal) }}"
-                                    class="btn btn-primary btn-sm px-3 shadow-sm" wire:navigate>
+                                    class="btn btn-primary btn-sm px-3 shadow-sm" wire:navigate.hover>
                                     <x-lucide-edit-3 class="icon me-1" />
                                     Review
                                 </a>

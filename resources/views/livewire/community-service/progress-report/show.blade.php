@@ -2,7 +2,7 @@
 <x-slot:pageTitle>Laporan Kemajuan Pengabdian</x-slot:pageTitle>
 <x-slot:pageSubtitle>{{ $proposal->title }}</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    <a href="{{ route('community-service.progress-report.index') }}" class="btn-outline-secondary btn" wire:navigate>
+    <a href="{{ route('community-service.progress-report.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
         <x-lucide-arrow-left class="icon" />
         Kembali
     </a>

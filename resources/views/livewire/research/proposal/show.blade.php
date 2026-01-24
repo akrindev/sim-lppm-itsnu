@@ -4,18 +4,18 @@
 <x-slot:pageActions>
     <div class="btn-list">
         @if (auth()->user()->hasRole('reviewer'))
-            <a href="{{ route('review.research') }}" class="btn-outline-secondary btn" wire:navigate>
+            <a href="{{ route('review.research') }}" class="btn-outline-secondary btn" wire:navigate.hover>
                 <x-lucide-arrow-left class="icon" />
                 Kembali
             </a>
         @else
-            <a href="{{ route('research.proposal.index') }}" class="btn-outline-secondary btn" wire:navigate>
+            <a href="{{ route('research.proposal.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
                 <x-lucide-arrow-left class="icon" />
                 Kembali
             </a>
         @endif
         @if ($proposal->status->value === 'draft' && $proposal->submitter_id === auth()->id())
-            <a href="{{ route('research.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
+            <a href="{{ route('research.proposal.edit', $proposal) }}" wire:navigate.hover class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
                 Edit
             </a>

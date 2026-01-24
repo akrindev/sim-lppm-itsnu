@@ -82,7 +82,7 @@
                             </td>
                             <td>
                                 <a href="{{ $proposal->detailable_type === 'App\Models\Research' ? route('research.proposal.show', $proposal) : route('community-service.proposal.show', $proposal) }}" 
-                                    class="btn btn-sm btn-outline-primary" wire:navigate>
+                                    class="btn btn-sm btn-outline-primary" wire:navigate.hover>
                                     Detail
                                 </a>
                             </td>

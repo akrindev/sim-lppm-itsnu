@@ -3,7 +3,7 @@
 <x-slot:pageSubtitle>Detail Revisi Proposal Penelitian</x-slot:pageSubtitle>
 <x-slot:pageActions>
     <div class="btn-list">
-        <a href="{{ route('research.proposal-revision.index') }}" class="btn-outline-secondary btn" wire:navigate>
+        <a href="{{ route('research.proposal-revision.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
             <x-lucide-arrow-left class="icon" />
             Kembali
         </a>

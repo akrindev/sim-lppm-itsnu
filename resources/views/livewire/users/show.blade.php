@@ -3,7 +3,7 @@
     <x-slot:pageTitle>Detail Pengguna</x-slot:pageTitle>
     <x-slot:pageSubtitle>Lihat profil lengkap pengguna dan metadata.</x-slot:pageSubtitle>
     <x-slot:pageActions>
-        <a href="{{ route('users.edit', $user) }}" class="btn btn-primary" wire:navigate>
+        <a href="{{ route('users.edit', $user) }}" class="btn btn-primary" wire:navigate.hover>
             Ubah pengguna
         </a>
     </x-slot:pageActions>

@@ -32,7 +32,7 @@
 
             <div class="mt-3 text-secondary text-center">
                 <span>{{ __('Atau, kembali ke') }}</span>
-                <a href="{{ route('login') }}" wire:navigate>{{ __('masuk') }}</a>
+                <a href="{{ route('login') }}" wire:navigate.hover>{{ __('masuk') }}</a>
             </div>
         </div>
     </div>

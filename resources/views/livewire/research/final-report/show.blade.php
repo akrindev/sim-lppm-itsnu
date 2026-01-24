@@ -2,7 +2,7 @@
 <x-slot:pageTitle>Laporan Akhir</x-slot:pageTitle>
 <x-slot:pageSubtitle>{{ $proposal->title }}</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    <a href="{{ route('research.final-report.index') }}" class="btn-outline-secondary btn" wire:navigate>
+    <a href="{{ route('research.final-report.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
         <x-lucide-arrow-left class="icon" />
         Kembali
     </a>

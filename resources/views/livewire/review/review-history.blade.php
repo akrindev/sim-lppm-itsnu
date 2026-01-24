@@ -203,7 +203,7 @@
                                         </div>
                                         <div class="p-2 border-top">
                                             <a href="{{ $proposal->detailable_type === 'App\Models\Research' ? route('research.proposal.show', $proposal) : route('community-service.proposal.show', $proposal) }}" 
-                                                class="btn btn-sm btn-ghost-primary" wire:navigate>
+                                                class="btn btn-sm btn-ghost-primary" wire:navigate.hover>
                                                 <x-lucide-external-link class="icon me-1" />
                                                 Lihat Proposal
                                             </a>

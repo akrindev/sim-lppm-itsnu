@@ -4,7 +4,7 @@
 <x-slot:pageActions>
     <div class="btn-list">
         <a href="{{ route('community-service.proposal-revision.index') }}" class="btn-outline-secondary btn"
-            wire:navigate>
+            wire:navigate.hover>
             <x-lucide-arrow-left class="icon" />
             Kembali
         </a>

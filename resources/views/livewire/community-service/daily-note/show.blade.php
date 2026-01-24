@@ -2,7 +2,7 @@
 <x-slot:pageTitle>Catatan Harian (Logbook)</x-slot:pageTitle>
 <x-slot:pageSubtitle>{{ $proposal->title }}</x-slot:pageSubtitle>
 <x-slot:pageActions>
-    <a href="{{ route('community-service.daily-note.index') }}" class="btn-outline-secondary btn" wire:navigate>
+    <a href="{{ route('community-service.daily-note.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
         <x-lucide-arrow-left class="me-2 icon" />
         Kembali
     </a>

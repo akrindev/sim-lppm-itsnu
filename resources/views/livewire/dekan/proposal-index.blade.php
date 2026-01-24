@@ -164,13 +164,13 @@
                                 <div class="flex-nowrap btn-list">
                                     @if ($proposal->detailable_type === 'App\Models\Research')
                                         <a href="{{ route('research.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-primary" wire:navigate>
+                                            class="btn btn-sm btn-primary" wire:navigate.hover>
                                             <x-lucide-eye class="icon" />
                                             Lihat & Proses
                                         </a>
                                     @else
                                         <a href="{{ route('community-service.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-primary" wire:navigate>
+                                            class="btn btn-sm btn-primary" wire:navigate.hover>
                                             <x-lucide-eye class="icon" />
                                             Lihat & Proses
                                         </a>

@@ -236,7 +236,7 @@
                                                 <span class="avatar avatar-sm avatar-rounded me-2" style="background-image: url({{ $pkm->submitter->profile_picture }})"></span>
                                                 <div class="flex-fill">
                                                     <div class="font-weight-medium text-truncate" style="max-width: 500px;" title="{{ $pkm->title }}">
-                                                        <a href="{{ route('community-service.proposal.show', $pkm) }}" class="text-reset" wire:navigate>
+                                                        <a href="{{ route('community-service.proposal.show', $pkm) }}" class="text-reset" wire:navigate.hover>
                                                             {{ $pkm->title }}
                                                         </a>
                                                     </div>

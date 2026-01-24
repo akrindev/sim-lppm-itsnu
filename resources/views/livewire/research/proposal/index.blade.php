@@ -16,7 +16,7 @@
         @endphp
 
         @if ($isWithinSchedule && auth()->user()->activeHasRole('dosen'))
-            <a href="{{ route('research.proposal.create') }}" wire:navigate class="btn btn-primary">
+            <a href="{{ route('research.proposal.create') }}" wire:navigate.hover class="btn btn-primary">
                 <x-lucide-plus class="icon" />
                 Usulan Penelitian Baru
             </a>
@@ -138,7 +138,7 @@
                                     <td>
                                         <div class="btn-list flex-nowrap">
                                             <a href="{{ route('research.proposal.show', $proposal) }}"
-                                                class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate>
+                                                class="btn btn-icon btn-ghost-primary" title="Lihat" wire:navigate.hover>
                                                 <x-lucide-eye class="icon" />
                                             </a>
                                             {{-- @if ($proposal->status->value === 'draft')

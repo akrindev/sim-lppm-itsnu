@@ -16,7 +16,7 @@
         @endphp
 
         @if ($isWithinSchedule && auth()->user()->activeHasRole('dosen'))
-            <a href="{{ route('community-service.proposal.create') }}" wire:navigate class="btn btn-primary">
+            <a href="{{ route('community-service.proposal.create') }}" wire:navigate.hover class="btn btn-primary">
                 <x-lucide-plus class="icon" />
                 Usulan Pengabdian Baru
             </a>
@@ -178,12 +178,12 @@
                             <td>
                                 <div class="btn-list flex-nowrap">
                                     <a href="{{ route('community-service.proposal.show', $proposal) }}"
-                                        class="btn btn-icon btn-ghost-primary" wire:navigate title="Lihat">
+                                        class="btn btn-icon btn-ghost-primary" wire:navigate.hover title="Lihat">
                                         <x-lucide-eye class="icon" />
                                     </a>
                                     {{-- @if ($proposal->status->value === 'draft' && $proposal->submitter_id === auth()->id())
                                         <a href="{{ route('community-service.proposal.edit', $proposal) }}"
-                                            class="btn btn-icon btn-ghost-info" title="Edit" wire:navigate>
+                                            class="btn btn-icon btn-ghost-info" title="Edit" wire:navigate.hover>
                                             <x-lucide-pencil class="icon" />
                                         </a>
                                     @endif --}}
