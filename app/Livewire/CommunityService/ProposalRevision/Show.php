@@ -51,9 +51,9 @@ class Show extends Component
 
         // Eager load all required relationships for the show page
         $proposal->load([
-            'submitter',
+            'submitter.identity',
             'focusArea',
-            // 'communityServiceScheme',
+            'researchScheme',
             'detailable.partner',
             'budgetItems.budgetGroup',
             'budgetItems.budgetComponent',

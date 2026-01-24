@@ -64,8 +64,7 @@ class ReviewLog extends Model
      */
     public function scores(): HasMany
     {
-        return $this->hasMany(ReviewScore::class, 'proposal_reviewer_id', 'proposal_reviewer_id')
-            ->where('round', $this->round);
+        return $this->hasMany(ReviewScore::class, 'proposal_reviewer_id', 'proposal_reviewer_id');
     }
 
     /**

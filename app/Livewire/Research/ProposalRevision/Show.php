@@ -50,7 +50,7 @@ class Show extends Component
 
         // Eager load all required relationships for the show page
         $proposal->load([
-            'submitter',
+            'submitter.identity',
             'focusArea',
             'researchScheme',
             'detailable.macroResearchGroup',
@@ -149,7 +149,6 @@ class Show extends Component
 
             // Reset file input
             $this->substanceFile = null;
-
         } catch (\Exception $e) {
             $message = 'Gagal menyimpan perubahan: '.$e->getMessage();
             session()->flash('error', $message);

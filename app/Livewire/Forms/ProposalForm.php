@@ -120,7 +120,7 @@ class ProposalForm extends Form
      */
     public function setProposal(Proposal $proposal): void
     {
-        $proposal->load([
+        $proposal->loadMissing([
             'submitter.identity',
             'detailable',
             'teamMembers.identity',
