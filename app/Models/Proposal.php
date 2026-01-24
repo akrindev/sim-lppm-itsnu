@@ -16,6 +16,9 @@ class Proposal extends Model
     /** @use HasFactory<\Database\Factories\ProposalFactory> */
     use HasFactory, HasUuids;
 
+    public ?string $notes = null;
+
+
     /**
      * The type of the auto-incrementing ID's primary key.
      */
