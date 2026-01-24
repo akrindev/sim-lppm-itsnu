@@ -18,7 +18,6 @@ class Proposal extends Model
 
     public ?string $notes = null;
 
-
     /**
      * The type of the auto-incrementing ID's primary key.
      */

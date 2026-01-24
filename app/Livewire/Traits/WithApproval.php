@@ -6,7 +6,6 @@ use App\Enums\ProposalStatus;
 use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Services\NotificationService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 trait WithApproval

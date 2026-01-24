@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 class NotificationCenter extends Component
 {
     use HasToast, WithPagination;
+
     protected $paginationTheme = 'bootstrap';
 
     #[Url]
@@ -77,7 +78,6 @@ class NotificationCenter extends Component
         session()->flash('success', $message);
         $this->toastSuccess($message);
     }
-
 
     public function getIconAttribute(string $type): string
     {
