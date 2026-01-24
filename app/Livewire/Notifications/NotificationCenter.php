@@ -6,12 +6,16 @@ use App\Livewire\Concerns\HasToast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class NotificationCenter extends Component
 {
-    use HasToast;
+    use HasToast, WithPagination;
+    protected $paginationTheme = 'bootstrap';
 
+    #[Url]
     public string $filter = 'all'; // 'all', 'unread', 'read'
 
     public function render()
@@ -34,6 +38,11 @@ class NotificationCenter extends Component
             'notifications' => $notifications,
             'unreadCount' => $unreadCount,
         ]);
+    }
+
+    public function updatingFilter(): void
+    {
+        $this->resetPage();
     }
 
     #[On('notification-received')]
@@ -69,10 +78,6 @@ class NotificationCenter extends Component
         $this->toastSuccess($message);
     }
 
-    public function setFilter(string $filter): void
-    {
-        $this->filter = $filter;
-    }
 
     public function getIconAttribute(string $type): string
     {
