@@ -338,7 +338,7 @@ document.addEventListener("alpine:init", () => {
                 try {
                     this.$wire.set(`form.budget_items.${index}.unit_price`, 0);
                     this.$wire.calculateTotal(index);
-                } catch (e) {}
+                } catch (e) { }
                 return;
             }
 
@@ -363,7 +363,7 @@ document.addEventListener("alpine:init", () => {
                     false,
                 );
                 this.$wire.calculateTotal(index);
-            } catch (e) {}
+            } catch (e) { }
 
             // Restore cursor position
             this.$nextTick(() => {
@@ -739,6 +739,89 @@ document.addEventListener("livewire:init", () => {
 
 // Setup on navigation
 document.addEventListener("livewire:navigated", setupModalCallbacks);
+
+// Close dropdowns after navigation (needed for @persist header)
+document.addEventListener("livewire:navigated", () => {
+    // Close all open Bootstrap dropdowns
+    document.querySelectorAll(".dropdown-menu.show").forEach((menu) => {
+        menu.classList.remove("show");
+        const toggle = menu.previousElementSibling;
+        if (toggle?.classList.contains("dropdown-toggle")) {
+            toggle.classList.remove("show");
+            toggle.setAttribute("aria-expanded", "false");
+        }
+    });
+    document.querySelectorAll(".dropdown.show, .nav-item.dropdown.show").forEach((dropdown) => {
+        dropdown.classList.remove("show");
+    });
+
+    // Also use Bootstrap API if available
+    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach((el) => {
+        const instance = (window.bootstrap?.Dropdown || window.tabler?.Dropdown)?.getInstance(el);
+        instance?.hide();
+    });
+
+    // Update active navigation links (needed for @persist header)
+    const normalizePath = (path) => path.replace(/\/+$/, "") || "/";
+    const currentPath = normalizePath(window.location.pathname);
+
+    // Remove all active classes from nav items and links
+    document.querySelectorAll(".navbar-nav .nav-item.active, .navbar-nav .nav-link.active, .dropdown-item.active").forEach((el) => {
+        el.classList.remove("active");
+    });
+
+    // Find the best matching link
+    let bestMatch = null;
+    let bestMatchLength = -1;
+
+    document.querySelectorAll(".navbar-nav .nav-link[href], .dropdown-item[href]").forEach((link) => {
+        const href = link.getAttribute("href");
+
+        // Skip dummy links, hashes, or javascript calls
+        if (!href || href === "#" || href.startsWith("javascript:")) return;
+
+        try {
+            const linkPath = normalizePath(new URL(href, window.location.origin).pathname);
+
+            // 1. Exact Match
+            if (currentPath === linkPath) {
+                // Exact match is always the highest priority
+                bestMatch = link;
+                bestMatchLength = 999;
+            }
+            // 2. Prefix Match (for nested routes)
+            else if (linkPath !== "/" && currentPath.startsWith(linkPath + "/")) {
+                if (linkPath.length > bestMatchLength) {
+                    bestMatch = link;
+                    bestMatchLength = linkPath.length;
+                }
+            }
+        } catch (e) {
+            // Ignore invalid URLs
+        }
+    });
+
+    // Activate the best match
+    if (bestMatch) {
+        bestMatch.classList.add("active");
+
+        // Also mark parent nav-item as active
+        const navItem = bestMatch.closest(".nav-item");
+        if (navItem) {
+            navItem.classList.add("active");
+        }
+
+        // If it's a dropdown item, mark the parent dropdown as active
+        const parentDropdown = bestMatch.closest(".nav-item.dropdown");
+        if (parentDropdown) {
+            parentDropdown.classList.add("active");
+            const dropdownToggle = parentDropdown.querySelector(".nav-link.dropdown-toggle");
+            if (dropdownToggle) {
+                dropdownToggle.classList.add("active");
+            }
+        }
+    }
+});
 
 // Cleanup on navigation start
 document.addEventListener("livewire:navigate", () => {

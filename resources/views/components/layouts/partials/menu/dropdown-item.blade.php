@@ -6,8 +6,7 @@
 @if ($itemType === 'dropend')
     <div class="dropend">
         <a class="{{ $item['toggle_class'] ?? 'dropdown-item dropdown-toggle' }}{{ $isActive ? ' active' : '' }}"
-            href="{{ $item['href'] ?? '#' }}"
-            data-bs-toggle="{{ $item['toggle']['data-bs-toggle'] ?? 'dropdown' }}"
+            href="{{ $item['href'] ?? '#' }}" data-bs-toggle="{{ $item['toggle']['data-bs-toggle'] ?? 'dropdown' }}"
             data-bs-auto-close="{{ $item['toggle']['data-bs-auto-close'] ?? 'outside' }}"
             role="{{ $item['toggle']['role'] ?? 'button' }}"
             aria-expanded="{{ $item['toggle']['aria-expanded'] ?? 'false' }}">
@@ -21,10 +20,9 @@
     </div>
 @else
     <a class="{{ $item['class'] ?? 'dropdown-item' }}{{ $isActive ? ' active' : '' }}" href="{{ $item['href'] ?? '#' }}"
-        wire:navigate
-        @foreach (($item['attributes'] ?? []) as $attribute => $value)
-            {{ $attribute }}="{{ $value }}"
-        @endforeach>
+        wire:navigate.hover
+        @foreach ($item['attributes'] ?? [] as $attribute => $value)
+            {{ $attribute }}="{{ $value }}" @endforeach>
         @if (!empty($item['prefix_icon']))
             @include('components.layouts.partials.menu.icon', [
                 'name' => $item['prefix_icon'],
