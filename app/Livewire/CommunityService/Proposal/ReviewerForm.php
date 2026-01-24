@@ -349,6 +349,12 @@ class ReviewerForm extends Component
             // Close the form after successful submission
             $this->showForm = false;
 
+            // Clear computed property cache to refresh data immediately
+            unset($this->proposal);
+            unset($this->myReview);
+            unset($this->allReviews);
+            unset($this->allReviewLogs);
+
             // Flash message and dispatch event
             session()->flash('success', $message);
             $this->toastSuccess($message);
