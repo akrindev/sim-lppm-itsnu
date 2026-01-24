@@ -19,7 +19,7 @@
                             Nama <span class="text-danger">*</span>
                         </label>
                         <input id="user-name" type="text" class="form-control @error('name') is-invalid @enderror"
-                            wire:model.defer="name" autocomplete="name" placeholder="Masukkan nama lengkap" required>
+                            wire:model="name" autocomplete="name" placeholder="Masukkan nama lengkap" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -31,7 +31,7 @@
                             Alamat email <span class="text-danger">*</span>
                         </label>
                         <input id="user-email" type="email" class="form-control @error('email') is-invalid @enderror"
-                            wire:model.defer="email" autocomplete="email" placeholder="nama@contoh.com" required>
+                            wire:model="email" autocomplete="email" placeholder="nama@contoh.com" required>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -47,7 +47,7 @@
                             @foreach ($this->roleOptions as $option)
                                 <label class="form-selectgroup-item">
                                     <input type="checkbox" name="role" value="{{ $option['value'] }}"
-                                        class="form-selectgroup-input" wire:model.defer="selectedRoles"
+                                        class="form-selectgroup-input" wire:model="selectedRoles"
                                         @if (in_array($option['value'], $selectedRoles)) checked @endif>
                                     <span class="form-selectgroup-label">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -79,7 +79,7 @@
                         </label>
                         <input id="identity-id" type="text"
                             class="form-control @error('identity_id') is-invalid @enderror"
-                            wire:model.defer="identity_id" placeholder="mis., NIP, NIDN, atau ID Karyawan" required>
+                            wire:model="identity_id" placeholder="mis., NIP, NIDN, atau ID Karyawan" required>
                         @error('identity_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -92,7 +92,7 @@
                             Tempat Lahir <span class="text-muted">(opsional)</span>
                         </label>
                         <input id="birthplace" type="text"
-                            class="form-control @error('birthplace') is-invalid @enderror" wire:model.defer="birthplace"
+                            class="form-control @error('birthplace') is-invalid @enderror" wire:model="birthplace"
                             placeholder="Contoh: Kota, Provinsi">
                         @error('birthplace')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -106,7 +106,7 @@
                             Tanggal Lahir <span class="text-muted">(opsional)</span>
                         </label>
                         <input id="birthdate" type="date"
-                            class="form-control @error('birthdate') is-invalid @enderror" wire:model.defer="birthdate">
+                            class="form-control @error('birthdate') is-invalid @enderror" wire:model="birthdate">
                         @error('birthdate')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -118,7 +118,7 @@
                         <label class="form-label" for="address">
                             Alamat <span class="text-muted">(opsional)</span>
                         </label>
-                        <textarea id="address" class="form-control @error('address') is-invalid @enderror" wire:model.defer="address"
+                        <textarea id="address" class="form-control @error('address') is-invalid @enderror" wire:model="address"
                             rows="3" placeholder="Masukkan alamat lengkap Anda"></textarea>
                         @error('address')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -132,7 +132,7 @@
                             ID SINTA <span class="text-muted">(opsional)</span>
                         </label>
                         <input id="sinta-id" type="text"
-                            class="form-control @error('sinta_id') is-invalid @enderror" wire:model.defer="sinta_id"
+                            class="form-control @error('sinta_id') is-invalid @enderror" wire:model="sinta_id"
                             placeholder="mis., 1234567">
                         @error('sinta_id')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -146,7 +146,7 @@
                             Tipe Identitas <span class="text-danger">*</span>
                         </label>
                         <select id="identity-type" class="form-select @error('type') is-invalid @enderror"
-                            wire:model.defer="type" required>
+                            wire:model="type" required>
                             <option value="">Pilih tipe identitas...</option>
                             <option value="dosen">Dosen</option>
                             <option value="mahasiswa">Mahasiswa</option>
@@ -204,7 +204,7 @@
                         </label>
                         <select id="study-program"
                             class="form-select @error('study_program_id') is-invalid @enderror"
-                            wire:model.defer="study_program_id" @disabled(empty($this->studyProgramOptions)) required>
+                            wire:model="study_program_id" @disabled(empty($this->studyProgramOptions)) required>
                             <option value="">Pilih program studi...</option>
                             @foreach ($this->studyProgramOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
@@ -220,7 +220,7 @@
                     <div class="mb-3">
                         <label class="d-block form-label">Verifikasi email</label>
                         <label class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" wire:model.defer="emailVerified">
+                            <input class="form-check-input" type="checkbox" wire:model="emailVerified">
                             <span class="form-check-label">Tandai email sebagai terverifikasi</span>
                         </label>
                         @error('emailVerified')

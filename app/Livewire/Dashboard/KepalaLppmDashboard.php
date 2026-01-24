@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard;
 
 use App\Models\Proposal;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -23,7 +24,7 @@ class KepalaLppmDashboard extends Component
 
     public $availableYears = [];
 
-    public function mount()
+    public function mount(): void
     {
         $this->user = Auth::user();
         $this->roleName = active_role();
@@ -33,7 +34,7 @@ class KepalaLppmDashboard extends Component
         $this->loadAnalytics();
     }
 
-    public function updatedSelectedYear()
+    public function updatedSelectedYear(): void
     {
         $this->loadAnalytics();
     }
@@ -53,75 +54,84 @@ class KepalaLppmDashboard extends Component
         return $years;
     }
 
-    public function loadAnalytics()
+    public function loadAnalytics(): void
     {
         $yearFilter = $this->selectedYear;
 
-        // Statistik Penelitian
-        $totalResearch = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')->count();
+        // OPTIMIZED: Single aggregated query for all stats
+        $this->loadStats($yearFilter);
 
-        $researchPending = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->where('status', 'reviewed')->count();
+        // Load recent proposals
+        $this->loadRecentProposals($yearFilter);
+    }
 
-        $researchApproved = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->where('status', 'approved')->count();
+    /**
+     * Load all stats in a single aggregated query.
+     * Replaces 9+ separate count queries with 1 grouped query.
+     */
+    private function loadStats(string $yearFilter): void
+    {
+        $statsRaw = Proposal::query()
+            ->whereYear('created_at', $yearFilter)
+            ->select([
+                'detailable_type',
+                'status',
+                DB::raw('COUNT(*) as count'),
+            ])
+            ->groupBy('detailable_type', 'status')
+            ->get();
 
-        $researchCompleted = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->where('status', 'completed')->count();
+        $this->stats = $this->transformStats($statsRaw);
+    }
 
-        // Statistik PKM
-        $totalCommunityService = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')->count();
+    /**
+     * Transform raw stats query result into stats array.
+     */
+    private function transformStats(Collection $raw): array
+    {
+        $research = $raw->filter(fn ($r) => str_contains($r->detailable_type, 'Research'));
+        $communityService = $raw->filter(fn ($r) => str_contains($r->detailable_type, 'CommunityService'));
 
-        $communityServicePending = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->where('status', 'reviewed')->count();
+        $researchPending = $research->where('status', 'reviewed')->sum('count');
+        $communityServicePending = $communityService->where('status', 'reviewed')->sum('count');
 
-        $communityServiceApproved = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->where('status', 'approved')->count();
-
-        $communityServiceCompleted = Proposal::whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->where('status', 'completed')->count();
-
-        $pendingInitialCount = Proposal::whereYear('created_at', $yearFilter)
-            ->where('status', 'approved')->count();
-
-        $this->stats = [
-            'total_research' => $totalResearch,
-            'total_community_service' => $totalCommunityService,
+        return [
+            'total_research' => $research->sum('count'),
+            'total_community_service' => $communityService->sum('count'),
             'research_pending' => $researchPending,
             'community_service_pending' => $communityServicePending,
-            'research_approved' => $researchApproved,
-            'community_service_approved' => $communityServiceApproved,
-            'research_completed' => $researchCompleted,
-            'community_service_completed' => $communityServiceCompleted,
-            'pending_initial_approval' => $pendingInitialCount,
+            'research_approved' => $research->where('status', 'approved')->sum('count'),
+            'community_service_approved' => $communityService->where('status', 'approved')->sum('count'),
+            'research_completed' => $research->where('status', 'completed')->sum('count'),
+            'community_service_completed' => $communityService->where('status', 'completed')->sum('count'),
+            'pending_initial_approval' => $raw->where('status', 'approved')->sum('count'),
             'pending_final_decision' => $researchPending + $communityServicePending,
         ];
+    }
 
-        // Data penelitian terbaru
-        $this->recentResearch = Proposal::with(['submitter'])
+    /**
+     * Load recent proposals in a single query.
+     */
+    private function loadRecentProposals(string $yearFilter): void
+    {
+        $relevantStatuses = ['reviewed', 'approved', 'rejected', 'completed'];
+
+        $recentProposals = Proposal::with(['submitter'])
             ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->whereIn('status', ['reviewed', 'approved', 'rejected', 'completed'])
+            ->whereIn('status', $relevantStatuses)
             ->latest()
-            ->limit(10)
+            ->limit(20)
             ->get();
 
-        // Data PKM terbaru
-        $this->recentCommunityService = Proposal::with(['submitter'])
-            ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->whereIn('status', ['reviewed', 'approved', 'rejected', 'completed'])
-            ->latest()
-            ->limit(10)
-            ->get();
+        $this->recentResearch = $recentProposals
+            ->filter(fn ($p) => str_contains($p->detailable_type, 'Research'))
+            ->take(10)
+            ->values();
+
+        $this->recentCommunityService = $recentProposals
+            ->filter(fn ($p) => str_contains($p->detailable_type, 'CommunityService'))
+            ->take(10)
+            ->values();
     }
 
     public function render()

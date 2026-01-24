@@ -170,6 +170,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('reviewers/{proposalReviewer}/export-pdf', [\App\Http\Controllers\ReviewExportController::class, 'download'])
         ->name('reviewers.export-pdf');
+
+    Route::get('daily-notes/{proposal}/export-pdf', [\App\Http\Controllers\DailyNoteExportController::class, 'download'])
+        ->name('daily-notes.export-pdf');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

@@ -30,7 +30,7 @@
 @endphp
 
 <x-tabler.modal :id="$id" :title="$title" :wire-ignore="$wireIgnore" size="sm" centered="true"
-    close-button="$closable" class="modal-alert">
+    close-button="$closable" class="modal-alert" :data-auto-close="$autoClose ? 'true' : 'false'" :data-duration="$duration">
     <x-slot name="body">
         <div class="d-flex align-items-start">
             @if ($icon)
@@ -64,87 +64,3 @@
         </div>
     </x-slot>
 </x-tabler.modal>
-
-@once
-    @push('scripts')
-        <script>
-            document.addEventListener('livewire:init', () => {
-                // Auto-close functionality
-                window.initializeAlertModal = (modalId, autoClose, duration) => {
-                    const modal = document.getElementById(modalId);
-                    if (!modal || !autoClose) return;
-
-                    const timer = setTimeout(() => {
-                        const bsModal = bootstrap.Modal.getInstance(modal);
-                        if (bsModal) {
-                            bsModal.hide();
-                        }
-                    }, duration);
-
-                    // Clear timer if modal is manually closed
-                    modal.addEventListener('hidden.bs.modal', () => {
-                        clearTimeout(timer);
-                    });
-                };
-
-                // Initialize auto-close for existing alert modals
-                document.querySelectorAll('.modal-alert').forEach(modal => {
-                    if (modal.dataset.autoClose === 'true') {
-                        window.initializeAlertModal(
-                            modal.id,
-                            true,
-                            parseInt(modal.dataset.duration || 5000)
-                        );
-                    }
-                });
-
-                // Initialize when modal is shown
-                document.addEventListener('show.bs.modal', (e) => {
-                    const modal = e.target;
-                    if (modal.classList.contains('modal-alert')) {
-                        const autoClose = modal.dataset.autoClose === 'true';
-                        const duration = parseInt(modal.dataset.duration || 5000);
-
-                        if (autoClose) {
-                            window.initializeAlertModal(modal.id, autoClose, duration);
-                        }
-                    }
-                });
-            });
-        </script>
-    @endpush
-@endonce
-
-{{--
-Usage Example:
-<x-tabler.modal-alert
-    id="success-alert"
-    type="success"
-    title="Success!"
-    message="Your changes have been saved successfully."
-    auto-close="true"
-    duration="3000"
-/>
-
-<x-tabler.modal-alert
-    id="error-alert"
-    type="error"
-    title="Error"
-    message="Something went wrong. Please try again."
-    :dismissible="true"
->
-    <div class="mt-3">
-        <small class="text-muted">Contact support if the problem persists.</small>
-    </div>
-</x-tabler.modal-alert>
-
-<x-tabler.modal-alert
-    id="warning-alert"
-    type="warning"
-    title="Warning"
-    message="Your session will expire in 5 minutes."
-    icon="icon-tabler icon-tabler-clock"
-    :auto-close="false"
-    :dismissible="false"
-/>
---}}

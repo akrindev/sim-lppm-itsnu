@@ -6,7 +6,6 @@ use App\Enums\ProposalStatus;
 use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Services\NotificationService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 trait WithApproval
@@ -41,6 +40,7 @@ trait WithApproval
                 throw new \Exception('Status transisi tidak valid.');
             }
 
+            $proposal->notes = $this->approvalNotes;
             $proposal->update(['status' => $newStatus->value]);
 
             if ($newStatus === ProposalStatus::UNDER_REVIEW) {
@@ -91,18 +91,8 @@ trait WithApproval
                 throw new \Exception('Status transisi tidak valid.');
             }
 
+            $proposal->notes = $this->approvalNotes;
             $proposal->update(['status' => $newStatus->value]);
-
-            if ($this->approvalNotes) {
-                $log = new \App\Models\ProposalStatusLog;
-                $log->proposal_id = $proposal->id;
-                $log->status_before = $proposal->getOriginal('status');
-                $log->status_after = $newStatus->value;
-                $log->user_id = Auth::id();
-                $log->notes = $this->approvalNotes;
-                $log->at = now();
-                $log->save();
-            }
 
             $kepalaLppmUsers = $this->notificationService()
                 ->getUsersByRole('kepala lppm');

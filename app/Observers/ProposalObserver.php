@@ -26,6 +26,7 @@ class ProposalObserver
                 'user_id' => auth()->id(),
                 'status_before' => $proposal->getOriginal('status'),
                 'status_after' => $proposal->status,
+                'notes' => $proposal->notes ?? null,
                 'at' => now(),
             ]);
         }

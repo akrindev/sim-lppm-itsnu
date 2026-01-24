@@ -30,6 +30,12 @@ class Show extends Component
     #[Validate('nullable|string')]
     public string $notes = '';
 
+    #[Validate('nullable|exists:budget_groups,id')]
+    public ?int $budget_group_id = null;
+
+    #[Validate('nullable|numeric|min:0')]
+    public $amount = 0;
+
     #[Validate(['evidence.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120'])] // 5MB max per file
     public $evidence = [];
 
@@ -47,22 +53,41 @@ class Show extends Component
 
     protected function canAccess(Proposal $proposal): bool
     {
+        $user = Auth::user();
+
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'superadmin'])) {
+            return true;
+        }
+
+        return $proposal->submitter_id === $user->id ||
+            $proposal->teamMembers()->where('user_id', $user->id)->exists();
+    }
+
+    public function canManage(Proposal $proposal): bool
+    {
         $userId = Auth::id();
 
-        // Check if submitter or team member
         return $proposal->submitter_id === $userId ||
             $proposal->teamMembers()->where('user_id', $userId)->exists();
     }
 
     public function create(): void
     {
-        $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
+        $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId', 'budget_group_id', 'amount']);
         $this->activity_date = date('Y-m-d');
         $this->dispatch('open-modal', modalId: 'daily-note-modal');
     }
 
     public function save(): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $this->validate();
 
         $data = [
@@ -71,6 +96,8 @@ class Show extends Component
             'activity_description' => $this->activity_description,
             'progress_percentage' => $this->progress_percentage,
             'notes' => $this->notes,
+            'budget_group_id' => $this->budget_group_id,
+            'amount' => $this->amount,
         ];
 
         if ($this->editingId) {
@@ -88,7 +115,7 @@ class Show extends Component
             }
         }
 
-        $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);
+        $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId', 'budget_group_id', 'amount']);
         $this->activity_date = date('Y-m-d');
         $this->dispatch('note-saved');
         $this->dispatch('close-modal', modalId: 'daily-note-modal');
@@ -99,6 +126,10 @@ class Show extends Component
 
     public function edit(string $id): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $note = DailyNote::findOrFail($id);
 
         // Authorization check (optional but recommended)
@@ -111,12 +142,18 @@ class Show extends Component
         $this->activity_description = $note->activity_description;
         $this->progress_percentage = $note->progress_percentage;
         $this->notes = $note->notes ?? '';
+        $this->budget_group_id = $note->budget_group_id;
+        $this->amount = $note->amount;
 
         $this->dispatch('open-modal', modalId: 'daily-note-modal');
     }
 
     public function delete(string $id): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $note = DailyNote::findOrFail($id);
         if ($note->proposal_id !== $this->proposal->id) {
             abort(403);
@@ -129,6 +166,10 @@ class Show extends Component
 
     public function deleteEvidence(string $mediaId): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $media = Media::findOrFail($mediaId);
 
         // Check if the media belongs to a note in this proposal
@@ -144,9 +185,17 @@ class Show extends Component
         }
     }
 
+    public function removeEvidence(int $index): void
+    {
+        if (isset($this->evidence[$index])) {
+            unset($this->evidence[$index]);
+            $this->evidence = array_values($this->evidence);
+        }
+    }
+
     public function cancelEdit(): void
     {
-        $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);
+        $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId', 'budget_group_id', 'amount']);
         $this->activity_date = date('Y-m-d');
         $this->dispatch('close-modal', modalId: 'daily-note-modal');
     }
@@ -154,7 +203,8 @@ class Show extends Component
     public function render()
     {
         return view('livewire.research.daily-note.show', [
-            'notes_list' => $this->proposal->dailyNotes()->with('media')->latest('activity_date')->get(),
+            'notes_list' => $this->proposal->dailyNotes()->with(['media.model', 'budgetGroup'])->latest('activity_date')->get(),
+            'budget_groups' => \App\Models\BudgetGroup::whereIn('id', $this->proposal->budgetItems()->pluck('budget_group_id'))->get(),
         ]);
     }
 }

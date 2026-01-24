@@ -25,41 +25,19 @@
         </div>
 
         <div class="card-body">
-            <!-- Filter Tabs -->
+            <!-- Filter Select -->
             <div class="mb-3">
-                <div class="nav nav-pills card-pills nav-fill">
-                    <button wire:click="setFilter('all')" class="nav-link {{ $filter === 'all' ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="me-1">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.35-4.35" />
-                        </svg>
-                        Semua
-                    </button>
-                    <button wire:click="setFilter('unread')"
-                        class="nav-link {{ $filter === 'unread' ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="me-1">
-                            <path
-                                d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                        </svg>
-                        Belum Dibaca
-                        @if ($unreadCount > 0)
-                            <span class="bg-primary ms-1 badge">{{ $unreadCount }}</span>
-                        @endif
-                    </button>
-                    <button wire:click="setFilter('read')" class="nav-link {{ $filter === 'read' ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="me-1">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        Sudah Dibaca
-                    </button>
+                <div class="align-items-center row">
+                    <div class="col-auto">
+                        <label class="mb-0 form-label">Filter Status:</label>
+                    </div>
+                    <div class="col-md-4">
+                        <select wire:model.live="filter" class="form-select">
+                            <option value="all">Semua Notifikasi</option>
+                            <option value="unread">Belum Dibaca ({{ $unreadCount }})</option>
+                            <option value="read">Sudah Dibaca</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -77,7 +55,8 @@
                             $timeAgo = $notification->created_at->diffForHumans();
                         @endphp
 
-                        <div class="list-group-item {{ $isUnread ? 'bg-primary-fg' : '' }}">
+                        <div
+                            class="list-group-item list-group-item-action position-relative {{ $isUnread ? 'bg-azure-lt' : '' }}">
                             <div class="align-items-center row">
                                 <div class="col-auto">
                                     <span class="avatar avatar-sm"
@@ -114,8 +93,8 @@
 
                                             @case('check-square')
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
                                                     <polyline points="9 11 12 14 22 4" />
                                                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                                                 </svg>
@@ -123,8 +102,8 @@
 
                                             @case('award')
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
                                                     <circle cx="12" cy="8" r="7" />
                                                     <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.11" />
                                                 </svg>
@@ -132,8 +111,8 @@
 
                                             @default
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
                                                     <path
                                                         d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                                                     <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
@@ -144,7 +123,7 @@
 
                                 <div class="text-truncate col">
                                     <a href="{{ $data['link'] ?? '#' }}"
-                                        class="text-body-emphasis text-decoration-none d-block fw-semibold {{ $isUnread ? 'fw-bold' : '' }}">
+                                        class="text-body-emphasis text-decoration-none d-block fw-semibold stretched-link {{ $isUnread ? 'fw-bold' : '' }}">
                                         {{ $data['title'] ?? $typeLabel }}
                                     </a>
                                     <div
@@ -152,12 +131,14 @@
                                         {{ $data['message'] ?? '' }}
                                     </div>
                                     <div class="mt-1">
-                                        <span class="bg-secondary badge">{{ $typeLabel }}</span>
-                                        <span class="ms-2 text-secondary">{{ $timeAgo }}</span>
+                                        <x-tabler.badge color="secondary" variant="light">
+                                            {{ $typeLabel }}
+                                        </x-tabler.badge>
+                                        <span class="ms-2 text-secondary small">{{ $timeAgo }}</span>
                                     </div>
                                 </div>
 
-                                <div class="col-auto">
+                                <div class="position-relative col-auto" style="z-index: 2;">
                                     @if ($isUnread)
                                         <button wire:click="markAsRead('{{ $notification->id }}')"
                                             class="btn-outline-primary btn btn-sm">

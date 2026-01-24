@@ -2,8 +2,8 @@
 
 use App\Livewire\Settings\ProfileForm;
 use App\Models\User;
-use Livewire\Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 

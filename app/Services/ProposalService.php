@@ -177,7 +177,7 @@ class ProposalService
         };
 
         return Proposal::query()
-            ->with(['submitter.identity.faculty', 'detailable'])
+            ->with(['submitter.identity.faculty', 'detailable', 'focusArea'])
             ->whereHas('detailable', function ($query) use ($detailableType) {
                 $query->where('detailable_type', $detailableType);
             });

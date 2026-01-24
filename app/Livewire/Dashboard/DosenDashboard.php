@@ -23,7 +23,7 @@ class DosenDashboard extends Component
 
     public $availableYears = [];
 
-    public function mount()
+    public function mount(): void
     {
         $this->user = Auth::user();
         $this->roleName = active_role();
@@ -33,7 +33,7 @@ class DosenDashboard extends Component
         $this->loadAnalytics();
     }
 
-    public function updatedSelectedYear()
+    public function updatedSelectedYear(): void
     {
         $this->loadAnalytics();
     }
@@ -53,77 +53,98 @@ class DosenDashboard extends Component
         return $years;
     }
 
-    public function loadAnalytics()
+    public function loadAnalytics(): void
     {
         $yearFilter = $this->selectedYear;
 
-        // Statistik Penelitian
-        $researchCount = Proposal::where('submitter_id', $this->user->id)
+        // OPTIMIZED: Single aggregated query for own proposals stats
+        $this->loadStats($yearFilter);
+
+        // Load as member counts (2 separate queries needed due to relationship)
+        $this->loadMemberStats($yearFilter);
+
+        // Load recent proposals
+        $this->loadRecentProposals($yearFilter);
+    }
+
+    /**
+     * Load all stats in a single aggregated query.
+     * Replaces 6 separate count queries with 1 grouped query.
+     */
+    private function loadStats(string $yearFilter): void
+    {
+        $statsRaw = Proposal::query()
+            ->where('submitter_id', $this->user->id)
             ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->count();
+            ->select([
+                'detailable_type',
+                'status',
+                DB::raw('COUNT(*) as count'),
+            ])
+            ->groupBy('detailable_type', 'status')
+            ->get();
 
-        $researchAsMember = $this->user->proposals()
-            ->whereYear('proposals.created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->count();
-
-        $researchPending = Proposal::where('submitter_id', $this->user->id)
-            ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->where('status', 'submitted')->count();
-
-        $researchApproved = Proposal::where('submitter_id', $this->user->id)
-            ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->where('status', 'approved')->count();
-
-        // Statistik PKM
-        $communityServiceCount = Proposal::where('submitter_id', $this->user->id)
-            ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->count();
-
-        $communityServiceAsMember = $this->user->proposals()
-            ->whereYear('proposals.created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->count();
-
-        $communityServicePending = Proposal::where('submitter_id', $this->user->id)
-            ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->where('status', 'submitted')->count();
-
-        $communityServiceApproved = Proposal::where('submitter_id', $this->user->id)
-            ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
-            ->where('status', 'approved')->count();
+        $research = $statsRaw->filter(fn ($r) => str_contains($r->detailable_type, 'Research'));
+        $communityService = $statsRaw->filter(fn ($r) => str_contains($r->detailable_type, 'CommunityService'));
 
         $this->stats = [
-            'my_research' => $researchCount,
-            'my_community_service' => $communityServiceCount,
-            'research_as_member' => $researchAsMember,
-            'community_service_as_member' => $communityServiceAsMember,
-            'community_service_pending' => $communityServicePending,
-            'research_approved' => $researchApproved,
-            'community_service_approved' => $communityServiceApproved,
+            'my_research' => $research->sum('count'),
+            'my_community_service' => $communityService->sum('count'),
+            'research_pending' => $research->where('status', 'submitted')->sum('count'),
+            'community_service_pending' => $communityService->where('status', 'submitted')->sum('count'),
+            'research_approved' => $research->where('status', 'approved')->sum('count'),
+            'community_service_approved' => $communityService->where('status', 'approved')->sum('count'),
         ];
+    }
 
-        // Data penelitian terbaru
-        $this->recentResearch = Proposal::where('submitter_id', $this->user->id)
-            ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\Research')
-            ->latest()
-            ->limit(10)
+    /**
+     * Load member stats in optimized queries.
+     * Uses raw query to avoid pivot column conflicts with GROUP BY.
+     */
+    private function loadMemberStats(string $yearFilter): void
+    {
+        // Use raw query builder to avoid pivot columns being auto-included
+        $memberStats = DB::table('proposals')
+            ->join('proposal_user', 'proposals.id', '=', 'proposal_user.proposal_id')
+            ->where('proposal_user.user_id', $this->user->id)
+            ->whereYear('proposals.created_at', $yearFilter)
+            ->select([
+                'proposals.detailable_type',
+                DB::raw('COUNT(*) as count'),
+            ])
+            ->groupBy('proposals.detailable_type')
             ->get();
 
-        // Data PKM terbaru
-        $this->recentCommunityService = Proposal::where('submitter_id', $this->user->id)
+        $this->stats['research_as_member'] = $memberStats
+            ->filter(fn ($r) => str_contains($r->detailable_type, 'Research'))
+            ->sum('count');
+
+        $this->stats['community_service_as_member'] = $memberStats
+            ->filter(fn ($r) => str_contains($r->detailable_type, 'CommunityService'))
+            ->sum('count');
+    }
+
+    /**
+     * Load recent proposals in a single query.
+     */
+    private function loadRecentProposals(string $yearFilter): void
+    {
+        $recentProposals = Proposal::query()
+            ->where('submitter_id', $this->user->id)
             ->whereYear('created_at', $yearFilter)
-            ->where('detailable_type', 'App\Models\CommunityService')
             ->latest()
-            ->limit(10)
+            ->limit(20)
             ->get();
+
+        $this->recentResearch = $recentProposals
+            ->filter(fn ($p) => str_contains($p->detailable_type, 'Research'))
+            ->take(10)
+            ->values();
+
+        $this->recentCommunityService = $recentProposals
+            ->filter(fn ($p) => str_contains($p->detailable_type, 'CommunityService'))
+            ->take(10)
+            ->values();
     }
 
     public function render()

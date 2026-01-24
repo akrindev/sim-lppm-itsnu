@@ -120,14 +120,20 @@ class ProposalForm extends Form
      */
     public function setProposal(Proposal $proposal): void
     {
-        $proposal->load([
+        $proposal->loadMissing([
             'submitter.identity',
             'detailable',
             'teamMembers.identity',
             'outputs',
-            'budgetItems',
+            'budgetItems.budgetComponent',
+            'budgetItems.budgetGroup',
             'partners',
             'reviewers.user',
+        ]);
+
+        $proposal->loadMorph('detailable', [
+            Research::class => ['tktLevels', 'tktIndicators', 'macroResearchGroup'],
+            CommunityService::class => ['macroResearchGroup'],
         ]);
 
         $this->proposal = $proposal;

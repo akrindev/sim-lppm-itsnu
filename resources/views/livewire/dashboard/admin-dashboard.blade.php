@@ -39,7 +39,7 @@
                             <div class="dropdown-menu">
                                 @foreach ($availableYears as $year)
                                     <a href="#" class="dropdown-item {{ $selectedYear == $year ? 'active' : '' }}"
-                                        wire:click="$set('selectedYear', {{ $year }})">
+                                        wire:click.preserve-scroll="$set('selectedYear', {{ $year }})">
                                         {{ $year }}
                                     </a>
                                 @endforeach

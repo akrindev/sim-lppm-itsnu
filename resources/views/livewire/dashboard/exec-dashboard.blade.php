@@ -20,7 +20,7 @@
                             <div class="dropdown-menu">
                                 @foreach ($availableYears as $year)
                                     <a href="#" class="dropdown-item {{ $selectedYear == $year ? 'active' : '' }}"
-                                        wire:click="$set('selectedYear', {{ $year }})">
+                                        wire:click.preserve-scroll="$set('selectedYear', {{ $year }})">
                                         {{ $year }}
                                     </a>
                                 @endforeach
@@ -33,15 +33,15 @@
                             </a>
                             <div class="dropdown-menu">
                                 <a href="#" class="dropdown-item {{ $selectedSemester === 'all' ? 'active' : '' }}"
-                                    wire:click="$set('selectedSemester', 'all')">
+                                    wire:click.preserve-scroll="$set('selectedSemester', 'all')">
                                     Semua
                                 </a>
                                 <a href="#" class="dropdown-item {{ $selectedSemester === '1' ? 'active' : '' }}"
-                                    wire:click="$set('selectedSemester', '1')">
+                                    wire:click.preserve-scroll="$set('selectedSemester', '1')">
                                     Semester 1 (Jan-Jun)
                                 </a>
                                 <a href="#" class="dropdown-item {{ $selectedSemester === '2' ? 'active' : '' }}"
-                                    wire:click="$set('selectedSemester', '2')">
+                                    wire:click.preserve-scroll="$set('selectedSemester', '2')">
                                     Semester 2 (Jul-Des)
                                 </a>
                             </div>
