@@ -443,6 +443,132 @@ document.addEventListener("alpine:init", () => {
             });
         },
     }));
+
+    /**
+     * Alpine component for form modal functionality
+     */
+    Alpine.data("modalForm", (id, formId, submitText) => ({
+        loading: false,
+        submitText: submitText,
+
+        init() {
+            this.$watch("loading", (value) => {
+                const modal = document.getElementById(id);
+                if (modal) {
+                    if (value) {
+                        modal.classList.add("modal-loading");
+                    } else {
+                        modal.classList.remove("modal-loading");
+                    }
+                }
+            });
+        },
+
+        submitForm() {
+            const form = document.getElementById(formId);
+            if (form) {
+                this.loading = true;
+                // Trigger Livewire form submission
+                this.$wire.call("handleSubmit").finally(() => {
+                    this.loading = false;
+                });
+            }
+        },
+
+        resetForm() {
+            const form = document.getElementById(formId);
+            if (form) {
+                form.reset();
+            }
+            this.loading = false;
+        },
+    }));
+
+    /**
+     * Alpine component for image preview modal
+     */
+    Alpine.data("imagePreview", (src) => ({
+        currentImage: src,
+        currentIndex: 0,
+        totalImages: 1,
+        zoomLevel: 1,
+        isZoomed: false,
+        images: [src],
+
+        init() {
+            // Initialize images array if passed via data attributes in children
+            const slotImages = this.$el.parentElement.querySelectorAll(
+                "[data-image-src]",
+            );
+            if (slotImages.length > 0) {
+                this.images = Array.from(slotImages).map(
+                    (img) => img.dataset.imageSrc,
+                );
+                this.totalImages = this.images.length;
+            }
+
+            // Set up image load events
+            const img = this.$el.querySelector(".preview-image");
+            if (img) {
+                img.addEventListener("load", () => {
+                    img.classList.remove("loading");
+                });
+            }
+        },
+
+        zoomIn() {
+            if (this.zoomLevel < 3) {
+                this.zoomLevel += 0.25;
+                this.isZoomed = this.zoomLevel > 1;
+            }
+        },
+
+        zoomOut() {
+            if (this.zoomLevel > 0.25) {
+                this.zoomLevel -= 0.25;
+                this.isZoomed = this.zoomLevel > 1;
+            }
+        },
+
+        resetZoom() {
+            this.zoomLevel = 1;
+            this.isZoomed = false;
+        },
+
+        zoomToggle() {
+            if (this.zoomLevel === 1) {
+                this.zoomLevel = 2;
+                this.isZoomed = true;
+            } else {
+                this.resetZoom();
+            }
+        },
+
+        downloadImage() {
+            const link = document.createElement("a");
+            link.href = this.currentImage;
+            link.download = this.currentImage.split("/").pop() || "image";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+
+        nextImage() {
+            if (this.currentIndex < this.totalImages - 1) {
+                this.currentIndex++;
+                this.currentImage = this.images[this.currentIndex];
+                this.resetZoom();
+            }
+        },
+
+        previousImage() {
+            if (this.currentIndex > 0) {
+                this.currentIndex--;
+                this.currentImage = this.images[this.currentIndex];
+                this.resetZoom();
+            }
+        },
+    }));
 });
 
 // Fallback: Initialize on page navigation (e.g., wire:navigate)
@@ -476,3 +602,315 @@ document.addEventListener("livewire:init", () => {
         });
     });
 });
+
+/**
+ * GLOBAL MODAL MANAGEMENT
+ * Optimized for Bootstrap 5 + Livewire 3 (wire:navigate)
+ */
+
+// Helper to get/create Bootstrap modal instance
+const getBsModal = (el) => {
+    return (
+        (window.bootstrap?.Modal || window.tabler?.Modal)?.getOrCreateInstance(
+            el,
+        ) || null
+    );
+};
+
+// Helper to find the closest Livewire component from an element
+const findLwComponent = (element) => {
+    let current = element;
+    while (current && current !== document.body) {
+        if (current.hasAttribute("wire:id")) {
+            const wireId = current.getAttribute("wire:id");
+            return window.Livewire?.find(wireId);
+        }
+        current = current.parentElement;
+    }
+    return null;
+};
+
+// Initialize listeners for modals (callbacks like onShow/onHide)
+const setupModalCallbacks = () => {
+    document
+        .querySelectorAll("[data-livewire-modal]:not([data-modal-bound])")
+        .forEach((modalEl) => {
+            modalEl.dataset.modalBound = "true";
+
+            const onShow = modalEl.dataset.livewireOnShow;
+            const onHide = modalEl.dataset.livewireOnHide;
+
+            if (onShow) {
+                modalEl.addEventListener("show.bs.modal", () => {
+                    const component = findLwComponent(modalEl);
+                    if (component) {
+                        if (typeof component[onShow] === "function") {
+                            component[onShow]();
+                        } else {
+                            component.call(onShow);
+                        }
+                    }
+                });
+            }
+
+            if (onHide) {
+                modalEl.addEventListener("hidden.bs.modal", () => {
+                    const component = findLwComponent(modalEl);
+                    if (component) {
+                        if (typeof component[onHide] === "function") {
+                            component[onHide]();
+                        } else {
+                            component.call(onHide);
+                        }
+                    }
+                });
+            }
+
+            // Auto-close logic for alert modals
+            if (
+                modalEl.classList.contains("modal-alert") &&
+                modalEl.dataset.autoClose === "true"
+            ) {
+                const duration = parseInt(modalEl.dataset.duration || 5000);
+                modalEl.addEventListener("shown.bs.modal", () => {
+                    const timer = setTimeout(() => {
+                        const instance = getBsModal(modalEl);
+                        instance?.hide();
+                    }, duration);
+                    modalEl.addEventListener(
+                        "hidden.bs.modal",
+                        () => clearTimeout(timer),
+                        { once: true },
+                    );
+                });
+            }
+        });
+
+    // Handle auto-submit for form modals
+    document.querySelectorAll(".modal-form form").forEach((form) => {
+        if (form.dataset.autoSubmitBound) return;
+        form.dataset.autoSubmitBound = "true";
+
+        form.addEventListener("keydown", (e) => {
+            if (
+                e.key === "Enter" &&
+                !e.shiftKey &&
+                e.target.tagName !== "TEXTAREA"
+            ) {
+                e.preventDefault();
+                const submitBtn = form
+                    .closest(".modal")
+                    ?.querySelector(".btn-primary");
+                submitBtn?.click();
+            }
+        });
+    });
+};
+
+// Event handlers for global open/close dispatch
+const handleOpenModalEvent = (data) => {
+    const modalId = data.detail?.modalId || data.modalId;
+    if (!modalId) return;
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        getBsModal(modal)?.show();
+    }
+};
+
+const handleCloseModalEvent = (data) => {
+    const modalId = data.detail?.modalId || data.modalId;
+    if (!modalId) return;
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        (window.bootstrap?.Modal || window.tabler?.Modal)
+            ?.getInstance(modal)
+            ?.hide();
+    }
+};
+
+// Register Global Listeners
+window.addEventListener("open-modal", handleOpenModalEvent);
+window.addEventListener("close-modal", handleCloseModalEvent);
+
+document.addEventListener("livewire:init", () => {
+    window.Livewire.on("open-modal", handleOpenModalEvent);
+    window.Livewire.on("close-modal", handleCloseModalEvent);
+});
+
+// Setup on navigation
+document.addEventListener("livewire:navigated", setupModalCallbacks);
+
+// Cleanup on navigation start
+document.addEventListener("livewire:navigate", () => {
+    document.querySelectorAll(".modal.show").forEach((el) => {
+        const instance = (window.bootstrap?.Modal || window.tabler?.Modal)
+            ?.getInstance(el);
+        instance?.hide();
+    });
+
+    // Force cleanup
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+    document.querySelectorAll(".modal-backdrop").forEach((el) => el.remove());
+});
+
+// Global Helpers
+window.LoadingModal = {
+    show: (id) => {
+        const el = document.getElementById(id);
+        if (el) getBsModal(el)?.show();
+    },
+    hide: (id) => {
+        const el = document.getElementById(id);
+        if (el) {
+            (window.bootstrap?.Modal || window.tabler?.Modal)
+                ?.getInstance(el)
+                ?.hide();
+        }
+    },
+};
+
+window.ImagePreviewModal = {
+    show: (id, src) => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (src) {
+                const img = el.querySelector(".preview-image");
+                if (img) img.src = src;
+            }
+            getBsModal(el)?.show();
+        }
+    },
+};
+
+// Initial execution
+document.addEventListener("DOMContentLoaded", setupModalCallbacks);
+setupModalCallbacks();
+
+/**
+ * GLOBAL TOAST MANAGEMENT
+ */
+
+const TOAST_VARIANT_ICONS = {
+    success: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check me-2 text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>`,
+    danger: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x me-2 text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 10l4 4m0 -4l-4 4" /></svg>`,
+    warning: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-triangle me-2 text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>`,
+    info: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>`,
+};
+
+window.showToast = ({
+    message = "Notification",
+    title = null,
+    variant = "default",
+    position = "top-end",
+    autoHide = true,
+    delay = 5000,
+}) => {
+    const positionMap = {
+        "top-start": "top-0 start-0",
+        "top-center": "top-0 start-50 translate-middle-x",
+        "top-end": "top-0 end-0",
+        "middle-start": "top-50 start-0 translate-middle-y",
+        "middle-center": "top-50 start-50 translate-middle",
+        "middle-end": "top-50 end-0 translate-middle-y",
+        "bottom-start": "bottom-0 start-0",
+        "bottom-center": "bottom-0 start-50 translate-middle-x",
+        "bottom-end": "bottom-0 end-0",
+    };
+
+    const containerSelector = `.toast-container.position-fixed.${(positionMap[position] || positionMap["top-end"]).split(" ").join(".")}`;
+    let container = document.querySelector(containerSelector);
+
+    if (!container) {
+        container = document.createElement("div");
+        container.className = `toast-container position-fixed ${positionMap[position] || positionMap["top-end"]} p-3`;
+        container.style.zIndex = "1090";
+        document.body.appendChild(container);
+    }
+
+    const toastId = `toast-${Date.now()}`;
+    const icon = TOAST_VARIANT_ICONS[variant] || "";
+    const displayTitle =
+        title || variant.charAt(0).toUpperCase() + variant.slice(1);
+
+    const html = `
+        <div class="toast border-${variant}" id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true"
+            data-bs-autohide="${autoHide}" data-bs-delay="${delay}">
+            <div class="toast-header">
+                ${icon}
+                <strong class="me-auto">${displayTitle}</strong>
+                <button type="button" class="ms-2 btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">${message}</div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML("beforeend", html);
+    const el = document.getElementById(toastId);
+    const instance = new (window.bootstrap?.Toast || window.tabler?.Toast)(el);
+    instance.show();
+
+    el.addEventListener("hidden.bs.toast", () => {
+        el.remove();
+        if (container.children.length === 0) container.remove();
+    });
+};
+
+const setupToastListeners = () => {
+    // Handle triggers via data attributes
+    document.querySelectorAll('[data-bs-toggle="toast"]').forEach((trigger) => {
+        if (trigger.dataset.toastBound) return;
+        trigger.dataset.toastBound = "true";
+
+        trigger.addEventListener("click", (e) => {
+            e.preventDefault();
+            const target = trigger.getAttribute("data-bs-target");
+            if (target) {
+                const el = document.querySelector(target);
+                if (el)
+                    new (window.bootstrap?.Toast || window.tabler?.Toast)(
+                        el,
+                    ).show();
+            }
+        });
+    });
+
+    // Handle session flash messages on page load/navigation
+    const flashData = window.__toastFlashData || null;
+    if (flashData) {
+        Object.entries(flashData).forEach(([type, message]) => {
+            if (message) {
+                window.showToast({
+                    message: message,
+                    variant: type === "error" ? "danger" : type,
+                    position: "top-end",
+                });
+            }
+        });
+        // Clear flash data so it doesn't show again on re-navigated
+        window.__toastFlashData = null;
+    }
+};
+
+document.addEventListener("livewire:init", () => {
+    window.Livewire.on("toast", (data) => {
+        const config = Array.isArray(data) ? data[0] : data;
+        window.showToast(config);
+    });
+
+    window.Livewire.on("show-toast", (data) => {
+        const config = Array.isArray(data) ? data[0] : data;
+        if (config?.id) {
+            const el = document.getElementById(config.id);
+            if (el)
+                new (window.bootstrap?.Toast || window.tabler?.Toast)(
+                    el,
+                ).show();
+        }
+    });
+});
+
+document.addEventListener("livewire:navigated", setupToastListeners);
+document.addEventListener("DOMContentLoaded", setupToastListeners);
+setupToastListeners();

@@ -20,7 +20,7 @@
                         <div class="dropdown-menu dropdown-menu-end shadow">
                             @foreach ($availableYears as $year)
                                 <button class="dropdown-item {{ $selectedYear == $year ? 'active' : '' }}"
-                                    wire:click="$set('selectedYear', {{ $year }})">
+                                    wire:click.preserve-scroll="$set('selectedYear', {{ $year }})">
                                     {{ $year }}
                                 </button>
                             @endforeach

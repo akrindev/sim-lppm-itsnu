@@ -136,6 +136,7 @@ class ReviewerForm extends Component
     {
         return Proposal::with([
             'reviewers.user.identity',
+            'reviewers.scores.criteria',
         ])->find($this->proposalId);
     }
 

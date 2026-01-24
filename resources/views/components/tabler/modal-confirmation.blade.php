@@ -30,8 +30,8 @@
     };
 @endphp
 
-<x-tabler.modal :id="$id" :title="$title" :wire-ignore="$wireIgnore" :component-id="$componentId" :on-show="$onConfirm ? 'prepareConfirmation' : null"
-    :on-hide="$onCancel ? 'cleanupConfirmation' : null" size="sm" centered="true" close-button="true" class="modal-confirmation">
+<x-tabler.modal :id="$id" :title="$title" :wire-ignore="$wireIgnore" :component-id="$componentId" :on-show="$onConfirm"
+    :on-hide="$onCancel" size="sm" centered="true" close-button="true" class="modal-confirmation">
     <x-slot name="body">
         <div class="d-flex">
             @if ($icon)
@@ -67,53 +67,3 @@
         </button>
     </x-slot>
 </x-tabler.modal>
-
-@once
-    @push('scripts')
-        <script>
-            document.addEventListener('livewire:init', () => {
-                // Handle confirmation modal interactions
-                document.querySelectorAll('.modal-confirmation').forEach(modal => {
-                    const confirmBtn = modal.querySelector('.modal-footer .btn-{{ $variant }}');
-
-                    if (confirmBtn) {
-                        confirmBtn.addEventListener('click', (e) => {
-                            const componentId = modal.dataset.livewireComponent;
-                            const onConfirm = modal.dataset.livewireOnShow;
-
-                            if (componentId && onConfirm) {
-                                const component = window.Livewire?.find(componentId);
-                                component?.call(onConfirm);
-                            }
-                        });
-                    }
-                });
-            });
-        </script>
-    @endpush
-@endonce
-
-{{--
-Usage Example:
-<x-tabler.modal-confirmation
-    id="delete-confirmation"
-    title="Delete Item"
-    message="Are you sure you want to delete this item? This action cannot be undone."
-    confirm-text="Delete"
-    cancel-text="Cancel"
-    variant="danger"
-    component-id="{{ $this->id }}"
-    on-confirm="deleteItem"
-/>
-
-<x-tabler.modal-confirmation
-    id="export-confirmation"
-    title="Export Data"
-    message="This will generate a large file. Continue?"
-    confirm-text="Export"
-    cancel-text="Cancel"
-    variant="warning"
-    component-id="{{ $this->id }}"
-    on-confirm="exportData"
-/>
---}}

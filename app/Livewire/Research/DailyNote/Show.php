@@ -47,15 +47,30 @@ class Show extends Component
 
     protected function canAccess(Proposal $proposal): bool
     {
+        $user = Auth::user();
+
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'superadmin'])) {
+            return true;
+        }
+
+        return $proposal->submitter_id === $user->id ||
+            $proposal->teamMembers()->where('user_id', $user->id)->exists();
+    }
+
+    public function canManage(Proposal $proposal): bool
+    {
         $userId = Auth::id();
 
-        // Check if submitter or team member
         return $proposal->submitter_id === $userId ||
             $proposal->teamMembers()->where('user_id', $userId)->exists();
     }
 
     public function create(): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);
         $this->activity_date = date('Y-m-d');
         $this->dispatch('open-modal', modalId: 'daily-note-modal');
@@ -63,6 +78,10 @@ class Show extends Component
 
     public function save(): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $this->validate();
 
         $data = [
@@ -99,6 +118,10 @@ class Show extends Component
 
     public function edit(string $id): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $note = DailyNote::findOrFail($id);
 
         // Authorization check (optional but recommended)
@@ -117,6 +140,10 @@ class Show extends Component
 
     public function delete(string $id): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $note = DailyNote::findOrFail($id);
         if ($note->proposal_id !== $this->proposal->id) {
             abort(403);
@@ -129,6 +156,10 @@ class Show extends Component
 
     public function deleteEvidence(string $mediaId): void
     {
+        if (! $this->canManage($this->proposal)) {
+            abort(403);
+        }
+
         $media = Media::findOrFail($mediaId);
 
         // Check if the media belongs to a note in this proposal

@@ -44,6 +44,7 @@ class Research extends Component
             ->with([
                 'submitter',
                 'detailable',
+                'focusArea',
                 'reviewers' => function ($query) {
                     $query->where('user_id', Auth::id());
                 },

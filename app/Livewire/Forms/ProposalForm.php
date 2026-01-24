@@ -125,9 +125,15 @@ class ProposalForm extends Form
             'detailable',
             'teamMembers.identity',
             'outputs',
-            'budgetItems',
+            'budgetItems.budgetComponent',
+            'budgetItems.budgetGroup',
             'partners',
             'reviewers.user',
+        ]);
+
+        $proposal->loadMorph('detailable', [
+            Research::class => ['tktLevels', 'tktIndicators', 'macroResearchGroup'],
+            CommunityService::class => ['macroResearchGroup'],
         ]);
 
         $this->proposal = $proposal;
