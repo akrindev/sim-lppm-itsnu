@@ -174,6 +174,14 @@ class Show extends Component
         }
     }
 
+    public function removeEvidence(int $index): void
+    {
+        if (isset($this->evidence[$index])) {
+            unset($this->evidence[$index]);
+            $this->evidence = array_values($this->evidence);
+        }
+    }
+
     public function cancelEdit(): void
     {
         $this->reset(['activity_description', 'progress_percentage', 'notes', 'evidence', 'editingId']);

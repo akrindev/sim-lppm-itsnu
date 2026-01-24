@@ -80,12 +80,22 @@
                                     <div class="d-flex flex-column gap-1">
                                         @foreach ($note->media as $media)
                                             <div class="d-flex align-items-center gap-1">
-                                                <a href="{{ $media->getUrl() }}" target="_blank"
-                                                    class="text-decoration-none text-truncate" style="max-width: 150px;"
-                                                    title="{{ $media->file_name }}">
-                                                    <x-lucide-file-text class="icon-inline me-1 text-muted icon" />
-                                                    <small>{{ $media->file_name }}</small>
-                                                </a>
+                                                @if (str_starts_with($media->mime_type, 'image/'))
+                                                    <a href="#"
+                                                        @click.prevent="window.ImagePreviewModal.show('image-preview-modal', '{{ $media->getUrl() }}')"
+                                                        class="text-decoration-none text-truncate"
+                                                        style="max-width: 150px;" title="{{ $media->file_name }}">
+                                                        <x-lucide-image class="icon-inline me-1 text-muted icon" />
+                                                        <small>{{ $media->file_name }}</small>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ $media->getUrl() }}" target="_blank"
+                                                        class="text-decoration-none text-truncate"
+                                                        style="max-width: 150px;" title="{{ $media->file_name }}">
+                                                        <x-lucide-file-text class="icon-inline me-1 text-muted icon" />
+                                                        <small>{{ $media->file_name }}</small>
+                                                    </a>
+                                                @endif
                                             </div>
                                         @endforeach
                                     </div>
@@ -204,21 +214,30 @@
                                 <div class="p-2 card-body">
                                     <div class="mb-2 small fw-bold">File Baru:</div>
                                     <div class="row g-2">
-                                        @foreach ($evidence as $file)
+                                        @foreach ($evidence as $index => $file)
                                             <div class="col-12">
                                                 <div
-                                                    class="d-flex align-items-center gap-2 bg-body-tertiary p-2 border rounded">
-                                                    @if (str_starts_with($file->getMimeType(), 'image/'))
-                                                        <img src="{{ $file->temporaryUrl() }}"
-                                                            class="rounded object-cover"
-                                                            style="width: 40px; height: 40px;">
-                                                    @else
-                                                        <x-lucide-file class="text-muted icon" />
-                                                    @endif
-                                                    <div class="flex-fill text-truncate small"
-                                                        title="{{ $file->getClientOriginalName() }}">
-                                                        {{ $file->getClientOriginalName() }}
+                                                    class="d-flex align-items-center justify-content-between bg-body-tertiary p-2 border rounded">
+                                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                                        @if (str_starts_with($file->getMimeType(), 'image/'))
+                                                            <img src="{{ $file->temporaryUrl() }}"
+                                                                class="rounded object-cover"
+                                                                style="width: 40px; height: 40px;">
+                                                        @else
+                                                            <x-lucide-file class="text-muted icon" />
+                                                        @endif
+                                                        <div class="text-truncate small"
+                                                            title="{{ $file->getClientOriginalName() }}">
+                                                            {{ $file->getClientOriginalName() }}
+                                                        </div>
                                                     </div>
+                                                    <button type="button"
+                                                        wire:click="removeEvidence({{ $index }})"
+                                                        wire:confirm="Batalkan upload file ini?"
+                                                        class="btn btn-icon btn-sm btn-ghost-danger"
+                                                        title="Hapus file">
+                                                        <x-lucide-x class="icon" />
+                                                    </button>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -294,4 +313,6 @@
             </div>
         </form>
     </x-tabler.modal>
+
+    <x-tabler.modal-image id="image-preview-modal" title="Preview Bukti" downloadable="true" />
 </div>
