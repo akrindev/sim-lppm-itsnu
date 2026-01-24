@@ -6,6 +6,10 @@
         <x-lucide-arrow-left class="me-2 icon" />
         Kembali
     </a>
+    <a href="{{ route('daily-notes.export-pdf', $proposal) }}" target="_blank" class="btn-outline-primary btn">
+        <x-lucide-download class="me-2 icon" />
+        Unduh Catatan (PDF)
+    </a>
 </x-slot:pageActions>
 
 <div>
@@ -26,6 +30,46 @@
             </div>
         </div>
     </div>
+
+    @if ($notes_list->count() > 0)
+        <div class="mt-3 mb-3 row g-2">
+            <div class="col-md-3">
+                <div class="bg-primary text-primary-fg card card-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="bg-white-lt me-3 stamp">
+                                <x-lucide-calculator class="icon" />
+                            </span>
+                            <div>
+                                <div class="text-white-50 small">Total Digunakan</div>
+                                <div class="mb-0 h2 fw-bold">Rp
+                                    {{ number_format($notes_list->sum('amount'), 0, ',', '.') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @foreach ($notes_list->groupBy('budget_group_id') as $groupId => $items)
+                <div class="col-md-3">
+                    <div class="card card-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <span class="bg-blue-lt me-3 stamp">
+                                    <x-lucide-tag class="icon" />
+                                </span>
+                                <div class="text-truncate">
+                                    <div class="text-secondary text-truncate small">
+                                        {{ $items->first()->budgetGroup->name ?? 'Tanpa Kelompok' }}</div>
+                                    <div class="mb-0 h3">Rp {{ number_format($items->sum('amount'), 0, ',', '.') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     <div class="card">
         <div class="card-header">

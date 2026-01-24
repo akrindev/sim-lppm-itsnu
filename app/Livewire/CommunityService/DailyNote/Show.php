@@ -202,7 +202,7 @@ class Show extends Component
     public function render()
     {
         return view('livewire.community-service.daily-note.show', [
-            'notes_list' => $this->proposal->dailyNotes()->with(['media', 'budgetGroup'])->latest('activity_date')->get(),
+            'notes_list' => $this->proposal->dailyNotes()->with(['media.model', 'budgetGroup'])->latest('activity_date')->get(),
             'budget_groups' => \App\Models\BudgetGroup::whereIn('id', $this->proposal->budgetItems()->pluck('budget_group_id'))->get(),
         ]);
     }
