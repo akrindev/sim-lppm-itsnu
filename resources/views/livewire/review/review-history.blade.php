@@ -3,7 +3,7 @@
 <x-slot:pageSubtitle>Daftar proposal yang telah Anda selesai review.</x-slot:pageSubtitle>
 
 <div>
-    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm" role="alert">
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm collapse" id="reviewHistoryInfo" role="alert">
         <div class="d-flex">
             <div>
                 <x-lucide-info class="alert-icon icon me-2" />
@@ -17,7 +17,14 @@
                 </div>
             </div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#reviewHistoryInfo" aria-label="Close"></button>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-ghost-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#reviewHistoryInfo" aria-expanded="false" aria-controls="reviewHistoryInfo">
+            <x-lucide-info class="icon me-1" />
+            Informasi Siklus Review
+        </button>
     </div>
 
     {{-- Stats Cards --}}

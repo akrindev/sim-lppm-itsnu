@@ -5,6 +5,30 @@
 <div>
     <x-tabler.alert />
 
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm collapse" id="dekanIndexInfo" role="alert">
+        <div class="d-flex">
+            <div>
+                <x-lucide-info class="alert-icon icon me-2" />
+            </div>
+            <div>
+                <h4 class="alert-title">Panduan Persetujuan Dekan</h4>
+                <div class="text-secondary">
+                    Halaman ini menampilkan usulan dari fakultas Anda yang memerlukan validasi awal. 
+                    Tugas Anda adalah memastikan kesesuaian tim dan substansi awal sebelum diteruskan ke LPPM. 
+                    Klik <strong>Lihat & Proses</strong> untuk meninjau dan memberikan keputusan.
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#dekanIndexInfo" aria-label="Close"></button>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-ghost-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#dekanIndexInfo" aria-expanded="false" aria-controls="dekanIndexInfo">
+            <x-lucide-info class="icon me-1" />
+            Panduan Validasi
+        </button>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="mb-3 row row-deck row-cards">
         <div class="col-sm-6 col-lg-4">

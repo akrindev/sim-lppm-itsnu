@@ -5,6 +5,29 @@
 <div>
     <x-tabler.alert />
 
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm collapse" id="researchReviewInfo" role="alert">
+        <div class="d-flex">
+            <div>
+                <x-lucide-info class="alert-icon icon me-2" />
+            </div>
+            <div>
+                <h4 class="alert-title">Daftar Review Penelitian</h4>
+                <div class="text-secondary">
+                    Halaman ini menampilkan daftar proposal penelitian yang ditugaskan kepada Anda untuk direview. 
+                    Klik tombol <strong>Review</strong> pada proposal yang ingin Anda evaluasi.
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#researchReviewInfo" aria-label="Close"></button>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-ghost-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#researchReviewInfo" aria-expanded="false" aria-controls="researchReviewInfo">
+            <x-lucide-info class="icon me-1" />
+            Informasi Daftar Review
+        </button>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="row row-deck row-cards mb-3">
         <div class="col-sm-6 col-lg-3">
