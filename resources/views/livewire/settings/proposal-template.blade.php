@@ -148,6 +148,101 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row row-cards mt-3">
+                <div class="col-12">
+                    <h2 class="page-title mb-3">Template Monev Internal</h2>
+                </div>
+                <!-- Monev Berita Acara -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Berita Acara Monev</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveMonevBeritaAcaraTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="monev_berita_acara_template">
+                                    @error('monev_berita_acara_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->monevBeritaAcaraTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadMonevBeritaAcaraTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->monevBeritaAcaraTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monev Borang -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Borang Monev</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveMonevBorangTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="monev_borang_template">
+                                    @error('monev_borang_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->monevBorangTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadMonevBorangTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->monevBorangTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monev Rekap Penilaian -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Rekap Penilaian Monev</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveMonevRekapPenilaianTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="monev_rekap_penilaian_template">
+                                    @error('monev_rekap_penilaian_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->monevRekapPenilaianTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadMonevRekapPenilaianTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->monevRekapPenilaianTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

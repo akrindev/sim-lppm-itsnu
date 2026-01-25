@@ -126,6 +126,7 @@ Route::middleware(['auth'])->group(function () {
         Route::livewire('penugasan-reviewer', \App\Livewire\AdminLppm\ReviewerAssignment::class)->name('assign-reviewers');
         Route::livewire('beban-kerja-reviewer', \App\Livewire\AdminLppm\ReviewerWorkload::class)->name('reviewer-workload');
         Route::livewire('monitoring-review', \App\Livewire\AdminLppm\ReviewMonitoring::class)->name('review-monitoring');
+        Route::livewire('monev', \App\Livewire\AdminLppm\Monev\MonevIndex::class)->name('monev.index');
     });
 
     Route::livewire('settings', SettingsIndex::class)

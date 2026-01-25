@@ -63,6 +63,14 @@ class Proposal extends Model
     }
 
     /**
+     * Get all monev sessions for the proposal.
+     */
+    public function monevs(): HasMany
+    {
+        return $this->hasMany(ProposalMonev::class)->orderBy('monev_date', 'desc');
+    }
+
+    /**
      * Get the user who submitted the proposal.
      */
     public function submitter(): BelongsTo
