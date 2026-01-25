@@ -79,13 +79,27 @@ abstract class ProposalShow extends Component
     #[Computed]
     public function canEdit(): bool
     {
-        return $this->proposal->status === ProposalStatus::DRAFT;
+        $user = auth()->user();
+
+        if ($user->hasRole(['admin lppm', 'superadmin'])) {
+            return true;
+        }
+
+        return $this->proposal->status === ProposalStatus::DRAFT
+            && $this->proposal->submitter_id === $user->id;
     }
 
     #[Computed]
     public function canDelete(): bool
     {
-        return $this->proposal->status === ProposalStatus::DRAFT;
+        $user = auth()->user();
+
+        if ($user->hasRole(['admin lppm', 'superadmin'])) {
+            return true;
+        }
+
+        return $this->proposal->status === ProposalStatus::DRAFT
+            && $this->proposal->submitter_id === $user->id;
     }
 
     public function render()

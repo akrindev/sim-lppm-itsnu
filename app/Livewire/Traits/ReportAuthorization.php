@@ -31,6 +31,10 @@ trait ReportAuthorization
     {
         $user = Auth::user();
 
+        if ($user->hasRole(['admin lppm', 'superadmin'])) {
+            return true;
+        }
+
         return $proposal->submitter_id === $user->id;
     }
 }

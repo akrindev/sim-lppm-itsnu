@@ -58,8 +58,14 @@ abstract class ProposalCreate extends Component
 
     protected function canEditProposal(\App\Models\Proposal $proposal): bool
     {
+        $user = Auth::user();
+
+        if ($user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita'])) {
+            return true;
+        }
+
         return $proposal->status === \App\Enums\ProposalStatus::DRAFT
-            && $proposal->submitter_id === Auth::id();
+            && $proposal->submitter_id === $user->id;
     }
 
     abstract protected function getProposalType(): string;

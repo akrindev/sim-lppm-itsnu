@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Proposal extends Model
 {
     /** @use HasFactory<\Database\Factories\ProposalFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     public ?string $notes = null;
 
@@ -254,6 +255,14 @@ class Proposal extends Model
     public function reviewLogs(): HasMany
     {
         return $this->hasMany(ReviewLog::class)->orderBy('round', 'desc')->orderBy('completed_at', 'desc');
+    }
+
+    /**
+     * Get all activities for the proposal.
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ProposalActivity::class)->orderBy('created_at', 'desc');
     }
 
     /**
