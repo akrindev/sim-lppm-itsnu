@@ -49,14 +49,18 @@ class Index extends Component
             // Reviewer: proposal yang ditugaskan ke dia dengan review completed
             $query->whereHas('reviewers', function ($q) use ($user) {
                 $q->where('user_id', $user->id)
-                    ->where('status', 'completed');
+                    ->whereIn('status', ['completed', 'pending']);
             });
         } elseif ($user->hasAnyRole(['kepala lppm', 'admin lppm', 'rektor'])) {
             // Kepala LPPM/Admin/Rektor: semua proposal yang sudah ada review completed
             $query->whereHas('reviewers', function ($q) {
-                $q->where('status', 'completed');
+                $q->whereIn('status', ['completed', 'pending']);
             });
         }
+
+        $query->whereHas('reviewers', function ($q) {
+            $q->whereIn('status', ['completed', 'pending']);
+        });
 
         // Eager load relationships
         $query->with([
@@ -64,14 +68,14 @@ class Index extends Component
             'detailable',
             'focusArea',
             'reviewers' => function ($q) {
-                $q->where('status', 'completed')
+                $q->whereIn('status', ['completed', 'pending'])
                     ->with('user');
             },
         ]);
 
         // Search filter
         if (! empty($this->search)) {
-            $searchTerm = '%'.$this->search.'%';
+            $searchTerm = '%' . $this->search . '%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
                     ->orWhereHas('submitter', function ($sq) use ($searchTerm) {
