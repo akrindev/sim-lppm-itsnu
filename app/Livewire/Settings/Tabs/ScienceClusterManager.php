@@ -48,6 +48,7 @@ class ScienceClusterManager extends Component
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = ScienceCluster::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-science-cluster');
     }
 
     public function handleConfirmDeleteAction(): void

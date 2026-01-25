@@ -4,6 +4,7 @@ namespace App\Livewire\Settings\Tabs;
 
 use App\Livewire\Concerns\HasToast;
 use App\Models\BudgetCap;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -40,7 +41,7 @@ class BudgetCapManager extends Component
      */
     public function mount(): void
     {
-        if (! auth()->user()->hasRole('admin lppm')) {
+        if (! Auth::user()->hasRole('admin lppm')) {
             abort(403, 'Hanya Admin LPPM yang dapat mengakses pengaturan anggaran.');
         }
     }
@@ -142,5 +143,6 @@ class BudgetCapManager extends Component
     {
         $this->deleteItemId = $id;
         $this->deleteItemYear = (string) \App\Models\BudgetCap::find($id)?->year ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-budget-cap');
     }
 }

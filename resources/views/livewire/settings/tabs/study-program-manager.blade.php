@@ -3,8 +3,7 @@
     <div class="card">
         <div class="d-flex align-items-center justify-content-between card-header">
             <h3 class="card-title">Program Studi</h3>
-            <button type="button" class="btn btn-primary" wire:click='create' data-bs-toggle="modal"
-                data-bs-target="#modal-study-program">
+            <button type="button" class="btn btn-primary" wire:click='create' data-bs-toggle="modal" data-bs-target="#modal-study-program">
                 <x-lucide-plus class="icon" />
                 Tambah Program Studi
             </button>
@@ -27,12 +26,12 @@
                             <td>{{ $item->faculty?->name ?? 'N/A' }}</td>
                             <td>
                                 <div class="btn-list">
-                                    <button type="button" class="btn-outline-warning btn btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#modal-study-program" wire:click="edit('{{ $item->id }}')">
+                                    <button type="button" class="btn-outline-warning btn btn-sm"
+                                        wire:click="edit('{{ $item->id }}')" data-bs-toggle="modal" data-bs-target="#modal-study-program">
                                         Edit
                                     </button>
                                     <button type="button" class="btn-outline-danger btn btn-sm"
-                                        data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-study-program" wire:click="confirmDelete('{{ $item->id }}')">
+                                        wire:click="confirmDelete('{{ $item->id }}')" wire:loading.attr="disabled">
                                         Hapus
                                     </button>
                                 </div>
@@ -50,6 +49,7 @@
         
 @teleport('body')
 <x-tabler.modal-confirmation
+            wire:key="modal-confirm-delete-study-program"
             id="modal-confirm-delete-study-program"
             title="Konfirmasi Hapus"
             message="Apakah Anda yakin ingin menghapus {{ $deleteItemName ?? '' }}?"
@@ -58,7 +58,7 @@
             component-id="{{ $this->getId() }}"
             on-confirm="handleConfirmDeleteAction"
         />
-<x-tabler.modal id="modal-study-program" :title="$modalTitle" onHide="resetForm">
+<x-tabler.modal wire:key="modal-study-program" id="modal-study-program" :title="$modalTitle" onHide="resetForm" component-id="{{ $this->getId() }}">
             <x-slot:body>
                 <form wire:submit="save" id="form-study-program">
                     <div class="mb-3">
@@ -96,7 +96,7 @@
             </x-slot:body>
             <x-slot:footer>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" form="form-study-program" class="btn btn-primary">Simpan</button>
+                <button type="submit" form="form-study-program" class="btn btn-primary" wire:loading.class="btn-loading" wire:target="save">Simpan</button>
             </x-slot:footer>
         </x-tabler.modal>
 @endteleport

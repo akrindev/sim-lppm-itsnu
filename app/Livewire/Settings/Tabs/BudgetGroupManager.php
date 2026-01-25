@@ -122,8 +122,6 @@ class BudgetGroupManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    
-
     /**
      * Calculate total percentage across all budget groups.
      * Excludes the currently editing group to allow percentage updates.
@@ -148,5 +146,6 @@ class BudgetGroupManager extends Component
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = \App\Models\BudgetGroup::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-budget-group');
     }
 }

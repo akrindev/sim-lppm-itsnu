@@ -66,6 +66,7 @@ class TktManager extends Component
     public function confirmDeleteCategory(string $type): void
     {
         $this->deleteType = $type;
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-tkt-category');
     }
 
     public function handleConfirmDeleteCategory(): void
@@ -80,6 +81,7 @@ class TktManager extends Component
     {
         $this->deleteIndicatorId = $id;
         $this->deleteIndicatorName = $name;
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-tkt-indicator');
     }
 
     public function handleConfirmDeleteIndicator(): void

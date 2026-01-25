@@ -4,7 +4,7 @@
     if (modalId) {
         const modalEl = document.getElementById(modalId);
         if (modalEl) {
-            const modal = bootstrap.Modal.getInstance(modalEl);
+            const modal = window.getBsModal ? window.getBsModal(modalEl) : (window.bootstrap?.Modal?.getInstance(modalEl) || window.tabler?.bootstrap?.Modal?.getInstance(modalEl));
             if (modal) modal.hide();
         }
     }

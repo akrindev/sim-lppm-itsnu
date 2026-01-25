@@ -609,16 +609,23 @@ document.addEventListener("livewire:init", () => {
  */
 
 // Helper to get/create Bootstrap modal instance
-const getBsModal = (el) => {
+window.getBsModal = (el) => {
+    if (!el) return null;
+    const bootstrap = window.bootstrap || window.tabler?.bootstrap || window.tabler;
     return (
-        (window.bootstrap?.Modal || window.tabler?.Modal)?.getOrCreateInstance(
-            el,
-        ) || null
+        bootstrap?.Modal?.getOrCreateInstance(el) || null
     );
 };
 
 // Helper to find the closest Livewire component from an element
 const findLwComponent = (element) => {
+    // 1. Try explicit component-id attribute (for teleported modals)
+    if (element.hasAttribute("component-id")) {
+        const componentId = element.getAttribute("component-id");
+        return window.Livewire?.find(componentId);
+    }
+
+    // 2. Try generic DOM traversal for wire:id
     let current = element;
     while (current && current !== document.body) {
         if (current.hasAttribute("wire:id")) {
@@ -709,33 +716,65 @@ const setupModalCallbacks = () => {
 
 // Event handlers for global open/close dispatch
 const handleOpenModalEvent = (data) => {
-    const modalId = data.detail?.modalId || data.modalId;
-    if (!modalId) return;
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        getBsModal(modal)?.show();
+    const modalId = data.detail?.modalId || data.modalId || (Array.isArray(data) ? data[0]?.modalId : null);
+
+    if (!modalId) {
+        console.warn('open-modal: No modalId provided in event data');
+        return;
     }
+
+    // Use a small timeout to ensure DOM updates (especially teleports) have settled
+    setTimeout(() => {
+        const modalEl = document.getElementById(modalId);
+        if (modalEl) {
+            const modal = window.getBsModal(modalEl);
+            modal?.show();
+        } else {
+            console.error(`open-modal: Element with ID "${modalId}" not found in DOM after delay`);
+        }
+    }, 50);
 };
 
 const handleCloseModalEvent = (data) => {
-    const modalId = data.detail?.modalId || data.modalId;
+    const modalId = data.detail?.modalId || data.modalId || (Array.isArray(data) ? data[0]?.modalId : null);
+
     if (!modalId) return;
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        (window.bootstrap?.Modal || window.tabler?.Modal)
-            ?.getInstance(modal)
-            ?.hide();
+
+    const modalEl = document.getElementById(modalId);
+    if (modalEl) {
+        const modal = window.getBsModal(modalEl);
+        modal?.hide();
     }
 };
 
 // Register Global Listeners
+const registerGlobalLivewireListeners = () => {
+    window.Livewire.on("open-modal", handleOpenModalEvent);
+    window.Livewire.on("close-modal", handleCloseModalEvent);
+    window.Livewire.on("toast", (data) => {
+        const config = Array.isArray(data) ? data[0] : data;
+        window.showToast(config);
+    });
+    window.Livewire.on("show-toast", (data) => {
+        const config = Array.isArray(data) ? data[0] : data;
+        if (config?.id) {
+            const el = document.getElementById(config.id);
+            if (el)
+                new (window.bootstrap?.Toast || window.tabler?.Toast)(
+                    el,
+                ).show();
+        }
+    });
+};
+
 window.addEventListener("open-modal", handleOpenModalEvent);
 window.addEventListener("close-modal", handleCloseModalEvent);
 
-document.addEventListener("livewire:init", () => {
-    window.Livewire.on("open-modal", handleOpenModalEvent);
-    window.Livewire.on("close-modal", handleCloseModalEvent);
-});
+if (window.Livewire) {
+    registerGlobalLivewireListeners();
+} else {
+    document.addEventListener("livewire:init", registerGlobalLivewireListeners);
+}
 
 // Setup on navigation
 document.addEventListener("livewire:navigated", setupModalCallbacks);
@@ -976,23 +1015,8 @@ const setupToastListeners = () => {
     }
 };
 
-document.addEventListener("livewire:init", () => {
-    window.Livewire.on("toast", (data) => {
-        const config = Array.isArray(data) ? data[0] : data;
-        window.showToast(config);
-    });
-
-    window.Livewire.on("show-toast", (data) => {
-        const config = Array.isArray(data) ? data[0] : data;
-        if (config?.id) {
-            const el = document.getElementById(config.id);
-            if (el)
-                new (window.bootstrap?.Toast || window.tabler?.Toast)(
-                    el,
-                ).show();
-        }
-    });
-});
+// Note: Toast listeners are now registered in registerGlobalLivewireListeners above
+// to ensure they are attached even if app.js loads after Livewire initializes.
 
 document.addEventListener("livewire:navigated", setupToastListeners);
 document.addEventListener("DOMContentLoaded", setupToastListeners);

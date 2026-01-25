@@ -88,6 +88,8 @@
                 'tabindex' => '-1',
                 'aria-labelledby' => $titleId,
                 'aria-hidden' => 'true',
+                'data-bs-backdrop' => (string) $backdrop,
+                'data-bs-keyboard' => $keyboard ? 'true' : 'false',
                 'data-livewire-modal' => $id,
                 'data-livewire-on-show' => $onShow,
                 'data-livewire-on-hide' => $onHide,

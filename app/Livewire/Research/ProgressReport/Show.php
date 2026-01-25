@@ -251,8 +251,8 @@ class Show extends Component
         $this->js("
             const modalEl = document.getElementById('modalMandatoryOutput');
             if (modalEl) {
-                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                modal.hide();
+                const modal = window.getBsModal ? window.getBsModal(modalEl) : (window.bootstrap?.Modal?.getOrCreateInstance(modalEl) || window.tabler?.bootstrap?.Modal?.getOrCreateInstance(modalEl));
+                if (modal) modal.hide();
             }
         ");
 
@@ -277,8 +277,8 @@ class Show extends Component
         $this->js("
             const modalEl = document.getElementById('modalAdditionalOutput');
             if (modalEl) {
-                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                modal.hide();
+                const modal = window.getBsModal ? window.getBsModal(modalEl) : (window.bootstrap?.Modal?.getOrCreateInstance(modalEl) || window.tabler?.bootstrap?.Modal?.getOrCreateInstance(modalEl));
+                if (modal) modal.hide();
             }
         ");
 

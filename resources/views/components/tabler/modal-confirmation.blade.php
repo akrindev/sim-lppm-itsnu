@@ -31,7 +31,8 @@
 @endphp
 
 <x-tabler.modal :id="$id" :title="$title" :wire-ignore="$wireIgnore" :component-id="$componentId"
-    :on-hide="$onCancel" size="sm" centered="true" close-button="true" class="modal-confirmation">
+    :on-hide="$onCancel" size="sm" centered="true" close-button="true"
+    {{ $attributes->merge(['class' => 'modal-confirmation']) }}>
     <x-slot name="body">
         <div class="d-flex">
             @if ($icon)

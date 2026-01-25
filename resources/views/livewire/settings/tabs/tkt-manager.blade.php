@@ -45,7 +45,7 @@
                                 @enderror
                             </div>
                             <div class="btn-list">
-                                <button type="button" class="btn btn-success btn-sm" wire:click="saveNewCategory">
+                                <button type="button" class="btn btn-success btn-sm" wire:click="saveNewCategory" wire:loading.class="btn-loading" wire:target="saveNewCategory">
                                     <x-lucide-check class="icon" />
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" wire:click="cancelAddCategory">
@@ -77,7 +77,7 @@
                                                 wire:keydown.escape="cancelEditCategory"
                                                 autofocus
                                                 style="font-size: 0.85rem;">
-                                            <button type="button" class="btn btn-success btn-sm p-1" wire:click="saveCategory">
+                                            <button type="button" class="btn btn-success btn-sm p-1" wire:click="saveCategory" wire:loading.class="btn-loading" wire:target="saveCategory">
                                                 <x-lucide-check class="icon" style="width: 14px; height: 14px;" />
                                             </button>
                                             <button type="button" class="btn btn-secondary btn-sm p-1" wire:click="cancelEditCategory">
@@ -110,8 +110,8 @@
                                                 <x-lucide-pencil class="icon" style="width: 12px; height: 12px;" />
                                             </button>
                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-tkt-category"
                                                 wire:click="confirmDeleteCategory('{{ $type }}')"
+                                                wire:loading.attr="disabled"
                                                 title="Hapus">
                                                 <x-lucide-trash-2 class="icon" style="width: 12px; height: 12px;" />
                                             </button>
@@ -191,7 +191,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                     <div class="mt-2 btn-list">
-                                        <button type="button" class="btn btn-primary btn-sm" wire:click="saveLevelDesc">
+                                        <button type="button" class="btn btn-primary btn-sm" wire:click="saveLevelDesc" wire:loading.class="btn-loading" wire:target="saveLevelDesc">
                                             <x-lucide-check class="icon me-1" /> Simpan
                                         </button>
                                         <button type="button" class="btn btn-secondary btn-sm"
@@ -248,7 +248,7 @@
                                         </div>
                                     </div>
                                     <div class="mt-2 btn-list">
-                                        <button type="button" class="btn btn-success btn-sm" wire:click="saveNewIndicator">
+                                        <button type="button" class="btn btn-success btn-sm" wire:click="saveNewIndicator" wire:loading.class="btn-loading" wire:target="saveNewIndicator">
                                             <x-lucide-check class="icon me-1" /> Simpan
                                         </button>
                                         <button type="button" class="btn btn-secondary btn-sm"
@@ -292,7 +292,7 @@
                                                     <td>
                                                         <div class="btn-list flex-nowrap">
                                                             <button type="button" class="btn btn-success btn-sm p-1"
-                                                                wire:click="saveIndicator" title="Simpan">
+                                                                wire:click="saveIndicator" wire:loading.class="btn-loading" wire:target="saveIndicator" title="Simpan">
                                                                 <x-lucide-check class="icon" />
                                                             </button>
                                                             <button type="button" class="btn btn-secondary btn-sm p-1"
@@ -316,9 +316,9 @@
                                                                 title="Edit">
                                                                 <x-lucide-pencil class="icon" />
                                                             </button>
-                                                            <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-tkt-indicator"
+                                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
                                                                 wire:click="confirmDeleteIndicator({{ $indicator->id }}, '{{ $indicator->indicator }}')"
+                                                                wire:loading.attr="disabled"
                                                                 title="Hapus">
                                                                 <x-lucide-trash-2 class="icon" />
                                                             </button>
@@ -409,11 +409,11 @@
 
     
 @teleport('body')
-<x-tabler.modal-confirmation id="modal-confirm-delete-tkt-category" title="Konfirmasi Hapus Kategori"
+<x-tabler.modal-confirmation wire:key="modal-confirm-delete-tkt-category" id="modal-confirm-delete-tkt-category" title="Konfirmasi Hapus Kategori"
         message="Apakah Anda yakin ingin menghapus kategori {{ $deleteType ?? '' }} beserta semua level dan indikatornya?"
         confirm-text="Ya, Hapus" cancel-text="Batal" component-id="{{ $this->getId() }}"
         on-confirm="handleConfirmDeleteCategory" />
-<x-tabler.modal-confirmation id="modal-confirm-delete-tkt-indicator" title="Konfirmasi Hapus Indikator"
+<x-tabler.modal-confirmation wire:key="modal-confirm-delete-tkt-indicator" id="modal-confirm-delete-tkt-indicator" title="Konfirmasi Hapus Indikator"
         message="Apakah Anda yakin ingin menghapus indikator ini?" confirm-text="Ya, Hapus" cancel-text="Batal"
         component-id="{{ $this->getId() }}" on-confirm="handleConfirmDeleteIndicator" />
 @endteleport

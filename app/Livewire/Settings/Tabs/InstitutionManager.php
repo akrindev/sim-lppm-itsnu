@@ -15,6 +15,12 @@ class InstitutionManager extends Component
     #[Validate('required|min:3|max:255')]
     public string $name = '';
 
+    #[Validate('required|min:2|max:10')]
+    public string $code = '';
+
+    #[Validate('required|min:5|max:500')]
+    public string $address = '';
+
     public ?int $editingId = null;
 
     public string $modalTitle = 'Institusi';
@@ -32,35 +38,43 @@ class InstitutionManager extends Component
 
     public function create(): void
     {
-        $this->reset(['name', 'editingId']);
+        $this->reset(['name', 'code', 'address', 'editingId']);
         $this->modalTitle = 'Tambah Institusi';
-    }
-
-    public function save(): void
-    {
-        $this->validate();
-
-        if ($this->editingId) {
-            Institution::findOrFail($this->editingId)->update(['name' => $this->name]);
-        } else {
-            Institution::create(['name' => $this->name]);
-        }
-
-        $message = $this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan';
-
-        // close modal
-        $this->dispatch('close-modal', modalId: 'modal-institution');
-        $this->reset(['name', 'editingId']);
-
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
     }
 
     public function edit(Institution $institution): void
     {
         $this->editingId = $institution->id;
         $this->name = $institution->name;
+        $this->code = $institution->code;
+        $this->address = $institution->address;
         $this->modalTitle = 'Edit Institusi';
+    }
+
+    public function save(): void
+    {
+        $this->validate();
+
+        $data = [
+            'name' => $this->name,
+            'code' => $this->code,
+            'address' => $this->address,
+        ];
+
+        if ($this->editingId) {
+            Institution::findOrFail($this->editingId)->update($data);
+        } else {
+            Institution::create($data);
+        }
+
+        $message = $this->editingId ? 'Institusi berhasil diubah' : 'Institusi berhasil ditambahkan';
+
+        // close modal
+        $this->dispatch('close-modal', modalId: 'modal-institution');
+        $this->reset(['name', 'code', 'address', 'editingId']);
+
+        session()->flash('success', $message);
+        $this->toastSuccess($message);
     }
 
     public function delete(Institution $institution): void
@@ -75,7 +89,7 @@ class InstitutionManager extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['name', 'editingId']);
+        $this->reset(['name', 'code', 'address', 'editingId']);
     }
 
     public function handleConfirmDeleteAction(): void
@@ -95,11 +109,10 @@ class InstitutionManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    
-
     public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = \App\Models\Institution::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-institution');
     }
 }

@@ -113,5 +113,6 @@ class PartnerManager extends Component
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = \App\Models\Partner::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-partner');
     }
 }

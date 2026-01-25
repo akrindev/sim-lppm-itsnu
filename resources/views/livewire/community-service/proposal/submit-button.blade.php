@@ -1,13 +1,12 @@
 <div>
     @if ($this->canSubmit)
-        <button type="button" class="mb-3 w-full btn btn-success" data-bs-toggle="modal"
-            data-bs-target="#confirmSubmitModal">
+        <button type="button" class="mb-3 w-full btn btn-success" wire:click="confirmSubmit">
             <x-lucide-send class="icon" />
             Submit Proposal
         </button>
 
         @teleport('body')
-            <x-tabler.modal id="confirmSubmitModal" title="Konfirmasi Pengajuan Proposal">
+            <x-tabler.modal id="confirmSubmitModal" title="Konfirmasi Pengajuan Proposal" component-id="{{ $this->getId() }}">
                 <x-slot:body>
                     <div class="py-4 text-center">
                         <x-lucide-send class="mb-2 text-success icon" style="width: 3rem; height: 3rem;" />

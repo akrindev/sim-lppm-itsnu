@@ -99,5 +99,6 @@ class NationalPriorityManager extends Component
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = \App\Models\NationalPriority::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-national-priority');
     }
 }

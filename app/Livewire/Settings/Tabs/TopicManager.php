@@ -106,11 +106,10 @@ class TopicManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    
-
     public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = \App\Models\Topic::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-topic');
     }
 }

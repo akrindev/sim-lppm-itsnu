@@ -36,6 +36,13 @@ class KeywordManager extends Component
         $this->modalTitle = 'Tambah Kata Kunci';
     }
 
+    public function edit(Keyword $keyword): void
+    {
+        $this->editingId = $keyword->id;
+        $this->name = $keyword->name;
+        $this->modalTitle = 'Edit Kata Kunci';
+    }
+
     public function save(): void
     {
         $this->validate();
@@ -54,13 +61,6 @@ class KeywordManager extends Component
 
         session()->flash('success', $message);
         $this->toastSuccess($message);
-    }
-
-    public function edit(Keyword $keyword): void
-    {
-        $this->editingId = $keyword->id;
-        $this->name = $keyword->name;
-        $this->modalTitle = 'Edit Kata Kunci';
     }
 
     public function delete(Keyword $keyword): void
@@ -95,11 +95,10 @@ class KeywordManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    
-
     public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
         $this->deleteItemName = \App\Models\Keyword::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-keyword');
     }
 }

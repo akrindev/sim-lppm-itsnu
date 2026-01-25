@@ -50,7 +50,7 @@
                                 @endif
                             </div>
                             <div class="btn-list">
-                                <button type="button" class="btn btn-success btn-sm" wire:click="saveNewCluster">
+                                <button type="button" class="btn btn-success btn-sm" wire:click="saveNewCluster" wire:loading.class="btn-loading" wire:target="saveNewCluster">
                                     <x-lucide-check class="icon" />
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" wire:click="cancelAddCluster">
@@ -77,7 +77,7 @@
                                                 class="form-control form-control-sm @error('clusterNameInput') is-invalid @enderror"
                                                 wire:model="clusterNameInput" wire:keydown.enter="saveCluster"
                                                 wire:keydown.escape="cancelEditCluster" autofocus style="font-size: 0.85rem;">
-                                            <button type="button" class="btn btn-success btn-sm p-1" wire:click="saveCluster">
+                                            <button type="button" class="btn btn-success btn-sm p-1" wire:click="saveCluster" wire:loading.class="btn-loading" wire:target="saveCluster">
                                                 <x-lucide-check class="icon" style="width: 14px; height: 14px;" />
                                             </button>
                                             <button type="button" class="btn btn-secondary btn-sm p-1"
@@ -118,8 +118,8 @@
                                                 <x-lucide-pencil class="icon" style="width: 12px; height: 12px;" />
                                             </button>
                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
                                                 wire:click="confirmDelete({{ $level1->id }})"
+                                                wire:loading.attr="disabled"
                                                 title="Hapus">
                                                 <x-lucide-trash-2 class="icon" style="width: 12px; height: 12px;" />
                                             </button>
@@ -197,8 +197,8 @@
                                                                     style="width: 10px; height: 10px;" />
                                                             </button>
                                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
                                                                 wire:click="confirmDelete({{ $level2->id }})"
+                                                                wire:loading.attr="disabled"
                                                                 title="Hapus">
                                                                 <x-lucide-trash-2 class="icon"
                                                                     style="width: 10px; height: 10px;" />
@@ -262,8 +262,8 @@
                                                                         </button>
                                                                         <button type="button"
                                                                             class="btn btn-ghost-danger btn-sm p-1"
-                                                                            data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
                                                                             wire:click="confirmDelete({{ $level3->id }})"
+                                                                            wire:loading.attr="disabled"
                                                                             title="Hapus">
                                                                             <x-lucide-trash-2 class="icon"
                                                                                 style="width: 9px; height: 9px;" />
@@ -389,8 +389,8 @@
                                                                 <x-lucide-pencil class="icon" />
                                                             </button>
                                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
                                                                 wire:click="confirmDelete({{ $child->id }})"
+                                                                wire:loading.attr="disabled"
                                                                 title="Hapus">
                                                                 <x-lucide-trash-2 class="icon" />
                                                             </button>
@@ -490,7 +490,7 @@
 
     
 @teleport('body')
-<x-tabler.modal-confirmation id="modal-confirm-delete-science-cluster" title="Konfirmasi Hapus"
+<x-tabler.modal-confirmation wire:key="modal-confirm-delete-science-cluster" id="modal-confirm-delete-science-cluster" title="Konfirmasi Hapus"
         message="Apakah Anda yakin ingin menghapus {{ $deleteItemName ?? '' }}? Tindakan ini akan menghapus semua sub-cluster di bawahnya."
         confirm-text="Ya, Hapus" cancel-text="Batal" component-id="{{ $this->getId() }}"
         on-confirm="handleConfirmDeleteAction" />
