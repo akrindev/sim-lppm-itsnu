@@ -14,7 +14,7 @@ trait ReportAuthorization
     {
         $user = Auth::user();
 
-        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor'])) {
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'dekan'])) {
             return $query;
         }
 

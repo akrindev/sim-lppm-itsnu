@@ -21,9 +21,12 @@ class ReportWorkflowTest extends TestCase
 
     protected Proposal $proposal;
 
+    protected User $dekan;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->seed(\Database\Seeders\RoleSeeder::class);
         $this->seed(\Database\Seeders\InstitutionSeeder::class);
@@ -51,6 +54,9 @@ class ReportWorkflowTest extends TestCase
             'category' => 'Wajib',
             'type' => 'Jurnal Nasional',
         ]);
+
+        $this->dekan = User::factory()->create();
+        $this->dekan->assignRole('dekan');
     }
 
     public function test_dosen_can_create_and_submit_progress_report()
@@ -188,5 +194,29 @@ class ReportWorkflowTest extends TestCase
         $report = $proposal->progressReports()->first();
         $this->assertNotNull($report);
         $this->assertEquals('Updated PKM summary.', $report->summary_update);
+        $this->assertNotNull($report);
+        $this->assertEquals('Updated PKM summary.', $report->summary_update);
+    }
+
+    public function test_dekan_can_view_progress_report()
+    {
+        $this->actingAs($this->dekan)
+            ->withSession(['active_role' => 'dekan']);
+
+        Livewire::test(\App\Livewire\Research\ProgressReport\Show::class, [
+            'proposal' => $this->proposal,
+        ])
+            ->assertStatus(200);
+    }
+
+    public function test_dekan_can_view_daily_notes()
+    {
+        $this->actingAs($this->dekan)
+            ->withSession(['active_role' => 'dekan']);
+
+        Livewire::test(\App\Livewire\Research\DailyNote\Show::class, [
+            'proposal' => $this->proposal,
+        ])
+            ->assertStatus(200);
     }
 }

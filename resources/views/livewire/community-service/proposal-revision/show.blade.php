@@ -273,7 +273,7 @@
 
                                     <!-- Scoring Details Table -->
                                     <div class="table-responsive mb-3 border rounded-2">
-                                        <table class="table table-vcenter bg-white mb-0">
+                                        <table class="table table-vcenter mb-0">
                                             <thead class="bg-body-tertiary">
                                                 <tr>
                                                     <th class="py-2">Kriteria</th>
@@ -386,7 +386,7 @@
                                                         <!-- History Scores Small Table -->
                                                         <div class="table-responsive mb-2">
                                                             <table
-                                                                class="table table-borderless table-vcenter bg-white mb-0 border rounded"
+                                                                class="table table-borderless table-vcenter mb-0 border rounded"
                                                                 style="font-size: 9pt;">
                                                                 <thead class="bg-body-tertiary">
                                                                     <tr>
@@ -410,8 +410,7 @@
                                                             </table>
                                                         </div>
 
-                                                        <div
-                                                            class="bg-white p-2 border rounded text-muted italic small">
+                                                        <div class="p-2 border rounded text-muted italic small">
                                                             {{ $log->review_notes }}
                                                         </div>
                                                         <div class="mt-1 text-end">

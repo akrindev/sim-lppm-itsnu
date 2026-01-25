@@ -55,7 +55,7 @@ class Show extends Component
     {
         $user = Auth::user();
 
-        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'superadmin'])) {
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'superadmin', 'dekan'])) {
             return true;
         }
 

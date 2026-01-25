@@ -18,7 +18,7 @@ trait ReportData
         $user = \Illuminate\Support\Facades\Auth::user();
         $roleFilter = property_exists($this, 'roleFilter') ? $this->roleFilter : '';
 
-        if ($roleFilter && ! $user->activeHasAnyRole(['admin lppm', 'kepala lppm', 'rektor'])) {
+        if ($roleFilter && ! $user->activeHasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'dekan'])) {
             $query = $this->applyRoleFilter($query, $user, $roleFilter);
         }
 
@@ -31,7 +31,7 @@ trait ReportData
             return $query;
         }
 
-        $searchPattern = '%'.$searchTerm.'%';
+        $searchPattern = '%' . $searchTerm . '%';
 
         return $query->where(function ($q) use ($searchPattern) {
             $q->where('title', 'LIKE', $searchPattern)
@@ -71,7 +71,7 @@ trait ReportData
             $relations = [
                 'submitter.identity',
                 'focusArea',
-                'progressReports' => fn ($q) => $q->latest(),
+                'progressReports' => fn($q) => $q->latest(),
             ];
         }
 
