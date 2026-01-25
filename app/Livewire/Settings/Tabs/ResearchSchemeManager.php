@@ -70,6 +70,7 @@ class ResearchSchemeManager extends Component
         $this->name = $researchScheme->name;
         $this->strata = $researchScheme->strata;
         $this->modalTitle = 'Edit Skema Penelitian';
+        $this->dispatch('open-modal', modalId: 'modal-research-scheme');
     }
 
     public function delete(ResearchScheme $researchScheme): void

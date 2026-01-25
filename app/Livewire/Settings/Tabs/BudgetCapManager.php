@@ -105,6 +105,7 @@ class BudgetCapManager extends Component
         $this->research_budget_cap = $budgetCap->research_budget_cap ? (string) $budgetCap->research_budget_cap : null;
         $this->community_service_budget_cap = $budgetCap->community_service_budget_cap ? (string) $budgetCap->community_service_budget_cap : null;
         $this->modalTitle = 'Edit Pengaturan Anggaran';
+        $this->dispatch('open-modal', modalId: 'modal-budget-cap');
     }
 
     public function delete(BudgetCap $budgetCap): void

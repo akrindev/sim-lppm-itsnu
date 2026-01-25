@@ -61,6 +61,7 @@ class NationalPriorityManager extends Component
         $this->editingId = $nationalPriority->id;
         $this->name = $nationalPriority->name;
         $this->modalTitle = 'Edit Prioritas Nasional';
+        $this->dispatch('open-modal', modalId: 'modal-national-priority');
     }
 
     public function delete(NationalPriority $nationalPriority): void

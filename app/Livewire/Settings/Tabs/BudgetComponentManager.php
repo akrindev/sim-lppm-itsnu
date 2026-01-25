@@ -86,6 +86,7 @@ class BudgetComponentManager extends Component
         $this->unit = $budgetComponent->unit;
         $this->description = $budgetComponent->description;
         $this->modalTitle = 'Edit Komponen Anggaran';
+        $this->dispatch('open-modal', modalId: 'modal-budget-component');
     }
 
     public function delete(BudgetComponent $budgetComponent): void

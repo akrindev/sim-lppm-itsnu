@@ -41,6 +41,7 @@ class KeywordManager extends Component
         $this->editingId = $keyword->id;
         $this->name = $keyword->name;
         $this->modalTitle = 'Edit Kata Kunci';
+        $this->dispatch('open-modal', modalId: 'modal-keyword');
     }
 
     public function save(): void

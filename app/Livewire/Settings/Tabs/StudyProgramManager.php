@@ -57,6 +57,7 @@ class StudyProgramManager extends Component
         $this->institutionId = $studyProgram->institution_id;
         $this->facultyId = $studyProgram->faculty_id;
         $this->modalTitle = 'Edit Program Studi';
+        $this->dispatch('open-modal', modalId: 'modal-study-program');
     }
 
     public function save(): void

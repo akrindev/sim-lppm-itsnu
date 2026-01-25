@@ -72,6 +72,7 @@ class TopicManager extends Component
         $this->name = $topic->name;
         $this->themeId = $topic->theme_id;
         $this->modalTitle = 'Edit Topik';
+        $this->dispatch('open-modal', modalId: 'modal-topic');
     }
 
     public function delete(Topic $topic): void

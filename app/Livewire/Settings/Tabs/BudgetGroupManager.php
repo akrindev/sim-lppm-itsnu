@@ -88,6 +88,7 @@ class BudgetGroupManager extends Component
         $this->description = $budgetGroup->description;
         $this->percentage = $budgetGroup->percentage ? (string) $budgetGroup->percentage : null;
         $this->modalTitle = 'Edit Kelompok Anggaran';
+        $this->dispatch('open-modal', modalId: 'modal-budget-group');
     }
 
     public function delete(BudgetGroup $budgetGroup): void

@@ -77,6 +77,7 @@ class FacultyManager extends Component
         $this->code = $faculty->code;
         $this->institutionId = $faculty->institution_id;
         $this->modalTitle = 'Edit Fakultas';
+        $this->dispatch('open-modal', modalId: 'modal-faculty');
     }
 
     public function delete(Faculty $faculty): void

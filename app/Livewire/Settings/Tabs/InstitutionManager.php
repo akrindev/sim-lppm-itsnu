@@ -49,6 +49,7 @@ class InstitutionManager extends Component
         $this->code = $institution->code;
         $this->address = $institution->address;
         $this->modalTitle = 'Edit Institusi';
+        $this->dispatch('open-modal', modalId: 'modal-institution');
     }
 
     public function save(): void

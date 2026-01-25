@@ -40,6 +40,7 @@ class PartnerManager extends Component
     {
         $this->reset(['name', 'type', 'address', 'editingId']);
         $this->modalTitle = 'Tambah Mitra';
+        $this->dispatch('open-modal', modalId: 'modal-partner');
     }
 
     public function save(): void
@@ -75,6 +76,7 @@ class PartnerManager extends Component
         $this->type = $partner->type;
         $this->address = $partner->address;
         $this->modalTitle = 'Edit Mitra';
+        $this->dispatch('open-modal', modalId: 'modal-partner');
     }
 
     public function delete(Partner $partner): void

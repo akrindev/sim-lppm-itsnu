@@ -72,6 +72,7 @@ class ThemeManager extends Component
         $this->name = $theme->name;
         $this->focusAreaId = $theme->focus_area_id;
         $this->modalTitle = 'Edit Tema';
+        $this->dispatch('open-modal', modalId: 'modal-theme');
     }
 
     public function delete(Theme $theme): void
