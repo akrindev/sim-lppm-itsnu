@@ -28,7 +28,7 @@
                             <td>{{ $item->description ?? '-' }}</td>
                             <td>
                                 @if ($item->percentage)
-                                    <span class="bg-green-lt badge">{{ number_format($item->percentage, 2) }}%</span>
+                                    <span class="bg-green-lt badge">{{ number_format($item->percentage, 0) }}%</span>
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
@@ -90,7 +90,7 @@
                     <label class="form-label">Persentase Alokasi (0-100%)</label>
                     <div class="input-group">
                         <input type="number" wire:model="percentage" class="form-control" placeholder="30"
-                            step="0.01" min="0" max="100">
+                            step="1" min="0" max="100">
                         <span class="input-group-text">%</span>
                     </div>
                     <small class="form-hint">Kosongkan jika tidak ada batasan persentase untuk kelompok ini.</small>

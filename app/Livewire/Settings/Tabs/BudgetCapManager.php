@@ -22,10 +22,10 @@ class BudgetCapManager extends Component
     #[Validate('required|integer|min:2000|max:2100')]
     public string $year = '';
 
-    #[Validate('nullable|numeric|min:0')]
+    #[Validate('nullable|integer|min:0')]
     public ?string $research_budget_cap = null;
 
-    #[Validate('nullable|numeric|min:0')]
+    #[Validate('nullable|integer|min:0')]
     public ?string $community_service_budget_cap = null;
 
     public ?int $editingId = null;
@@ -71,15 +71,15 @@ class BudgetCapManager extends Component
             ->exists();
 
         if ($exists) {
-            $this->addError('year', 'Pengaturan anggaran untuk tahun '.$this->year.' sudah ada.');
+            $this->addError('year', 'Pengaturan anggaran untuk tahun ' . $this->year . ' sudah ada.');
 
             return;
         }
 
         $data = [
             'year' => (int) $this->year,
-            'research_budget_cap' => $this->research_budget_cap ? (float) $this->research_budget_cap : null,
-            'community_service_budget_cap' => $this->community_service_budget_cap ? (float) $this->community_service_budget_cap : null,
+            'research_budget_cap' => $this->research_budget_cap ? (int) $this->research_budget_cap : null,
+            'community_service_budget_cap' => $this->community_service_budget_cap ? (int) $this->community_service_budget_cap : null,
         ];
 
         if ($this->editingId) {
@@ -102,8 +102,8 @@ class BudgetCapManager extends Component
     {
         $this->editingId = $budgetCap->id;
         $this->year = (string) $budgetCap->year;
-        $this->research_budget_cap = $budgetCap->research_budget_cap ? (string) $budgetCap->research_budget_cap : null;
-        $this->community_service_budget_cap = $budgetCap->community_service_budget_cap ? (string) $budgetCap->community_service_budget_cap : null;
+        $this->research_budget_cap = $budgetCap->research_budget_cap ? (string) (int) $budgetCap->research_budget_cap : null;
+        $this->community_service_budget_cap = $budgetCap->community_service_budget_cap ? (string) (int) $budgetCap->community_service_budget_cap : null;
         $this->modalTitle = 'Edit Pengaturan Anggaran';
         $this->dispatch('open-modal', modalId: 'modal-budget-cap');
     }
