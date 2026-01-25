@@ -26,7 +26,8 @@
                         <tr wire:key="reviewer-{{ $reviewer->id }}">
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <span class="avatar avatar-sm me-2">{{ $reviewer->initials() }}</span>
+                                    <span class="me-2 avatar avatar-sm"
+                                        style="background-image: url({{ $reviewer->profile_picture }})"></span>
                                     <div>
                                         <div class="fw-bold">{{ $reviewer->name }}</div>
                                         <div class="text-secondary small">{{ $reviewer->email }}</div>
@@ -35,18 +36,19 @@
                             </td>
                             <td>{{ $reviewer->identity?->faculty?->name ?? '—' }}</td>
                             <td class="text-center">
-                                <span class="badge bg-blue-lt">{{ $total }}</span>
+                                <span class="bg-blue-lt badge">{{ $total }}</span>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-warning-lt">{{ $reviewer->pending_count }}</span>
+                                <span class="bg-warning-lt badge">{{ $reviewer->pending_count }}</span>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-success-lt">{{ $completed }}</span>
+                                <span class="bg-success-lt badge">{{ $completed }}</span>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="progress progress-xs w-100 me-2">
-                                        <div class="progress-bar bg-primary" x-data :style="'width: ' + {{ $percentage }} + '%'"></div>
+                                    <div class="me-2 w-100 progress progress-xs">
+                                        <div class="bg-primary progress-bar" x-data
+                                            :style="'width: ' + {{ $percentage }} + '%'"></div>
                                     </div>
                                     <span class="small">{{ $percentage }}%</span>
                                 </div>
@@ -54,7 +56,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4">Tidak ada reviewer terdaftar.</td>
+                            <td colspan="6" class="py-4 text-center">Tidak ada reviewer terdaftar.</td>
                         </tr>
                     @endforelse
                 </tbody>

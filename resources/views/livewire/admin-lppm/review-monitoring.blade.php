@@ -3,11 +3,12 @@
 <x-slot:pageSubtitle>Pantau status penyelesaian review untuk setiap usulan yang sedang dalam tahap evaluasi.</x-slot:pageSubtitle>
 
 <div>
-    <div class="card mb-3">
+    <div class="mb-3 card">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <input type="text" class="form-control" placeholder="Cari judul proposal..." wire:model.live.debounce.300ms="search">
+                    <input type="text" class="form-control" placeholder="Cari judul proposal..."
+                        wire:model.live.debounce.300ms="search">
                 </div>
                 <div class="col-md-4">
                     <select class="form-select" wire:model.live="typeFilter">
@@ -17,7 +18,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-outline-secondary w-100" wire:click="resetFilters">Reset</button>
+                    <button class="btn-outline-secondary w-100 btn" wire:click="resetFilters">Reset</button>
                 </div>
             </div>
         </div>
@@ -39,16 +40,17 @@
                         <tr wire:key="prop-{{ $proposal->id }}">
                             <td class="text-wrap">
                                 <div class="fw-bold">{{ $proposal->title }}</div>
-                                <div class="small text-secondary">{{ $proposal->submitter?->name }}</div>
+                                <div class="text-secondary small">{{ $proposal->submitter?->name }}</div>
                             </td>
                             <td>
                                 @if ($proposal->reviewers->isEmpty())
                                     <span class="text-danger small">Belum ada reviewer ditugaskan</span>
                                 @else
-                                    <div class="avatar-list avatar-list-stacked mb-2">
+                                    <div class="mb-2 avatar-list-stacked avatar-list">
                                         @foreach ($proposal->reviewers as $reviewer)
-                                            <span class="avatar avatar-xs rounded" title="{{ $reviewer->user?->name }}: {{ $reviewer->status->label() }}">
-                                                {{ $reviewer->user?->initials() }}
+                                            <span class="rounded avatar avatar-xs"
+                                                title="{{ $reviewer->user?->name }}: {{ $reviewer->status->label() }}"
+                                                style="background-image: url({{ $reviewer->user?->profile_picture }})">
                                             </span>
                                         @endforeach
                                     </div>
@@ -56,9 +58,9 @@
                                         @foreach ($proposal->reviewers as $reviewer)
                                             <div class="d-flex align-items-center mb-1">
                                                 @if ($reviewer->isCompleted())
-                                                    <x-lucide-check-circle class="icon icon-sm text-success me-1" />
+                                                    <x-lucide-check-circle class="me-1 text-success icon icon-sm" />
                                                 @else
-                                                    <x-lucide-clock class="icon icon-sm text-warning me-1" />
+                                                    <x-lucide-clock class="me-1 text-warning icon icon-sm" />
                                                 @endif
                                                 <span>{{ $reviewer->user?->name }}</span>
                                             </div>
@@ -73,23 +75,23 @@
                                     $percentage = $totalRev > 0 ? round(($doneRev / $totalRev) * 100) : 0;
                                 @endphp
                                 <div class="d-flex align-items-center">
-                                    <div class="progress progress-xs w-100 me-2">
-                                        <div class="progress-bar bg-{{ $percentage == 100 ? 'success' : 'primary' }}" 
+                                    <div class="me-2 w-100 progress progress-xs">
+                                        <div class="progress-bar bg-{{ $percentage == 100 ? 'success' : 'primary' }}"
                                             x-data :style="'width: ' + {{ $percentage }} + '%'"></div>
                                     </div>
                                     <span class="small">{{ $doneRev }}/{{ $totalRev }}</span>
                                 </div>
                             </td>
                             <td>
-                                <a href="{{ $proposal->detailable_type === 'App\Models\Research' ? route('research.proposal.show', $proposal) : route('community-service.proposal.show', $proposal) }}" 
-                                    class="btn btn-sm btn-outline-primary" wire:navigate.hover>
+                                <a href="{{ $proposal->detailable_type === 'App\Models\Research' ? route('research.proposal.show', $proposal) : route('community-service.proposal.show', $proposal) }}"
+                                    class="btn-outline-primary btn btn-sm" wire:navigate.hover>
                                     Detail
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center py-4">Tidak ada proposal dalam tahap review.</td>
+                            <td colspan="4" class="py-4 text-center">Tidak ada proposal dalam tahap review.</td>
                         </tr>
                     @endforelse
                 </tbody>

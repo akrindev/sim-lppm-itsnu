@@ -7,7 +7,7 @@
     <x-tabler.alert />
 
     <!-- Statistics Cards -->
-    <div class="row row-deck row-cards mb-3">
+    <div class="mb-3 row row-deck row-cards">
         <div class="col-sm-6 col-lg-3">
             <div class="card">
                 <div class="card-body">
@@ -15,7 +15,7 @@
                         <div class="subheader">Total Proposal</div>
                     </div>
                     <div class="d-flex align-items-baseline">
-                        <div class="h1 mb-0 me-2">{{ $this->statusStats['all'] }}</div>
+                        <div class="me-2 mb-0 h1">{{ $this->statusStats['all'] }}</div>
                         <div class="me-auto">
                             <span class="d-inline-flex align-items-center text-secondary lh-1">
                                 Siap ditugaskan
@@ -33,7 +33,7 @@
                         <div class="subheader">Penelitian</div>
                     </div>
                     <div class="d-flex align-items-baseline">
-                        <div class="h1 mb-0 me-2">{{ $this->statusStats['research'] }}</div>
+                        <div class="me-2 mb-0 h1">{{ $this->statusStats['research'] }}</div>
                         <div class="me-auto">
                             <span class="d-inline-flex align-items-center text-blue lh-1">
                                 <x-lucide-microscope class="icon icon-sm" />
@@ -51,7 +51,7 @@
                         <div class="subheader">Pengabdian</div>
                     </div>
                     <div class="d-flex align-items-baseline">
-                        <div class="h1 mb-0 me-2">{{ $this->statusStats['community_service'] }}</div>
+                        <div class="me-2 mb-0 h1">{{ $this->statusStats['community_service'] }}</div>
                         <div class="me-auto">
                             <span class="d-inline-flex align-items-center text-green lh-1">
                                 <x-lucide-hand-heart class="icon icon-sm" />
@@ -69,7 +69,7 @@
                         <div class="subheader">Belum Ditugaskan</div>
                     </div>
                     <div class="d-flex align-items-baseline">
-                        <div class="h1 mb-0 me-2">{{ $this->statusStats['unassigned'] }}</div>
+                        <div class="me-2 mb-0 h1">{{ $this->statusStats['unassigned'] }}</div>
                         <div class="me-auto">
                             <span class="d-inline-flex align-items-center text-yellow lh-1">
                                 <x-lucide-alert-circle class="icon icon-sm" />
@@ -82,7 +82,7 @@
     </div>
 
     <!-- Filter Section -->
-    <div class="row mb-3">
+    <div class="mb-3 row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -137,7 +137,7 @@
     <!-- Proposals Table -->
     <div class="card">
         <div class="table-responsive">
-            <table class="card-table table-vcenter table">
+            <table class="card-table table table-vcenter">
                 <thead>
                     <tr>
                         <th>Judul</th>
@@ -153,7 +153,8 @@
                             <td class="text-wrap">
                                 <div class="text-reset fw-bold">{{ $proposal->title }}</div>
                                 <div class="mt-1">
-                                    <x-tabler.badge variant="outline" class="text-uppercase" style="font-size: 0.65rem;">
+                                    <x-tabler.badge variant="outline" class="text-uppercase"
+                                        style="font-size: 0.65rem;">
                                         {{ $proposal->focusArea?->name ?? '—' }}
                                     </x-tabler.badge>
                                 </div>
@@ -161,12 +162,12 @@
                             <td>
                                 @if ($proposal->detailable_type === 'App\Models\Research')
                                     <x-tabler.badge color="blue" variant="light">
-                                        <x-lucide-microscope class="icon icon-sm me-1" />
+                                        <x-lucide-microscope class="me-1 icon icon-sm" />
                                         Penelitian
                                     </x-tabler.badge>
                                 @else
                                     <x-tabler.badge color="green" variant="light">
-                                        <x-lucide-hand-heart class="icon icon-sm me-1" />
+                                        <x-lucide-hand-heart class="me-1 icon icon-sm" />
                                         Pengabdian
                                     </x-tabler.badge>
                                 @endif
@@ -174,24 +175,36 @@
                             <td>
                                 <div>{{ $proposal->submitter?->name }}</div>
                                 <small class="text-secondary">
-                                    {{ $proposal->submitter?->identity->identity_id }} &middot; {{ $proposal->updated_at?->format('d M Y') }}
+                                    {{ $proposal->submitter?->identity->identity_id }} &middot;
+                                    {{ $proposal->updated_at?->format('d M Y') }}
                                 </small>
                             </td>
                             <td>
-                                <div class="btn-list flex-nowrap">
-                                    @if ($proposal->detailable_type === 'App\Models\Research')
-                                        <a href="{{ route('research.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-primary" wire:navigate.hover>
-                                            <x-lucide-user-plus class="icon" />
-                                            Tugaskan
-                                        </a>
-                                    @else
-                                        <a href="{{ route('community-service.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-primary" wire:navigate.hover>
-                                            <x-lucide-user-plus class="icon" />
-                                            Tugaskan
-                                        </a>
-                                    @endif
+                                @if ($proposal->reviewers->isEmpty())
+                                    <span class="text-danger small">Belum ditugaskan</span>
+                                @else
+                                    <div class="mb-2 avatar-list-stacked avatar-list">
+                                        @foreach ($proposal->reviewers as $reviewer)
+                                            <span class="rounded avatar avatar-xs" title="{{ $reviewer->user?->name }}"
+                                                style="background-image: url({{ $reviewer->user?->profile_picture }})"
+                                                wire:key="rev-{{ $reviewer->id }}">
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                    <div class="text-secondary small">
+                                        @foreach ($proposal->reviewers as $reviewer)
+                                            <div class="mb-1 lh-1">{{ $reviewer->user?->name }}</div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="flex-nowrap btn-list">
+                                    <a href="{{ $proposal->detailable_type === 'App\Models\Research' ? route('research.proposal.show', $proposal) : route('community-service.proposal.show', $proposal) }}"
+                                        class="btn btn-sm btn-primary" wire:navigate.hover>
+                                        <x-lucide-user-plus class="icon" />
+                                        Tugaskan
+                                    </a>
                                 </div>
                             </td>
                         </tr>
