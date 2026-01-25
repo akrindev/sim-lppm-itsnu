@@ -98,7 +98,7 @@
         document.addEventListener('livewire:initialized', () => {
             @this.on('user-deleted', () => {
                 const modal = document.getElementById('confirmUserDeletionModal');
-                const bsModal = bootstrap.Modal.getInstance(modal);
+                const bsModal = window.getBsModal ? window.getBsModal(modal) : (window.bootstrap?.Modal?.getInstance(modal) || window.tabler?.bootstrap?.Modal?.getInstance(modal));
                 if (bsModal) {
                     bsModal.hide();
                 }

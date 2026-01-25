@@ -5,6 +5,30 @@
 <div>
     <x-tabler.alert />
 
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm collapse" id="finalDecisionInfo" role="alert">
+        <div class="d-flex">
+            <div>
+                <x-lucide-info class="alert-icon icon me-2" />
+            </div>
+            <div>
+                <h4 class="alert-title">Panduan Keputusan Final</h4>
+                <div class="text-secondary">
+                    Halaman ini menampilkan usulan yang telah selesai dinilai oleh seluruh reviewer. 
+                    Anda dapat melihat ringkasan rekomendasi reviewer sebelum memberikan keputusan akhir (Diterima / Perlu Revisi / Ditolak). 
+                    Keputusan <strong>Diterima</strong> akan menandai proposal sebagai usulan yang didanai/selesai.
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#finalDecisionInfo" aria-label="Close"></button>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-ghost-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#finalDecisionInfo" aria-expanded="false" aria-controls="finalDecisionInfo">
+            <x-lucide-info class="icon me-1" />
+            Informasi Pengambilan Keputusan
+        </button>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="row row-deck row-cards mb-3">
         <div class="col-sm-6 col-lg-4">
@@ -172,13 +196,13 @@
                                 <div class="btn-list flex-nowrap">
                                     @if ($proposal->detailable_type === 'App\Models\Research')
                                         <a href="{{ route('research.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-primary" wire:navigate>
+                                            class="btn btn-sm btn-primary" wire:navigate.hover>
                                             <x-lucide-eye class="icon" />
                                             Lihat & Proses
                                         </a>
                                     @else
                                         <a href="{{ route('community-service.proposal.show', $proposal) }}"
-                                            class="btn btn-sm btn-primary" wire:navigate>
+                                            class="btn btn-sm btn-primary" wire:navigate.hover>
                                             <x-lucide-eye class="icon" />
                                             Lihat & Proses
                                         </a>

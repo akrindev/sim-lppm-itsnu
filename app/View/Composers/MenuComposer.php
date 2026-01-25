@@ -147,6 +147,12 @@ class MenuComposer
                     ],
                 ],
             ],
+            [
+                'title' => 'Monev Internal',
+                'icon' => 'presentation-analytics',
+                'route' => 'admin-lppm.monev.index',
+                'roles' => ['admin lppm', 'superadmin'],
+            ],
             // Reviewer menu
             [
                 'title' => 'Review Penelitian',

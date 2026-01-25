@@ -105,7 +105,7 @@
                             </td>
                             <td>
                                 <a href="{{ route('research.daily-note.show', $proposal) }}"
-                                    class="btn btn-primary btn-sm" wire:navigate>
+                                    class="btn btn-primary btn-sm" wire:navigate.hover>
                                     <x-lucide-book class="icon me-2" />
                                     Buka Logbook
                                 </a>

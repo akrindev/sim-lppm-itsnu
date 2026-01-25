@@ -120,7 +120,7 @@
                             </td>
                             <td>
                                 <a href="{{ route('research.progress-report.show', $proposal) }}"
-                                    class="btn btn-primary btn-sm" wire:navigate>
+                                    class="btn btn-primary btn-sm" wire:navigate.hover>
                                     <x-lucide-file-edit class="icon" />
                                     {{ $proposal->progressReports->isEmpty() ? 'Buat Laporan' : 'Lihat Laporan' }}
                                 </a>

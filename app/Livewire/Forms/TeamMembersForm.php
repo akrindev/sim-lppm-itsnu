@@ -40,6 +40,16 @@ class TeamMembersForm extends Component
         }
     }
 
+    public function openAddModal(): void
+    {
+        $this->resetMemberForm();
+    }
+
+    public function openDeleteModal(int $index): void
+    {
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-'.$index);
+    }
+
     /**
      * Check if member identity exists in system
      */

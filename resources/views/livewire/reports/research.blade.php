@@ -236,7 +236,7 @@
                                                 <span class="avatar avatar-sm avatar-rounded me-2" style="background-image: url({{ $research->submitter->profile_picture }})"></span>
                                                 <div class="flex-fill">
                                                     <div class="font-weight-medium text-truncate" style="max-width: 500px;" title="{{ $research->title }}">
-                                                        <a href="{{ route('research.proposal.show', $research) }}" class="text-reset" wire:navigate>
+                                                        <a href="{{ route('research.proposal.show', $research) }}" class="text-reset" wire:navigate.hover>
                                                             {{ $research->title }}
                                                         </a>
                                                     </div>

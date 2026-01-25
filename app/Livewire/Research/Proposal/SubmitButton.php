@@ -57,6 +57,11 @@ class SubmitButton extends Component
             ->get();
     }
 
+    public function confirmSubmit(): void
+    {
+        $this->dispatch('open-modal', modalId: 'confirmSubmitModal');
+    }
+
     public function submit(): void
     {
         $proposal = $this->proposal;

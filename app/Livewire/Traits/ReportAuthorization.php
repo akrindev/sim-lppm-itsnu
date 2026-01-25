@@ -14,7 +14,7 @@ trait ReportAuthorization
     {
         $user = Auth::user();
 
-        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor'])) {
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'dekan'])) {
             return $query;
         }
 
@@ -30,6 +30,10 @@ trait ReportAuthorization
     protected function canEditReport(Proposal $proposal): bool
     {
         $user = Auth::user();
+
+        if ($user->hasRole(['admin lppm', 'superadmin'])) {
+            return true;
+        }
 
         return $proposal->submitter_id === $user->id;
     }

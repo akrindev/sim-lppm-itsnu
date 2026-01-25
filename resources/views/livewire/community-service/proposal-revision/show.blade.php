@@ -4,7 +4,7 @@
 <x-slot:pageActions>
     <div class="btn-list">
         <a href="{{ route('community-service.proposal-revision.index') }}" class="btn-outline-secondary btn"
-            wire:navigate>
+            wire:navigate.hover>
             <x-lucide-arrow-left class="icon" />
             Kembali
         </a>
@@ -273,8 +273,8 @@
 
                                     <!-- Scoring Details Table -->
                                     <div class="table-responsive mb-3 border rounded-2">
-                                        <table class="table table-vcenter bg-white mb-0">
-                                            <thead class="bg-light">
+                                        <table class="table table-vcenter mb-0">
+                                            <thead class="bg-body-tertiary">
                                                 <tr>
                                                     <th class="py-2">Kriteria</th>
                                                     <th class="py-2">Catatan Reviewer</th>
@@ -300,7 +300,7 @@
                                                     </tr>
                                                 @endforeach
                                             </tbody>
-                                            <tfoot class="bg-light fw-bold">
+                                            <tfoot class="bg-body-tertiary fw-bold">
                                                 <tr>
                                                     <td colspan="2" class="py-2 text-end">TOTAL:</td>
                                                     <td class="py-2 text-center">
@@ -369,7 +369,7 @@
                                         <div class="p-0 accordion-body">
                                             <div class="divide-y">
                                                 @foreach ($logs as $log)
-                                                    <div class="bg-light p-3">
+                                                    <div class="bg-body-tertiary p-3">
                                                         <div
                                                             class="d-flex align-items-center justify-content-between mb-2">
                                                             <div class="fw-bold small">
@@ -386,9 +386,9 @@
                                                         <!-- History Scores Small Table -->
                                                         <div class="table-responsive mb-2">
                                                             <table
-                                                                class="table table-borderless table-vcenter bg-white mb-0 border rounded"
+                                                                class="table table-borderless table-vcenter mb-0 border rounded"
                                                                 style="font-size: 9pt;">
-                                                                <thead class="bg-light">
+                                                                <thead class="bg-body-tertiary">
                                                                     <tr>
                                                                         <th class="px-2 py-1">Kriteria</th>
                                                                         <th class="px-2 py-1 text-center">Skor</th>
@@ -410,8 +410,7 @@
                                                             </table>
                                                         </div>
 
-                                                        <div
-                                                            class="bg-white p-2 border rounded text-muted italic small">
+                                                        <div class="p-2 border rounded text-muted italic small">
                                                             {{ $log->review_notes }}
                                                         </div>
                                                         <div class="mt-1 text-end">

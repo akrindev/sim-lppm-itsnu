@@ -20,7 +20,7 @@ class BudgetGroupManager extends Component
 
     public ?string $description = null;
 
-    #[Validate('nullable|numeric|min:0|max:100')]
+    #[Validate('nullable|integer|min:0|max:100')]
     public ?string $percentage = null;
 
     public ?int $editingId = null;
@@ -61,7 +61,7 @@ class BudgetGroupManager extends Component
             'code' => $this->code,
             'name' => $this->name,
             'description' => $this->description,
-            'percentage' => $this->percentage ? (float) $this->percentage : null,
+            'percentage' => $this->percentage ? (int) $this->percentage : null,
         ];
 
         if ($this->editingId) {
@@ -86,8 +86,9 @@ class BudgetGroupManager extends Component
         $this->code = $budgetGroup->code;
         $this->name = $budgetGroup->name;
         $this->description = $budgetGroup->description;
-        $this->percentage = $budgetGroup->percentage ? (string) $budgetGroup->percentage : null;
+        $this->percentage = $budgetGroup->percentage ? (string) (int) $budgetGroup->percentage : null;
         $this->modalTitle = 'Edit Kelompok Anggaran';
+        $this->dispatch('open-modal', modalId: 'modal-budget-group');
     }
 
     public function delete(BudgetGroup $budgetGroup): void
@@ -122,12 +123,6 @@ class BudgetGroupManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
-    {
-        $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
-    }
-
     /**
      * Calculate total percentage across all budget groups.
      * Excludes the currently editing group to allow percentage updates.
@@ -146,5 +141,12 @@ class BudgetGroupManager extends Component
         }
 
         return (float) $total;
+    }
+
+    public function confirmDelete(int $id): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = \App\Models\BudgetGroup::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-budget-group');
     }
 }

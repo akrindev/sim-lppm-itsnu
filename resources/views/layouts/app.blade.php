@@ -14,22 +14,26 @@
         {{-- <link href="/preview/css/demo.css" rel="stylesheet" /> --}}
         <!-- END DEMO STYLES -->
         <!-- BEGIN CUSTOM FONT -->
+        <link rel="preconnect" href="https://rsms.me" crossorigin>
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media='all'">
+        <noscript>
+            <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+        </noscript>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <style>
-            @import url("https://rsms.me/inter/inter.css");
-        </style>
         <!-- END CUSTOM FONT -->
     </head>
 
     <body>
         <!-- Toast Container for notifications -->
         <x-tabler.toast-container />
-        
+
         <!-- BEGIN GLOBAL THEME SCRIPT -->
         {{-- @vite(['resources/js/theme-config.js']) --}}
         <!-- END GLOBAL THEME SCRIPT -->
         <div class="page">
-            @include('components.layouts.header')
+            @persist('header')
+                @include('components.layouts.header')
+            @endpersist
             <div class="page-wrapper">
                 <!-- BEGIN PAGE HEADER -->
                 @if (isset($pageTitle))

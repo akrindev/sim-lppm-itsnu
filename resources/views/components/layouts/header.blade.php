@@ -151,7 +151,8 @@
                 <div class="nav-item dropdown">
                     <a href="#" class="d-flex p-0 px-2 nav-link lh-1" data-bs-toggle="dropdown"
                         aria-label="Open user menu">
-                        <span class="avatar avatar-sm" style="background-image: url({{ auth()->user()->profile_picture }})">
+                        <span class="avatar avatar-sm"
+                            style="background-image: url({{ auth()->user()->profile_picture }})">
                             @if (!auth()->user()->getFirstMedia('avatar') && !auth()->user()->identity?->profile_picture)
                                 {{ auth()->user()->initials() }}
                             @endif
@@ -205,8 +206,8 @@
 
                                         @if ($isDropdown)
                                             <li class="nav-item dropdown{{ $isActive ? ' active' : '' }}">
-                                                <a class="nav-link dropdown-toggle{{ $isActive ? ' active' : '' }}" href="#"
-                                                    data-bs-toggle="dropdown"
+                                                <a class="nav-link dropdown-toggle{{ $isActive ? ' active' : '' }}"
+                                                    href="#" data-bs-toggle="dropdown"
                                                     data-bs-auto-close="{{ $menuItem['dropdown']['auto_close'] ?? 'outside' }}"
                                                     role="button" aria-expanded="false">
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
@@ -233,8 +234,8 @@
                                             </li>
                                         @else
                                             <li class="nav-item{{ $isActive ? ' active' : '' }}">
-                                                <a class="nav-link{{ $isActive ? ' active' : '' }}" href="{{ $menuItem['href'] ?? '#' }}"
-                                                    wire:navigate>
+                                                <a class="nav-link{{ $isActive ? ' active' : '' }}"
+                                                    href="{{ $menuItem['href'] ?? '#' }}" wire:navigate.hover>
                                                     <span class="d-lg-inline-block nav-link-icon d-md-none">
                                                         @if (!empty($menuItem['icon']))
                                                             @include(

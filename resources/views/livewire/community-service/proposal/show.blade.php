@@ -4,21 +4,27 @@
 <x-slot:pageActions>
     <div class="btn-list">
         @if (auth()->user()->hasRole('reviewer'))
-            <a href="{{ route('review.community-service') }}" class="btn-outline-secondary btn" wire:navigate>
+            <a href="{{ route('review.community-service') }}" class="btn-outline-secondary btn" wire:navigate.hover>
                 <x-lucide-arrow-left class="icon" />
                 Kembali
             </a>
         @else
-            <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn" wire:navigate>
+            <a href="{{ route('community-service.proposal.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
                 <x-lucide-arrow-left class="icon" />
                 Kembali
             </a>
         @endif
-        @if ($proposal->status->value === 'draft' && $proposal->submitter_id === auth()->id())
-            <a href="{{ route('community-service.proposal.edit', $proposal) }}" wire:navigate class="btn btn-primary">
+        @if ($this->canEdit)
+            <a href="{{ $this->getEditRoute($proposal->id) }}" wire:navigate.hover class="btn btn-primary">
                 <x-lucide-pencil class="icon" />
                 Edit
             </a>
+        @endif
+        @if ($this->canDelete)
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <x-lucide-trash-2 class="icon" />
+                Hapus
+            </button>
         @endif
         <a href="{{ route('proposals.export-pdf', $proposal) }}" target="_blank" class="btn-outline-primary btn">
             <x-lucide-download class="icon" />
@@ -32,29 +38,39 @@
         <x-tabler.alert />
     </div>
 
+    @php
+        $user = auth()->user();
+        $role = 'guest';
+        if ($user->hasRole('reviewer')) $role = 'reviewer';
+        elseif ($user->hasRole('dekan')) $role = 'dekan';
+        elseif ($user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita'])) $role = 'admin';
+        elseif ($user->hasRole('kepala lppm')) $role = 'kepala';
+        elseif ($user->id === $proposal->submitter_id) $role = 'dosen';
+    @endphp
+
+    <div class="col-md-12">
+        @include('livewire.proposals.components.role-info-alert', ['role' => $role])
+    </div>
+
     <!-- Steps Indicator -->
     <div class="mb-3 col-md-12">
         <div class="card">
             <div class="card-body">
                 <ul class="my-4 steps steps-green steps-counter">
                     <li class="step-item" :class="{ 'active': currentStep === 1 }">
-                        <a href="#" @click.prevent="currentStep = 1" class="text-decoration-none">Identitas
-                            Usulan</a>
+                        <a href="#" @click.prevent="currentStep = 1" class="text-decoration-none">Identitas Usulan</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 2 }">
-                        <a href="#" @click.prevent="currentStep = 2" class="text-decoration-none">Substansi
-                            Usulan</a>
+                        <a href="#" @click.prevent="currentStep = 2" class="text-decoration-none">Substansi Usulan</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 3 }">
                         <a href="#" @click.prevent="currentStep = 3" class="text-decoration-none">RAB</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 4 }">
-                        <a href="#" @click.prevent="currentStep = 4" class="text-decoration-none">Dokumen
-                            Pendukung</a>
+                        <a href="#" @click.prevent="currentStep = 4" class="text-decoration-none">Dokumen Pendukung</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 5 }">
-                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Review &
-                            Riwayat</a>
+                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Review & Riwayat</a>
                     </li>
                 </ul>
             </div>
@@ -65,133 +81,7 @@
     <div class="col-md-12">
         <!-- Section 1: Identitas Usulan -->
         <div id="section-identitas" x-show="currentStep === 1">
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">1.1 Informasi Dasar</h3>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3 row">
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-file-text class="me-2 icon" />Judul</label>
-                            <p class="text-reset">{{ $proposal->title }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-info class="me-2 icon" />Status</label>
-                            <p>
-                                <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
-                                    {{ $proposal->status->label() }}
-                                </x-tabler.badge>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-user class="me-2 icon" />Author</label>
-                            <p class="text-reset">{{ $proposal->submitter?->name }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-calendar class="me-2 icon" />Periode Pelaksanaan</label>
-                            <p class="text-reset">
-                                @if ($proposal->start_year && $proposal->duration_in_years)
-                                    {{ $proposal->start_year }} -
-                                    {{ (int) $proposal->start_year + (int) $proposal->duration_in_years - 1 }}
-                                    ({{ $proposal->duration_in_years }} Tahun)
-                                @else
-                                    {{ $proposal->duration_in_years ?? '—' }} Tahun
-                                @endif
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">1.2 Informasi Dasar Proposal</h3>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3 row">
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-focus class="me-2 icon" />Bidang Fokus</label>
-                            <p class="text-reset">{{ $proposal->focusArea?->name ?? '—' }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-tag class="me-2 icon" />Tema</label>
-                            <p class="text-reset">{{ $proposal->theme?->name ?? '—' }}</p>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <div class="col-md-6">
-                            <label class="form-label"><x-lucide-hash class="me-2 icon" />Topik</label>
-                            <p class="text-reset">{{ $proposal->topic?->name ?? '—' }}</p>
-                        </div>
-                        @if ($proposal->nationalPriority)
-                            <div class="col-md-6">
-                                <label class="form-label"><x-lucide-star class="me-2 icon" />Prioritas Nasional</label>
-                                <p class="text-reset">{{ $proposal->nationalPriority->name }}</p>
-                            </div>
-                        @endif
-                    </div>
-
-                    @if ($proposal->sbk_value > 0)
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label"><x-lucide-dollar-sign class="me-2 icon" />Nilai SBK</label>
-                                <p class="text-reset">Rp {{ number_format($proposal->sbk_value, 0, ',', '.') }}</p>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">1.3 Klasifikasi Ilmu</h3>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3 row">
-                        <div class="col-md-4">
-                            <label class="form-label">Level 1</label>
-                            <p class="text-reset">{{ $proposal->clusterLevel1?->name ?? '—' }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Level 2</label>
-                            <p class="text-reset">{{ $proposal->clusterLevel2?->name ?? '—' }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Level 3</label>
-                            <p class="text-reset">{{ $proposal->clusterLevel3?->name ?? '—' }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">1.4 Ringkasan & Masalah Mitra</h3>
-                </div>
-                <div class="card-body">
-                    @php $communityService = $proposal->detailable; @endphp
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Ringkasan Proposal</label>
-                        <p class="text-reset" style="text-align: justify;">{{ $proposal->summary ?? '—' }}</p>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Masalah Mitra</label>
-                        <p class="text-reset" style="text-align: justify;">
-                            {{ $communityService?->partner_issue_summary ?? '—' }}</p>
-                    </div>
-                    <div class="mb-0">
-                        <label class="form-label fw-bold">Solusi yang Ditawarkan</label>
-                        <p class="text-reset" style="text-align: justify;">
-                            {{ $communityService?->solution_offered ?? '—' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Team Members Management -->
+            @include('livewire.community-service.proposal.components.identitas-usulan', ['proposal' => $proposal])
             <div class="mb-3">
                 <livewire:community-service.proposal.team-member-form :proposalId="$proposal->id" :key="'team-form-' . $proposal->id" />
             </div>
@@ -199,673 +89,63 @@
 
         <!-- Section 2: Substansi Usulan -->
         <div id="section-substansi" x-show="currentStep === 2">
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">2.1 Substansi Usulan</h3>
-                </div>
-                <div class="card-body">
-                    @php $communityService = $proposal->detailable; @endphp
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Kelompok Makro Riset</label>
-                            <p class="text-reset">{{ $communityService?->macroResearchGroup?->name ?? '—' }}</p>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">File Substansi</label>
-                            @if ($communityService && $communityService->hasMedia('substance_file'))
-                                @php
-                                    $media = $communityService->getFirstMedia('substance_file');
-                                @endphp
-                                <div class="mb-0 alert alert-info">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <x-lucide-file-text class="me-2 text-primary icon" />
-                                            <strong>{{ $media->name }}</strong>
-                                            <small class="ms-2 text-muted">({{ $media->human_readable_size }})</small>
-                                        </div>
-                                        <a href="{{ $media->getUrl() }}" target="_blank"
-                                            class="btn-outline-primary btn btn-sm">
-                                            <x-lucide-download class="icon" />
-                                            Download
-                                        </a>
-                                    </div>
-                                </div>
-                            @else
-                                <p class="text-muted text-reset">Tidak ada file</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Section 2.2: Luaran Target Capaian --}}
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">2.2 Luaran Target Capaian</h3>
-                </div>
-                <div class="card-body">
-                    <h5 class="mb-2">2.2.1 Luaran Wajib</h5>
-                    @php
-                        $requiredOutputs = $proposal->outputs->where('category', 'Wajib');
-                        $startYear = (int) ($proposal->start_year ?? date('Y'));
-                        $duration = (int) ($proposal->duration_in_years ?? 1);
-                    @endphp
-                    @if ($requiredOutputs->isEmpty())
-                        <p class="text-muted small">Belum ada luaran wajib</p>
-                    @else
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Tahun Ke-</th>
-                                        <th>Kelompok</th>
-                                        <th>Luaran</th>
-                                        <th>Status</th>
-                                        <th>Keterangan (URL)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($requiredOutputs as $output)
-                                        @php
-                                            $outputYear = $output->output_year ?? 1;
-                                            $displayYear = $startYear + $outputYear - 1;
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $outputYear }} ({{ $displayYear }})</td>
-                                            <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
-                                            <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
-                                            <td>{{ $output->target_status }}</td>
-                                            <td>{{ $output->description ?? '-' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
-
-                    <h5 class="mb-2">2.2.2 Luaran Tambahan</h5>
-                    @php
-                        $additionalOutputs = $proposal->outputs->where('category', 'Tambahan');
-                    @endphp
-                    @if ($additionalOutputs->isEmpty())
-                        <p class="text-muted small">Belum ada luaran tambahan</p>
-                    @else
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Tahun Ke-</th>
-                                        <th>Kelompok</th>
-                                        <th>Luaran</th>
-                                        <th>Status</th>
-                                        <th>Keterangan (URL)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($additionalOutputs as $output)
-                                        @php
-                                            $outputYear = $output->output_year ?? 1;
-                                            $displayYear = $startYear + $outputYear - 1;
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $outputYear }} ({{ $displayYear }})</td>
-                                            <td>{{ ucfirst(str_replace('_', ' ', $output->group)) }}</td>
-                                            <td>{{ ucfirst(str_replace('_', ' ', $output->type)) }}</td>
-                                            <td>{{ $output->target_status }}</td>
-                                            <td>{{ $output->description ?? '-' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
-                </div>
-            </div>
+            @include('livewire.community-service.proposal.components.substansi-usulan', ['proposal' => $proposal])
         </div>
 
         <!-- Section 3: RAB -->
         <div id="section-rab" x-show="currentStep === 3">
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">3.1 Rencana Anggaran Biaya (RAB)</h3>
-                </div>
-                @if ($proposal->budgetItems->isEmpty())
-                    <div class="card-body">
-                        <p class="text-muted">Belum ada item anggaran</p>
-                    </div>
-                @else
-                    @php
-                        $startYear = (int) ($proposal->start_year ?? date('Y'));
-                        $duration = (int) ($proposal->duration_in_years ?? 1);
-                        $budgetByYear = $proposal->budgetItems->groupBy('year');
-                    @endphp
-
-                    {{-- Year Summary Cards for Multi-Year Proposals --}}
-                    @if ($duration > 1)
-                        <div class="pb-0 card-body">
-                            <div class="mb-3 row g-2">
-                                @for ($y = 1; $y <= $duration; $y++)
-                                    @php
-                                        $yearTotal = $budgetByYear->get($y, collect())->sum('total_price');
-                                        $actualYear = $startYear + $y - 1;
-                                    @endphp
-                                    <div class="col-auto">
-                                        <div class="card card-sm">
-                                            <div class="px-3 py-2 card-body">
-                                                <div class="text-muted small">Tahun {{ $y }}
-                                                    ({{ $actualYear }})</div>
-                                                <div class="fw-bold">Rp {{ number_format($yearTotal, 0, ',', '.') }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endfor
-                                <div class="col-auto">
-                                    <div class="bg-primary-lt card card-sm">
-                                        <div class="px-3 py-2 card-body">
-                                            <div class="text-muted small">Total Keseluruhan</div>
-                                            <div class="fw-bold">Rp
-                                                {{ number_format($proposal->budgetItems->sum('total_price'), 0, ',', '.') }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="table-responsive">
-                        <table class="card-table table table-bordered">
-                            <thead>
-                                <tr>
-                                    @if ($duration > 1)
-                                        <th style="width: 80px;">Tahun Ke-</th>
-                                    @endif
-                                    <th>Kelompok</th>
-                                    <th>Komponen</th>
-                                    <th>Item</th>
-                                    <th>Satuan</th>
-                                    <th>Volume</th>
-                                    <th class="text-end">Harga Satuan</th>
-                                    <th class="text-end">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($proposal->budgetItems as $item)
-                                    @php
-                                        $itemYear = $item->year ?? 1;
-                                        $displayYear = $startYear + $itemYear - 1;
-                                    @endphp
-                                    <tr>
-                                        @if ($duration > 1)
-                                            <td class="text-center">{{ $itemYear }} ({{ $displayYear }})</td>
-                                        @endif
-                                        <td>{{ $item->budgetGroup?->name ?? ($item->group ?? '-') }}</td>
-                                        <td>{{ $item->budgetComponent?->name ?? ($item->component ?? '-') }}</td>
-                                        <td>{{ $item->item_description ?? '-' }}</td>
-                                        <td><x-tabler.badge>{{ $item->budgetComponent?->unit ?? '-' }}</x-tabler.badge>
-                                        </td>
-                                        <td>{{ $item->volume }}</td>
-                                        <td class="text-end">Rp {{ number_format($item->unit_price, 0, ',', '.') }}
-                                        </td>
-                                        <td class="text-end">Rp {{ number_format($item->total_price, 0, ',', '.') }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="{{ $duration > 1 ? 7 : 6 }}" class="text-end">Total Anggaran:</th>
-                                    <th class="text-end">Rp
-                                        {{ number_format($proposal->budgetItems->sum('total_price'), 0, ',', '.') }}
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                @endif
-            </div>
+            @include('livewire.proposals.proposal-rab', ['proposal' => $proposal])
         </div>
 
         <!-- Section 4: Dokumen Pendukung -->
         <div id="section-dokumen" x-show="currentStep === 4">
-            <div class="mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">4.1 Mitra Kerjasama</h3>
-                </div>
-                <div class="card-body">
-                    @if ($proposal->partners->isEmpty())
-                        <p class="text-muted">Belum ada mitra yang ditambahkan</p>
-                    @else
-                        <div class="table-responsive">
-                            <table class="table table-vcenter">
-                                <thead>
-                                    <tr>
-                                        <th>Nama Mitra</th>
-                                        <th>Institusi</th>
-                                        <th>Email</th>
-                                        <th>Negara</th>
-                                        <th>Alamat</th>
-                                        <th>Tipe</th>
-                                        <th>Surat Kesanggupan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($proposal->partners as $partner)
-                                        <tr>
-                                            <td>
-                                                <div class="font-weight-medium">{{ $partner->name }}</div>
-                                            </td>
-                                            <td>
-                                                @if ($partner->institution)
-                                                    <div class="d-flex align-items-center">
-                                                        <x-lucide-building class="me-1 text-muted icon" />
-                                                        {{ $partner->institution }}
-                                                    </div>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($partner->email)
-                                                    <a href="mailto:{{ $partner->email }}" class="text-reset">
-                                                        <div class="d-flex align-items-center">
-                                                            <x-lucide-mail class="me-1 text-muted icon" />
-                                                            {{ $partner->email }}
-                                                        </div>
-                                                    </a>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($partner->country)
-                                                    <div class="d-flex align-items-center">
-                                                        <x-lucide-map-pin class="me-1 text-muted icon" />
-                                                        {{ $partner->country }}
-                                                    </div>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($partner->address)
-                                                    <div class="text-truncate" style="max-width: 200px;"
-                                                        title="{{ $partner->address }}">
-                                                        {{ $partner->address }}
-                                                    </div>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <x-tabler.badge color="blue">
-                                                    {{ $partner->type ?? 'External' }}
-                                                </x-tabler.badge>
-                                            </td>
-                                            <td>
-                                                @if ($partner->hasMedia('commitment_letter'))
-                                                    <a href="{{ $partner->getFirstMediaUrl('commitment_letter') }}"
-                                                        target="_blank" class="btn btn-sm btn-primary">
-                                                        <x-lucide-download class="icon" />
-                                                        Unduh
-                                                    </a>
-                                                @else
-                                                    <x-tabler.badge color="yellow">
-                                                        <x-lucide-file-x class="me-1 icon" />
-                                                        Tidak Ada
-                                                    </x-tabler.badge>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
-                </div>
-            </div>
+            @include('livewire.proposals.proposal-partners', ['proposal' => $proposal])
         </div>
 
         <!-- Section 5: Workflow & Aksi -->
         <div id="section-workflow" x-show="currentStep === 5">
-            <!-- Reviewer Assignment (Admin Only) -->
-            @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita']) &&
-                    $proposal->status->value === 'under_review')
-                <div class="mb-3">
-                    <livewire:community-service.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
-                </div>
-            @endif
-
-            <!-- Reviewer Form -->
-            <div class="mb-3">
-                <livewire:community-service.proposal.reviewer-form :proposalId="$proposal->id" :key="'reviewer-form-' . $proposal->id" />
-            </div>
-
-            <!-- Dekan Approval (Status: SUBMITTED) -->
-            @if (auth()->user()->hasRole(['dekan']) && $proposal->status->value === 'submitted')
-                <div class="mb-3 card">
-                    <div class="card-header">
-                        <h3 class="card-title">Persetujuan Dekan</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-3 text-secondary">
-                            Silakan tinjau proposal ini dan berikan keputusan Anda sebagai Dekan.
-                        </p>
-                        <div class="gap-2 btn-list">
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                                data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'approved')">
-                                <x-lucide-check class="icon" />
-                                Setujui Proposal
-                            </button>
-                            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'need_fix')">
-                                <x-lucide-alert-triangle class="icon" />
-                                Perlu Perbaikan
-                            </button>
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                data-bs-target="#approvalModal" wire:click="$set('approvalDecision', 'rejected')">
-                                <x-lucide-x class="icon" />
-                                Tolak Proposal
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <!-- Kepala LPPM Initial Approval -->
-            @if (auth()->user()->hasRole(['kepala lppm']) && $proposal->status->value === 'approved')
-                <div class="mb-3">
-                    <livewire:community-service.proposal.kepala-lppm-initial-approval :proposalId="$proposal->id"
-                        :key="'initial-approval-' . $proposal->id" />
-                </div>
-            @endif
-
-            <!-- Kepala LPPM Final Decision -->
-            @if (auth()->user()->hasRole(['kepala lppm']) && $proposal->status->value === 'reviewed')
-                <div class="mb-3">
-                    <livewire:community-service.proposal.kepala-lppm-final-decision :proposalId="$proposal->id"
-                        :key="'final-decision-' . $proposal->id" />
-                </div>
-            @endif
-
-
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <!-- Status & Actions Card -->
-                    <div class="mb-3 h-100 card">
+            @include('livewire.community-service.proposal.components.workflow-actions', ['proposal' => $proposal])
+            
+            <!-- History Section -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
                         <div class="card-header">
-                            <h3 class="card-title">Status & Aksi</h3>
+                            <h3 class="card-title">Riwayat Perubahan Data</h3>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Status Saat Ini</label>
-                                <p>
-                                    <x-tabler.badge :color="$proposal->status->color()" class="fw-normal">
-                                        {{ $proposal->status->label() }}
-                                    </x-tabler.badge>
-                                </p>
-                            </div>
-
-                            @if ($proposal->status->value === 'draft')
-                                <livewire:community-service.proposal.submit-button :proposalId="$proposal->id"
-                                    :key="'submit-button-' . $proposal->id" />
-                            @endif
-
-                            {{-- Accept/Reject for team members --}}
-                            @php
-                                $currentMember = $proposal->teamMembers->firstWhere('id', auth()->id());
-                            @endphp
-                            @if ($currentMember && $currentMember->pivot->status === 'pending')
-                                <div class="d-flex gap-2 mb-3">
-                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                                        data-bs-target="#acceptMemberModal">
-                                        <x-lucide-check class="icon" />
-                                        Terima Undangan
-                                    </button>
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#rejectMemberModal">
-                                        <x-lucide-x class="icon" />
-                                        Tolak Undangan
-                                    </button>
-                                </div>
-                            @endif
-
-                            @if ($this->canDelete && $proposal->submitter_id === auth()->id())
-                                <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal">
-                                    <x-lucide-trash-2 class="icon" />
-                                    Hapus
-                                </button>
-                            @endif
+                            <livewire:proposals.proposal-activity-timeline :proposal="$proposal" />
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <!-- Timeline Card -->
-                    <div class="mb-3 h-100 card">
+                <div class="col-md-6">
+                    <div class="card h-100">
                         <div class="card-header">
-                            <h4 class="mb-0 card-title">Status Proposal</h4>
+                            <h3 class="card-title">Riwayat Status</h3>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Dibuat Pada</label>
-                                <p>{{ $proposal->created_at->format('d M Y H:i') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Terakhir Diperbarui</label>
-                                <p>{{ $proposal->updated_at->format('d M Y H:i') }}</p>
-                            </div>
+                            @include('livewire.proposals.proposal-status-history', ['logs' => $proposal->statusLogs])
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <!-- Review Status Card -->
-                    <div class="mb-3 h-100 card">
-                        <div class="card-header">
-                            <h4 class="mb-0 card-title">Review Status</h4>
-                        </div>
-                        @php $reviewers = $proposal->reviewers; @endphp
-                        @if ($reviewers->isEmpty())
-                            <p class="text-muted">Belum ada reviewer yang ditugaskan</p>
-                        @else
-                            <div class="table-responsive">
-                                <table class="card-table table table-bordered table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Reviewer</th>
-                                            <th>Status</th>
-                                            <th>Tanggal Review</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($reviewers as $reviewer)
-                                            <tr>
-                                                <td>{{ $reviewer->user?->name ?? '-' }}</td>
-                                                <td>
-                                                    <x-tabler.badge :color="$reviewer->status->color()">
-                                                        {{ $reviewer->status->label() }}
-                                                    </x-tabler.badge>
-                                                </td>
-                                                <td>{{ $reviewer->updated_at?->format('d M Y H:i') ?? '-' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Status History Section -->
-            <div class="mt-4 mb-3 card">
-                <div class="card-header">
-                    <h3 class="card-title">Riwayat Status</h3>
-                </div>
-                <div class="card-body">
-                    @if ($proposal->statusLogs->isEmpty())
-                        <p class="text-muted">Belum ada riwayat perubahan status</p>
-                    @else
-                        <div class="timeline">
-                            @foreach ($proposal->statusLogs as $log)
-                                <div class="timeline-item">
-                                    <div class="timeline-content">
-                                        <div class="d-flex align-items-start justify-content-between mb-2">
-                                            <div>
-                                                <strong>{{ $log->status_before?->label() ?? '—' }}</strong>
-                                                <x-lucide-arrow-right class="mx-2 icon"
-                                                    style="width: 1rem; height: 1rem;" />
-                                                <strong>{{ $log->status_after->label() }}</strong>
-                                            </div>
-                                            <small class="text-muted">{{ $log->at->format('d M Y H:i') }}</small>
-                                        </div>
-                                        <p class="mb-1 text-secondary">
-                                            Oleh: <strong>{{ $log->user?->name ?? '—' }}</strong>
-                                        </p>
-                                        @if ($log->notes)
-                                            <p class="mb-0 text-secondary">
-                                                Catatan: {{ $log->notes }}
-                                            </p>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
+        <!-- Navigation Buttons -->
+        <div class="mt-4">
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn" @click="currentStep--" x-show="currentStep > 1">
+                    <x-lucide-arrow-left class="icon" />
+                    Kembali
+                </button>
+                <div x-show="currentStep === 1"></div>
+                <button type="button" class="btn btn-primary" @click="currentStep++" x-show="currentStep < 5">
+                    Selanjutnya
+                    <x-lucide-arrow-right class="icon" />
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Navigation Buttons -->
-    <div class="mt-4">
-        <div class="d-flex justify-content-between">
-            <button type="button" class="btn" @click="currentStep--" x-show="currentStep > 1">
-                <x-lucide-arrow-left class="icon" />
-                Kembali
-            </button>
-            <div x-show="currentStep === 1"></div>
-            <button type="button" class="btn btn-primary" @click="currentStep++" x-show="currentStep < 5">
-                Selanjutnya
-                <x-lucide-arrow-right class="icon" />
-            </button>
-        </div>
-    </div>
-
-
-    <!-- Delete Modal -->
-    @if ($proposal->status->value !== 'completed' && $proposal->submitter_id === auth()->id())
-        @teleport('body')
-            <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
-                <x-slot:body>
-                    <div class="py-1 text-center">
-                        <x-lucide-alert-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
-                        <h3>Hapus Proposal?</h3>
-                        <div class="text-secondary">
-                            Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan.
-                        </div>
-                    </div>
-                </x-slot:body>
-
-                <x-slot:footer>
-                    <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
-                        Batal
-                    </button>
-                    <button type="button" wire:click="delete" class="btn btn-danger" data-bs-dismiss="modal">
-                        Ya, Hapus Proposal
-                    </button>
-                </x-slot:footer>
-            </x-tabler.modal>
-        @endteleport
-    @endif
-
-    <!-- Accept Member Confirmation Modal -->
-    @teleport('body')
-        <x-tabler.modal id="acceptMemberModal" title="Terima Undangan?" wire:ignore.self>
-            <x-slot:body>
-                <div class="py-1 text-center">
-                    <x-lucide-check-circle class="mb-2 text-success icon" style="width: 3rem; height: 3rem;" />
-                    <h3>Terima Undangan?</h3>
-                    <div class="text-secondary">
-                        Apakah Anda yakin ingin menerima undangan sebagai anggota tim proposal ini?
-                    </div>
-                </div>
-            </x-slot:body>
-
-            <x-slot:footer>
-                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
-                    Batal
-                </button>
-                <button type="button" wire:click="acceptMember" class="btn btn-success" data-bs-dismiss="modal"
-                    onclick="setTimeout(() => window.location.reload(), 3000)">
-                    Ya, Terima
-                </button>
-            </x-slot:footer>
-        </x-tabler.modal>
-    @endteleport
-
-    <!-- Reject Member Confirmation Modal -->
-    @teleport('body')
-        <x-tabler.modal id="rejectMemberModal" title="Tolak Undangan?" wire:ignore.self>
-            <x-slot:body>
-                <div class="py-1 text-center">
-                    <x-lucide-x-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
-                    <h3>Tolak Undangan?</h3>
-                    <div class="text-secondary">
-                        Apakah Anda yakin ingin menolak undangan sebagai anggota tim proposal ini?
-                    </div>
-                </div>
-            </x-slot:body>
-
-            <x-slot:footer>
-                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
-                    Batal
-                </button>
-                <button type="button" wire:click="rejectMember" class="btn btn-danger" data-bs-dismiss="modal"
-                    onclick="setTimeout(() => window.location.reload(), 3000)">
-                    Ya, Tolak
-                </button>
-            </x-slot:footer>
-        </x-tabler.modal>
-    @endteleport
-
-    <!-- Approval Modal (Dekan Decision) -->
-    @teleport('body')
-        <x-tabler.modal id="approvalModal" title="Keputusan Dekan" wire:ignore.self>
-            <x-slot:body>
-                <div class="py-1">
-                    <div class="mb-3 text-center">
-                        @if ($approvalDecision === 'approved')
-                            <x-lucide-check-circle class="mb-2 text-success icon" style="width: 3rem; height: 3rem;" />
-                            <h3>Setujui Proposal?</h3>
-                        @elseif($approvalDecision === 'need_fix')
-                            <x-lucide-alert-triangle class="mb-2 text-warning icon" style="width: 3rem; height: 3rem;" />
-                            <h3>Perlu Perbaikan?</h3>
-                        @elseif($approvalDecision === 'rejected')
-                            <x-lucide-x-circle class="mb-2 text-danger icon" style="width: 3rem; height: 3rem;" />
-                            <h3>Tolak Proposal?</h3>
-                        @endif
-                        <div class="text-secondary">
-                            Apakah Anda yakin dengan keputusan ini?
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Catatan (Opsional)</label>
-                        <textarea class="form-control" wire:model="approvalNotes" rows="3"
-                            placeholder="Masukkan catatan atau alasan jika ada..."></textarea>
-                    </div>
-                </div>
-            </x-slot:body>
-
-            <x-slot:footer>
-                <button type="button" class="btn-outline-secondary btn" data-bs-dismiss="modal">
-                    Batal
-                </button>
-                <button type="button" wire:click="submitDekanDecision" class="btn btn-primary" data-bs-dismiss="modal">
-                    Ya, Konfirmasi
-                </button>
-            </x-slot:footer>
-        </x-tabler.modal>
-    @endteleport
+    @include('livewire.proposals.components.modals', ['proposal' => $proposal])
 </div>

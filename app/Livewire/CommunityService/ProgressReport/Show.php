@@ -202,7 +202,7 @@ class Show extends Component
         $this->js("
             const modal = document.getElementById('modalMandatoryOutput');
             if (modal) {
-                const bsModal = bootstrap.Modal.getInstance(modal) || tabler?.Modal?.getInstance(modal);
+                const bsModal = window.getBsModal ? window.getBsModal(modal) : (window.bootstrap?.Modal?.getInstance(modal) || window.tabler?.bootstrap?.Modal?.getInstance(modal));
                 if (bsModal) bsModal.hide();
             }
         ");
@@ -227,7 +227,7 @@ class Show extends Component
         $this->js("
             const modal = document.getElementById('modalAdditionalOutput');
             if (modal) {
-                const bsModal = bootstrap.Modal.getInstance(modal) || tabler?.Modal?.getInstance(modal);
+                const bsModal = window.getBsModal ? window.getBsModal(modal) : (window.bootstrap?.Modal?.getInstance(modal) || window.tabler?.bootstrap?.Modal?.getInstance(modal));
                 if (bsModal) bsModal.hide();
             }
         ");

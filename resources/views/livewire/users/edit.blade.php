@@ -3,7 +3,7 @@
     <x-slot:pageTitle>Edit Pengguna</x-slot:pageTitle>
     <x-slot:pageSubtitle>Perbarui profil pengguna dan penetapan peran.</x-slot:pageSubtitle>
     <x-slot:pageActions>
-        <a href="{{ route('users.show', $this->user) }}" class="btn-outline-secondary btn" wire:navigate>
+        <a href="{{ route('users.show', $this->user) }}" class="btn-outline-secondary btn" wire:navigate.hover>
             Lihat profil
         </a>
     </x-slot:pageActions>
@@ -235,7 +235,7 @@
 
         <div class="d-flex align-items-center justify-content-between card-footer" x-data="{ show: false }"
             x-on:user-updated.window="console.log('updated');show = true; setTimeout(() => show = false, 5000);">
-            <a href="{{ route('users.show', $this->user) }}" class="btn btn-link" wire:navigate>
+            <a href="{{ route('users.show', $this->user) }}" class="btn btn-link" wire:navigate.hover>
                 Batal
             </a>
             <div x-show="show" class="text-green fw-bold">

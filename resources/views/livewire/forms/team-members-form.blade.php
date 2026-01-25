@@ -34,8 +34,7 @@
                                     @endif
                                 </td>
                                 <td class="text-end align-middle">
-                                    <button type="button" data-bs-toggle="modal"
-                                        data-bs-target="#modal-confirm-delete-{{ $index }}"
+                                    <button type="button" wire:click="openDeleteModal({{ $index }})"
                                         class="btn-outline-danger btn btn-sm" title="Hapus">
                                         <x-lucide-trash-2 class="icon" />
                                     </button>
@@ -49,7 +48,7 @@
     @endif
 
     <!-- Add Button -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-add-member">
+    <button type="button" class="btn btn-primary" wire:click="openAddModal" data-bs-toggle="modal" data-bs-target="#modal-add-member">
         <x-lucide-plus class="icon" />
         Tambah Anggota
     </button>
@@ -60,7 +59,7 @@
 
     <!-- Add Member Modal -->
     @teleport('body')
-        <x-tabler.modal id="modal-add-member" :title="$modalTitle" on-show="resetMemberForm">
+        <x-tabler.modal id="modal-add-member" :title="$modalTitle" on-show="resetMemberForm" component-id="{{ $this->getId() }}">
             <x-slot:body>
                 <div class="mb-3">
                     <label class="form-label" for="member_nidn">NIDN / NIP <span class="text-danger">*</span></label>
@@ -155,7 +154,7 @@
     @if (!empty($members))
         @foreach ($members as $index => $member)
             @teleport('body')
-                <x-tabler.modal id="modal-confirm-delete-{{ $index }}" title="Konfirmasi Hapus">
+                <x-tabler.modal id="modal-confirm-delete-{{ $index }}" title="Konfirmasi Hapus" component-id="{{ $this->getId() }}">
                     <x-slot:body>
                         <div class="text-center">
                             <div class="mb-3">

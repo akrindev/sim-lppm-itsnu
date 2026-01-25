@@ -19,7 +19,7 @@ class NationalPriorityManager extends Component
 
     public string $modalTitle = 'Prioritas Nasional';
 
-    public ?string $deleteItemId = null;
+    public ?int $deleteItemId = null;
 
     public string $deleteItemName = '';
 
@@ -61,6 +61,7 @@ class NationalPriorityManager extends Component
         $this->editingId = $nationalPriority->id;
         $this->name = $nationalPriority->name;
         $this->modalTitle = 'Edit Prioritas Nasional';
+        $this->dispatch('open-modal', modalId: 'modal-national-priority');
     }
 
     public function delete(NationalPriority $nationalPriority): void
@@ -95,9 +96,10 @@ class NationalPriorityManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(string|int $id, string $name): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\NationalPriority::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-national-priority');
     }
 }

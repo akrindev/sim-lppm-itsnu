@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Abstracts;
 
-use App\Enums\ProposalStatus;
 use App\Livewire\Forms\ProposalForm;
 use App\Livewire\Traits\WithApproval;
 use App\Livewire\Traits\WithTeamManagement;
@@ -79,13 +78,27 @@ abstract class ProposalShow extends Component
     #[Computed]
     public function canEdit(): bool
     {
-        return $this->proposal->status === ProposalStatus::DRAFT;
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        if ($user->hasRole(['admin lppm', 'superadmin'])) {
+            return true;
+        }
+
+        return $this->proposal->status === \App\Enums\ProposalStatus::DRAFT
+            && $this->proposal->submitter_id === $user->id;
     }
 
     #[Computed]
     public function canDelete(): bool
     {
-        return $this->proposal->status === ProposalStatus::DRAFT;
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        if ($user->hasRole(['admin lppm', 'superadmin'])) {
+            return true;
+        }
+
+        return $this->proposal->status === \App\Enums\ProposalStatus::DRAFT
+            && $this->proposal->submitter_id === $user->id;
     }
 
     public function render()

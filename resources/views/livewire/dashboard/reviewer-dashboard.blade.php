@@ -52,7 +52,7 @@
                                             </div>
                                         </div>
                                         <a href="{{ route($review->proposal->detailable_type === 'App\Models\Research' ? 'research.proposal.show' : 'community-service.proposal.show', $review->proposal) }}" 
-                                            class="btn btn-sm btn-danger shadow-sm" wire:navigate>
+                                            class="btn btn-sm btn-danger shadow-sm" wire:navigate.hover>
                                             Review
                                         </a>
                                     </div>
@@ -77,7 +77,7 @@
                                             </div>
                                         </div>
                                         <a href="{{ route($review->proposal->detailable_type === 'App\Models\Research' ? 'research.proposal.show' : 'community-service.proposal.show', $review->proposal) }}" 
-                                            class="btn btn-sm btn-warning shadow-sm" wire:navigate>
+                                            class="btn btn-sm btn-warning shadow-sm" wire:navigate.hover>
                                             Mulai
                                         </a>
                                     </div>
@@ -102,7 +102,7 @@
                                             </div>
                                         </div>
                                         <a href="{{ route($review->proposal->detailable_type === 'App\Models\Research' ? 'research.proposal.show' : 'community-service.proposal.show', $review->proposal) }}" 
-                                            class="btn btn-sm btn-info shadow-sm" wire:navigate>
+                                            class="btn btn-sm btn-info shadow-sm" wire:navigate.hover>
                                             Proses
                                         </a>
                                     </div>
@@ -199,7 +199,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Tugas Penelitian (Butuh Review)</h3>
                             <div class="card-actions">
-                                <a href="{{ route('review.research') }}" class="btn btn-link btn-sm" wire:navigate>Lihat Semua</a>
+                                <a href="{{ route('review.research') }}" class="btn btn-link btn-sm" wire:navigate.hover>Lihat Semua</a>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -231,7 +231,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('research.proposal.show', $research) }}" class="btn btn-white btn-icon shadow-sm" title="Buka Proposal" wire:navigate>
+                                                <a href="{{ route('research.proposal.show', $research) }}" class="btn btn-white btn-icon shadow-sm" title="Buka Proposal" wire:navigate.hover>
                                                     <x-lucide-external-link class="icon text-primary" />
                                                 </a>
                                             </td>
@@ -250,7 +250,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Tugas PKM (Butuh Review)</h3>
                             <div class="card-actions">
-                                <a href="{{ route('review.community-service') }}" class="btn btn-link btn-sm" wire:navigate>Lihat Semua</a>
+                                <a href="{{ route('review.community-service') }}" class="btn btn-link btn-sm" wire:navigate.hover>Lihat Semua</a>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -282,7 +282,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('community-service.proposal.show', $pkm) }}" class="btn btn-white btn-icon shadow-sm" title="Buka Proposal" wire:navigate>
+                                                <a href="{{ route('community-service.proposal.show', $pkm) }}" class="btn btn-white btn-icon shadow-sm" title="Buka Proposal" wire:navigate.hover>
                                                     <x-lucide-external-link class="icon text-primary" />
                                                 </a>
                                             </td>

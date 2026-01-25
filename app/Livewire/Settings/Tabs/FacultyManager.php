@@ -77,6 +77,7 @@ class FacultyManager extends Component
         $this->code = $faculty->code;
         $this->institutionId = $faculty->institution_id;
         $this->modalTitle = 'Edit Fakultas';
+        $this->dispatch('open-modal', modalId: 'modal-faculty');
     }
 
     public function delete(Faculty $faculty): void
@@ -111,9 +112,10 @@ class FacultyManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\Faculty::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-faculty');
     }
 }

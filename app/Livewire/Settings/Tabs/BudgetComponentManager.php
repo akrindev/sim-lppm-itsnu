@@ -86,6 +86,7 @@ class BudgetComponentManager extends Component
         $this->unit = $budgetComponent->unit;
         $this->description = $budgetComponent->description;
         $this->modalTitle = 'Edit Komponen Anggaran';
+        $this->dispatch('open-modal', modalId: 'modal-budget-component');
     }
 
     public function delete(BudgetComponent $budgetComponent): void
@@ -120,9 +121,10 @@ class BudgetComponentManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\BudgetComponent::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-budget-component');
     }
 }

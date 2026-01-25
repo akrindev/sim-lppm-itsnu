@@ -16,6 +16,12 @@ class ProposalTemplate extends Component
 
     public $community_service_template;
 
+    public $monev_berita_acara_template;
+
+    public $monev_borang_template;
+
+    public $monev_rekap_penilaian_template;
+
     public function saveResearchTemplate()
     {
         $this->validate([
@@ -58,6 +64,63 @@ class ProposalTemplate extends Component
         $this->toastSuccess($message);
     }
 
+    public function saveMonevBeritaAcaraTemplate()
+    {
+        $this->validate([
+            'monev_berita_acara_template' => 'required|file|mimes:doc,docx,pdf|max:10240',
+        ]);
+
+        $setting = Setting::firstOrCreate(['key' => 'monev_berita_acara_template']);
+        $setting->clearMediaCollection('template');
+        $setting->addMedia($this->monev_berita_acara_template->getRealPath())
+            ->usingName($this->monev_berita_acara_template->getClientOriginalName())
+            ->usingFileName($this->monev_berita_acara_template->getClientOriginalName())
+            ->toMediaCollection('template');
+
+        $this->monev_berita_acara_template = null;
+        unset($this->monevBeritaAcaraTemplateMedia);
+
+        $this->toastSuccess('Template Berita Acara Monev berhasil diunggah.');
+    }
+
+    public function saveMonevBorangTemplate()
+    {
+        $this->validate([
+            'monev_borang_template' => 'required|file|mimes:doc,docx,pdf|max:10240',
+        ]);
+
+        $setting = Setting::firstOrCreate(['key' => 'monev_borang_template']);
+        $setting->clearMediaCollection('template');
+        $setting->addMedia($this->monev_borang_template->getRealPath())
+            ->usingName($this->monev_borang_template->getClientOriginalName())
+            ->usingFileName($this->monev_borang_template->getClientOriginalName())
+            ->toMediaCollection('template');
+
+        $this->monev_borang_template = null;
+        unset($this->monevBorangTemplateMedia);
+
+        $this->toastSuccess('Template Borang Monev berhasil diunggah.');
+    }
+
+    public function saveMonevRekapPenilaianTemplate()
+    {
+        $this->validate([
+            'monev_rekap_penilaian_template' => 'required|file|mimes:doc,docx,pdf|max:10240',
+        ]);
+
+        $setting = Setting::firstOrCreate(['key' => 'monev_rekap_penilaian_template']);
+        $setting->clearMediaCollection('template');
+        $setting->addMedia($this->monev_rekap_penilaian_template->getRealPath())
+            ->usingName($this->monev_rekap_penilaian_template->getClientOriginalName())
+            ->usingFileName($this->monev_rekap_penilaian_template->getClientOriginalName())
+            ->toMediaCollection('template');
+
+        $this->monev_rekap_penilaian_template = null;
+        unset($this->monevRekapPenilaianTemplateMedia);
+
+        $this->toastSuccess('Template Rekap Penilaian Monev berhasil diunggah.');
+    }
+
     public function downloadResearchTemplate()
     {
         $setting = Setting::where('key', 'research_proposal_template')->first();
@@ -80,6 +143,33 @@ class ProposalTemplate extends Component
         $this->toastError($message);
     }
 
+    public function downloadMonevBeritaAcaraTemplate()
+    {
+        $setting = Setting::where('key', 'monev_berita_acara_template')->first();
+        if ($setting && $setting->hasMedia('template')) {
+            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
+        }
+        $this->toastError('Template belum tersedia.');
+    }
+
+    public function downloadMonevBorangTemplate()
+    {
+        $setting = Setting::where('key', 'monev_borang_template')->first();
+        if ($setting && $setting->hasMedia('template')) {
+            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
+        }
+        $this->toastError('Template belum tersedia.');
+    }
+
+    public function downloadMonevRekapPenilaianTemplate()
+    {
+        $setting = Setting::where('key', 'monev_rekap_penilaian_template')->first();
+        if ($setting && $setting->hasMedia('template')) {
+            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
+        }
+        $this->toastError('Template belum tersedia.');
+    }
+
     #[Computed]
     public function researchTemplateMedia()
     {
@@ -92,6 +182,30 @@ class ProposalTemplate extends Component
     public function communityServiceTemplateMedia()
     {
         $setting = Setting::where('key', 'community_service_proposal_template')->first();
+
+        return $setting ? $setting->getFirstMedia('template') : null;
+    }
+
+    #[Computed]
+    public function monevBeritaAcaraTemplateMedia()
+    {
+        $setting = Setting::where('key', 'monev_berita_acara_template')->first();
+
+        return $setting ? $setting->getFirstMedia('template') : null;
+    }
+
+    #[Computed]
+    public function monevBorangTemplateMedia()
+    {
+        $setting = Setting::where('key', 'monev_borang_template')->first();
+
+        return $setting ? $setting->getFirstMedia('template') : null;
+    }
+
+    #[Computed]
+    public function monevRekapPenilaianTemplateMedia()
+    {
+        $setting = Setting::where('key', 'monev_rekap_penilaian_template')->first();
 
         return $setting ? $setting->getFirstMedia('template') : null;
     }

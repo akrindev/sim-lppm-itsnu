@@ -31,13 +31,12 @@
                             <td>{{ $item->description ?? '-' }}</td>
                             <td>
                                 <div class="btn-list">
-                                    <button type="button" class="btn-outline-warning btn btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#modal-budget-component" wire:click="edit({{ $item->id }})">
+                                    <button type="button" class="btn-outline-warning btn btn-sm"
+                                        wire:click="edit({{ $item->id }})">
                                         Edit
                                     </button>
-                                    <button type="button" class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#modal-confirm-delete"
-                                        wire:click="confirmDelete({{ $item->id }}, '{{ $item->name }}')">
+                                    <button type="button" class="btn-outline-danger btn btn-sm"
+                                        wire:click="confirmDelete({{ $item->id }})" wire:loading.attr="disabled">
                                         Hapus
                                     </button>
                                 </div>
@@ -51,68 +50,65 @@
             {{ $budgetComponents->links() }}
         </div>
     </div>
-    @teleport('body')
-        <x-tabler.modal id="modal-budget-component" :title="$modalTitle" onHide="resetForm">
-            <x-slot:body>
-                <form wire:submit="save" id="form-budget-component">
-                    <div class="mb-3">
-                        <label class="form-label">Kelompok Anggaran</label>
-                        <select wire:model="budgetGroupId" class="form-select">
-                            <option value="">Pilih Kelompok</option>
-                            @foreach ($budgetGroups as $group)
-                                <option value="{{ $group->id }}">{{ $group->code }} - {{ $group->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('budgetGroupId')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Kode</label>
-                        <input type="text" wire:model="code" class="form-control" placeholder="Contoh: 1.1, 1.2">
-                        @error('code')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nama</label>
-                        <input type="text" wire:model="name" class="form-control" placeholder="Nama komponen">
-                        @error('name')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Unit</label>
-                        <input type="text" wire:model="unit" class="form-control"
-                            placeholder="Contoh: pcs, pack, liter, orang">
-                        @error('unit')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Deskripsi (Opsional)</label>
-                        <textarea wire:model="description" class="form-control" rows="3" placeholder="Deskripsi komponen"></textarea>
-                        @error('description')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </form>
-            </x-slot:body>
-            <x-slot:footer>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" form="form-budget-component" class="btn btn-primary">Simpan</button>
-            </x-slot:footer>
-        </x-tabler.modal>
 
-        <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
-            <x-slot:body>
-                <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
-            </x-slot:body>
-            <x-slot:footer>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
-                    data-bs-dismiss="modal">Ya, Hapus</button>
-            </x-slot:footer>
-        </x-tabler.modal>
-    @endteleport
+
+
+    <x-tabler.modal-confirmation wire:key="modal-confirm-delete-budget-component"
+        id="modal-confirm-delete-budget-component" title="Konfirmasi Hapus"
+        message="Apakah Anda yakin ingin menghapus {{ $deleteItemName ?? '' }}?" confirm-text="Ya, Hapus"
+        cancel-text="Batal" component-id="{{ $this->getId() }}" on-confirm="handleConfirmDeleteAction" />
+    <x-tabler.modal wire:key="modal-budget-component" id="modal-budget-component" :title="$modalTitle" onHide="resetForm"
+        component-id="{{ $this->getId() }}">
+        <x-slot:body>
+            <form wire:submit="save" id="form-budget-component">
+                <div class="mb-3">
+                    <label class="form-label">Kelompok Anggaran</label>
+                    <select wire:model="budgetGroupId" class="form-select">
+                        <option value="">Pilih Kelompok</option>
+                        @foreach ($budgetGroups as $group)
+                            <option value="{{ $group->id }}">{{ $group->code }} - {{ $group->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('budgetGroupId')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kode</label>
+                    <input type="text" wire:model="code" class="form-control" placeholder="Contoh: 1.1, 1.2">
+                    @error('code')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="name" class="form-control" placeholder="Nama komponen">
+                    @error('name')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Unit</label>
+                    <input type="text" wire:model="unit" class="form-control"
+                        placeholder="Contoh: pcs, pack, liter, orang">
+                    @error('unit')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi (Opsional)</label>
+                    <textarea wire:model="description" class="form-control" rows="3" placeholder="Deskripsi komponen"></textarea>
+                    @error('description')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-budget-component" class="btn btn-primary" wire:loading.class="btn-loading"
+                wire:target="save">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
+
 </div>

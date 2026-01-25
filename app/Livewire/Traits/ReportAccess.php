@@ -47,8 +47,9 @@ trait ReportAccess
     protected function canView(): bool
     {
         $user = Auth::user();
+        // dd($user->getRoleNames());
 
-        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor'])) {
+        if ($user->hasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'dekan'])) {
             return true;
         }
 

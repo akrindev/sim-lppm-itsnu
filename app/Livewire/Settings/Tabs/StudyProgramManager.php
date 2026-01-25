@@ -17,6 +17,9 @@ class StudyProgramManager extends Component
     #[Validate('required|min:3|max:255')]
     public string $name = '';
 
+    #[Validate('required|min:2|max:10')]
+    public string $code = '';
+
     #[Validate('required|exists:institutions,id')]
     public ?int $institutionId = null;
 
@@ -42,8 +45,19 @@ class StudyProgramManager extends Component
 
     public function create(): void
     {
-        $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
+        $this->reset(['name', 'code', 'institutionId', 'facultyId', 'editingId']);
         $this->modalTitle = 'Tambah Program Studi';
+    }
+
+    public function edit(StudyProgram $studyProgram): void
+    {
+        $this->editingId = $studyProgram->id;
+        $this->name = $studyProgram->name;
+        $this->code = $studyProgram->code;
+        $this->institutionId = $studyProgram->institution_id;
+        $this->facultyId = $studyProgram->faculty_id;
+        $this->modalTitle = 'Edit Program Studi';
+        $this->dispatch('open-modal', modalId: 'modal-study-program');
     }
 
     public function save(): void
@@ -52,6 +66,7 @@ class StudyProgramManager extends Component
 
         $data = [
             'name' => $this->name,
+            'code' => $this->code,
             'institution_id' => $this->institutionId,
             'faculty_id' => $this->facultyId,
         ];
@@ -66,19 +81,10 @@ class StudyProgramManager extends Component
 
         // close modal
         $this->dispatch('close-modal', modalId: 'modal-study-program');
-        $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
+        $this->reset(['name', 'code', 'institutionId', 'facultyId', 'editingId']);
 
         session()->flash('success', $message);
         $this->toastSuccess($message);
-    }
-
-    public function edit(StudyProgram $studyProgram): void
-    {
-        $this->editingId = $studyProgram->id;
-        $this->name = $studyProgram->name;
-        $this->institutionId = $studyProgram->institution_id;
-        $this->facultyId = $studyProgram->faculty_id;
-        $this->modalTitle = 'Edit Program Studi';
     }
 
     public function delete(StudyProgram $studyProgram): void
@@ -93,7 +99,7 @@ class StudyProgramManager extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['name', 'institutionId', 'facultyId', 'editingId']);
+        $this->reset(['name', 'code', 'institutionId', 'facultyId', 'editingId']);
     }
 
     public function handleConfirmDeleteAction(): void
@@ -113,9 +119,10 @@ class StudyProgramManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\StudyProgram::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-study-program');
     }
 }

@@ -72,6 +72,7 @@ class ThemeManager extends Component
         $this->name = $theme->name;
         $this->focusAreaId = $theme->focus_area_id;
         $this->modalTitle = 'Edit Tema';
+        $this->dispatch('open-modal', modalId: 'modal-theme');
     }
 
     public function delete(Theme $theme): void
@@ -106,9 +107,10 @@ class ThemeManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\Theme::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-theme');
     }
 }

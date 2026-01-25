@@ -4,6 +4,7 @@ namespace App\Livewire\Settings\Tabs;
 
 use App\Livewire\Concerns\HasToast;
 use App\Models\BudgetCap;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -21,10 +22,10 @@ class BudgetCapManager extends Component
     #[Validate('required|integer|min:2000|max:2100')]
     public string $year = '';
 
-    #[Validate('nullable|numeric|min:0')]
+    #[Validate('nullable|integer|min:0')]
     public ?string $research_budget_cap = null;
 
-    #[Validate('nullable|numeric|min:0')]
+    #[Validate('nullable|integer|min:0')]
     public ?string $community_service_budget_cap = null;
 
     public ?int $editingId = null;
@@ -40,7 +41,7 @@ class BudgetCapManager extends Component
      */
     public function mount(): void
     {
-        if (! auth()->user()->hasRole('admin lppm')) {
+        if (! Auth::user()->hasRole('admin lppm')) {
             abort(403, 'Hanya Admin LPPM yang dapat mengakses pengaturan anggaran.');
         }
     }
@@ -77,8 +78,8 @@ class BudgetCapManager extends Component
 
         $data = [
             'year' => (int) $this->year,
-            'research_budget_cap' => $this->research_budget_cap ? (float) $this->research_budget_cap : null,
-            'community_service_budget_cap' => $this->community_service_budget_cap ? (float) $this->community_service_budget_cap : null,
+            'research_budget_cap' => $this->research_budget_cap ? (int) $this->research_budget_cap : null,
+            'community_service_budget_cap' => $this->community_service_budget_cap ? (int) $this->community_service_budget_cap : null,
         ];
 
         if ($this->editingId) {
@@ -101,9 +102,10 @@ class BudgetCapManager extends Component
     {
         $this->editingId = $budgetCap->id;
         $this->year = (string) $budgetCap->year;
-        $this->research_budget_cap = $budgetCap->research_budget_cap ? (string) $budgetCap->research_budget_cap : null;
-        $this->community_service_budget_cap = $budgetCap->community_service_budget_cap ? (string) $budgetCap->community_service_budget_cap : null;
+        $this->research_budget_cap = $budgetCap->research_budget_cap ? (string) (int) $budgetCap->research_budget_cap : null;
+        $this->community_service_budget_cap = $budgetCap->community_service_budget_cap ? (string) (int) $budgetCap->community_service_budget_cap : null;
         $this->modalTitle = 'Edit Pengaturan Anggaran';
+        $this->dispatch('open-modal', modalId: 'modal-budget-cap');
     }
 
     public function delete(BudgetCap $budgetCap): void
@@ -138,9 +140,10 @@ class BudgetCapManager extends Component
         $this->reset(['deleteItemId', 'deleteItemYear']);
     }
 
-    public function confirmDelete(int $id, string $year): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemYear = $year;
+        $this->deleteItemYear = (string) \App\Models\BudgetCap::find($id)?->year ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-budget-cap');
     }
 }

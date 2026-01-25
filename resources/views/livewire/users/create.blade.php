@@ -3,7 +3,7 @@
     <x-slot:pageTitle>Tambah Pengguna Baru</x-slot:pageTitle>
     <x-slot:pageSubtitle>Tambahkan pengguna baru ke sistem dengan informasi lengkap.</x-slot:pageSubtitle>
     <x-slot:pageActions>
-        <a href="{{ route('users.index') }}" class="btn-outline-secondary btn" wire:navigate>
+        <a href="{{ route('users.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
             Kembali ke daftar pengguna
         </a>
     </x-slot:pageActions>

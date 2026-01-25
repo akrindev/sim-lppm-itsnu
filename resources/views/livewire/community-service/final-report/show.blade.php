@@ -4,7 +4,7 @@
     if (modalId) {
         const modalEl = document.getElementById(modalId);
         if (modalEl) {
-            const modal = bootstrap.Modal.getInstance(modalEl);
+            const modal = window.getBsModal ? window.getBsModal(modalEl) : (window.bootstrap?.Modal?.getInstance(modalEl) || window.tabler?.bootstrap?.Modal?.getInstance(modalEl));
             if (modal) modal.hide();
         }
     }
@@ -13,7 +13,7 @@
     <x-slot:pageTitle>Laporan Akhir</x-slot:pageTitle>
     <x-slot:pageSubtitle>{{ $proposal->title }}</x-slot:pageSubtitle>
     <x-slot:pageActions>
-        <a href="{{ route('community-service.final-report.index') }}" class="btn-outline-secondary btn" wire:navigate>
+        <a href="{{ route('community-service.final-report.index') }}" class="btn-outline-secondary btn" wire:navigate.hover>
             <x-lucide-arrow-left class="icon" />
             Kembali
         </a>

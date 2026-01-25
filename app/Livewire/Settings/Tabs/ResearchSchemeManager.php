@@ -70,6 +70,7 @@ class ResearchSchemeManager extends Component
         $this->name = $researchScheme->name;
         $this->strata = $researchScheme->strata;
         $this->modalTitle = 'Edit Skema Penelitian';
+        $this->dispatch('open-modal', modalId: 'modal-research-scheme');
     }
 
     public function delete(ResearchScheme $researchScheme): void
@@ -104,9 +105,10 @@ class ResearchSchemeManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\ResearchScheme::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-research-scheme');
     }
 }

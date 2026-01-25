@@ -34,6 +34,7 @@ class FocusAreaManager extends Component
     {
         $this->reset(['name', 'editingId']);
         $this->modalTitle = 'Tambah Area Fokus';
+        $this->dispatch('open-modal', modalId: 'modal-focus-area');
     }
 
     public function save(): void
@@ -61,6 +62,7 @@ class FocusAreaManager extends Component
         $this->editingId = $focusArea->id;
         $this->name = $focusArea->name;
         $this->modalTitle = 'Edit Area Fokus';
+        $this->dispatch('open-modal', modalId: 'modal-focus-area');
     }
 
     public function delete(FocusArea $focusArea): void
@@ -95,9 +97,10 @@ class FocusAreaManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\FocusArea::find($id)?->name ?? '';
+        $this->dispatch('open-modal', modalId: 'modal-confirm-delete-focus-area');
     }
 }
