@@ -71,7 +71,7 @@ class BudgetCapManager extends Component
             ->exists();
 
         if ($exists) {
-            $this->addError('year', 'Pengaturan anggaran untuk tahun ' . $this->year . ' sudah ada.');
+            $this->addError('year', 'Pengaturan anggaran untuk tahun '.$this->year.' sudah ada.');
 
             return;
         }

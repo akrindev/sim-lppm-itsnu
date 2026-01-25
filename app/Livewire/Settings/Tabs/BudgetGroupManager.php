@@ -52,7 +52,7 @@ class BudgetGroupManager extends Component
         $totalPercentage = $this->calculateTotalPercentage();
 
         if ($totalPercentage > 100) {
-            $this->addError('percentage', 'Total persentase semua kelompok anggaran tidak boleh melebihi 100%. Saat ini: ' . number_format($totalPercentage, 2) . '%');
+            $this->addError('percentage', 'Total persentase semua kelompok anggaran tidak boleh melebihi 100%. Saat ini: '.number_format($totalPercentage, 2).'%');
 
             return;
         }
