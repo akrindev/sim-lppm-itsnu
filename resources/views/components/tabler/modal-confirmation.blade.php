@@ -30,7 +30,7 @@
     };
 @endphp
 
-<x-tabler.modal :id="$id" :title="$title" :wire-ignore="$wireIgnore" :component-id="$componentId" :on-show="$onConfirm"
+<x-tabler.modal :id="$id" :title="$title" :wire-ignore="$wireIgnore" :component-id="$componentId"
     :on-hide="$onCancel" size="sm" centered="true" close-button="true" class="modal-confirmation">
     <x-slot name="body">
         <div class="d-flex">
@@ -59,10 +59,7 @@
             {{ $cancelText }}
         </button>
         <button type="button" class="btn btn-{{ $variant }}" data-bs-dismiss="modal"
-            @if ($onConfirm && $componentId) x-on:click="
-                    const component = window.Livewire?.find('{{ $componentId }}');
-                    component?.call('{{ $onConfirm }}');
-                " @endif>
+            @if ($onConfirm) wire:click="{{ $onConfirm }}" @endif>
             {{ $confirmText }}
         </button>
     </x-slot>

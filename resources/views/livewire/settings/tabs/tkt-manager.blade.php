@@ -110,8 +110,8 @@
                                                 <x-lucide-pencil class="icon" style="width: 12px; height: 12px;" />
                                             </button>
                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                wire:click="deleteCategory('{{ $type }}')"
-                                                wire:confirm="Hapus kategori '{{ $type }}' beserta semua level dan indikatornya?"
+                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-tkt-category"
+                                                wire:click="confirmDeleteCategory('{{ $type }}')"
                                                 title="Hapus">
                                                 <x-lucide-trash-2 class="icon" style="width: 12px; height: 12px;" />
                                             </button>
@@ -317,8 +317,9 @@
                                                                 <x-lucide-pencil class="icon" />
                                                             </button>
                                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                                wire:click="deleteIndicator({{ $indicator->id }})"
-                                                                wire:confirm="Hapus indikator ini?" title="Hapus">
+                                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-tkt-indicator"
+                                                                wire:click="confirmDeleteIndicator({{ $indicator->id }}, '{{ $indicator->indicator }}')"
+                                                                title="Hapus">
                                                                 <x-lucide-trash-2 class="icon" />
                                                             </button>
                                                         </div>
@@ -403,4 +404,17 @@
             background-color: var(--tblr-danger-bg-subtle);
         }
     </style>
+
+    
+
+    
+@teleport('body')
+<x-tabler.modal-confirmation id="modal-confirm-delete-tkt-category" title="Konfirmasi Hapus Kategori"
+        message="Apakah Anda yakin ingin menghapus kategori {{ $deleteType ?? '' }} beserta semua level dan indikatornya?"
+        confirm-text="Ya, Hapus" cancel-text="Batal" component-id="{{ $this->getId() }}"
+        on-confirm="handleConfirmDeleteCategory" />
+<x-tabler.modal-confirmation id="modal-confirm-delete-tkt-indicator" title="Konfirmasi Hapus Indikator"
+        message="Apakah Anda yakin ingin menghapus indikator ini?" confirm-text="Ya, Hapus" cancel-text="Batal"
+        component-id="{{ $this->getId() }}" on-confirm="handleConfirmDeleteIndicator" />
+@endteleport
 </div>

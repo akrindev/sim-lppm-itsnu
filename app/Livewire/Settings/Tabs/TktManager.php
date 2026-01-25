@@ -57,6 +57,40 @@ class TktManager extends Component
 
     public string $categoryNameInput = '';
 
+    public string $deleteType = '';
+
+    public ?int $deleteIndicatorId = null;
+
+    public string $deleteIndicatorName = '';
+
+    public function confirmDeleteCategory(string $type): void
+    {
+        $this->deleteType = $type;
+    }
+
+    public function handleConfirmDeleteCategory(): void
+    {
+        if ($this->deleteType) {
+            $this->deleteCategory($this->deleteType);
+            $this->deleteType = '';
+        }
+    }
+
+    public function confirmDeleteIndicator(int $id, string $name): void
+    {
+        $this->deleteIndicatorId = $id;
+        $this->deleteIndicatorName = $name;
+    }
+
+    public function handleConfirmDeleteIndicator(): void
+    {
+        if ($this->deleteIndicatorId) {
+            $this->deleteIndicator($this->deleteIndicatorId);
+            $this->deleteIndicatorId = null;
+            $this->deleteIndicatorName = '';
+        }
+    }
+
     public function mount(): void
     {
         // Auto-expand and select first type if none selected

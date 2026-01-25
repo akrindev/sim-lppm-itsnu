@@ -118,8 +118,8 @@
                                                 <x-lucide-pencil class="icon" style="width: 12px; height: 12px;" />
                                             </button>
                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                wire:click="deleteCluster({{ $level1->id }})"
-                                                wire:confirm="Hapus cluster '{{ $level1->name }}' beserta semua sub-cluster?"
+                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
+                                                wire:click="confirmDelete({{ $level1->id }})"
                                                 title="Hapus">
                                                 <x-lucide-trash-2 class="icon" style="width: 12px; height: 12px;" />
                                             </button>
@@ -197,8 +197,8 @@
                                                                     style="width: 10px; height: 10px;" />
                                                             </button>
                                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                                wire:click="deleteCluster({{ $level2->id }})"
-                                                                wire:confirm="Hapus cluster '{{ $level2->name }}'?"
+                                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
+                                                                wire:click="confirmDelete({{ $level2->id }})"
                                                                 title="Hapus">
                                                                 <x-lucide-trash-2 class="icon"
                                                                     style="width: 10px; height: 10px;" />
@@ -262,8 +262,8 @@
                                                                         </button>
                                                                         <button type="button"
                                                                             class="btn btn-ghost-danger btn-sm p-1"
-                                                                            wire:click="deleteCluster({{ $level3->id }})"
-                                                                            wire:confirm="Hapus cluster '{{ $level3->name }}'?"
+                                                                            data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
+                                                                            wire:click="confirmDelete({{ $level3->id }})"
                                                                             title="Hapus">
                                                                             <x-lucide-trash-2 class="icon"
                                                                                 style="width: 9px; height: 9px;" />
@@ -389,8 +389,8 @@
                                                                 <x-lucide-pencil class="icon" />
                                                             </button>
                                                             <button type="button" class="btn btn-ghost-danger btn-sm p-1"
-                                                                wire:click="deleteCluster({{ $child->id }})"
-                                                                wire:confirm="Hapus cluster '{{ $child->name }}'?"
+                                                                data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-science-cluster"
+                                                                wire:click="confirmDelete({{ $child->id }})"
                                                                 title="Hapus">
                                                                 <x-lucide-trash-2 class="icon" />
                                                             </button>
@@ -487,4 +487,12 @@
             background-color: var(--tblr-danger-bg-subtle);
         }
     </style>
+
+    
+@teleport('body')
+<x-tabler.modal-confirmation id="modal-confirm-delete-science-cluster" title="Konfirmasi Hapus"
+        message="Apakah Anda yakin ingin menghapus {{ $deleteItemName ?? '' }}? Tindakan ini akan menghapus semua sub-cluster di bawahnya."
+        confirm-text="Ya, Hapus" cancel-text="Batal" component-id="{{ $this->getId() }}"
+        on-confirm="handleConfirmDeleteAction" />
+@endteleport
 </div>

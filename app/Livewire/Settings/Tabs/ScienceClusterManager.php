@@ -40,6 +40,25 @@ class ScienceClusterManager extends Component
 
     public ?int $newClusterParentId = null;
 
+    public ?int $deleteItemId = null;
+
+    public string $deleteItemName = '';
+
+    public function confirmDelete(int $id): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = ScienceCluster::find($id)?->name ?? '';
+    }
+
+    public function handleConfirmDeleteAction(): void
+    {
+        if ($this->deleteItemId) {
+            $this->deleteCluster($this->deleteItemId);
+            $this->deleteItemId = null;
+            $this->deleteItemName = '';
+        }
+    }
+
     public function mount(): void
     {
         // Auto-select first level 1 cluster if none selected

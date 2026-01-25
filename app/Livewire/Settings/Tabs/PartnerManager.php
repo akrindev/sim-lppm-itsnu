@@ -109,9 +109,9 @@ class PartnerManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(string $id, string $name): void
+    public function confirmDelete(string $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\Partner::find($id)?->name ?? '';
     }
 }

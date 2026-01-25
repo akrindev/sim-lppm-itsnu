@@ -106,9 +106,11 @@ class ThemeManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
+    
+
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
+        $this->deleteItemName = \App\Models\Theme::find($id)?->name ?? '';
     }
 }

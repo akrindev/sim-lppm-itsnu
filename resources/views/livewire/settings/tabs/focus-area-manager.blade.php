@@ -27,9 +27,8 @@
                                         data-bs-target="#modal-focus-area" wire:click="edit('{{ $item->id }}')">
                                         Edit
                                     </button>
-                                    <button type="button" class="btn-outline-danger btn btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#modal-confirm-delete"
-                                        wire:click="confirmDelete('{{ $item->id }}', '{{ $item->name }}')">
+                                    <button type="button" class="btn-outline-danger btn btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#modal-confirm-delete-focus-area" wire:click="confirmDelete('{{ $item->id }}')">
                                         Hapus
                                     </button>
                                 </div>
@@ -43,34 +42,36 @@
             {{ $focusAreas->links() }}
         </div>
     </div>
-    @teleport('body')
-        <x-tabler.modal id="modal-focus-area" :title="$modalTitle" onHide="resetForm">
-            <x-slot:body>
-                <form wire:submit="save" id="form-focus-area">
-                    <div class="mb-3">
-                        <label class="form-label">Nama</label>
-                        <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
-                        @error('name')
-                            <div class="d-block invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </form>
-            </x-slot:body>
-            <x-slot:footer>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" form="form-focus-area" class="btn btn-primary">Simpan</button>
-            </x-slot:footer>
-        </x-tabler.modal>
 
-        <x-tabler.modal id="modal-confirm-delete" title="Konfirmasi Hapus">
-            <x-slot:body>
-                <p>Apakah Anda yakin ingin menghapus <strong>{{ $deleteItemName ?? '' }}</strong>?</p>
-            </x-slot:body>
-            <x-slot:footer>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" wire:click="handleConfirmDeleteAction"
-                    data-bs-dismiss="modal">Ya, Hapus</button>
-            </x-slot:footer>
-        </x-tabler.modal>
-    @endteleport
+    
+
+    
+@teleport('body')
+<x-tabler.modal-confirmation
+        id="modal-confirm-delete-focus-area"
+        title="Konfirmasi Hapus"
+        message="Apakah Anda yakin ingin menghapus {{ $deleteItemName ?? '' }}?"
+        confirm-text="Ya, Hapus"
+        cancel-text="Batal"
+        component-id="{{ $this->getId() }}"
+        on-confirm="handleConfirmDeleteAction"
+    />
+<x-tabler.modal id="modal-focus-area" :title="$modalTitle" onHide="resetForm">
+        <x-slot:body>
+            <form wire:submit="save" id="form-focus-area">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" wire:model="name" class="form-control" placeholder="Enter name">
+                    @error('name')
+                        <div class="d-block invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </form>
+        </x-slot:body>
+        <x-slot:footer>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" form="form-focus-area" class="btn btn-primary">Simpan</button>
+        </x-slot:footer>
+    </x-tabler.modal>
+@endteleport
 </div>

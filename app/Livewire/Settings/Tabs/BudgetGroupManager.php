@@ -122,11 +122,7 @@ class BudgetGroupManager extends Component
         $this->reset(['deleteItemId', 'deleteItemName']);
     }
 
-    public function confirmDelete(int $id, string $name): void
-    {
-        $this->deleteItemId = $id;
-        $this->deleteItemName = $name;
-    }
+    
 
     /**
      * Calculate total percentage across all budget groups.
@@ -146,5 +142,11 @@ class BudgetGroupManager extends Component
         }
 
         return (float) $total;
+    }
+
+    public function confirmDelete(int $id): void
+    {
+        $this->deleteItemId = $id;
+        $this->deleteItemName = \App\Models\BudgetGroup::find($id)?->name ?? '';
     }
 }

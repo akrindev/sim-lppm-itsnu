@@ -138,9 +138,9 @@ class BudgetCapManager extends Component
         $this->reset(['deleteItemId', 'deleteItemYear']);
     }
 
-    public function confirmDelete(int $id, string $year): void
+    public function confirmDelete(int $id): void
     {
         $this->deleteItemId = $id;
-        $this->deleteItemYear = $year;
+        $this->deleteItemYear = (string) \App\Models\BudgetCap::find($id)?->year ?? '';
     }
 }
