@@ -293,20 +293,6 @@
                                                 wire:navigate.hover>
                                                 <x-lucide-eye class="icon" />
                                             </a>
-                                            {{-- @if ($proposal->status->value === 'draft')
-                                                <a href="#" class="btn btn-icon btn-ghost-info" title="Edit">
-                                                    <x-lucide-pencil class="icon" />
-                                                </a>
-                                            @endif --}}
-                                            @if (
-                                                $proposal->status->value === 'draft' &&
-                                                    (auth()->user()->hasRole('admin lppm') || $proposal->submitter_id === auth()->id()))
-                                                <button type="button" class="btn btn-icon btn-ghost-danger"
-                                                    title="Hapus"
-                                                    wire:click="confirmDeleteProposal('{{ $proposal->id }}')">
-                                                    <x-lucide-trash-2 class="icon" />
-                                                </button>
-                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -332,10 +318,5 @@
             </div>
         </div>
 
-        <!-- Delete Proposal Confirmation Modal -->
-        <x-tabler.modal-confirmation id="deleteProposalModal" title="Hapus Proposal?"
-            message="Apakah Anda yakin ingin menghapus proposal ini? Tindakan ini tidak dapat dibatalkan."
-            confirm-text="Ya, Hapus Proposal" cancel-text="Batal" variant="danger" icon="trash"
-            component-id="{{ $this->getId() }}" on-confirm="deleteProposal" on-cancel="cancelDeleteProposal" />
     </div>
 </div>

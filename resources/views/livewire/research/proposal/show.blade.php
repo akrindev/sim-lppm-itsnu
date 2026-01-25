@@ -20,6 +20,12 @@
                 Edit
             </a>
         @endif
+        @if ($this->canDelete)
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <x-lucide-trash-2 class="icon" />
+                Hapus
+            </button>
+        @endif
         <a href="{{ route('proposals.export-pdf', $proposal) }}" target="_blank" class="btn-outline-primary btn">
             <x-lucide-download class="icon" />
             Unduh Proposal (PDF)

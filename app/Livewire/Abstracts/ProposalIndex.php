@@ -16,8 +16,6 @@ abstract class ProposalIndex extends Component
     use WithFilters;
     use WithPagination;
 
-    public string $confirmingDeleteProposalId = '';
-
     private ?ProposalService $proposalService = null;
 
     public function mount(): void
@@ -79,52 +77,4 @@ abstract class ProposalIndex extends Component
     {
         return view($this->getViewName());
     }
-
-    public function confirmDeleteProposal(string $proposalId): void
-    {
-        $this->confirmingDeleteProposalId = $proposalId;
-        $this->dispatch('open-modal', modalId: 'deleteProposalModal');
-    }
-
-    public function cancelDeleteProposal(): void
-    {
-        $this->confirmingDeleteProposalId = '';
-    }
-
-    public function prepareConfirmation(): void
-    {
-        // Required by modal-confirmation component
-    }
-
-    public function cleanupConfirmation(): void
-    {
-        $this->cancelDeleteProposal();
-    }
-
-    public function deleteProposal(?string $proposalId = null): void
-    {
-        $id = $proposalId ?: $this->confirmingDeleteProposalId;
-        $proposal = \App\Models\Proposal::findOrFail($id);
-
-        if ($proposal->detailable_type !== match ($this->getProposalType()) {
-            'research' => \App\Models\Research::class,
-            'community-service' => \App\Models\CommunityService::class,
-        }) {
-            abort(404);
-        }
-
-        if (! $this->canDeleteProposal($proposal)) {
-            abort(403);
-        }
-
-        app(\App\Services\ProposalService::class)->deleteProposal($proposal);
-
-        $message = 'Proposal berhasil dihapus.';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
-        $this->dispatch('proposal-deleted');
-        $this->cancelDeleteProposal();
-    }
-
-    abstract protected function canDeleteProposal(\App\Models\Proposal $proposal): bool;
 }

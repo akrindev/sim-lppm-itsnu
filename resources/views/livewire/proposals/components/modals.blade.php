@@ -1,6 +1,6 @@
 <div>
     <!-- Delete Modal -->
-    @if ($proposal->status->value !== 'completed' && $proposal->submitter_id === auth()->id())
+    @if ($this->canDelete)
         @teleport('body')
             <x-tabler.modal id="deleteModal" title="Hapus Proposal?" wire:ignore.self>
                 <x-slot:body>

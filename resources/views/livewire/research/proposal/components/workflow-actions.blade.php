@@ -98,7 +98,7 @@
                         </div>
                     @endif
 
-                    @if ($this->canDelete && $proposal->submitter_id === auth()->id())
+                    @if ($this->canDelete)
                         <button type="button" class="btn-outline-danger btn" data-bs-toggle="modal"
                             data-bs-target="#deleteModal">
                             <x-lucide-trash-2 class="icon" />
