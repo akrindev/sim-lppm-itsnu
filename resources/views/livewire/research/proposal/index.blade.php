@@ -28,6 +28,112 @@
 <div>
     <x-tabler.alert />
 
+    <!-- Status Stats -->
+    <div class="row row-cards mb-3">
+        <div class="col-sm-6 col-lg-2">
+            <div class="card card-sm border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-primary text-white avatar">
+                                <x-lucide-list class="icon" />
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="font-weight-medium">{{ $this->statusStats['total'] }}</div>
+                            <div class="text-secondary small">Total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card card-sm border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-secondary text-white avatar">
+                                <x-lucide-file-text class="icon" />
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="font-weight-medium">{{ $this->statusStats['by_status']['draft'] ?? 0 }}</div>
+                            <div class="text-secondary small">Draft</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card card-sm border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-info text-white avatar">
+                                <x-lucide-send class="icon" />
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="font-weight-medium">{{ $this->statusStats['by_status']['submitted'] ?? 0 }}</div>
+                            <div class="text-secondary small">Diajukan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card card-sm border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-success text-white avatar">
+                                <x-lucide-check-circle class="icon" />
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="font-weight-medium">{{ $this->statusStats['by_status']['approved'] ?? 0 }}</div>
+                            <div class="text-secondary small">Disetujui</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card card-sm border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-danger text-white avatar">
+                                <x-lucide-x-circle class="icon" />
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="font-weight-medium">{{ $this->statusStats['by_status']['rejected'] ?? 0 }}</div>
+                            <div class="text-secondary small">Ditolak</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <div class="card card-sm border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="bg-azure text-white avatar">
+                                <x-lucide-award class="icon" />
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="font-weight-medium">{{ $this->statusStats['by_status']['completed'] ?? 0 }}</div>
+                            <div class="text-secondary small">Selesai</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Role-based Tabs (only for regular dosen users) -->
     @unless (auth()->user()->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
         <div class="mb-3">

@@ -50,10 +50,42 @@ class ProposalService
     {
         $type = $filters['type'] ?? 'research';
 
+        // Sanitize type
+        $type = in_array($type, ['research', 'community-service']) ? $type : 'research';
+
         $query = $this->getBaseProposalQuery($type);
+        $user = Auth::user();
+
+        // Security & Role-based filtering
+        if ($user->activeHasRole('dosen')) {
+            $role = $filters['role'] ?? 'ketua';
+            if (! in_array($role, ['ketua', 'anggota'])) {
+                $role = 'ketua';
+            }
+            $this->applyRoleFilter($query, $role);
+        } elseif ($user->activeHasRole('reviewer')) {
+            $this->applyRoleFilter($query, 'reviewer');
+        } elseif ($user->activeHasRole('dekan')) {
+            $facultyId = $user->identity?->faculty_id;
+            $query->whereHas('submitter.identity', function ($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+
+            if (isset($filters['role']) && $filters['role'] !== '') {
+                $this->applyRoleFilter($query, (string) $filters['role']);
+            }
+        } else {
+            // Admin roles
+            if (isset($filters['role']) && $filters['role'] !== '') {
+                $role = (string) $filters['role'];
+                if (in_array($role, ['submitter', 'ketua', 'team_member', 'anggota', 'reviewer'])) {
+                    $this->applyRoleFilter($query, $role);
+                }
+            }
+        }
 
         if (isset($filters['search']) && $filters['search'] !== '') {
-            $search = $filters['search'];
+            $search = (string) $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhereHas('submitter', function ($sq) use ($search) {
@@ -66,22 +98,24 @@ class ProposalService
         }
 
         if (isset($filters['status']) && $filters['status'] !== '') {
-            $query->where('status', $filters['status']);
+            $statusValue = (string) $filters['status'];
+            // Validate status against ProposalStatus enum values
+            if (in_array($statusValue, array_column(ProposalStatus::cases(), 'value'))) {
+                $query->where('status', $statusValue);
+            }
         }
 
         if (isset($filters['year']) && $filters['year'] !== '') {
-            $year = $filters['year'];
-            $query->where(function ($q) use ($year) {
-                $q->where('start_year', $year)
-                    ->orWhere(function ($sq) use ($year) {
-                        $sq->whereNull('start_year')
-                            ->whereYear('created_at', $year);
-                    });
-            });
-        }
-
-        if (isset($filters['role']) && $filters['role'] !== '') {
-            $this->applyRoleFilter($query, $filters['role']);
+            $year = (int) $filters['year'];
+            if ($year > 2000 && $year < 2100) {
+                $query->where(function ($q) use ($year) {
+                    $q->where('start_year', $year)
+                        ->orWhere(function ($sq) use ($year) {
+                            $sq->whereNull('start_year')
+                                ->whereYear('created_at', $year);
+                        });
+                });
+            }
         }
 
         return $query->latest()->paginate(15);
@@ -102,6 +136,25 @@ class ProposalService
     {
         $type = $filters['type'] ?? 'research';
         $query = $this->getBaseProposalQuery($type);
+        $user = Auth::user();
+
+        // Apply restrictions to stats as well
+        if ($user->activeHasRole('dosen')) {
+            // For stats, we might want to show based on current active role filter or combined?
+            // Usually, tabs show stats for that specific tab.
+            $role = $filters['role'] ?? 'ketua';
+            if (! in_array($role, ['ketua', 'anggota'])) {
+                $role = 'ketua';
+            }
+            $this->applyRoleFilter($query, $role);
+        } elseif ($user->activeHasRole('reviewer')) {
+            $this->applyRoleFilter($query, 'reviewer');
+        } elseif ($user->activeHasRole('dekan')) {
+            $facultyId = $user->identity?->faculty_id;
+            $query->whereHas('submitter.identity', function ($q) use ($facultyId) {
+                $q->where('faculty_id', $facultyId);
+            });
+        }
 
         $totalCount = $query->count();
 

@@ -14,17 +14,37 @@ class ReviewerAssignment extends Component
 {
     use WithPagination;
 
-    #[Url]
+    #[Url(history: true)]
     public string $search = '';
 
-    #[Url]
+    #[Url(history: true)]
     public string $typeFilter = 'all';
 
-    #[Url]
+    #[Url(history: true)]
     public string $yearFilter = '';
 
-    #[Url]
+    #[Url(history: true)]
     public string $assignmentFilter = 'all'; // all, assigned, unassigned
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedTypeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedYearFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedAssignmentFilter(): void
+    {
+        $this->resetPage();
+    }
 
     public function resetFilters(): void
     {
@@ -59,19 +79,26 @@ class ReviewerAssignment extends Component
                 'reviewers.user',
             ])
             ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('title', 'like', "%{$this->search}%")
-                        ->orWhere('summary', 'like', "%{$this->search}%");
+                $search = (string) $this->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('summary', 'like', "%{$search}%");
                 });
             })
             ->when($this->typeFilter !== 'all', function ($query) {
-                $detailableType = $this->typeFilter === 'research'
-                    ? \App\Models\Research::class
-                    : \App\Models\CommunityService::class;
-                $query->where('detailable_type', $detailableType);
+                $type = (string) $this->typeFilter;
+                if (in_array($type, ['research', 'community_service'])) {
+                    $detailableType = $type === 'research'
+                        ? \App\Models\Research::class
+                        : \App\Models\CommunityService::class;
+                    $query->where('detailable_type', $detailableType);
+                }
             })
             ->when($this->yearFilter, function ($query) {
-                $query->whereYear('created_at', $this->yearFilter);
+                $year = (int) $this->yearFilter;
+                if ($year > 2000 && $year < 2100) {
+                    $query->whereYear('created_at', $year);
+                }
             })
             ->when($this->assignmentFilter === 'assigned', function ($query) {
                 $query->has('reviewers');
