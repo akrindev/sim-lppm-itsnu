@@ -25,9 +25,21 @@
     <noscript>
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     </noscript>
+
+    <style>
+        /* Fix installer page overflow - allow scrolling when content is taller than viewport */
+        .page-installer {
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+    </style>
 </head>
 
-<body class="d-flex flex-column">
+<body class="d-flex flex-column" style="min-height: auto;">
     {{ $slot }}
 
     @livewireScripts

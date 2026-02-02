@@ -102,6 +102,11 @@ class DatabaseConfigForm extends Form
             'DB_DATABASE' => $this->database,
             'DB_USERNAME' => $this->username,
             'DB_PASSWORD' => $this->password,
+            'DB_CHARSET' => 'utf8mb4',
+            'DB_COLLATION' => 'utf8mb4_unicode_ci',
+            'DB_PREFIX' => '',
+            'DB_STRICT' => 'true',
+            'DB_ENGINE' => '',
         ];
     }
 }

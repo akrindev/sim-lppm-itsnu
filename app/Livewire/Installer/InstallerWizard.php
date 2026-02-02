@@ -19,6 +19,9 @@ class InstallerWizard extends Component
 
     public int $totalSteps = 5;
 
+    /** @var array<int, bool> Track which steps have been completed */
+    public array $completedSteps = [];
+
     public DatabaseConfigForm $databaseForm;
 
     public InstitutionSetupForm $institutionForm;
@@ -28,6 +31,8 @@ class InstallerWizard extends Component
     public array $environmentChecks = [];
 
     public bool $environmentPassed = false;
+
+    public bool $databaseTested = false;
 
     public array $installationProgress = [
         'percent' => 0,
@@ -66,10 +71,18 @@ class InstallerWizard extends Component
 
     public function nextStep(): void
     {
-        if ($this->currentStep < $this->totalSteps) {
-            $this->validateCurrentStep();
-            $this->currentStep++;
+        if ($this->currentStep >= $this->totalSteps) {
+            return;
         }
+
+        // Validate current step before proceeding
+        if (! $this->validateAndCheckCurrentStep()) {
+            return;
+        }
+
+        // Mark current step as completed
+        $this->completedSteps[$this->currentStep] = true;
+        $this->currentStep++;
     }
 
     public function previousStep(): void
@@ -81,8 +94,8 @@ class InstallerWizard extends Component
 
     public function goToStep(int $step): void
     {
-        // Only allow going to completed steps or next step
-        if ($step <= $this->currentStep || $step === $this->currentStep + 1) {
+        // Only allow going to completed steps or current step
+        if ($step <= $this->currentStep && ($step === 1 || isset($this->completedSteps[$step - 1]))) {
             $this->currentStep = $step;
         }
     }
@@ -92,20 +105,79 @@ class InstallerWizard extends Component
         $result = $this->databaseForm->testConnection();
 
         if ($result['success']) {
+            $this->databaseTested = true;
             $this->dispatch('notify', type: 'success', message: $result['message']);
         } else {
+            $this->databaseTested = false;
             $this->dispatch('notify', type: 'error', message: $result['message']);
         }
     }
 
-    public function validateCurrentStep(): void
+    /**
+     * Validate current step and return true if can proceed.
+     */
+    protected function validateAndCheckCurrentStep(): bool
     {
-        match ($this->currentStep) {
-            2 => $this->databaseForm->validate(),
-            3 => $this->institutionForm->validate(),
-            4 => $this->adminForm->validate(),
-            default => null,
+        return match ($this->currentStep) {
+            1 => $this->validateEnvironmentStep(),
+            2 => $this->validateDatabaseStep(),
+            3 => $this->validateInstitutionStep(),
+            4 => $this->validateAdminStep(),
+            default => true,
         };
+    }
+
+    protected function validateEnvironmentStep(): bool
+    {
+        if (! $this->environmentPassed) {
+            $this->dispatch('notify', type: 'error', message: 'Perbaiki masalah environment terlebih dahulu.');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function validateDatabaseStep(): bool
+    {
+        $this->databaseForm->validate();
+
+        if (! $this->databaseTested) {
+            // Auto-test connection if not tested yet
+            $result = $this->databaseForm->testConnection();
+
+            if (! $result['success']) {
+                $this->dispatch('notify', type: 'error', message: $result['message']);
+
+                return false;
+            }
+
+            $this->databaseTested = true;
+        }
+
+        return true;
+    }
+
+    protected function validateInstitutionStep(): bool
+    {
+        $this->institutionForm->validate();
+
+        return true;
+    }
+
+    protected function validateAdminStep(): bool
+    {
+        $this->adminForm->validate();
+
+        return true;
+    }
+
+    /**
+     * Reset database tested flag when form values change.
+     */
+    public function updatedDatabaseForm(): void
+    {
+        $this->databaseTested = false;
     }
 
     public function startInstallation(): void
@@ -167,6 +239,14 @@ class InstallerWizard extends Component
     public function removeFaculty(int $index): void
     {
         $this->institutionForm->removeFaculty($index);
+    }
+
+    /**
+     * Check if a step is completed.
+     */
+    public function isStepCompleted(int $step): bool
+    {
+        return isset($this->completedSteps[$step]) && $this->completedSteps[$step];
     }
 
     public function render(): View

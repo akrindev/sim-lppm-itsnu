@@ -12,7 +12,7 @@ class DatabaseTester
     public function testConnection(array $config): array
     {
         try {
-            // Create a temporary connection to test
+            // Create a temporary connection to test with full MariaDB/MySQL compatibility
             $tempConfig = config('database');
             $tempConfig['connections']['installer_test'] = [
                 'driver' => $config['driver'] ?? 'mariadb',
@@ -26,20 +26,37 @@ class DatabaseTester
                 'prefix' => '',
                 'strict' => true,
                 'engine' => null,
+                'options' => [
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                    \PDO::ATTR_EMULATE_PREPARES => false,
+                    \PDO::ATTR_TIMEOUT => 5,
+                    \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+                ],
             ];
 
             config(['database' => $tempConfig]);
 
+            // Purge any existing connection to ensure fresh test
+            DB::purge('installer_test');
+
             // Test connection
             $connection = DB::connection('installer_test');
-            $connection->getPdo();
+            $pdo = $connection->getPdo();
+
+            // Test actual query execution
+            $result = $pdo->query('SELECT 1 as test')->fetch();
+
+            if (! $result || $result['test'] !== 1) {
+                throw new Exception('Database query test failed');
+            }
 
             return [
                 'success' => true,
-                'message' => 'Connection successful',
+                'message' => 'Koneksi database berhasil',
                 'details' => [
                     'driver' => $connection->getDriverName(),
-                    'server_version' => $connection->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION),
+                    'server_version' => $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION),
                 ],
             ];
         } catch (Exception $e) {
@@ -54,10 +71,10 @@ class DatabaseTester
     public function testCredentialsOnly(array $config): array
     {
         try {
-            // Test connection without selecting database
+            // Test connection without selecting database with full MariaDB compatibility
             $dsn = sprintf(
-                '%s:host=%s;port=%s',
-                $config['driver'] ?? 'mysql',
+                '%s:host=%s;port=%s;charset=utf8mb4',
+                $config['driver'] === 'mariadb' ? 'mysql' : ($config['driver'] ?? 'mysql'),
                 $config['host'],
                 $config['port'] ?? 3306
             );
@@ -68,13 +85,18 @@ class DatabaseTester
                 $config['password'] ?? '',
                 [
                     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
                     \PDO::ATTR_TIMEOUT => 5,
+                    \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
                 ]
             );
 
+            // Test by getting server version
+            $version = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
+
             return [
                 'success' => true,
-                'message' => 'Credentials valid',
+                'message' => "Credentials valid (Server: {$version})",
             ];
         } catch (Exception $e) {
             return [
@@ -88,8 +110,8 @@ class DatabaseTester
     {
         try {
             $dsn = sprintf(
-                '%s:host=%s;port=%s',
-                $config['driver'] ?? 'mysql',
+                '%s:host=%s;port=%s;charset=utf8mb4',
+                $config['driver'] === 'mariadb' ? 'mysql' : ($config['driver'] ?? 'mysql'),
                 $config['host'],
                 $config['port'] ?? 3306
             );
@@ -100,6 +122,8 @@ class DatabaseTester
                 $config['password'] ?? '',
                 [
                     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_TIMEOUT => 5,
+                    \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
                 ]
             );
 
@@ -116,8 +140,8 @@ class DatabaseTester
     {
         try {
             $dsn = sprintf(
-                '%s:host=%s;port=%s',
-                $config['driver'] ?? 'mysql',
+                '%s:host=%s;port=%s;charset=utf8mb4',
+                $config['driver'] === 'mariadb' ? 'mysql' : ($config['driver'] ?? 'mysql'),
                 $config['host'],
                 $config['port'] ?? 3306
             );
@@ -128,12 +152,14 @@ class DatabaseTester
                 $config['password'] ?? '',
                 [
                     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_TIMEOUT => 5,
+                    \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
                 ]
             );
 
             $database = $config['database'];
-            $charset = 'utf8mb4';
-            $collation = 'utf8mb4_unicode_ci';
+            $charset = $config['charset'] ?? 'utf8mb4';
+            $collation = $config['collation'] ?? 'utf8mb4_unicode_ci';
 
             $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$database}` CHARACTER SET {$charset} COLLATE {$collation}");
 
