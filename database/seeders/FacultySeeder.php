@@ -14,13 +14,15 @@ class FacultySeeder extends Seeder
         $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first()
             ?? \App\Models\Institution::first();
 
-        if ($institution) {
-            $faculties = [
-                ['name' => 'Fakultas Sains dan Teknologi', 'code' => 'SAINTEK'],
-                ['name' => 'Fakultas Desain Kreatif dan Bisnis Digital', 'code' => 'DEKABITA'],
-            ];
+        if (! $institution) {
+            return;
+        }
 
-            foreach ($faculties as $faculty) {
+        // Check if custom faculties were provided by the installer
+        $customFaculties = cache('installer_faculties_config');
+
+        if ($customFaculties && is_array($customFaculties)) {
+            foreach ($customFaculties as $faculty) {
                 \App\Models\Faculty::updateOrCreate(
                     ['code' => $faculty['code']],
                     [
@@ -30,6 +32,25 @@ class FacultySeeder extends Seeder
                     ]
                 );
             }
+
+            return;
+        }
+
+        // Default faculties
+        $faculties = [
+            ['name' => 'Fakultas Sains dan Teknologi', 'code' => 'SAINTEK'],
+            ['name' => 'Fakultas Desain Kreatif dan Bisnis Digital', 'code' => 'DEKABITA'],
+        ];
+
+        foreach ($faculties as $faculty) {
+            \App\Models\Faculty::updateOrCreate(
+                ['code' => $faculty['code']],
+                [
+                    'institution_id' => $institution->id,
+                    'name' => $faculty['name'],
+                    'code' => $faculty['code'],
+                ]
+            );
         }
     }
 }

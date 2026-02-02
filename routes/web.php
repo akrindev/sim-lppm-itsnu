@@ -3,6 +3,7 @@
 use App\Http\Controllers\RoleSwitcherController;
 use App\Livewire\Dashboard;
 use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
+use App\Livewire\Installer\InstallerWizard;
 use App\Livewire\Notifications\NotificationCenter;
 use App\Livewire\Review\CommunityService as ReviewCommunityService;
 use App\Livewire\Review\Research as ReviewResearch;
@@ -17,6 +18,10 @@ use App\Livewire\Users\Index as UsersIndex;
 use App\Livewire\Users\Show as UsersShow;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+
+// Installer Route - Available only when not installed
+Route::livewire('install', InstallerWizard::class)
+    ->name('install');
 
 Route::redirect('/', 'dashboard', 302);
 

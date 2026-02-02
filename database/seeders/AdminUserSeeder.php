@@ -13,6 +13,9 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Check if custom admin config was provided by the installer
+        $customAdmin = cache('installer_admin_config');
+
         // Get institution
         $institution = \App\Models\Institution::where('name', 'like', '%Institut Teknologi dan Sains Nahdlatul Ulama%')->first()
             ?? \App\Models\Institution::first();
@@ -23,7 +26,36 @@ class AdminUserSeeder extends Seeder
             return;
         }
 
-        // Create Superadmin
+        if ($customAdmin) {
+            // Use custom admin data from installer
+            $adminUser = User::firstOrCreate(
+                ['email' => $customAdmin['email']],
+                [
+                    'name' => $customAdmin['name'],
+                    'password' => Hash::make($customAdmin['password']),
+                    'email_verified_at' => now(),
+                ]
+            );
+
+            if (! $adminUser->identity) {
+                $adminUser->identity()->create([
+                    'identity_id' => 'ADMIN',
+                    'type' => 'dosen',
+                    'institution_id' => $institution->id,
+                    'address' => $institution->short_name ?? 'Institution Address',
+                    'birthdate' => '2000-01-01',
+                    'birthplace' => 'Institution City',
+                ]);
+            }
+
+            $adminUser->assignRole('superadmin');
+
+            $this->command->info("Admin user '{$customAdmin['name']}' created successfully!");
+
+            return;
+        }
+
+        // Create Superadmin (default)
         $superadmin = User::firstOrCreate(
             ['email' => 'superadmin@email.com'],
             [
@@ -36,9 +68,8 @@ class AdminUserSeeder extends Seeder
         if (! $superadmin->identity) {
             $superadmin->identity()->create([
                 'identity_id' => 'SUPERADMIN',
-                'type' => 'dosen', // Defaulting to dosen type for system users if needed, or maybe just leave as is
+                'type' => 'dosen',
                 'institution_id' => $institution->id,
-                // Admins might not belong to specific faculty/prodi, so nullable
                 'address' => 'ITSNU Pekalongan',
                 'birthdate' => '2000-01-01',
                 'birthplace' => 'Pekalongan',

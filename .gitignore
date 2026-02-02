@@ -26,3 +26,4 @@ yarn-error.log
 .mcp.json
 CLAUDE.md
 /public/vendor
+.env.old
