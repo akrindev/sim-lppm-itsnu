@@ -163,9 +163,6 @@ class InstallationService
 
     public function runInstallation(array $config, callable $onProgress): void
     {
-        // Clear any previous progress
-        $this->clearProgress();
-
         $steps = [
             ['name' => 'backup_env', 'label' => 'Backing up existing configuration...', 'weight' => 5],
             ['name' => 'write_env', 'label' => 'Writing environment file...', 'weight' => 5],
