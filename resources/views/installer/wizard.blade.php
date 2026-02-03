@@ -845,7 +845,7 @@
                             <h2 class="card-title mb-1">Instalasi</h2>
                             <p class="text-secondary mb-4">Menyiapkan aplikasi Anda...</p>
 
-                            @if (!$installationProgress['complete'] && !$isInstalling)
+                            @if (!$installationProgress['complete'] && !$isInstalling && !$installationProgress['error'])
                                 <div class="alert alert-info">
                                     <div class="d-flex">
                                         <div>
@@ -924,28 +924,98 @@
                                     </div>
                                 </div>
 
-                                <button class="w-100 btn btn-primary" wire:click="startInstallation">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24"
-                                        height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                        fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-                                        <path d="M7 11l5 5l5 -5" />
-                                        <path d="M12 4l0 12" />
-                                    </svg>
-                                    Mulai Instalasi
+                                <button class="w-100 btn btn-primary" wire:click="startInstallation"
+                                    wire:loading.attr="disabled">
+                                    <span wire:loading.remove wire:target="startInstallation">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24"
+                                            height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                                            <path d="M7 11l5 5l5 -5" />
+                                            <path d="M12 4l0 12" />
+                                        </svg>
+                                        Mulai Instalasi
+                                    </span>
+                                    <span wire:loading wire:target="startInstallation">
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        Memulai...
+                                    </span>
                                 </button>
                             @endif
 
-                            @if ($isInstalling || $installationProgress['complete'])
+                            @if ($isInstalling || $installationProgress['complete'] || $installationProgress['error'])
+                                {{-- Installation Steps Progress --}}
+                                @php
+                                    $installSteps = [
+                                        ['key' => 'backup_env', 'label' => 'Backup konfigurasi', 'threshold' => 5],
+                                        ['key' => 'write_env', 'label' => 'Menulis file environment', 'threshold' => 10],
+                                        ['key' => 'clear_config', 'label' => 'Membersihkan cache', 'threshold' => 12],
+                                        ['key' => 'generate_key', 'label' => 'Generate application key', 'threshold' => 17],
+                                        ['key' => 'run_migrations', 'label' => 'Menjalankan migrasi database', 'threshold' => 67],
+                                        ['key' => 'run_seeders', 'label' => 'Mengisi data awal', 'threshold' => 92],
+                                        ['key' => 'create_admin', 'label' => 'Membuat akun admin', 'threshold' => 97],
+                                        ['key' => 'storage_link', 'label' => 'Membuat storage link', 'threshold' => 99],
+                                        ['key' => 'finalize', 'label' => 'Finalisasi instalasi', 'threshold' => 100],
+                                    ];
+                                    $currentPercent = $installationProgress['percent'];
+                                    $hasError = !empty($installationProgress['error']);
+                                @endphp
+
+                                <div class="mb-4">
+                                    <div class="list-group list-group-flush">
+                                        @foreach ($installSteps as $index => $step)
+                                            @php
+                                                $prevThreshold = $index > 0 ? $installSteps[$index - 1]['threshold'] : 0;
+                                                $isCompleted = $currentPercent >= $step['threshold'];
+                                                $isActive = $currentPercent >= $prevThreshold && $currentPercent < $step['threshold'];
+                                                $isPending = $currentPercent < $prevThreshold;
+                                                $isFailed = $hasError && $isActive;
+                                            @endphp
+                                            <div class="list-group-item d-flex align-items-center py-2 {{ $isFailed ? 'list-group-item-danger' : '' }}">
+                                                <span class="me-3">
+                                                    @if ($isFailed)
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                            <path d="M10 10l4 4m0 -4l-4 4" />
+                                                        </svg>
+                                                    @elseif ($isCompleted)
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                            <path d="M9 12l2 2l4 -4" />
+                                                        </svg>
+                                                    @elseif ($isActive)
+                                                        <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                                                    @else
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-secondary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                        </svg>
+                                                    @endif
+                                                </span>
+                                                <span class="{{ $isCompleted ? 'text-success' : ($isActive ? 'fw-bold' : 'text-secondary') }}">
+                                                    {{ $step['label'] }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
                                 {{-- Progress Bar --}}
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between mb-1">
-                                        <span class="fw-medium">{{ $installationProgress['message'] }}</span>
+                                        <span class="fw-medium">
+                                            @if ($isInstalling)
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            @endif
+                                            {{ $installationProgress['message'] }}
+                                        </span>
                                         <span class="text-secondary">{{ $installationProgress['percent'] }}%</span>
                                     </div>
                                     <div class="progress">
-                                        <div class="progress-bar {{ $installationProgress['error'] ? 'bg-danger' : ($installationProgress['complete'] ? 'bg-success' : 'progress-bar-indeterminate') }}"
+                                        <div class="progress-bar {{ $installationProgress['error'] ? 'bg-danger' : ($installationProgress['complete'] ? 'bg-success' : '') }}"
                                             role="progressbar"
                                             style="width: {{ $installationProgress['percent'] }}%"></div>
                                     </div>
@@ -971,6 +1041,25 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    {{-- Retry Button --}}
+                                    <button class="w-100 btn btn-warning mb-3" wire:click="retryInstallation"
+                                        wire:loading.attr="disabled">
+                                        <span wire:loading.remove wire:target="retryInstallation">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                                                <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                                            </svg>
+                                            Coba Lagi
+                                        </span>
+                                        <span wire:loading wire:target="retryInstallation">
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            Memulai ulang...
+                                        </span>
+                                    </button>
                                 @endif
 
                                 {{-- Installation Logs --}}
@@ -978,9 +1067,10 @@
                                     <div class="mb-3">
                                         <label class="form-label">Log Instalasi</label>
                                         <div class="bg-dark text-light rounded p-3"
-                                            style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                                            style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;"
+                                            id="installation-logs">
                                             @foreach ($installationProgress['logs'] as $log)
-                                                <div class="text-success-lt">{{ $log }}</div>
+                                                <div class="{{ str_contains($log, 'ERROR') ? 'text-danger' : 'text-success-lt' }}">{{ $log }}</div>
                                             @endforeach
                                         </div>
                                     </div>

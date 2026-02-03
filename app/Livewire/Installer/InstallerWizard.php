@@ -281,6 +281,19 @@ class InstallerWizard extends Component
         }
     }
 
+    /**
+     * Retry installation after a failure.
+     */
+    public function retryInstallation(): void
+    {
+        // Reset error state but keep logs for context
+        $this->installationProgress['error'] = null;
+        $this->installationProgress['logs'][] = '--- Retrying installation ---';
+
+        // Start installation again
+        $this->startInstallation();
+    }
+
     public function addFaculty(): void
     {
         $this->institutionForm->addFaculty();
