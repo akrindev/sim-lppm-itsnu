@@ -13,6 +13,11 @@ class Institution extends Model
 
     protected $fillable = [
         'name',
+        'short_name',
+        'address',
+        'phone',
+        'email',
+        'website',
     ];
 
     /**
