@@ -75,6 +75,7 @@ class InstallationService
         $steps = [
             ['name' => 'backup_env', 'label' => 'Backing up existing configuration...', 'weight' => 5],
             ['name' => 'write_env', 'label' => 'Writing environment file...', 'weight' => 5],
+            ['name' => 'clear_config', 'label' => 'Clearing configuration cache...', 'weight' => 2],
             ['name' => 'generate_key', 'label' => 'Generating application key...', 'weight' => 5],
             ['name' => 'run_migrations', 'label' => 'Running database migrations...', 'weight' => 50],
             ['name' => 'run_seeders', 'label' => 'Seeding master data...', 'weight' => 25],
@@ -92,6 +93,7 @@ class InstallationService
             match ($step['name']) {
                 'backup_env' => $this->backupEnvFile(),
                 'write_env' => $this->writeEnvFile($config),
+                'clear_config' => $this->clearConfigCache(),
                 'generate_key' => $this->generateKey(),
                 'run_migrations' => $this->runMigrations($onProgress, $currentWeight, $totalWeight, $step['weight']),
                 'run_seeders' => $this->runSeeders($onProgress, $currentWeight, $totalWeight, $step['weight'], $config),
@@ -127,6 +129,15 @@ class InstallationService
         Artisan::call('key:generate', ['--force' => true]);
     }
 
+    private function clearConfigCache(): void
+    {
+        try {
+            Artisan::call('config:clear');
+        } catch (Exception) {
+            // Ignore failures during installation.
+        }
+    }
+
     private function runMigrations(callable $onProgress, int &$currentWeight, int $totalWeight, int $stepWeight): void
     {
         // Get migration files to calculate progress
@@ -136,6 +147,12 @@ class InstallationService
 
         // We can't easily get real-time migration progress, so we'll simulate
         // In reality, migrations run all at once via Artisan
+        $dbEnv = $this->buildDatabaseEnv();
+        $this->applyDatabaseEnv($dbEnv);
+        if (empty($dbEnv['DB_PASSWORD'])) {
+            throw new Exception('Database password is empty. Please re-enter it in the installer.');
+        }
+
         Artisan::call('migrate', ['--force' => true, '--step' => true]);
 
         // Simulate progress during migration
@@ -180,6 +197,12 @@ class InstallationService
         }
 
         foreach ($seeders as $index => $seederClass) {
+            $dbEnv = $this->buildDatabaseEnv();
+            $this->applyDatabaseEnv($dbEnv);
+            if (empty($dbEnv['DB_PASSWORD'])) {
+                throw new Exception('Database password is empty. Please re-enter it in the installer.');
+            }
+
             Artisan::call('db:seed', ['--class' => $seederClass, '--force' => true]);
 
             $progress = $currentWeight + ($stepWeight * ($index + 1) / $totalSeeders);
@@ -249,6 +272,55 @@ class InstallationService
         } catch (Exception) {
             // Storage link might already exist or fail silently
         }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildDatabaseEnv(): array
+    {
+        $writer = new EnvironmentWriter;
+        $current = $writer->readCurrent();
+
+        return [
+            'DB_CONNECTION' => $current['DB_CONNECTION'] ?? 'mariadb',
+            'DB_HOST' => $current['DB_HOST'] ?? '127.0.0.1',
+            'DB_PORT' => $current['DB_PORT'] ?? '3306',
+            'DB_DATABASE' => $current['DB_DATABASE'] ?? 'laravel',
+            'DB_USERNAME' => $current['DB_USERNAME'] ?? 'root',
+            'DB_PASSWORD' => $current['DB_PASSWORD'] ?? '',
+        ];
+    }
+
+    /**
+     * @param  array<string, string>  $envVars
+     */
+    private function applyDatabaseEnv(array $envVars): void
+    {
+        foreach ($envVars as $key => $value) {
+            if ($value === '') {
+                continue;
+            }
+
+            putenv("{$key}={$value}");
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+        }
+
+        config([
+            'database.default' => $envVars['DB_CONNECTION'],
+            'database.connections.'.$envVars['DB_CONNECTION'] => [
+                'driver' => $envVars['DB_CONNECTION'],
+                'host' => $envVars['DB_HOST'],
+                'port' => $envVars['DB_PORT'],
+                'database' => $envVars['DB_DATABASE'],
+                'username' => $envVars['DB_USERNAME'],
+                'password' => $envVars['DB_PASSWORD'],
+            ],
+        ]);
+
+        DB::purge($envVars['DB_CONNECTION']);
+        DB::reconnect($envVars['DB_CONNECTION']);
     }
 
     private function finalizeInstallation(): void

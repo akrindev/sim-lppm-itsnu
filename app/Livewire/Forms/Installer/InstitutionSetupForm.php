@@ -16,7 +16,7 @@ class InstitutionSetupForm extends Form
 
     public string $phone = '';
 
-    public string $email = 'info@itsnu.ac.id';
+    public string $institutionEmail = 'info@itsnu.ac.id';
 
     public string $website = 'https://itsnu.ac.id';
 
@@ -32,7 +32,7 @@ class InstitutionSetupForm extends Form
             'institutionShortName' => 'required|string|max:100',
             'address' => 'nullable|string|max:500',
             'phone' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
+            'institutionEmail' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'faculties' => 'required|array|min:1',
             'faculties.*.name' => 'required|string|max:100',
@@ -66,14 +66,29 @@ class InstitutionSetupForm extends Form
 
     public function getInstitutionData(): array
     {
+        $this->normalizeInputs();
+
+        logger()->debug('InstitutionSetupForm::getInstitutionData()', [
+            'institutionShortName' => $this->institutionShortName,
+            'institutionName' => $this->institutionName,
+        ]);
+
         return [
             'name' => $this->institutionName,
             'short_name' => $this->institutionShortName,
             'address' => $this->address,
             'phone' => $this->phone,
-            'email' => $this->email,
+            'email' => $this->institutionEmail,
             'website' => $this->website,
         ];
+    }
+
+    public function normalizeInputs(): void
+    {
+        $this->institutionName = trim($this->institutionName);
+        $this->institutionShortName = trim($this->institutionShortName);
+        $this->institutionEmail = trim($this->institutionEmail);
+        $this->website = trim($this->website);
     }
 
     public function getFacultiesData(): array

@@ -18,9 +18,10 @@
                             @foreach ([
         1 => 'Environment',
         2 => 'Database',
-        3 => 'Institusi',
-        4 => 'Admin',
-        5 => 'Install',
+        3 => 'Konfigurasi',
+        4 => 'Institusi',
+        5 => 'Admin',
+        6 => 'Install',
     ] as $step => $label)
                                 @php
                                     $isCompleted = isset($completedSteps[$step]) && $completedSteps[$step];
@@ -212,10 +213,10 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Password</label>
                                     <input type="password"
-                                        class="form-control @error('databaseForm.password') is-invalid @enderror"
-                                        wire:model="databaseForm.password"
+                                        class="form-control @error('databaseForm.dbPasswordInput') is-invalid @enderror"
+                                        wire:model="databaseForm.dbPasswordInput"
                                         placeholder="Biarkan kosong jika tidak ada">
-                                    @error('databaseForm.password')
+                                    @error('databaseForm.dbPasswordInput')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -279,7 +280,363 @@
                                 </div>
                             </div>
                         @elseif ($currentStep === 3)
-                            {{-- Step 3: Institution Setup --}}
+                            {{-- Step 3: Environment Configuration --}}
+                            <h2 class="card-title mb-1">Konfigurasi Environment</h2>
+                            <p class="text-secondary mb-4">Atur pengaturan aplikasi, session, cache, dan email</p>
+
+                            {{-- Application Settings --}}
+                            <div class="mb-4">
+                                <h3 class="mb-3">Pengaturan Aplikasi</h3>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Environment</label>
+                                        <select class="form-select @error('environmentForm.appEnv') is-invalid @enderror"
+                                            wire:model="environmentForm.appEnv">
+                                            @foreach ($envOptions['appEnv'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.appEnv')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Bahasa</label>
+                                        <select class="form-select @error('environmentForm.appLocale') is-invalid @enderror"
+                                            wire:model="environmentForm.appLocale">
+                                            @foreach ($envOptions['appLocale'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.appLocale')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label required">URL Aplikasi</label>
+                                    <input type="url"
+                                        class="form-control @error('environmentForm.appUrl') is-invalid @enderror"
+                                        wire:model="environmentForm.appUrl" placeholder="https://example.com">
+                                    @error('environmentForm.appUrl')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-check">
+                                        <input type="checkbox" class="form-check-input"
+                                            wire:model="environmentForm.appDebug">
+                                        <span class="form-check-label">Aktifkan Mode Debug (tidak disarankan untuk production)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {{-- Session & Cache Settings --}}
+                            <div class="mb-4">
+                                <h3 class="mb-3">Session & Cache</h3>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Session Driver</label>
+                                        <select class="form-select @error('environmentForm.sessionDriver') is-invalid @enderror"
+                                            wire:model="environmentForm.sessionDriver">
+                                            @foreach ($envOptions['sessionDriver'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.sessionDriver')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Cache Store</label>
+                                        <select class="form-select @error('environmentForm.cacheStore') is-invalid @enderror"
+                                            wire:model="environmentForm.cacheStore">
+                                            @foreach ($envOptions['cacheStore'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.cacheStore')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Queue Connection</label>
+                                        <select class="form-select @error('environmentForm.queueConnection') is-invalid @enderror"
+                                            wire:model="environmentForm.queueConnection">
+                                            @foreach ($envOptions['queueConnection'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.queueConnection')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Mail Settings --}}
+                            <div class="mb-4">
+                                <h3 class="mb-3">Pengaturan Email</h3>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Mail Driver</label>
+                                        <select class="form-select @error('environmentForm.mailMailer') is-invalid @enderror"
+                                            wire:model.live="environmentForm.mailMailer">
+                                            @foreach ($envOptions['mailMailer'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.mailMailer')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Enkripsi</label>
+                                        <select class="form-select @error('environmentForm.mailEncryption') is-invalid @enderror"
+                                            wire:model="environmentForm.mailEncryption">
+                                            @foreach ($envOptions['mailEncryption'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.mailEncryption')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                @if ($environmentForm->mailMailer === 'smtp')
+                                    <div class="row mb-3">
+                                        <div class="col-md-8">
+                                            <label class="form-label">SMTP Host</label>
+                                            <input type="text"
+                                                class="form-control @error('environmentForm.mailHost') is-invalid @enderror"
+                                                wire:model="environmentForm.mailHost" placeholder="smtp.example.com">
+                                            @error('environmentForm.mailHost')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Port</label>
+                                            <input type="text"
+                                                class="form-control @error('environmentForm.mailPort') is-invalid @enderror"
+                                                wire:model="environmentForm.mailPort" placeholder="587">
+                                            @error('environmentForm.mailPort')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">SMTP Username</label>
+                                            <input type="text"
+                                                class="form-control @error('environmentForm.mailUsername') is-invalid @enderror"
+                                                wire:model="environmentForm.mailUsername" placeholder="user@example.com">
+                                            @error('environmentForm.mailUsername')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">SMTP Password</label>
+                                            <input type="password"
+                                                class="form-control @error('environmentForm.mailPassword') is-invalid @enderror"
+                                                wire:model="environmentForm.mailPassword" placeholder="Password">
+                                            @error('environmentForm.mailPassword')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">From Email</label>
+                                        <input type="email"
+                                            class="form-control @error('environmentForm.mailFromAddress') is-invalid @enderror"
+                                            wire:model="environmentForm.mailFromAddress" placeholder="noreply@example.com">
+                                        @error('environmentForm.mailFromAddress')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">From Name</label>
+                                        <input type="text"
+                                            class="form-control @error('environmentForm.mailFromName') is-invalid @enderror"
+                                            wire:model="environmentForm.mailFromName" placeholder="LPPM ITSNU">
+                                        @error('environmentForm.mailFromName')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Storage Settings --}}
+                            <div class="mb-4">
+                                <h3 class="mb-3">Penyimpanan File</h3>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Filesystem Disk</label>
+                                        <select class="form-select @error('environmentForm.filesystemDisk') is-invalid @enderror"
+                                            wire:model.live="environmentForm.filesystemDisk">
+                                            @foreach ($envOptions['filesystemDisk'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.filesystemDisk')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Media Disk</label>
+                                        <select class="form-select @error('environmentForm.mediaDisk') is-invalid @enderror"
+                                            wire:model.live="environmentForm.mediaDisk">
+                                            @foreach ($envOptions['mediaDisk'] as $value => $label)
+                                                <option value="{{ $value }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('environmentForm.mediaDisk')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                @if ($environmentForm->filesystemDisk === 's3' || $environmentForm->mediaDisk === 's3')
+                                    <div class="alert alert-info mb-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                                            <path d="M12 9h.01" />
+                                            <path d="M11 12h1v4h1" />
+                                        </svg>
+                                        <div>Konfigurasi AWS S3 diperlukan untuk penyimpanan cloud.</div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">AWS Access Key ID</label>
+                                            <input type="text"
+                                                class="form-control @error('environmentForm.awsAccessKeyId') is-invalid @enderror"
+                                                wire:model="environmentForm.awsAccessKeyId">
+                                            @error('environmentForm.awsAccessKeyId')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">AWS Secret Access Key</label>
+                                            <input type="password"
+                                                class="form-control @error('environmentForm.awsSecretAccessKey') is-invalid @enderror"
+                                                wire:model="environmentForm.awsSecretAccessKey">
+                                            @error('environmentForm.awsSecretAccessKey')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">AWS Region</label>
+                                            <select class="form-select @error('environmentForm.awsDefaultRegion') is-invalid @enderror"
+                                                wire:model="environmentForm.awsDefaultRegion">
+                                                @foreach ($envOptions['awsRegion'] as $value => $label)
+                                                    <option value="{{ $value }}">{{ $label }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('environmentForm.awsDefaultRegion')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">AWS Bucket</label>
+                                            <input type="text"
+                                                class="form-control @error('environmentForm.awsBucket') is-invalid @enderror"
+                                                wire:model="environmentForm.awsBucket">
+                                            @error('environmentForm.awsBucket')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">AWS URL (opsional)</label>
+                                            <input type="url"
+                                                class="form-control @error('environmentForm.awsUrl') is-invalid @enderror"
+                                                wire:model="environmentForm.awsUrl" placeholder="https://bucket.s3.region.amazonaws.com">
+                                            @error('environmentForm.awsUrl')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">AWS Endpoint (opsional, untuk S3-compatible)</label>
+                                            <input type="url"
+                                                class="form-control @error('environmentForm.awsEndpoint') is-invalid @enderror"
+                                                wire:model="environmentForm.awsEndpoint" placeholder="https://s3.example.com">
+                                            @error('environmentForm.awsEndpoint')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-check">
+                                            <input type="checkbox" class="form-check-input"
+                                                wire:model="environmentForm.awsUsePathStyleEndpoint">
+                                            <span class="form-check-label">Gunakan Path Style Endpoint (untuk S3-compatible storage)</span>
+                                        </label>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Turnstile Settings --}}
+                            <div class="mb-4">
+                                <h3 class="mb-3">Cloudflare Turnstile (Opsional)</h3>
+                                <p class="text-secondary small mb-3">Turnstile digunakan untuk proteksi spam pada form. Dapatkan key di <a href="https://dash.cloudflare.com/sign-up?to=/:account/turnstile" target="_blank">Cloudflare Dashboard</a>.</p>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Site Key</label>
+                                        <input type="text"
+                                            class="form-control @error('environmentForm.turnstileSiteKey') is-invalid @enderror"
+                                            wire:model="environmentForm.turnstileSiteKey">
+                                        @error('environmentForm.turnstileSiteKey')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Secret Key</label>
+                                        <input type="password"
+                                            class="form-control @error('environmentForm.turnstileSecretKey') is-invalid @enderror"
+                                            wire:model="environmentForm.turnstileSecretKey">
+                                        @error('environmentForm.turnstileSecretKey')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-ghost-secondary" wire:click="previousStep">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24"
+                                        height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M5 12l14 0" />
+                                        <path d="M5 12l6 6" />
+                                        <path d="M5 12l6 -6" />
+                                    </svg>
+                                    Kembali
+                                </button>
+                                <button class="btn btn-primary" wire:click="nextStep">
+                                    Lanjutkan
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24"
+                                        height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M5 12l14 0" />
+                                        <path d="M13 18l6 -6" />
+                                        <path d="M13 6l6 6" />
+                                    </svg>
+                                </button>
+                            </div>
+                        @elseif ($currentStep === 4)
+                            {{-- Step 4: Institution Setup --}}
                             <h2 class="card-title mb-1">Pengaturan Institusi</h2>
                             <p class="text-secondary mb-4">Konfigurasi detail institusi Anda</p>
 
@@ -318,8 +675,12 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" wire:model="institutionForm.email"
+                                    <input type="email" class="form-control @error('institutionForm.institutionEmail') is-invalid @enderror"
+                                        wire:model="institutionForm.institutionEmail"
                                         placeholder="lppm@itsnu.ac.id">
+                                    @error('institutionForm.institutionEmail')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -408,17 +769,17 @@
                                     </svg>
                                 </button>
                             </div>
-                        @elseif ($currentStep === 4)
-                            {{-- Step 4: Admin Account --}}
+                        @elseif ($currentStep === 5)
+                            {{-- Step 5: Admin Account --}}
                             <h2 class="card-title mb-1">Akun Administrator</h2>
                             <p class="text-secondary mb-4">Buat akun administrator utama</p>
 
                             <div class="mb-3">
                                 <label class="form-label required">Nama Lengkap</label>
                                 <input type="text"
-                                    class="form-control @error('adminForm.name') is-invalid @enderror"
-                                    wire:model="adminForm.name" placeholder="Administrator">
-                                @error('adminForm.name')
+                                    class="form-control @error('adminForm.adminName') is-invalid @enderror"
+                                    wire:model="adminForm.adminName" placeholder="Administrator">
+                                @error('adminForm.adminName')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -426,9 +787,9 @@
                             <div class="mb-3">
                                 <label class="form-label required">Alamat Email</label>
                                 <input type="email"
-                                    class="form-control @error('adminForm.email') is-invalid @enderror"
-                                    wire:model="adminForm.email" placeholder="admin@example.com">
-                                @error('adminForm.email')
+                                    class="form-control @error('adminForm.adminEmail') is-invalid @enderror"
+                                    wire:model="adminForm.adminEmail" placeholder="admin@example.com">
+                                @error('adminForm.adminEmail')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -436,9 +797,9 @@
                             <div class="mb-3">
                                 <label class="form-label required">Password</label>
                                 <input type="password"
-                                    class="form-control @error('adminForm.password') is-invalid @enderror"
-                                    wire:model="adminForm.password">
-                                @error('adminForm.password')
+                                    class="form-control @error('adminForm.adminPassword') is-invalid @enderror"
+                                    wire:model="adminForm.adminPassword">
+                                @error('adminForm.adminPassword')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                                 <div class="form-hint">Minimal 8 karakter dengan huruf besar, huruf kecil, dan angka
@@ -448,9 +809,9 @@
                             <div class="mb-4">
                                 <label class="form-label required">Konfirmasi Password</label>
                                 <input type="password"
-                                    class="form-control @error('adminForm.passwordConfirmation') is-invalid @enderror"
-                                    wire:model="adminForm.passwordConfirmation">
-                                @error('adminForm.passwordConfirmation')
+                                    class="form-control @error('adminForm.adminPasswordConfirmation') is-invalid @enderror"
+                                    wire:model="adminForm.adminPasswordConfirmation">
+                                @error('adminForm.adminPasswordConfirmation')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -479,8 +840,8 @@
                                     </svg>
                                 </button>
                             </div>
-                        @elseif ($currentStep === 5)
-                            {{-- Step 5: Installation Progress --}}
+                        @elseif ($currentStep === 6)
+                            {{-- Step 6: Installation Progress --}}
                             <h2 class="card-title mb-1">Instalasi</h2>
                             <p class="text-secondary mb-4">Menyiapkan aplikasi Anda...</p>
 
@@ -524,6 +885,17 @@
                                                         <path d="M5 12l5 5l10 -10" />
                                                     </svg>
                                                     Database OK
+                                                </div>
+                                                <div class="col-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="text-success icon me-1" width="24" height="24"
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        fill="none" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                        <path d="M5 12l5 5l10 -10" />
+                                                    </svg>
+                                                    Konfigurasi OK
                                                 </div>
                                                 <div class="col-6">
                                                     <svg xmlns="http://www.w3.org/2000/svg"

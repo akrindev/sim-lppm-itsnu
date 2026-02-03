@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Forms\Installer;
 
 use App\Services\Installer\DatabaseTester;
+use Livewire\Attributes\Locked;
 use Livewire\Form;
 
 class DatabaseConfigForm extends Form
@@ -17,7 +18,18 @@ class DatabaseConfigForm extends Form
 
     public string $username = 'root';
 
-    public string $password = '';
+    /**
+     * User-facing password input. Keep separate so empty input does not
+     * overwrite stored password when navigating steps.
+     */
+    public string $dbPasswordInput = '';
+
+    /**
+     * Stored password used for connection and .env.
+     * #[Locked] ensures this is always persisted across requests.
+     */
+    #[Locked]
+    public string $dbPassword = '';
 
     public bool $createDatabase = false;
 
@@ -28,7 +40,7 @@ class DatabaseConfigForm extends Form
             'port' => 'required|numeric|between:1,65535',
             'database' => 'required|string|max:64|regex:/^[a-zA-Z0-9_]+$/',
             'username' => 'required|string|max:255',
-            'password' => 'nullable|string|max:255',
+            'dbPasswordInput' => 'nullable|string|max:255',
             'createDatabase' => 'boolean',
         ];
     }
@@ -47,18 +59,21 @@ class DatabaseConfigForm extends Form
 
     public function toArray(): array
     {
+        $this->syncPasswordFromInput();
+
         return [
             'driver' => 'mariadb',
             'host' => $this->host,
             'port' => $this->port,
             'database' => $this->database,
             'username' => $this->username,
-            'password' => $this->password,
+            'password' => $this->dbPassword,
         ];
     }
 
     public function testConnection(): array
     {
+        $this->syncPasswordFromInput();
         $this->validate();
 
         $tester = new DatabaseTester;
@@ -93,20 +108,52 @@ class DatabaseConfigForm extends Form
         return $tester->testConnection($this->toArray());
     }
 
+    public function normalizeInputs(): void
+    {
+        $this->host = trim($this->host);
+        $this->port = trim((string) $this->port);
+        $this->database = trim($this->database);
+        $this->username = trim($this->username);
+        $this->syncPasswordFromInput();
+        $this->dbPassword = trim($this->dbPassword);
+    }
+
     public function getEnvConfig(): array
     {
+        $this->normalizeInputs();
+
         return [
             'DB_CONNECTION' => 'mariadb',
             'DB_HOST' => $this->host,
             'DB_PORT' => $this->port,
             'DB_DATABASE' => $this->database,
             'DB_USERNAME' => $this->username,
-            'DB_PASSWORD' => $this->password,
+            'DB_PASSWORD' => $this->dbPassword,
             'DB_CHARSET' => 'utf8mb4',
             'DB_COLLATION' => 'utf8mb4_unicode_ci',
             'DB_PREFIX' => '',
             'DB_STRICT' => 'true',
             'DB_ENGINE' => '',
         ];
+    }
+
+    /**
+     * Only overwrite stored password when user provides a new input.
+     */
+    public function syncPasswordFromInput(): void
+    {
+        if ($this->dbPasswordInput === '') {
+            return;
+        }
+
+        $this->dbPassword = trim($this->dbPasswordInput);
+    }
+
+    /**
+     * Auto-sync password when input is updated via Livewire.
+     */
+    public function updatedDbPasswordInput(): void
+    {
+        $this->syncPasswordFromInput();
     }
 }

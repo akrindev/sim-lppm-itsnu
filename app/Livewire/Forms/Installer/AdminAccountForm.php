@@ -9,42 +9,51 @@ use Livewire\Form;
 
 class AdminAccountForm extends Form
 {
-    public string $name = 'Administrator';
+    public string $adminName = 'Administrator';
 
-    public string $email = '';
+    public string $adminEmail = '';
 
-    public string $password = '';
+    public string $adminPassword = '';
 
-    public string $passwordConfirmation = '';
+    public string $adminPasswordConfirmation = '';
 
     protected function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'password' => ['required', Password::min(8)->mixedCase()->numbers()],
-            'passwordConfirmation' => 'required|same:password',
+            'adminName' => 'required|string|max:255',
+            'adminEmail' => 'required|email|max:255',
+            'adminPassword' => ['required', Password::min(8)->mixedCase()->numbers()],
+            'adminPasswordConfirmation' => 'required|same:adminPassword',
         ];
     }
 
     protected function messages(): array
     {
         return [
-            'name.required' => 'Admin name is required',
-            'email.required' => 'Admin email is required',
-            'email.email' => 'Please enter a valid email address',
-            'password.required' => 'Password is required',
-            'passwordConfirmation.required' => 'Please confirm the password',
-            'passwordConfirmation.same' => 'Passwords do not match',
+            'adminName.required' => 'Admin name is required',
+            'adminEmail.required' => 'Admin email is required',
+            'adminEmail.email' => 'Please enter a valid email address',
+            'adminPassword.required' => 'Password is required',
+            'adminPasswordConfirmation.required' => 'Please confirm the password',
+            'adminPasswordConfirmation.same' => 'Passwords do not match',
         ];
     }
 
     public function getAdminData(): array
     {
+        $this->normalizeInputs();
+
         return [
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => $this->password,
+            'name' => $this->adminName,
+            'email' => $this->adminEmail,
+            'password' => $this->adminPassword,
         ];
+    }
+
+    public function normalizeInputs(): void
+    {
+        $this->adminName = trim($this->adminName);
+        $this->adminEmail = trim($this->adminEmail);
+        $this->adminPassword = trim($this->adminPassword);
     }
 }
