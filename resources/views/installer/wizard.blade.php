@@ -852,6 +852,11 @@
                             </div>
                         @elseif ($currentStep === 6)
                             {{-- Step 6: Installation Progress --}}
+                            {{-- Poll for progress updates while installing --}}
+                            @if ($isInstalling)
+                                <div wire:poll.1s="checkProgress"></div>
+                            @endif
+
                             <h2 class="card-title mb-1">Instalasi</h2>
                             <p class="text-secondary mb-4">Menyiapkan aplikasi Anda...</p>
 

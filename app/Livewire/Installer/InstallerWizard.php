@@ -255,12 +255,8 @@ class InstallerWizard extends Component
             $this->installationService->runInstallation(
                 $config,
                 function (int $percent, string $message) {
-                    $this->installationProgress['percent'] = $percent;
-                    $this->installationProgress['message'] = $message;
+                    // Callback still called, just update logs
                     $this->installationProgress['logs'][] = "[{$percent}%] {$message}";
-
-                    // Stream updates to browser
-                    $this->stream(to: 'installationProgress', content: '');
                 }
             );
 
@@ -268,13 +264,50 @@ class InstallerWizard extends Component
             $this->installationProgress['percent'] = 100;
             $this->installationProgress['message'] = 'Installation complete!';
 
+            // Clear progress cache
+            $this->installationService->clearProgress();
+
             $this->dispatch('installation-complete');
         } catch (\Exception $e) {
             $this->installationProgress['error'] = $e->getMessage();
             $this->installationProgress['logs'][] = "ERROR: {$e->getMessage()}";
+
+            // Store error in cache for polling to pick up
+            $this->installationService->storeProgress(
+                $this->installationProgress['percent'],
+                $this->installationProgress['message'],
+                $e->getMessage(),
+                false
+            );
+
             $this->dispatch('notify', type: 'error', message: 'Installation failed: '.$e->getMessage());
         } finally {
             $this->isInstalling = false;
+        }
+    }
+
+    /**
+     * Check installation progress from cache (called by wire:poll).
+     */
+    public function checkProgress(): void
+    {
+        if (! $this->isInstalling) {
+            return;
+        }
+
+        $cached = $this->installationService->getProgress();
+
+        if ($cached['updated_at'] !== null) {
+            $this->installationProgress['percent'] = $cached['percent'];
+            $this->installationProgress['message'] = $cached['message'];
+
+            if ($cached['error']) {
+                $this->installationProgress['error'] = $cached['error'];
+            }
+
+            if ($cached['complete']) {
+                $this->installationProgress['complete'] = true;
+            }
         }
     }
 

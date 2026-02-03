@@ -6,6 +6,7 @@ namespace App\Services\Installer;
 
 use Exception;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -14,6 +15,8 @@ class InstallationService
     private const LOCK_FILE = 'app/.installed';
 
     private const ENV_BACKUP_PREFIX = '.env.backup.';
+
+    private const PROGRESS_CACHE_KEY = 'installer_progress';
 
     public function isInstalled(): bool
     {
@@ -70,8 +73,47 @@ class InstallationService
         return $status;
     }
 
+    /**
+     * Store installation progress in cache for real-time updates.
+     */
+    public function storeProgress(int $percent, string $message, ?string $error = null, bool $complete = false): void
+    {
+        Cache::put(self::PROGRESS_CACHE_KEY, [
+            'percent' => $percent,
+            'message' => $message,
+            'error' => $error,
+            'complete' => $complete,
+            'updated_at' => now()->timestamp,
+        ], 300); // 5 minutes TTL
+    }
+
+    /**
+     * Get installation progress from cache.
+     */
+    public function getProgress(): array
+    {
+        return Cache::get(self::PROGRESS_CACHE_KEY, [
+            'percent' => 0,
+            'message' => '',
+            'error' => null,
+            'complete' => false,
+            'updated_at' => null,
+        ]);
+    }
+
+    /**
+     * Clear installation progress from cache.
+     */
+    public function clearProgress(): void
+    {
+        Cache::forget(self::PROGRESS_CACHE_KEY);
+    }
+
     public function runInstallation(array $config, callable $onProgress): void
     {
+        // Clear any previous progress
+        $this->clearProgress();
+
         $steps = [
             ['name' => 'backup_env', 'label' => 'Backing up existing configuration...', 'weight' => 5],
             ['name' => 'write_env', 'label' => 'Writing environment file...', 'weight' => 5],
@@ -88,15 +130,17 @@ class InstallationService
         $currentWeight = 0;
 
         foreach ($steps as $step) {
-            $onProgress($this->calculatePercent($currentWeight, $totalWeight), $step['label']);
+            $percent = $this->calculatePercent($currentWeight, $totalWeight);
+            $onProgress($percent, $step['label']);
+            $this->storeProgress($percent, $step['label']);
 
             match ($step['name']) {
                 'backup_env' => $this->backupEnvFile(),
                 'write_env' => $this->writeEnvFile($config),
                 'clear_config' => $this->clearConfigCache(),
                 'generate_key' => $this->generateKey(),
-                'run_migrations' => $this->runMigrations($onProgress, $currentWeight, $totalWeight, $step['weight']),
-                'run_seeders' => $this->runSeeders($onProgress, $currentWeight, $totalWeight, $step['weight'], $config),
+                'run_migrations' => $this->runMigrations($currentWeight, $totalWeight, $step['weight']),
+                'run_seeders' => $this->runSeeders($currentWeight, $totalWeight, $step['weight'], $config),
                 'create_admin' => $this->createAdminUser($config['admin'] ?? []),
                 'storage_link' => $this->createStorageLink(),
                 'finalize' => $this->finalizeInstallation(),
@@ -107,6 +151,7 @@ class InstallationService
         }
 
         $onProgress(100, 'Installation complete!');
+        $this->storeProgress(100, 'Installation complete!', null, true);
     }
 
     private function backupEnvFile(): void
@@ -126,7 +171,50 @@ class InstallationService
 
     private function generateKey(): void
     {
+        // Reload .env file to ensure we have latest values
+        $this->reloadEnvFile();
+
+        // Generate the application key
         Artisan::call('key:generate', ['--force' => true]);
+
+        // Reload again to get the new key
+        $this->reloadEnvFile();
+    }
+
+    /**
+     * Reload the .env file into the application config.
+     */
+    private function reloadEnvFile(): void
+    {
+        $envPath = base_path('.env');
+        if (! File::exists($envPath)) {
+            return;
+        }
+
+        // Parse .env file and update config
+        $lines = explode("\n", File::get($envPath));
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line) || str_starts_with($line, '#')) {
+                continue;
+            }
+
+            if (str_contains($line, '=')) {
+                $parts = explode('=', $line, 2);
+                $key = trim($parts[0]);
+                $value = trim($parts[1] ?? '');
+
+                // Remove quotes
+                if (str_starts_with($value, '"') && str_ends_with($value, '"')) {
+                    $value = substr($value, 1, -1);
+                }
+
+                // Set in environment
+                putenv("{$key}={$value}");
+                $_ENV[$key] = $value;
+                $_SERVER[$key] = $value;
+            }
+        }
     }
 
     private function clearConfigCache(): void
@@ -138,15 +226,13 @@ class InstallationService
         }
     }
 
-    private function runMigrations(callable $onProgress, int &$currentWeight, int $totalWeight, int $stepWeight): void
+    private function runMigrations(int $currentWeight, int $totalWeight, int $stepWeight): void
     {
         // Get migration files to calculate progress
         $migrationFiles = File::files(database_path('migrations'));
         $totalMigrations = count($migrationFiles);
-        $processedMigrations = 0;
 
-        // We can't easily get real-time migration progress, so we'll simulate
-        // In reality, migrations run all at once via Artisan
+        // Apply database env before running migrations
         $dbEnv = $this->buildDatabaseEnv();
         $this->applyDatabaseEnv($dbEnv);
         if (empty($dbEnv['DB_PASSWORD'])) {
@@ -155,19 +241,19 @@ class InstallationService
 
         Artisan::call('migrate', ['--force' => true, '--step' => true]);
 
-        // Simulate progress during migration
+        // Simulate progress during migration (since artisan runs synchronously)
         for ($i = 0; $i < 10; $i++) {
             $processedMigrations = min($totalMigrations, (int) ($totalMigrations * ($i + 1) / 10));
             $progress = $currentWeight + ($stepWeight * ($i + 1) / 10);
-            $onProgress(
+            $this->storeProgress(
                 $this->calculatePercent($progress, $totalWeight),
                 "Running migrations... ({$processedMigrations}/{$totalMigrations})"
             );
-            usleep(100000); // 100ms for visual effect
+            usleep(50000); // 50ms for visual effect
         }
     }
 
-    private function runSeeders(callable $onProgress, int &$currentWeight, int $totalWeight, int $stepWeight, array $config = []): void
+    private function runSeeders(int $currentWeight, int $totalWeight, int $stepWeight, array $config = []): void
     {
         $seeders = [
             'RoleSeeder',
@@ -206,7 +292,7 @@ class InstallationService
             Artisan::call('db:seed', ['--class' => $seederClass, '--force' => true]);
 
             $progress = $currentWeight + ($stepWeight * ($index + 1) / $totalSeeders);
-            $onProgress(
+            $this->storeProgress(
                 $this->calculatePercent($progress, $totalWeight),
                 "Running seeders... ({$seederClass})"
             );
