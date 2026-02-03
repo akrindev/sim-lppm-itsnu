@@ -2,7 +2,7 @@
 
 ## 1. Project Summary & Stack
 Research & Community Service Management System for Institut Teknologi dan Sains Nahdlatul Ulama (ITSNU) Pekalongan.
-- **Stack:** PHP 8.4, Laravel 12, Livewire v3, Flux UI (Free), Tailwind v4, Tabler + Bootstrap 5, Pest v4, Pint.
+- **Stack:** PHP 8.4, Laravel 12, Livewire v4,  Tailwind v4, Tabler + Bootstrap 5, Pest v4, Pint.
 - **Key Models:** Polymorphic `Proposal` (morphs to `Research` or `CommunityService`), `User` (Spatie roles), `ProposalReviewer`.
 - **Architecture:** Controller-less (mostly Livewire), Form Objects for state, Traits for composable behavior, Abstract classes for shared logic.
 
@@ -26,12 +26,12 @@ Research & Community Service Management System for Institut Teknologi dan Sains 
 - **Config:** Use `config('app.name')`, NEVER use `env()` outside of config files.
 - **Models:** Use `protected function casts(): array` method instead of `$casts` property.
 
-## 4. Livewire v3 Patterns
+## 4. Livewire v4 Patterns
 - **Root Element:** Every component MUST have exactly one root HTML element.
 - **Performance:** Use `wire:key` in loops to prevent DOM diffing issues.
-- **Binding:** `wire:model.live` for real-time; `wire:model` is deferred by default.
+- **Binding:** `wire:model.live` for real-time; `wire:model` syncs on action requests by default.
 - **Form Objects:** Move complex validation/state to `Livewire\Form` classes in `app/Livewire/Forms/`.
-- **Events:** Use `$this->dispatch('event-name')` (Livewire v3) not `emit()`.
+- **Events:** Use `$this->dispatch('event-name')` (Livewire v4) not `emit()`.
 - **Computed:** Use `#[Computed]` for reactive/cached data (e.g., `$this->proposals`).
 
 ## 5. Database & Authorization
@@ -44,18 +44,18 @@ Research & Community Service Management System for Institut Teknologi dan Sains 
 ## 6. Proposal Workflow & Status Transitions
 
 ### 6.1 ProposalStatus Enum (`app/Enums/ProposalStatus.php`)
-| Status | Label (ID) | Description |
-|--------|------------|-------------|
-| `DRAFT` | Draft | Proposal sedang disusun |
-| `SUBMITTED` | Diajukan | Menunggu persetujuan Dekan |
-| `NEED_ASSIGNMENT` | Perlu Persetujuan Anggota | Anggota tim belum menerima undangan |
-| `APPROVED` | Disetujui Dekan | Menunggu persetujuan Kepala LPPM |
-| `WAITING_REVIEWER` | Menunggu Penugasan Reviewer | Admin LPPM perlu menugaskan reviewer |
-| `UNDER_REVIEW` | Sedang Direview | Reviewer sedang melakukan review |
-| `REVIEWED` | Review Selesai | Semua reviewer selesai, menunggu keputusan |
-| `REVISION_NEEDED` | Perlu Revisi | Proposal dikembalikan untuk perbaikan |
-| `COMPLETED` | Selesai | Proposal disetujui (terminal) |
-| `REJECTED` | Ditolak | Proposal ditolak (terminal) |
+| Status             | Label (ID)                  | Description                                |
+| ------------------ | --------------------------- | ------------------------------------------ |
+| `DRAFT`            | Draft                       | Proposal sedang disusun                    |
+| `SUBMITTED`        | Diajukan                    | Menunggu persetujuan Dekan                 |
+| `NEED_ASSIGNMENT`  | Perlu Persetujuan Anggota   | Anggota tim belum menerima undangan        |
+| `APPROVED`         | Disetujui Dekan             | Menunggu persetujuan Kepala LPPM           |
+| `WAITING_REVIEWER` | Menunggu Penugasan Reviewer | Admin LPPM perlu menugaskan reviewer       |
+| `UNDER_REVIEW`     | Sedang Direview             | Reviewer sedang melakukan review           |
+| `REVIEWED`         | Review Selesai              | Semua reviewer selesai, menunggu keputusan |
+| `REVISION_NEEDED`  | Perlu Revisi                | Proposal dikembalikan untuk perbaikan      |
+| `COMPLETED`        | Selesai                     | Proposal disetujui (terminal)              |
+| `REJECTED`         | Ditolak                     | Proposal ditolak (terminal)                |
 
 ### 6.2 Complete Workflow Diagram
 ```
@@ -87,26 +87,26 @@ REVIEWED
 ## 7. Reviewer Workflow & Management
 
 ### 7.1 ReviewStatus Enum (`app/Enums/ReviewStatus.php`)
-| Status | Label (ID) | Description |
-|--------|------------|-------------|
-| `PENDING` | Menunggu Review | Review belum dimulai |
-| `IN_PROGRESS` | Sedang Direview | Reviewer membuka form review |
-| `COMPLETED` | Review Selesai | Review telah disubmit |
+| Status                | Label (ID)         | Description                           |
+| --------------------- | ------------------ | ------------------------------------- |
+| `PENDING`             | Menunggu Review    | Review belum dimulai                  |
+| `IN_PROGRESS`         | Sedang Direview    | Reviewer membuka form review          |
+| `COMPLETED`           | Review Selesai     | Review telah disubmit                 |
 | `RE_REVIEW_REQUESTED` | Perlu Review Ulang | Proposal direvisi, perlu review ulang |
 
 ### 7.2 ProposalReviewer Model Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| `proposal_id` | UUID | FK to proposals |
-| `user_id` | UUID | FK to users (reviewer) |
-| `status` | ReviewStatus | Current review status |
-| `review_notes` | text | Reviewer's feedback |
-| `recommendation` | enum | `approved`, `rejected`, `revision_needed` |
-| `round` | int | Review cycle number (1, 2, 3...) |
-| `assigned_at` | datetime | When reviewer was assigned |
-| `deadline_at` | datetime | Review deadline |
-| `started_at` | datetime | When reviewer opened form |
-| `completed_at` | datetime | When review was submitted |
+| Field            | Type         | Description                               |
+| ---------------- | ------------ | ----------------------------------------- |
+| `proposal_id`    | UUID         | FK to proposals                           |
+| `user_id`        | UUID         | FK to users (reviewer)                    |
+| `status`         | ReviewStatus | Current review status                     |
+| `review_notes`   | text         | Reviewer's feedback                       |
+| `recommendation` | enum         | `approved`, `rejected`, `revision_needed` |
+| `round`          | int          | Review cycle number (1, 2, 3...)          |
+| `assigned_at`    | datetime     | When reviewer was assigned                |
+| `deadline_at`    | datetime     | Review deadline                           |
+| `started_at`     | datetime     | When reviewer opened form                 |
+| `completed_at`   | datetime     | When review was submitted                 |
 
 ### 7.3 Reviewer Assignment Flow
 1. **Admin LPPM** assigns reviewers when status = `WAITING_REVIEWER`
@@ -131,11 +131,11 @@ When proposal is resubmitted after `REVISION_NEEDED`:
 6. Reviewers receive `ProposalRevised` notification
 
 ### 7.6 Key Reviewer Actions (`app/Livewire/Actions/`)
-| Action | Purpose |
-|--------|---------|
+| Action                  | Purpose                            |
+| ----------------------- | ---------------------------------- |
 | `AssignReviewersAction` | Admin assigns reviewer to proposal |
-| `CompleteReviewAction` | Reviewer submits their review |
-| `RequestReReviewAction` | Triggers re-review after revision |
+| `CompleteReviewAction`  | Reviewer submits their review      |
+| `RequestReReviewAction` | Triggers re-review after revision  |
 
 ### 7.7 Reviewer Dashboard Features
 - **Stats:** Assigned, Completed, Pending, Re-Review counts
@@ -159,15 +159,15 @@ Route::middleware(['role:reviewer'])->prefix('review')->name('review.')->group(f
 - **Tom Select:** Add `x-data="tomSelect"` to `<select>` elements for searchable dropdowns.
 
 ## 9. System Roles (database/seeders/RoleSeeder.php)
-| Role | Description | Key Permissions |
-|------|-------------|-----------------|
-| `superadmin` | IT / Developers | Full access |
-| `admin lppm` | Operational staff | Assign reviewers, monitor progress |
-| `kepala lppm` | LPPM Director | Initial & final approval decisions |
-| `dekan` | Faculty Deans | First-level approval |
-| `dosen` | Lecturers | Create & submit proposals |
-| `reviewer` | Expert evaluators | Review assigned proposals |
-| `rektor` | University Rector | Strategic oversight |
+| Role          | Description       | Key Permissions                    |
+| ------------- | ----------------- | ---------------------------------- |
+| `superadmin`  | IT / Developers   | Full access                        |
+| `admin lppm`  | Operational staff | Assign reviewers, monitor progress |
+| `kepala lppm` | LPPM Director     | Initial & final approval decisions |
+| `dekan`       | Faculty Deans     | First-level approval               |
+| `dosen`       | Lecturers         | Create & submit proposals          |
+| `reviewer`    | Expert evaluators | Review assigned proposals          |
+| `rektor`      | University Rector | Strategic oversight                |
 
 ## 10. Domain Vocabulary
 - **Penelitian**: Research
@@ -187,18 +187,18 @@ Route::middleware(['role:reviewer'])->prefix('review')->name('review.')->group(f
 ## 12. Documentation Reference
 For deeper understanding of system flows and architecture, refer to these documents in `docs/`:
 
-| Document | Purpose | When to Use |
-|----------|---------|-------------|
-| `01-prd.md` | Product Requirements | Understanding project vision & goals |
-| `02-workflow-lengkap.md` | Business Workflow | High-level process understanding |
-| `03-peran-dan-wewenang.md` | Roles & Permissions | RACI matrix, access control |
-| `04-struktur-data.md` | Data Structure | Research vs PKM differences |
-| `05-transisi-status.md` | Status Transitions | State machine validation rules |
-| `06-master-data.md` | Master Data | Taxonomy, schemes, references |
-| `07-notifikasi.md` | Notification System | Notification triggers & templates |
-| `08-erd.md` | ERD Diagram | Database structure & relations |
-| `09-flow-detail-lengkap.md` | **Detailed Flow** | Component, Action, Route mapping per role |
-| `10-flow-visual-diagram.md` | **Visual Flow Diagrams** | ASCII diagrams for each workflow stage |
+| Document                    | Purpose                  | When to Use                               |
+| --------------------------- | ------------------------ | ----------------------------------------- |
+| `01-prd.md`                 | Product Requirements     | Understanding project vision & goals      |
+| `02-workflow-lengkap.md`    | Business Workflow        | High-level process understanding          |
+| `03-peran-dan-wewenang.md`  | Roles & Permissions      | RACI matrix, access control               |
+| `04-struktur-data.md`       | Data Structure           | Research vs PKM differences               |
+| `05-transisi-status.md`     | Status Transitions       | State machine validation rules            |
+| `06-master-data.md`         | Master Data              | Taxonomy, schemes, references             |
+| `07-notifikasi.md`          | Notification System      | Notification triggers & templates         |
+| `08-erd.md`                 | ERD Diagram              | Database structure & relations            |
+| `09-flow-detail-lengkap.md` | **Detailed Flow**        | Component, Action, Route mapping per role |
+| `10-flow-visual-diagram.md` | **Visual Flow Diagrams** | ASCII diagrams for each workflow stage    |
 
 ### Key Documents for Development:
 - **When implementing new features:** Start with `09-flow-detail-lengkap.md` for component/action mapping

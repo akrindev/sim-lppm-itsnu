@@ -27,3 +27,4 @@ yarn-error.log
 CLAUDE.md
 /public/vendor
 .env.old
+.env.backup*
