@@ -222,40 +222,103 @@ class InstallerWizard extends Component
         $this->institutionForm->normalizeInputs();
         $this->adminForm->normalizeInputs();
 
+        // Build and store config for the installation
+        $effectiveDbPassword = $this->databaseForm->dbPassword;
+        if ($this->storedDbPassword !== '') {
+            $effectiveDbPassword = $this->storedDbPassword;
+        }
+
+        $this->databaseForm->dbPassword = $effectiveDbPassword;
+        $this->storedDbPassword = $effectiveDbPassword;
+
+        // Build config in explicit order to prevent key conflicts
+        $dbConfig = $this->databaseForm->getEnvConfig();
+        $envConfig = $this->environmentForm->getEnvConfig();
+
+        // Merge ENV configs (database first, environment overrides)
+        $config = array_merge($dbConfig, $envConfig);
+
+        // Add non-ENV data for seeders (these are NOT env keys)
+        $config['institution'] = $this->institutionForm->getInstitutionData();
+        $config['faculties'] = $this->institutionForm->getFacultiesData();
+        $config['admin'] = $this->adminForm->getAdminData();
+
+        // Store config in cache for installation to use
+        $this->installationService->storeInstallationConfig($config);
+
+        // Initialize progress state
+        $this->installationService->storeProgress(0, 'Preparing installation...');
+
         $this->isInstalling = true;
         $this->installationProgress = [
             'percent' => 0,
-            'message' => 'Starting installation...',
+            'message' => 'Preparing installation...',
             'logs' => [],
             'complete' => false,
             'error' => null,
         ];
 
-        try {
-            $effectiveDbPassword = $this->databaseForm->dbPassword;
-            if ($this->storedDbPassword !== '') {
-                $effectiveDbPassword = $this->storedDbPassword;
+        // Don't run installation here - let checkProgress handle it
+        // This allows the page to re-render and show the poll first
+    }
+
+    /**
+     * Check installation progress from cache (called by wire:poll).
+     * Also triggers installation on first poll if not started yet.
+     */
+    public function checkProgress(): void
+    {
+        if (! $this->isInstalling) {
+            return;
+        }
+
+        $cached = $this->installationService->getProgress();
+
+        // Check if installation has actually started
+        if (! $this->installationService->isInstallationRunning() && ! $cached['complete'] && ! $cached['error']) {
+            // Start the actual installation
+            $this->doInstallation();
+
+            return;
+        }
+
+        // Update local state from cache
+        if ($cached['updated_at'] !== null) {
+            $this->installationProgress['percent'] = $cached['percent'];
+            $this->installationProgress['message'] = $cached['message'];
+
+            if ($cached['error']) {
+                $this->installationProgress['error'] = $cached['error'];
+                $this->isInstalling = false;
             }
 
-            $this->databaseForm->dbPassword = $effectiveDbPassword;
-            $this->storedDbPassword = $effectiveDbPassword;
+            if ($cached['complete']) {
+                $this->installationProgress['complete'] = true;
+                $this->isInstalling = false;
+                $this->dispatch('installation-complete');
+            }
+        }
+    }
 
-            // Build config in explicit order to prevent key conflicts
-            $dbConfig = $this->databaseForm->getEnvConfig();
-            $envConfig = $this->environmentForm->getEnvConfig();
+    /**
+     * Actually run the installation process.
+     */
+    private function doInstallation(): void
+    {
+        try {
+            // Mark installation as running
+            $this->installationService->markInstallationRunning();
 
-            // Merge ENV configs (database first, environment overrides)
-            $config = array_merge($dbConfig, $envConfig);
+            // Get stored config
+            $config = $this->installationService->getInstallationConfig();
 
-            // Add non-ENV data for seeders (these are NOT env keys)
-            $config['institution'] = $this->institutionForm->getInstitutionData();
-            $config['faculties'] = $this->institutionForm->getFacultiesData();
-            $config['admin'] = $this->adminForm->getAdminData();
+            if (empty($config)) {
+                throw new \Exception('Installation config not found. Please restart the installation.');
+            }
 
             $this->installationService->runInstallation(
                 $config,
                 function (int $percent, string $message) {
-                    // Callback still called, just update logs
                     $this->installationProgress['logs'][] = "[{$percent}%] {$message}";
                 }
             );
@@ -264,10 +327,9 @@ class InstallerWizard extends Component
             $this->installationProgress['percent'] = 100;
             $this->installationProgress['message'] = 'Installation complete!';
 
-            // Clear progress cache
-            $this->installationService->clearProgress();
+            // Clear caches
+            $this->installationService->clearInstallationConfig();
 
-            $this->dispatch('installation-complete');
         } catch (\Exception $e) {
             $this->installationProgress['error'] = $e->getMessage();
             $this->installationProgress['logs'][] = "ERROR: {$e->getMessage()}";
@@ -282,32 +344,8 @@ class InstallerWizard extends Component
 
             $this->dispatch('notify', type: 'error', message: 'Installation failed: '.$e->getMessage());
         } finally {
+            $this->installationService->markInstallationStopped();
             $this->isInstalling = false;
-        }
-    }
-
-    /**
-     * Check installation progress from cache (called by wire:poll).
-     */
-    public function checkProgress(): void
-    {
-        if (! $this->isInstalling) {
-            return;
-        }
-
-        $cached = $this->installationService->getProgress();
-
-        if ($cached['updated_at'] !== null) {
-            $this->installationProgress['percent'] = $cached['percent'];
-            $this->installationProgress['message'] = $cached['message'];
-
-            if ($cached['error']) {
-                $this->installationProgress['error'] = $cached['error'];
-            }
-
-            if ($cached['complete']) {
-                $this->installationProgress['complete'] = true;
-            }
         }
     }
 
@@ -319,6 +357,10 @@ class InstallerWizard extends Component
         // Reset error state but keep logs for context
         $this->installationProgress['error'] = null;
         $this->installationProgress['logs'][] = '--- Retrying installation ---';
+
+        // Clear previous state
+        $this->installationService->clearProgress();
+        $this->installationService->markInstallationStopped();
 
         // Start installation again
         $this->startInstallation();

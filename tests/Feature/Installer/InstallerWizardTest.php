@@ -11,6 +11,10 @@ class FakeInstallationService extends InstallationService
 {
     public array $lastConfig = [];
 
+    private bool $running = false;
+
+    private array $storedConfig = [];
+
     public function checkEnvironment(): array
     {
         return [];
@@ -26,6 +30,36 @@ class FakeInstallationService extends InstallationService
         $this->lastConfig = $config;
 
         $onProgress(100, 'Installation complete!');
+    }
+
+    public function storeInstallationConfig(array $config): void
+    {
+        $this->storedConfig = $config;
+    }
+
+    public function getInstallationConfig(): array
+    {
+        return $this->storedConfig;
+    }
+
+    public function clearInstallationConfig(): void
+    {
+        $this->storedConfig = [];
+    }
+
+    public function isInstallationRunning(): bool
+    {
+        return $this->running;
+    }
+
+    public function markInstallationRunning(): void
+    {
+        $this->running = true;
+    }
+
+    public function markInstallationStopped(): void
+    {
+        $this->running = false;
     }
 }
 
@@ -111,7 +145,9 @@ it('builds installation config from all form steps', function () {
 
     expect($component->instance()->databaseForm->getEnvConfig()['DB_PASSWORD'])->toBe('secret');
 
+    // startInstallation stores config, checkProgress triggers actual installation
     $component->call('startInstallation');
+    $component->call('checkProgress');
 
     expect($service->lastConfig['DB_DATABASE'])->toBe('lppm_itsnu')
         ->and($service->lastConfig['DB_USERNAME'])->toBe('app_user')
@@ -125,7 +161,7 @@ it('preserves database password through step navigation', function () {
     app()->instance(InstallationService::class, $service);
 
     // Test that password is properly synced and preserved
-    Livewire::test(InstallerWizard::class)
+    $component = Livewire::test(InstallerWizard::class)
         // Set up database form and stored password
         ->set('databaseForm.host', '127.0.0.1')
         ->set('databaseForm.port', '3306')
@@ -157,7 +193,8 @@ it('preserves database password through step navigation', function () {
         ->set('adminForm.adminEmail', 'admin@example.com')
         ->set('adminForm.adminPassword', 'Password1')
         ->set('adminForm.adminPasswordConfirmation', 'Password1')
-        ->call('startInstallation');
+        ->call('startInstallation')
+        ->call('checkProgress');
 
     expect($service->lastConfig['DB_PASSWORD'])->toBe('secret');
 });
@@ -168,7 +205,7 @@ it('updates database password when user enters new value', function () {
     app()->instance(InstallationService::class, $service);
 
     // Test that password is properly updated
-    Livewire::test(InstallerWizard::class)
+    $component = Livewire::test(InstallerWizard::class)
         // Set initial password and stored password
         ->set('databaseForm.host', '127.0.0.1')
         ->set('databaseForm.port', '3306')
@@ -200,7 +237,8 @@ it('updates database password when user enters new value', function () {
         ->set('adminForm.adminEmail', 'admin@example.com')
         ->set('adminForm.adminPassword', 'Password1')
         ->set('adminForm.adminPasswordConfirmation', 'Password1')
-        ->call('startInstallation');
+        ->call('startInstallation')
+        ->call('checkProgress');
 
     expect($service->lastConfig['DB_PASSWORD'])->toBe('new_password');
 });

@@ -18,6 +18,10 @@ class InstallationService
 
     private const PROGRESS_CACHE_KEY = 'installer_progress';
 
+    private const CONFIG_CACHE_KEY = 'installer_config';
+
+    private const RUNNING_CACHE_KEY = 'installer_running';
+
     public function isInstalled(): bool
     {
         // Check lock file
@@ -109,6 +113,54 @@ class InstallationService
         Cache::forget(self::PROGRESS_CACHE_KEY);
     }
 
+    /**
+     * Store installation config in cache for deferred execution.
+     */
+    public function storeInstallationConfig(array $config): void
+    {
+        Cache::put(self::CONFIG_CACHE_KEY, $config, 300); // 5 minutes TTL
+    }
+
+    /**
+     * Get installation config from cache.
+     */
+    public function getInstallationConfig(): array
+    {
+        return Cache::get(self::CONFIG_CACHE_KEY, []);
+    }
+
+    /**
+     * Clear installation config from cache.
+     */
+    public function clearInstallationConfig(): void
+    {
+        Cache::forget(self::CONFIG_CACHE_KEY);
+    }
+
+    /**
+     * Check if installation is currently running.
+     */
+    public function isInstallationRunning(): bool
+    {
+        return Cache::get(self::RUNNING_CACHE_KEY, false);
+    }
+
+    /**
+     * Mark installation as running.
+     */
+    public function markInstallationRunning(): void
+    {
+        Cache::put(self::RUNNING_CACHE_KEY, true, 600); // 10 minutes TTL
+    }
+
+    /**
+     * Mark installation as stopped.
+     */
+    public function markInstallationStopped(): void
+    {
+        Cache::forget(self::RUNNING_CACHE_KEY);
+    }
+
     public function runInstallation(array $config, callable $onProgress): void
     {
         // Clear any previous progress
@@ -171,14 +223,38 @@ class InstallationService
 
     private function generateKey(): void
     {
+        $envPath = base_path('.env');
+
+        // Ensure .env file exists
+        if (! File::exists($envPath)) {
+            throw new Exception('.env file not found. Cannot generate application key.');
+        }
+
         // Reload .env file to ensure we have latest values
         $this->reloadEnvFile();
 
-        // Generate the application key
-        Artisan::call('key:generate', ['--force' => true]);
+        // Generate a new key manually and write it to .env
+        $key = 'base64:'.base64_encode(random_bytes(32));
 
-        // Reload again to get the new key
+        // Read current .env content
+        $content = File::get($envPath);
+
+        // Replace APP_KEY line
+        if (preg_match('/^APP_KEY=.*/m', $content)) {
+            $content = preg_replace('/^APP_KEY=.*/m', "APP_KEY={$key}", $content);
+        } else {
+            // Add APP_KEY if it doesn't exist
+            $content = "APP_KEY={$key}\n".$content;
+        }
+
+        // Write back
+        File::put($envPath, $content);
+
+        // Reload to get the new key
         $this->reloadEnvFile();
+
+        // Also update Laravel's config directly
+        config(['app.key' => $key]);
     }
 
     /**
