@@ -9,6 +9,8 @@ use Livewire\Form;
 class EnvironmentConfigForm extends Form
 {
     // Application Settings
+    public string $appName = 'LPPM ITSNU';
+
     public string $appEnv = 'production';
 
     public bool $appDebug = false;
@@ -73,6 +75,7 @@ class EnvironmentConfigForm extends Form
     protected function rules(): array
     {
         return [
+            'appName' => 'required|string|min:3|max:100',
             'appEnv' => 'required|in:local,production,staging',
             'appDebug' => 'boolean',
             'appUrl' => 'required|url',
@@ -109,6 +112,8 @@ class EnvironmentConfigForm extends Form
     protected function messages(): array
     {
         return [
+            'appName.required' => 'Application name is required',
+            'appName.min' => 'Application name must be at least 3 characters',
             'appUrl.required' => 'Application URL is required',
             'appUrl.url' => 'Please enter a valid URL (e.g., https://example.com)',
             'sessionLifetime.min' => 'Session lifetime must be at least 1 minute',
@@ -127,6 +132,7 @@ class EnvironmentConfigForm extends Form
         $this->normalizeInputs();
 
         return [
+            'APP_NAME' => $this->appName,
             'APP_ENV' => $this->appEnv,
             'APP_DEBUG' => $this->appDebug ? 'true' : 'false',
             'APP_URL' => $this->appUrl,
@@ -162,6 +168,7 @@ class EnvironmentConfigForm extends Form
 
     public function normalizeInputs(): void
     {
+        $this->appName = trim($this->appName);
         $this->appUrl = rtrim(trim($this->appUrl), '/');
         $this->mailHost = trim($this->mailHost);
         $this->mailUsername = trim($this->mailUsername);

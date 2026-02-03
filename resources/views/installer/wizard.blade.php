@@ -287,6 +287,16 @@
                             {{-- Application Settings --}}
                             <div class="mb-4">
                                 <h3 class="mb-3">Pengaturan Aplikasi</h3>
+                                <div class="mb-3">
+                                    <label class="form-label required">Nama Aplikasi</label>
+                                    <input type="text"
+                                        class="form-control @error('environmentForm.appName') is-invalid @enderror"
+                                        wire:model="environmentForm.appName" placeholder="LPPM ITSNU">
+                                    <small class="text-muted">Nama yang akan ditampilkan di browser dan email</small>
+                                    @error('environmentForm.appName')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label required">Environment</label>

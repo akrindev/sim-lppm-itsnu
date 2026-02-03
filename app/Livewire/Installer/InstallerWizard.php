@@ -247,9 +247,6 @@ class InstallerWizard extends Component
             // Merge ENV configs (database first, environment overrides)
             $config = array_merge($dbConfig, $envConfig);
 
-            // Set APP_NAME explicitly (institution short name)
-            $config['APP_NAME'] = $this->institutionForm->institutionShortName;
-
             // Add non-ENV data for seeders (these are NOT env keys)
             $config['institution'] = $this->institutionForm->getInstitutionData();
             $config['faculties'] = $this->institutionForm->getFacultiesData();

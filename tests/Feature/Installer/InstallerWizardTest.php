@@ -95,6 +95,7 @@ it('builds installation config from all form steps', function () {
         ->set('databaseForm.port', '3306')
         ->set('databaseForm.database', '  lppm_itsnu  ')
         ->set('databaseForm.username', '  app_user  ')
+        ->set('environmentForm.appName', 'ITSNU Test')
         ->set('environmentForm.appUrl', 'https://example.com')
         ->set('institutionForm.institutionName', 'Institut Test')
         ->set('institutionForm.institutionShortName', 'ITSNU Test')
