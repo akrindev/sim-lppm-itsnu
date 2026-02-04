@@ -33,6 +33,10 @@ class InstallerMiddleware
             $isInstalled = false;
         }
 
+        if (! $isInstalled) {
+            $this->ensureInstallerKey();
+        }
+
         // When not installed, avoid database-backed services
         if (! $isInstalled) {
             config([
@@ -64,6 +68,49 @@ class InstallerMiddleware
     private function isInstalled(): bool
     {
         return File::exists($this->getLockFilePath());
+    }
+
+    private function ensureInstallerKey(): void
+    {
+        if (! empty(config('app.key'))) {
+            return;
+        }
+
+        $key = $this->getInstallerKey();
+
+        config(['app.key' => $key]);
+        putenv("APP_KEY={$key}");
+        $_ENV['APP_KEY'] = $key;
+        $_SERVER['APP_KEY'] = $key;
+    }
+
+    private function getInstallerKey(): string
+    {
+        $path = $this->getInstallerKeyPath();
+
+        if (File::exists($path)) {
+            $stored = trim(File::get($path));
+
+            if ($stored !== '') {
+                return $stored;
+            }
+        }
+
+        $key = 'base64:'.base64_encode(random_bytes(32));
+
+        try {
+            File::ensureDirectoryExists(dirname($path));
+            File::put($path, $key);
+        } catch (\Exception) {
+            // If we can't persist the key, we'll use the generated key for this request only.
+        }
+
+        return $key;
+    }
+
+    private function getInstallerKeyPath(): string
+    {
+        return storage_path('app/.installer_key');
     }
 
     private function getLockFilePath(): string

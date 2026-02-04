@@ -25,7 +25,7 @@ class FakeInstallationService extends InstallationService
         return true;
     }
 
-    public function runInstallation(array $config, callable $onProgress): void
+    public function runInstallation(array $config, callable $onProgress, ?callable $onStep = null): void
     {
         $this->lastConfig = $config;
 
