@@ -5,6 +5,7 @@ namespace App\Livewire\Traits;
 use App\Livewire\Concerns\HasToast;
 use App\Models\Proposal;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 trait WithTeamManagement
@@ -16,8 +17,14 @@ trait WithTeamManagement
         return app(NotificationService::class);
     }
 
-    public function acceptMember(string $userId): void
+    public function acceptMember(?string $userId = null): void
     {
+        $userId = $userId ?? (string) Auth::id();
+
+        if (! $userId) {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
         $proposal = $this->getProposal();
 
         DB::transaction(function () use ($proposal, $userId) {
@@ -37,8 +44,14 @@ trait WithTeamManagement
         $this->toastSuccess('Undangan tim berhasil diterima.');
     }
 
-    public function rejectMember(string $userId): void
+    public function rejectMember(?string $userId = null): void
     {
+        $userId = $userId ?? (string) Auth::id();
+
+        if (! $userId) {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
         $proposal = $this->getProposal();
 
         DB::transaction(function () use ($proposal, $userId) {
