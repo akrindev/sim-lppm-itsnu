@@ -181,4 +181,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('daily-notes.export-pdf');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

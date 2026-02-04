@@ -270,7 +270,7 @@ class MenuComposer
         ];
 
         return array_values(array_filter(array_map(
-            fn(array $item) => $this->formatItem($item, $user),
+            fn (array $item) => $this->formatItem($item, $user),
             $items,
         )));
     }
@@ -289,7 +289,7 @@ class MenuComposer
         $children = null;
         if (isset($item['children']) && is_array($item['children'])) {
             $children = array_values(array_filter(array_map(
-                fn(array $child) => $this->formatDropdownItem($child, $user),
+                fn (array $child) => $this->formatDropdownItem($child, $user),
                 $item['children'],
             )));
         }
@@ -338,7 +338,7 @@ class MenuComposer
         $children = null;
         if (isset($item['children']) && is_array($item['children'])) {
             $children = array_values(array_filter(array_map(
-                fn(array $child) => $this->formatDropdownItem($child, $user),
+                fn (array $child) => $this->formatDropdownItem($child, $user),
                 $item['children'],
             )));
         }
@@ -422,7 +422,7 @@ class MenuComposer
             if ($expandIndex && str_ends_with($pattern, '.index')) {
                 $resourceRoute = substr($pattern, 0, -6);
 
-                if (request()->routeIs($resourceRoute . '.*')) {
+                if (request()->routeIs($resourceRoute.'.*')) {
                     return true;
                 }
             }
