@@ -293,6 +293,13 @@ class InstallationService
     private function clearConfigCache(): void
     {
         try {
+            // Clear cached config files directly (faster and safer during install)
+            $cachedConfigPath = base_path('bootstrap/cache/config.php');
+            if (File::exists($cachedConfigPath)) {
+                File::delete($cachedConfigPath);
+            }
+
+            // Also try artisan but don't wait too long
             Artisan::call('config:clear');
         } catch (Exception) {
             // Ignore failures during installation.
@@ -328,8 +335,12 @@ class InstallationService
 
     private function runSeeders(int $currentWeight, int $totalWeight, int $stepWeight, array $config = []): void
     {
+        // Production seeders (always run)
         $seeders = [
+            // 1. Roles & Permissions
             'RoleSeeder',
+
+            // 2. Master Data (No Dependencies)
             'InstitutionSeeder',
             'ResearchSchemeSeeder',
             'TktSeeder',
@@ -340,13 +351,28 @@ class InstallationService
             'BudgetGroupSeeder',
             'BudgetComponentSeeder',
             'ReviewCriteriaSeeder',
+
+            // 3. Hierarchical Data (Self-referencing)
             'ScienceClusterSeeder',
+
+            // 4. Dependent Master Data
             'FacultySeeder',
             'StudyProgramSeeder',
             'ThemeSeeder',
             'TopicSeeder',
+
+            // 5. Users & Identities
             'AdminUserSeeder',
         ];
+
+        // Development seeders (only in non-production)
+        if (! app()->isProduction()) {
+            $seeders = array_merge($seeders, [
+                'PartnerSeeder',
+                'UserSeeder',
+                'ProposalSeeder',
+            ]);
+        }
 
         $totalSeeders = count($seeders);
 
@@ -355,13 +381,15 @@ class InstallationService
             $this->storeDynamicSeedersConfig($config);
         }
 
-        foreach ($seeders as $index => $seederClass) {
-            $dbEnv = $this->buildDatabaseEnv();
-            $this->applyDatabaseEnv($dbEnv);
-            if (empty($dbEnv['DB_PASSWORD'])) {
-                throw new Exception('Database password is empty. Please re-enter it in the installer.');
-            }
+        // Apply database env ONCE before running all seeders (not inside the loop)
+        // This prevents DB::purge/reconnect from causing transaction/visibility issues
+        $dbEnv = $this->buildDatabaseEnv();
+        $this->applyDatabaseEnv($dbEnv);
+        if (empty($dbEnv['DB_PASSWORD'])) {
+            throw new Exception('Database password is empty. Please re-enter it in the installer.');
+        }
 
+        foreach ($seeders as $index => $seederClass) {
             Artisan::call('db:seed', ['--class' => $seederClass, '--force' => true]);
 
             $progress = $currentWeight + ($stepWeight * ($index + 1) / $totalSeeders);
@@ -466,20 +494,34 @@ class InstallationService
             $_SERVER[$key] = $value;
         }
 
-        config([
-            'database.default' => $envVars['DB_CONNECTION'],
-            'database.connections.'.$envVars['DB_CONNECTION'] => [
-                'driver' => $envVars['DB_CONNECTION'],
-                'host' => $envVars['DB_HOST'],
-                'port' => $envVars['DB_PORT'],
-                'database' => $envVars['DB_DATABASE'],
-                'username' => $envVars['DB_USERNAME'],
-                'password' => $envVars['DB_PASSWORD'],
-            ],
+        $connection = $envVars['DB_CONNECTION'];
+
+        // Get existing connection config and merge with new values
+        $existingConfig = config("database.connections.{$connection}", []);
+
+        $newConfig = array_merge($existingConfig, [
+            'driver' => $connection,
+            'host' => $envVars['DB_HOST'],
+            'port' => $envVars['DB_PORT'],
+            'database' => $envVars['DB_DATABASE'],
+            'username' => $envVars['DB_USERNAME'],
+            'password' => $envVars['DB_PASSWORD'],
+            // Ensure required MariaDB/MySQL parameters are set
+            'charset' => $existingConfig['charset'] ?? 'utf8mb4',
+            'collation' => $existingConfig['collation'] ?? 'utf8mb4_unicode_ci',
+            'prefix' => $existingConfig['prefix'] ?? '',
+            'prefix_indexes' => $existingConfig['prefix_indexes'] ?? true,
+            'strict' => $existingConfig['strict'] ?? true,
+            'engine' => $existingConfig['engine'] ?? null,
         ]);
 
-        DB::purge($envVars['DB_CONNECTION']);
-        DB::reconnect($envVars['DB_CONNECTION']);
+        config([
+            'database.default' => $connection,
+            "database.connections.{$connection}" => $newConfig,
+        ]);
+
+        DB::purge($connection);
+        DB::reconnect($connection);
     }
 
     private function finalizeInstallation(): void
