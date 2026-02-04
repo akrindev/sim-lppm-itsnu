@@ -8,13 +8,13 @@ use App\Livewire\Forms\Installer\EnvironmentConfigForm;
 use App\Services\Installer\DatabaseTester;
 use App\Services\Installer\InstallationService;
 use Illuminate\Console\Command;
+use Laravel\Prompts\Prompt;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\form;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
-use function Laravel\Prompts\progress;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\spin;
 use function Laravel\Prompts\warning;
@@ -29,6 +29,7 @@ class InstallCommand extends Command
 
     public function handle(InstallationService $installationService): int
     {
+        $this->registerPromptFallbacks();
         $this->displayHeader();
 
         // Check if already installed
@@ -92,6 +93,15 @@ class InstallCommand extends Command
         return 1;
     }
 
+    private function registerPromptFallbacks(): void
+    {
+        $isInteractive = $this->input?->isInteractive() ?? true;
+        $isWindows = function_exists('windows_os') ? windows_os() : false;
+        $shouldFallback = ! $isInteractive || $isWindows || app()->runningUnitTests();
+
+        Prompt::fallbackWhen($shouldFallback);
+    }
+
     private function displayHeader(): void
     {
         $this->newLine();
@@ -108,6 +118,7 @@ class InstallCommand extends Command
 
         $checks = $service->checkEnvironment();
         $allPassed = true;
+        $missingExtensions = [];
 
         foreach ($checks as $check) {
             $status = $check['status'] ? '<fg=green>✓</>' : '<fg=red>✗</>';
@@ -121,6 +132,16 @@ class InstallCommand extends Command
         $this->newLine();
 
         if (! $allPassed) {
+            foreach ($checks as $key => $check) {
+                if (! $check['status'] && str_starts_with($key, 'ext_')) {
+                    $missingExtensions[] = substr($key, 4);
+                }
+            }
+
+            if (! empty($missingExtensions)) {
+                $this->displayExtensionInstallHints($missingExtensions);
+            }
+
             error('Environment checks failed. Please fix the issues above.');
 
             return false;
@@ -130,6 +151,71 @@ class InstallCommand extends Command
         $this->newLine();
 
         return true;
+    }
+
+    private function displayExtensionInstallHints(array $extensions): void
+    {
+        $extensions = array_values(array_unique($extensions));
+        $packages = $this->buildExtensionPackages($extensions);
+
+        $this->newLine();
+        warning('Missing PHP extensions detected: '.implode(', ', $extensions));
+
+        if (PHP_OS_FAMILY === 'Linux') {
+            $commands = $this->buildLinuxExtensionInstallCommands($packages);
+
+            if (! empty($commands)) {
+                note('Install commands (Linux):');
+                foreach ($commands as $command) {
+                    $this->line("  {$command}");
+                }
+            } else {
+                note('Install the missing PHP extensions using your package manager.');
+            }
+        } else {
+            note('Install the missing PHP extensions using your OS package manager.');
+        }
+
+        $this->newLine();
+    }
+
+    private function buildExtensionPackages(array $extensions): array
+    {
+        $phpVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
+        $map = [
+            'pdo_mysql' => "php{$phpVersion}-mysql",
+            'pdo' => "php{$phpVersion}-pdo",
+        ];
+
+        $packages = [];
+        foreach ($extensions as $extension) {
+            $packages[] = $map[$extension] ?? "php{$phpVersion}-{$extension}";
+        }
+
+        return array_values(array_unique($packages));
+    }
+
+    private function buildLinuxExtensionInstallCommands(array $packages): array
+    {
+        $commands = [];
+
+        if (file_exists('/usr/bin/apt-get')) {
+            $commands[] = 'sudo apt-get update && sudo apt-get install -y '.implode(' ', $packages);
+        }
+
+        if (file_exists('/usr/bin/dnf')) {
+            $commands[] = 'sudo dnf install -y '.implode(' ', $packages);
+        }
+
+        if (file_exists('/usr/bin/yum')) {
+            $commands[] = 'sudo yum install -y '.implode(' ', $packages);
+        }
+
+        if (file_exists('/usr/bin/pacman')) {
+            $commands[] = 'sudo pacman -S '.implode(' ', $packages);
+        }
+
+        return $commands;
     }
 
     private function configureEnvironment(): array
@@ -151,7 +237,7 @@ class InstallCommand extends Command
                 label: 'Application URL',
                 default: 'http://localhost',
                 required: true,
-                validate: ['required', 'url'],
+                validate: ['app_url' => 'url'],
                 hint: 'e.g., https://lppm.itsnu.ac.id',
                 name: 'app_url'
             )
@@ -160,6 +246,12 @@ class InstallCommand extends Command
                 options: $options['appEnv'],
                 default: 'production',
                 name: 'app_env'
+            )
+            ->select(
+                label: 'Locale',
+                options: $options['appLocale'],
+                default: 'id',
+                name: 'app_locale'
             )
             ->confirm(
                 label: 'Enable Debug Mode?',
@@ -174,41 +266,34 @@ class InstallCommand extends Command
             'APP_URL' => rtrim($responses['app_url'], '/'),
             'APP_ENV' => $responses['app_env'],
             'APP_DEBUG' => $responses['app_debug'] ? 'true' : 'false',
-            'APP_LOCALE' => 'id',
+            'APP_LOCALE' => $responses['app_locale'],
         ];
 
         // Skip advanced config if quick mode
         if ($isQuick) {
             $this->newLine();
-            note('Using default settings for session, cache, queue, and mail.');
+            note('Using default settings for session, cache, queue, mail, and storage.');
             $this->newLine();
 
             return array_merge($config, [
                 'SESSION_DRIVER' => 'file',
+                'SESSION_LIFETIME' => '120',
                 'CACHE_STORE' => 'file',
                 'QUEUE_CONNECTION' => 'sync',
                 'MAIL_MAILER' => 'log',
+                'FILESYSTEM_DISK' => 'local',
+                'MEDIA_DISK' => 'public',
             ]);
         }
 
-        // Advanced configuration
-        if (confirm('Configure advanced settings? (Session, Cache, Queue, Mail)', default: false)) {
-            $config = array_merge($config, $this->configureAdvancedEnvironment($options));
-        } else {
-            $config = array_merge($config, [
-                'SESSION_DRIVER' => 'file',
-                'CACHE_STORE' => 'file',
-                'QUEUE_CONNECTION' => 'sync',
-                'MAIL_MAILER' => 'log',
-            ]);
-        }
+        $config = array_merge($config, $this->configureAdvancedEnvironment($options, $config['APP_NAME']));
 
         $this->newLine();
 
         return $config;
     }
 
-    private function configureAdvancedEnvironment(array $options): array
+    private function configureAdvancedEnvironment(array $options, string $appName): array
     {
         $this->newLine();
         note('Session, Cache & Queue Configuration');
@@ -223,7 +308,8 @@ class InstallCommand extends Command
             ->text(
                 label: 'Session Lifetime (minutes)',
                 default: '120',
-                validate: ['required', 'numeric', 'min:1'],
+                required: true,
+                validate: ['session_lifetime' => 'numeric|min:1'],
                 name: 'session_lifetime'
             )
             ->select(
@@ -247,27 +333,14 @@ class InstallCommand extends Command
             'QUEUE_CONNECTION' => $responses['queue_connection'],
         ];
 
-        // Mail configuration
-        if (confirm('Configure mail settings?', default: false)) {
-            $config = array_merge($config, $this->configureMailSettings($options));
-        } else {
-            $config['MAIL_MAILER'] = 'log';
-        }
-
-        // Turnstile configuration
-        if (confirm('Configure Cloudflare Turnstile (CAPTCHA)?', default: false)) {
-            $config = array_merge($config, $this->configureTurnstile());
-        }
-
-        // S3 Storage configuration
-        if (confirm('Configure S3/Object Storage?', default: false)) {
-            $config = array_merge($config, $this->configureS3Storage($options));
-        }
+        $config = array_merge($config, $this->configureMailSettings($options, $appName));
+        $config = array_merge($config, $this->configureStorageSettings($options));
+        $config = array_merge($config, $this->configureTurnstile());
 
         return $config;
     }
 
-    private function configureMailSettings(array $options): array
+    private function configureMailSettings(array $options, string $appName): array
     {
         $this->newLine();
         note('Mail Configuration');
@@ -275,10 +348,19 @@ class InstallCommand extends Command
         $mailer = select(
             label: 'Mail Driver',
             options: $options['mailMailer'],
-            default: 'smtp'
+            default: 'log'
         );
 
-        $config = ['MAIL_MAILER' => $mailer];
+        $encryption = select(
+            label: 'Encryption',
+            options: $options['mailEncryption'],
+            default: 'tls'
+        );
+
+        $config = [
+            'MAIL_MAILER' => $mailer,
+            'MAIL_ENCRYPTION' => $encryption === 'null' ? '' : $encryption,
+        ];
 
         if ($mailer === 'smtp') {
             $responses = form()
@@ -290,6 +372,7 @@ class InstallCommand extends Command
                 ->text(
                     label: 'SMTP Port',
                     default: '587',
+                    validate: ['mail_port' => 'nullable|numeric'],
                     name: 'mail_port'
                 )
                 ->text(
@@ -300,22 +383,6 @@ class InstallCommand extends Command
                     label: 'SMTP Password',
                     name: 'mail_password'
                 )
-                ->select(
-                    label: 'Encryption',
-                    options: $options['mailEncryption'],
-                    default: 'tls',
-                    name: 'mail_encryption'
-                )
-                ->text(
-                    label: 'From Address',
-                    validate: ['nullable', 'email'],
-                    name: 'mail_from_address'
-                )
-                ->text(
-                    label: 'From Name',
-                    default: 'LPPM ITSNU',
-                    name: 'mail_from_name'
-                )
                 ->submit();
 
             $config = array_merge($config, [
@@ -323,13 +390,26 @@ class InstallCommand extends Command
                 'MAIL_PORT' => $responses['mail_port'],
                 'MAIL_USERNAME' => $responses['mail_username'],
                 'MAIL_PASSWORD' => $responses['mail_password'],
-                'MAIL_ENCRYPTION' => $responses['mail_encryption'] === 'null' ? '' : $responses['mail_encryption'],
-                'MAIL_FROM_ADDRESS' => $responses['mail_from_address'],
-                'MAIL_FROM_NAME' => $responses['mail_from_name'],
             ]);
         }
 
-        return $config;
+        $responses = form()
+            ->text(
+                label: 'From Address',
+                validate: ['mail_from_address' => 'nullable|email'],
+                name: 'mail_from_address'
+            )
+            ->text(
+                label: 'From Name',
+                default: $appName,
+                name: 'mail_from_name'
+            )
+            ->submit();
+
+        return array_merge($config, [
+            'MAIL_FROM_ADDRESS' => $responses['mail_from_address'],
+            'MAIL_FROM_NAME' => $responses['mail_from_name'],
+        ]);
     }
 
     private function configureTurnstile(): array
@@ -340,11 +420,12 @@ class InstallCommand extends Command
         $responses = form()
             ->text(
                 label: 'Site Key',
-                hint: 'Get from Cloudflare Dashboard',
+                hint: 'Leave empty to skip (Cloudflare Dashboard)',
                 name: 'site_key'
             )
             ->password(
                 label: 'Secret Key',
+                hint: 'Leave empty to skip',
                 name: 'secret_key'
             )
             ->submit();
@@ -353,6 +434,38 @@ class InstallCommand extends Command
             'TURNSTILE_SITE_KEY' => $responses['site_key'],
             'TURNSTILE_SECRET_KEY' => $responses['secret_key'],
         ];
+    }
+
+    private function configureStorageSettings(array $options): array
+    {
+        $this->newLine();
+        note('Storage Configuration');
+
+        $responses = form()
+            ->select(
+                label: 'Filesystem Disk',
+                options: $options['filesystemDisk'],
+                default: 'local',
+                name: 'filesystem_disk'
+            )
+            ->select(
+                label: 'Media Disk',
+                options: $options['mediaDisk'],
+                default: 'public',
+                name: 'media_disk'
+            )
+            ->submit();
+
+        $config = [
+            'FILESYSTEM_DISK' => $responses['filesystem_disk'],
+            'MEDIA_DISK' => $responses['media_disk'],
+        ];
+
+        if ($responses['filesystem_disk'] === 's3' || $responses['media_disk'] === 's3') {
+            $config = array_merge($config, $this->configureS3Storage($options));
+        }
+
+        return $config;
     }
 
     private function configureS3Storage(array $options): array
@@ -401,8 +514,6 @@ class InstallCommand extends Command
             ->submit();
 
         return [
-            'FILESYSTEM_DISK' => 's3',
-            'MEDIA_DISK' => 's3',
             'AWS_ACCESS_KEY_ID' => $responses['access_key'],
             'AWS_SECRET_ACCESS_KEY' => $responses['secret_key'],
             'AWS_DEFAULT_REGION' => $responses['region'],
@@ -430,7 +541,7 @@ class InstallCommand extends Command
                 label: 'Port',
                 default: $defaultConfig['port'],
                 required: true,
-                validate: ['required', 'numeric'],
+                validate: ['port' => 'numeric'],
                 name: 'port'
             )
             ->text(
@@ -556,13 +667,13 @@ class InstallCommand extends Command
             ->text(
                 label: 'Email',
                 default: 'info@itsnu.ac.id',
-                validate: ['nullable', 'email'],
+                validate: ['email' => 'nullable|email'],
                 name: 'email'
             )
             ->text(
                 label: 'Website',
                 default: 'https://itsnu.ac.id',
-                validate: ['nullable', 'url'],
+                validate: ['website' => 'nullable|url'],
                 name: 'website'
             )
             ->submit();
@@ -659,7 +770,7 @@ class InstallCommand extends Command
             ->text(
                 label: 'Email Address',
                 required: true,
-                validate: ['required', 'email'],
+                validate: ['email' => 'email'],
                 name: 'email'
             )
             ->password(
@@ -714,6 +825,12 @@ class InstallCommand extends Command
         $this->line("  App Name: {$envConfig['APP_NAME']}");
         $this->line("  URL: {$envConfig['APP_URL']}");
         $this->line("  Environment: {$envConfig['APP_ENV']}");
+        if (isset($envConfig['APP_LOCALE'])) {
+            $this->line("  Locale: {$envConfig['APP_LOCALE']}");
+        }
+        if (isset($envConfig['APP_DEBUG'])) {
+            $this->line("  Debug: {$envConfig['APP_DEBUG']}");
+        }
         $this->newLine();
 
         $this->line('<fg=yellow>Database:</>');
@@ -763,27 +880,17 @@ class InstallCommand extends Command
             'admin' => $adminConfig,
         ]);
 
-        $progress = progress(label: 'Installing', steps: 100);
-        $progress->start();
-
         try {
             $service->runInstallation(
                 $config,
-                function (int $percent, string $message) use ($progress) {
-                    $progress->label("Installing: {$message}");
-                    $currentProgress = $progress->progress ?? 0;
-                    $advance = $percent - $currentProgress;
-                    if ($advance > 0) {
-                        $progress->advance($advance);
-                    }
+                function (int $percent, string $message): void {},
+                function (array $step, callable $runStep) {
+                    spin($runStep, $step['label']);
                 }
             );
 
-            $progress->finish();
-
             return true;
         } catch (\Exception $e) {
-            $progress->finish();
             error("Installation failed: {$e->getMessage()}");
 
             return false;

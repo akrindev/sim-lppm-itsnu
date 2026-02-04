@@ -161,7 +161,7 @@ class InstallationService
         Cache::forget(self::RUNNING_CACHE_KEY);
     }
 
-    public function runInstallation(array $config, callable $onProgress): void
+    public function runInstallation(array $config, callable $onProgress, ?callable $onStep = null): void
     {
         $steps = [
             ['name' => 'backup_env', 'label' => 'Backing up existing configuration...', 'weight' => 5],
@@ -183,18 +183,26 @@ class InstallationService
             $onProgress($percent, $step['label']);
             $this->storeProgress($percent, $step['label']);
 
-            match ($step['name']) {
-                'backup_env' => $this->backupEnvFile(),
-                'write_env' => $this->writeEnvFile($config),
-                'clear_config' => $this->clearConfigCache(),
-                'generate_key' => $this->generateKey(),
-                'run_migrations' => $this->runMigrations($currentWeight, $totalWeight, $step['weight']),
-                'run_seeders' => $this->runSeeders($currentWeight, $totalWeight, $step['weight'], $config),
-                'create_admin' => $this->createAdminUser($config['admin'] ?? []),
-                'storage_link' => $this->createStorageLink(),
-                'finalize' => $this->finalizeInstallation(),
-                default => null,
+            $runStep = function () use ($step, $config, $currentWeight, $totalWeight) {
+                match ($step['name']) {
+                    'backup_env' => $this->backupEnvFile(),
+                    'write_env' => $this->writeEnvFile($config),
+                    'clear_config' => $this->clearConfigCache(),
+                    'generate_key' => $this->generateKey(),
+                    'run_migrations' => $this->runMigrations($currentWeight, $totalWeight, $step['weight']),
+                    'run_seeders' => $this->runSeeders($currentWeight, $totalWeight, $step['weight'], $config),
+                    'create_admin' => $this->createAdminUser($config['admin'] ?? []),
+                    'storage_link' => $this->createStorageLink(),
+                    'finalize' => $this->finalizeInstallation(),
+                    default => null,
+                };
             };
+
+            if ($onStep !== null) {
+                $onStep($step, $runStep);
+            } else {
+                $runStep();
+            }
 
             $currentWeight += $step['weight'];
         }
@@ -298,9 +306,6 @@ class InstallationService
             if (File::exists($cachedConfigPath)) {
                 File::delete($cachedConfigPath);
             }
-
-            // Also try artisan but don't wait too long
-            Artisan::call('config:clear');
         } catch (Exception) {
             // Ignore failures during installation.
         }
