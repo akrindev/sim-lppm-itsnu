@@ -21,6 +21,7 @@ return [
         'telescope*',
         'horizon*',
         '_boost/browser-logs',
+        'install*',
     ],
 
     /*

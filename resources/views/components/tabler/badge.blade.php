@@ -41,10 +41,14 @@
 
     $textColor = $colorMap[$color] ?? 'primary';
 
+    // Warna terang yang butuh text-dark untuk kontras
+    $lightColors = ['warning', 'yellow', 'lime', 'light'];
+    $solidTextClass = in_array($textColor, $lightColors) ? 'text-dark' : 'text-white';
+
     $bgClass = match ($variant) {
         'light' => "bg-{$textColor}-lt text-{$textColor}",
         'outline' => "border border-{$textColor} text-{$textColor}",
-        default => "bg-{$color}", // solid
+        default => "bg-{$textColor} {$solidTextClass}", // solid dengan text kontras
     };
 
     $sizeClass = match ($size) {

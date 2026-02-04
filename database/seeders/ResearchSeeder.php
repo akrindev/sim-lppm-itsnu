@@ -483,9 +483,11 @@ class ResearchSeeder extends Seeder
         };
 
         foreach ($path as $step) {
+            $actor = $step['u'] ?? $adminLppm ?? $kepalaLppm ?? $dekan ?? $submitter;
+
             ProposalStatusLog::create([
                 'proposal_id' => $proposal->id,
-                'user_id' => $step['u']?->id ?? $adminLppm->id,
+                'user_id' => $actor->id,
                 'status_before' => $step['f'],
                 'status_after' => $step['t'],
                 'at' => $baseTime->copy()->addDays($step['d']),

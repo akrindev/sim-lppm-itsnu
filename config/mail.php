@@ -109,8 +109,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'noreply@lppm.itsnupekalongan.ac.id'),
-        'name' => env('MAIL_FROM_NAME', 'SIM LPPM ITSNU'),
+        'address' => env('MAIL_FROM_ADDRESS') ?: 'noreply@lppm.itsnupekalongan.ac.id',
+        'name' => env('MAIL_FROM_NAME') ?: 'SIM LPPM ITSNU',
     ],
 
 ];

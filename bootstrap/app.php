@@ -28,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\ActiveRoleMiddleware::class,
         ]);
+
+        $middleware->prepend(\App\Http\Middleware\InstallerMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

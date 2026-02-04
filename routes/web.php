@@ -3,6 +3,7 @@
 use App\Http\Controllers\RoleSwitcherController;
 use App\Livewire\Dashboard;
 use App\Livewire\Dekan\ProposalIndex as DekanProposalIndex;
+use App\Livewire\Installer\InstallerWizard;
 use App\Livewire\Notifications\NotificationCenter;
 use App\Livewire\Review\CommunityService as ReviewCommunityService;
 use App\Livewire\Review\Research as ReviewResearch;
@@ -18,6 +19,10 @@ use App\Livewire\Users\Show as UsersShow;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
+// Installer Route - Available only when not installed
+Route::livewire('install', InstallerWizard::class)
+    ->name('install');
+
 Route::redirect('/', 'dashboard', 302);
 
 Route::livewire('dashboard', Dashboard::class)
@@ -26,15 +31,15 @@ Route::livewire('dashboard', Dashboard::class)
 
 Route::middleware(['auth'])->group(function () {
     Route::livewire('laporan-penelitian', \App\Livewire\Reports\Research::class)
-        ->middleware(['role:admin lppm|rektor|kepala lppm|superadmin'])
+        ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.research');
 
     Route::livewire('laporan-pkm', \App\Livewire\Reports\CommunityService::class)
-        ->middleware(['role:admin lppm|rektor|kepala lppm|superadmin'])
+        ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.pkm');
 
     Route::livewire('laporan-luaran', \App\Livewire\Reports\OutputReports::class)
-        ->middleware(['role:admin lppm|rektor|kepala lppm|superadmin'])
+        ->middleware(['role:admin lppm|rektor|kepala lppm'])
         ->name('reports.outputs');
 
     // User Management Routes
@@ -47,12 +52,12 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Research Routes
-    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan|superadmin'])->prefix('research')->name('research.')->group(function () {
+    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('research')->name('research.')->group(function () {
         Route::livewire('/', \App\Livewire\Research\Proposal\Index::class)->name('proposal.index');
 
         // Only dosen can create proposals
         Route::livewire('proposal/create', \App\Livewire\Research\Proposal\Create::class)
-            ->middleware('role:dosen|superadmin')
+            ->middleware('role:dosen')
             ->name('proposal.create');
 
         Route::livewire('proposal/{proposal}', \App\Livewire\Research\Proposal\Show::class)->name('proposal.show');
@@ -75,12 +80,12 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Community Service Routes
-    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan|superadmin'])->prefix('community-service')->name('community-service.')->group(function () {
+    Route::middleware(['role:dosen|kepala lppm|reviewer|admin lppm|rektor|dekan'])->prefix('community-service')->name('community-service.')->group(function () {
         Route::livewire('/', \App\Livewire\CommunityService\Proposal\Index::class)->name('proposal.index');
 
         // Only dosen can create proposals
         Route::livewire('proposal/create', \App\Livewire\CommunityService\Proposal\Create::class)
-            ->middleware('role:dosen|superadmin')
+            ->middleware('role:dosen')
             ->name('proposal.create');
 
         Route::livewire('proposal/{proposal}', \App\Livewire\CommunityService\Proposal\Show::class)->name('proposal.show');
@@ -103,26 +108,26 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Dekan Routes
-    Route::middleware(['role:dekan|superadmin'])->prefix('dekan')->name('dekan.')->group(function () {
+    Route::middleware(['role:dekan'])->prefix('dekan')->name('dekan.')->group(function () {
         Route::livewire('proposals', DekanProposalIndex::class)->name('proposals.index');
         Route::livewire('riwayat-persetujuan', \App\Livewire\Dekan\ApprovalHistory::class)->name('approval-history');
     });
 
     // Review Routes
-    Route::middleware(['role:reviewer|superadmin'])->prefix('review')->name('review.')->group(function () {
+    Route::middleware(['role:reviewer'])->prefix('review')->name('review.')->group(function () {
         Route::livewire('research', ReviewResearch::class)->name('research');
         Route::livewire('community-service', ReviewCommunityService::class)->name('community-service');
         Route::livewire('riwayat-review', \App\Livewire\Review\ReviewHistory::class)->name('review-history');
     });
 
     // Kepala LPPM Routes
-    Route::middleware(['role:kepala lppm|rektor|superadmin'])->prefix('kepala-lppm')->name('kepala-lppm.')->group(function () {
+    Route::middleware(['role:kepala lppm|rektor'])->prefix('kepala-lppm')->name('kepala-lppm.')->group(function () {
         Route::livewire('persetujuan-awal', \App\Livewire\KepalaLppm\InitialApproval::class)->name('initial-approval');
         Route::livewire('persetujuan-akhir', \App\Livewire\KepalaLppm\FinalDecision::class)->name('final-decision');
     });
 
     // Admin LPPM Routes
-    Route::middleware(['role:admin lppm|superadmin'])->prefix('admin-lppm')->name('admin-lppm.')->group(function () {
+    Route::middleware(['role:admin lppm'])->prefix('admin-lppm')->name('admin-lppm.')->group(function () {
         Route::livewire('penugasan-reviewer', \App\Livewire\AdminLppm\ReviewerAssignment::class)->name('assign-reviewers');
         Route::livewire('beban-kerja-reviewer', \App\Livewire\AdminLppm\ReviewerWorkload::class)->name('reviewer-workload');
         Route::livewire('monitoring-review', \App\Livewire\AdminLppm\ReviewMonitoring::class)->name('review-monitoring');

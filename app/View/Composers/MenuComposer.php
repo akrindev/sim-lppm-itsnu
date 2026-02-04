@@ -29,7 +29,7 @@ class MenuComposer
             [
                 'title' => 'Penelitian',
                 'icon' => 'puzzle',
-                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan', 'superadmin'],
+                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan'],
                 'children' => [
                     [
                         'title' => 'Usulan',
@@ -61,7 +61,7 @@ class MenuComposer
             [
                 'title' => 'Pengabdian',
                 'icon' => 'gift',
-                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan', 'superadmin'],
+                'roles' => ['dosen', 'kepala lppm', 'admin lppm', 'rektor', 'dekan'],
                 'children' => [
                     [
                         'title' => 'Usulan',
@@ -103,32 +103,32 @@ class MenuComposer
                 'title' => 'Persetujuan Dekan',
                 'icon' => 'clipboard-check',
                 'route' => 'dekan.proposals.index',
-                'roles' => ['dekan', 'superadmin'],
+                'roles' => ['dekan'],
             ],
             [
                 'title' => 'Riwayat Persetujuan',
                 'icon' => 'history',
                 'route' => 'dekan.approval-history',
-                'roles' => ['dekan', 'superadmin'],
+                'roles' => ['dekan'],
             ],
             // Kepala LPPM menus
             [
                 'title' => 'Persetujuan Awal',
                 'icon' => 'checkbox',
                 'route' => 'kepala-lppm.initial-approval',
-                'roles' => ['kepala lppm', 'superadmin'],
+                'roles' => ['kepala lppm'],
             ],
             [
                 'title' => 'Persetujuan Akhir',
                 'icon' => 'circle-check',
                 'route' => 'kepala-lppm.final-decision',
-                'roles' => ['kepala lppm', 'superadmin'],
+                'roles' => ['kepala lppm'],
             ],
             // Admin LPPM - Reviewer Management Group
             [
                 'title' => 'Reviewer',
                 'icon' => 'user-check',
-                'roles' => ['admin lppm', 'superadmin'],
+                'roles' => ['admin lppm'],
                 'children' => [
                     [
                         'title' => 'Penugasan Reviewer',
@@ -151,32 +151,32 @@ class MenuComposer
                 'title' => 'Monev Internal',
                 'icon' => 'presentation-analytics',
                 'route' => 'admin-lppm.monev.index',
-                'roles' => ['admin lppm', 'superadmin'],
+                'roles' => ['admin lppm'],
             ],
             // Reviewer menu
             [
                 'title' => 'Review Penelitian',
                 'icon' => 'lifebuoy',
                 'route' => 'review.research',
-                'roles' => ['reviewer', 'superadmin'],
+                'roles' => ['reviewer'],
             ],
             [
                 'title' => 'Review Pengabdian',
                 'icon' => 'lifebuoy',
                 'route' => 'review.community-service',
-                'roles' => ['reviewer', 'superadmin'],
+                'roles' => ['reviewer'],
             ],
             [
                 'title' => 'Riwayat Review',
                 'icon' => 'history',
                 'route' => 'review.review-history',
-                'roles' => ['reviewer', 'superadmin'],
+                'roles' => ['reviewer'],
             ],
             // Laporan - Reports menu (+ kepala lppm for decision-making)
             [
                 'title' => 'Laporan',
                 'icon' => 'file-analytics',
-                'roles' => ['admin lppm', 'rektor', 'kepala lppm', 'superadmin'],
+                'roles' => ['admin lppm', 'rektor', 'kepala lppm'],
                 'children' => [
                     [
                         'title' => 'Laporan Penelitian',
