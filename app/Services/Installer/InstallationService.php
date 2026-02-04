@@ -371,7 +371,7 @@ class InstallationService
         ];
 
         // Development seeders (only in non-production)
-        if (! app()->isProduction()) {
+        if (! $this->isProductionEnv($config)) {
             $seeders = array_merge($seeders, [
                 'PartnerSeeder',
                 'UserSeeder',
@@ -430,6 +430,13 @@ class InstallationService
         }
 
         cache()->forget('installer_admin_config');
+    }
+
+    private function isProductionEnv(array $config): bool
+    {
+        $env = $config['APP_ENV'] ?? $config['app_env'] ?? config('app.env', 'production');
+
+        return strtolower((string) $env) === 'production';
     }
 
     private function storeDynamicSeedersConfig(array $config): void
