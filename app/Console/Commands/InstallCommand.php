@@ -8,6 +8,7 @@ use App\Livewire\Forms\Installer\EnvironmentConfigForm;
 use App\Services\Installer\DatabaseTester;
 use App\Services\Installer\InstallationService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Laravel\Prompts\Prompt;
 
 use function Laravel\Prompts\confirm;
@@ -34,10 +35,15 @@ class InstallCommand extends Command
 
         // Check if already installed
         if ($installationService->isInstalled() && ! $this->option('force')) {
-            error('Application is already installed!');
+            if (! File::exists(storage_path('app/.installed'))) {
+                $installationService->lockInstallation();
+                note('Installer lock file was missing. Created storage/app/.installed.');
+            }
+
+            info('Application is already installed!');
             warning('Use --force to reinstall (this will delete all data).');
 
-            return 1;
+            return 0;
         }
 
         // Step 1: Environment Check

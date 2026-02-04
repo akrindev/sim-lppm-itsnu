@@ -64,7 +64,7 @@
 		"post-autoload-dump": [
 			"Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
 			"@php artisan package:discover --ansi",
-			"@php artisan app:install"
+			"@php artisan app:install --quick"
 		],
 		"post-update-cmd": [
 			"@php artisan vendor:publish --tag=laravel-assets --ansi --force"
