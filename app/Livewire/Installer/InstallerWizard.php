@@ -374,6 +374,12 @@ class InstallerWizard extends Component
         $this->installProcessLaunched = true;
         $this->installProcessStartedAt = time();
 
+        if (app()->runningUnitTests()) {
+            $this->doInstallation();
+
+            return;
+        }
+
         try {
             $logPath = storage_path('logs/installer-worker.log');
             $phpBinary = $this->resolvePhpBinary();
