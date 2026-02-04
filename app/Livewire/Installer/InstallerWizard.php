@@ -9,6 +9,7 @@ use App\Livewire\Forms\Installer\DatabaseConfigForm;
 use App\Livewire\Forms\Installer\EnvironmentConfigForm;
 use App\Livewire\Forms\Installer\InstitutionSetupForm;
 use App\Services\Installer\InstallationService;
+use Illuminate\Support\Facades\Process;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -46,6 +47,12 @@ class InstallerWizard extends Component
     ];
 
     public bool $isInstalling = false;
+
+    public bool $installProcessLaunched = false;
+
+    public ?int $lastProgressTimestamp = null;
+
+    public ?int $installProcessStartedAt = null;
 
     /**
      * Stored database password - kept on component level to ensure persistence.
@@ -250,6 +257,9 @@ class InstallerWizard extends Component
         $this->installationService->storeProgress(0, 'Preparing installation...');
 
         $this->isInstalling = true;
+        $this->installProcessLaunched = false;
+        $this->lastProgressTimestamp = null;
+        $this->installProcessStartedAt = null;
         $this->installationProgress = [
             'percent' => 0,
             'message' => 'Preparing installation...',
@@ -258,8 +268,7 @@ class InstallerWizard extends Component
             'error' => null,
         ];
 
-        // Don't run installation here - let checkProgress handle it
-        // This allows the page to re-render and show the poll first
+        $this->launchInstallationProcess();
     }
 
     /**
@@ -276,14 +285,19 @@ class InstallerWizard extends Component
 
         // Check if installation has actually started
         if (! $this->installationService->isInstallationRunning() && ! $cached['complete'] && ! $cached['error']) {
-            // Start the actual installation
-            $this->doInstallation();
-
-            return;
+            $this->launchInstallationProcess();
         }
 
         // Update local state from cache
         if ($cached['updated_at'] !== null) {
+            if ($this->lastProgressTimestamp !== $cached['updated_at']) {
+                $this->lastProgressTimestamp = $cached['updated_at'];
+
+                if ($cached['message'] !== '') {
+                    $this->installationProgress['logs'][] = "[{$cached['percent']}%] {$cached['message']}";
+                }
+            }
+
             $this->installationProgress['percent'] = $cached['percent'];
             $this->installationProgress['message'] = $cached['message'];
 
@@ -298,6 +312,8 @@ class InstallerWizard extends Component
                 $this->dispatch('installation-complete');
             }
         }
+
+        $this->detectStalledInstallation($cached);
     }
 
     /**
@@ -346,6 +362,132 @@ class InstallerWizard extends Component
         } finally {
             $this->installationService->markInstallationStopped();
             $this->isInstalling = false;
+        }
+    }
+
+    private function launchInstallationProcess(): void
+    {
+        if ($this->installProcessLaunched) {
+            return;
+        }
+
+        $this->installProcessLaunched = true;
+        $this->installProcessStartedAt = time();
+
+        try {
+            $logPath = storage_path('logs/installer-worker.log');
+            $phpBinary = $this->resolvePhpBinary();
+
+            if (PHP_OS_FAMILY === 'Windows') {
+                $command = sprintf('start /B "" %s artisan app:install-run > %s 2>&1', $this->escapeWindowsBinary($phpBinary), $this->escapeWindowsArgument($logPath));
+                $result = Process::path(base_path())
+                    ->run(['cmd', '/c', $command]);
+            } else {
+                $command = sprintf('%s artisan app:install-run > %s 2>&1 &', escapeshellarg($phpBinary), escapeshellarg($logPath));
+                $result = Process::path(base_path())
+                    ->run(['sh', '-c', $command]);
+            }
+
+            if (! $result->successful()) {
+                throw new \RuntimeException($result->errorOutput() ?: 'Failed to launch installation process.');
+            }
+        } catch (\Throwable $e) {
+            $this->installProcessLaunched = false;
+            $this->isInstalling = false;
+            $this->installationProgress['error'] = 'Gagal memulai proses instalasi: '.$e->getMessage();
+            $this->installationService->storeProgress(
+                $this->installationProgress['percent'],
+                $this->installationProgress['message'],
+                $this->installationProgress['error'],
+                false
+            );
+        }
+    }
+
+    private function resolvePhpBinary(): string
+    {
+        $binary = PHP_BINARY;
+
+        if (PHP_SAPI !== 'cli' || str_contains($binary, 'php-fpm') || str_contains($binary, 'php-cgi')) {
+            $candidates = $this->getPhpBinaryCandidates();
+
+            foreach ($candidates as $candidate) {
+                if ($candidate === 'php') {
+                    return $candidate;
+                }
+
+                if (is_file($candidate) && is_executable($candidate)) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return $binary;
+    }
+
+    private function getPhpBinaryCandidates(): array
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return [
+                'C:\\xampp\\php\\php.exe',
+                'C:\\laragon\\bin\\php\\php.exe',
+                'C:\\php\\php.exe',
+                'php.exe',
+                'php',
+            ];
+        }
+
+        return [
+            '/usr/bin/php',
+            '/usr/local/bin/php',
+            '/bin/php',
+            '/usr/bin/php8.4',
+            '/usr/bin/php8.3',
+            '/usr/bin/php8.2',
+            'php',
+        ];
+    }
+
+    private function escapeWindowsBinary(string $binary): string
+    {
+        if ($binary === 'php' || $binary === 'php.exe') {
+            return $binary;
+        }
+
+        return '"'.str_replace('"', '""', $binary).'"';
+    }
+
+    private function escapeWindowsArgument(string $value): string
+    {
+        return '"'.str_replace('"', '""', $value).'"';
+    }
+
+    private function detectStalledInstallation(array $cached): void
+    {
+        if (! $this->isInstalling || $cached['complete'] || $cached['error']) {
+            return;
+        }
+
+        if ($this->installProcessStartedAt === null) {
+            return;
+        }
+
+        $elapsed = time() - $this->installProcessStartedAt;
+
+        if ($elapsed < 15) {
+            return;
+        }
+
+        if (! $this->installationService->isInstallationRunning() && $cached['percent'] === 0) {
+            $this->installationProgress['error'] = 'Proses instalasi tidak berjalan. Periksa izin eksekusi PHP atau lihat log installer-worker.log.';
+            $this->isInstalling = false;
+
+            $this->installationService->storeProgress(
+                $this->installationProgress['percent'],
+                $this->installationProgress['message'],
+                $this->installationProgress['error'],
+                false
+            );
         }
     }
 

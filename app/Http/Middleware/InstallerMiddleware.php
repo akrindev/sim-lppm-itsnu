@@ -34,7 +34,7 @@ class InstallerMiddleware
         }
 
         if (! $isInstalled) {
-            $this->ensureInstallerKey();
+            $this->ensureInstallerKey(force: true);
         }
 
         // When not installed, avoid database-backed services
@@ -70,9 +70,9 @@ class InstallerMiddleware
         return File::exists($this->getLockFilePath());
     }
 
-    private function ensureInstallerKey(): void
+    private function ensureInstallerKey(bool $force = false): void
     {
-        if (! empty(config('app.key'))) {
+        if (! $force && ! empty(config('app.key'))) {
             return;
         }
 

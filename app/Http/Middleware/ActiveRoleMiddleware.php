@@ -23,10 +23,11 @@ class ActiveRoleMiddleware
         if (Auth::check()) {
             $user = Auth::user();
             $activeRole = session('active_role');
+            $roleNames = $user->getRoleNames();
 
             // If no active role set, use the first role
-            if (! $activeRole || ! $user->hasRole($activeRole)) {
-                $firstRole = $user->getRoleNames()->first();
+            if (! $activeRole || ! $roleNames->contains($activeRole)) {
+                $firstRole = $roleNames->first();
 
                 if ($firstRole) {
                     session(['active_role' => $firstRole]);
