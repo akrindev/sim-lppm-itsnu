@@ -4,7 +4,6 @@ public/build
 storage/*.key
 .git
 .env
-.docker
 Dockerfile
 docker-compose.yml
 docker-compose.override.yml

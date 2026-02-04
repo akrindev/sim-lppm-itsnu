@@ -30,10 +30,11 @@ Untuk mendapatkan salinan lokal dan menjalankannya, ikuti langkah-langkah sederh
 
 ### Prasyarat
 
-*   PHP 8.2 atau lebih tinggi
+*   PHP 8.2+ (disarankan 8.4)
 *   Composer
-*   Node.js & NPM
-*   MySQL atau basis data lain yang kompatibel
+*   Bun (direkomendasikan) atau Node.js & NPM
+*   MySQL/MariaDB atau basis data lain yang kompatibel
+*   Redis (opsional, jika memakai cache/queue redis)
 
 ### Instalasi
 
@@ -46,31 +47,25 @@ Untuk mendapatkan salinan lokal dan menjalankannya, ikuti langkah-langkah sederh
     ```sh
     composer install
     ```
-3.  **Instal paket NPM / bun**
+    Composer akan menjalankan `php artisan app:install` otomatis. Jika ingin menggunakan installer web, jalankan `composer install --no-scripts`.
+3.  **Jalankan installer (jika belum)**
     ```sh
-    npm install / bun install
+    php artisan app:install
     ```
-4.  **Siapkan file lingkungan Anda**
+    Installer akan membuat `.env`, menjalankan migrasi + seeder, dan membuat admin. Siapkan Cloudflare Turnstile Site Key & Secret Key (wajib). Gunakan `--quick` untuk konfigurasi cepat; `--force` untuk reinstall (menghapus data).
+4.  **Instal paket frontend**
     ```sh
-    cp .env.example .env
+    bun install
+    # atau
+    npm install
     ```
-    *Perbarui variabel `DB_*` di file `.env` Anda dengan kredensial basis data Anda.*
-
-5.  **Hasilkan kunci aplikasi**
+5.  **Bangun aset frontend**
     ```sh
-    php artisan key:generate
+    bun run build
+    # atau
+    npm run build
     ```
-6.  **Jalankan migrasi dan seeder basis data**
-    ```sh
-    php artisan migrate --seed
-    ```
-    *Ini akan membuat tabel yang diperlukan dan mengisinya dengan data awal (misalnya, peran dan pengguna admin).*
-
-7.  **Bangun aset frontend**
-    ```sh
-    npm run build / bun run build
-    ```
-8.  **Jalankan server pengembangan**
+6.  **Jalankan server pengembangan**
     ```sh
     php artisan serve
     ```
@@ -80,16 +75,27 @@ Untuk mendapatkan salinan lokal dan menjalankannya, ikuti langkah-langkah sederh
 
 Jika ingin menjalankan proyek menggunakan Docker:
 
-1.  **Salin .env dan sesuaikan host database/redis**
+1.  **Salin .env dan sesuaikan konfigurasi layanan**
+    ```sh
+    cp .env.example .env
+    ```
+    Pastikan `DB_HOST=mariadb`, `DB_PORT=3306`, `REDIS_HOST=redis`, dan isi `TURNSTILE_SITE_KEY` serta `TURNSTILE_SECRET_KEY`.
 2.  **Jalankan Docker Compose**
     ```sh
-    docker compose up -d
+    docker compose up -d --build
     ```
-3.  **Setup Awal di dalam Container**
+3.  **Instal dependensi & jalankan installer**
     ```sh
     docker compose exec app composer install
-    docker compose exec app php artisan key:generate
-    docker compose exec app php artisan migrate --seed
+    ```
+    Composer akan menjalankan `php artisan app:install` otomatis. Jika ingin memakai installer web, gunakan `docker compose exec app composer install --no-scripts` lalu buka `http://localhost:8000/install`.
+4.  **Bangun aset frontend (di host)**
+    ```sh
+    bun install
+    bun run build
+    # atau
+    npm install
+    npm run build
     ```
     Aplikasi akan tersedia di `http://localhost:8000`.
 
