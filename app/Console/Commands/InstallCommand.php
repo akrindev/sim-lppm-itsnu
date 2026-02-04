@@ -281,6 +281,8 @@ class InstallCommand extends Command
             note('Using default settings for session, cache, queue, mail, and storage.');
             $this->newLine();
 
+            $turnstileConfig = $this->configureTurnstile();
+
             return array_merge($config, [
                 'SESSION_DRIVER' => 'file',
                 'SESSION_LIFETIME' => '120',
@@ -289,7 +291,7 @@ class InstallCommand extends Command
                 'MAIL_MAILER' => 'log',
                 'FILESYSTEM_DISK' => 'local',
                 'MEDIA_DISK' => 'public',
-            ]);
+            ], $turnstileConfig);
         }
 
         $config = array_merge($config, $this->configureAdvancedEnvironment($options, $config['APP_NAME']));
@@ -426,12 +428,12 @@ class InstallCommand extends Command
         $responses = form()
             ->text(
                 label: 'Site Key',
-                hint: 'Leave empty to skip (Cloudflare Dashboard)',
+                required: true,
                 name: 'site_key'
             )
             ->password(
                 label: 'Secret Key',
-                hint: 'Leave empty to skip',
+                required: true,
                 name: 'secret_key'
             )
             ->submit();

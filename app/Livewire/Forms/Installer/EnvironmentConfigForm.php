@@ -93,8 +93,8 @@ class EnvironmentConfigForm extends Form
             'mailFromAddress' => 'nullable|email|max:255',
             'mailFromName' => 'nullable|string|max:255',
             // Turnstile
-            'turnstileSiteKey' => 'nullable|string|max:255',
-            'turnstileSecretKey' => 'nullable|string|max:255',
+            'turnstileSiteKey' => 'required|string|max:255',
+            'turnstileSecretKey' => 'required|string|max:255',
             // Storage
             'filesystemDisk' => 'required|in:local,s3',
             'mediaDisk' => 'required|in:public,s3',

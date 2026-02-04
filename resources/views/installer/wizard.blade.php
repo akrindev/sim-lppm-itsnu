@@ -613,11 +613,11 @@
 
                             {{-- Turnstile Settings --}}
                             <div class="mb-4">
-                                <h3 class="mb-3">Cloudflare Turnstile (Opsional)</h3>
-                                <p class="text-secondary small mb-3">Turnstile digunakan untuk proteksi spam pada form. Dapatkan key di <a href="https://dash.cloudflare.com/sign-up?to=/:account/turnstile" target="_blank">Cloudflare Dashboard</a>.</p>
+                                <h3 class="mb-3">Cloudflare Turnstile</h3>
+                                <p class="text-secondary small mb-3">Turnstile digunakan untuk proteksi spam pada form dan wajib diisi. Dapatkan key di <a href="https://dash.cloudflare.com/sign-up?to=/:account/turnstile" target="_blank">Cloudflare Dashboard</a>.</p>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Site Key</label>
+                                        <label class="form-label required">Site Key</label>
                                         <input type="text"
                                             class="form-control @error('environmentForm.turnstileSiteKey') is-invalid @enderror"
                                             wire:model="environmentForm.turnstileSiteKey"
@@ -627,7 +627,7 @@
                                         @enderror
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Secret Key</label>
+                                        <label class="form-label required">Secret Key</label>
                                         <div class="input-group input-group-flat" x-data="{ show: false }">
                                             <input :type="show ? 'text' : 'password'"
                                                 class="form-control @error('environmentForm.turnstileSecretKey') is-invalid @enderror"
