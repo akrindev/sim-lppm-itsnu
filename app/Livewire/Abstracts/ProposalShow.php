@@ -45,7 +45,7 @@ abstract class ProposalShow extends Component
     public function delete(): void
     {
         if (! $this->canDelete) {
-            abort(403, 'Hanya proposal dengan status draft yang dapat dihapus.');
+            abort(403, 'Hanya pengusul proposal yang dapat menghapus proposal draft.');
         }
 
         $this->proposalService->deleteProposal($this->proposal);
@@ -55,6 +55,10 @@ abstract class ProposalShow extends Component
 
     public function edit(): void
     {
+        if (! $this->canEdit) {
+            abort(403, 'Hanya pengusul proposal yang dapat mengedit proposal draft.');
+        }
+
         $this->redirectRoute($this->getEditRoute($this->proposal->id));
     }
 
@@ -80,10 +84,6 @@ abstract class ProposalShow extends Component
     {
         $user = \Illuminate\Support\Facades\Auth::user();
 
-        if ($user->hasRole(['admin lppm', 'superadmin'])) {
-            return true;
-        }
-
         return $this->proposal->status === \App\Enums\ProposalStatus::DRAFT
             && $this->proposal->submitter_id === $user->id;
     }
@@ -92,10 +92,6 @@ abstract class ProposalShow extends Component
     public function canDelete(): bool
     {
         $user = \Illuminate\Support\Facades\Auth::user();
-
-        if ($user->hasRole(['admin lppm', 'superadmin'])) {
-            return true;
-        }
 
         return $this->proposal->status === \App\Enums\ProposalStatus::DRAFT
             && $this->proposal->submitter_id === $user->id;
