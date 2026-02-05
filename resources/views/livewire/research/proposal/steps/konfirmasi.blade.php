@@ -17,55 +17,57 @@
                 <h4 class="mb-0 card-title">1. Identitas Usulan</h4>
             </div>
             <div class="card-body">
-                <table class="table table-sm">
-                    <tr>
-                        <td width="30%"><strong>Judul Proposal</strong></td>
-                        <td>{{ $form->title }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Skema Penelitian</strong></td>
-                        <td>{{ $this->schemes->find($form->research_scheme_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Periode Pelaksanaan</strong></td>
-                        <td>
-                            @if ($form->start_year && $form->duration_in_years)
-                                {{ $form->start_year }} - {{ (int) $form->start_year + (int) $form->duration_in_years - 1 }}
-                                ({{ $form->duration_in_years }} Tahun)
-                            @else
-                                {{ $form->duration_in_years }} Tahun
-                            @endif
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Bidang Fokus</strong></td>
-                        <td>{{ $this->focusAreas->find($form->focus_area_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Tema</strong></td>
-                        <td>{{ $this->themes->find($form->theme_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Topik</strong></td>
-                        <td>{{ $this->topics->find($form->topic_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Klaster Sains Level 1</strong></td>
-                        <td>{{ $this->scienceClusters->find($form->cluster_level1_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Ringkasan</strong></td>
-                        <td>{{ Str::limit($form->summary, 200) }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Ketua Peneliti</strong></td>
-                        <td>{{ $author_name }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Jumlah Anggota</strong></td>
-                        <td>{{ count($form->members) }} orang</td>
-                    </tr>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tr>
+                            <td width="30%"><strong>Judul Proposal</strong></td>
+                            <td>{{ $form->title }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Skema Penelitian</strong></td>
+                            <td>{{ $this->schemes->find($form->research_scheme_id)?->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Periode Pelaksanaan</strong></td>
+                            <td>
+                                @if ($form->start_year && $form->duration_in_years)
+                                    {{ $form->start_year }} - {{ (int) $form->start_year + (int) $form->duration_in_years - 1 }}
+                                    ({{ $form->duration_in_years }} Tahun)
+                                @else
+                                    {{ $form->duration_in_years }} Tahun
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bidang Fokus</strong></td>
+                            <td>{{ $this->focusAreas->find($form->focus_area_id)?->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tema</strong></td>
+                            <td>{{ $this->themes->find($form->theme_id)?->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Topik</strong></td>
+                            <td>{{ $this->topics->find($form->topic_id)?->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Klaster Sains Level 1</strong></td>
+                            <td>{{ $this->scienceClusters->find($form->cluster_level1_id)?->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ringkasan</strong></td>
+                            <td>{{ Str::limit($form->summary, 200) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ketua Peneliti</strong></td>
+                            <td>{{ $author_name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jumlah Anggota</strong></td>
+                            <td>{{ count($form->members) }} orang</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -75,33 +77,35 @@
                 <h4 class="mb-0 card-title">2. Substansi Usulan</h4>
             </div>
             <div class="card-body">
-                <table class="table table-sm">
-                    <tr>
-                        <td width="30%"><strong>Kelompok Makro Riset</strong></td>
-                        <td>{{ $this->macroResearchGroups->find($form->macro_research_group_id)?->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>File Substansi</strong></td>
-                        <td>
-                            @if ($form->substance_file && !is_string($form->substance_file))
-                                <x-lucide-file-check class="text-success icon" />
-                                {{ $form->substance_file->getClientOriginalName() }}
-                            @elseif ($form->proposal && $form->proposal->detailable && $form->proposal->detailable->hasMedia('substance_file'))
-                                @php
-                                    $media = $form->proposal->detailable->getFirstMedia('substance_file');
-                                @endphp
-                                <x-lucide-file-check class="text-success icon" />
-                                {{ $media->name }} <small class="text-muted">(Lama)</small>
-                            @else
-                                <span class="text-muted">Tidak ada file</span>
-                            @endif
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Jumlah Luaran Target</strong></td>
-                        <td>{{ count($form->outputs) }} luaran</td>
-                    </tr>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tr>
+                            <td width="30%"><strong>Kelompok Makro Riset</strong></td>
+                            <td>{{ $this->macroResearchGroups->find($form->macro_research_group_id)?->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>File Substansi</strong></td>
+                            <td>
+                                @if ($form->substance_file && !is_string($form->substance_file))
+                                    <x-lucide-file-check class="text-success icon" />
+                                    {{ $form->substance_file->getClientOriginalName() }}
+                                @elseif ($form->proposal && $form->proposal->detailable && $form->proposal->detailable->hasMedia('substance_file'))
+                                    @php
+                                        $media = $form->proposal->detailable->getFirstMedia('substance_file');
+                                    @endphp
+                                    <x-lucide-file-check class="text-success icon" />
+                                    {{ $media->name }} <small class="text-muted">(Lama)</small>
+                                @else
+                                    <span class="text-muted">Tidak ada file</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jumlah Luaran Target</strong></td>
+                            <td>{{ count($form->outputs) }} luaran</td>
+                        </tr>
+                    </table>
+                </div>
 
                 @if (!empty($form->outputs))
                     <h5 class="mt-3">Luaran Target Capaian:</h5>
