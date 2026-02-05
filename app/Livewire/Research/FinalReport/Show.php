@@ -505,11 +505,23 @@ class Show extends Component
      */
     public function render()
     {
+        $mandatoryOutputsMap = collect();
+        $additionalOutputsMap = collect();
+
+        if ($this->progressReport) {
+            $this->progressReport->loadMissing(['mandatoryOutputs', 'additionalOutputs']);
+
+            $mandatoryOutputsMap = $this->progressReport->mandatoryOutputs->keyBy('proposal_output_id');
+            $additionalOutputsMap = $this->progressReport->additionalOutputs->keyBy('proposal_output_id');
+        }
+
         return view('livewire.research.final-report.show', [
             'allKeywords' => $this->getAllKeywords(),
             'editingMandatoryId' => $this->form->editingMandatoryId,
             'editingAdditionalId' => $this->form->editingAdditionalId,
             'isFinalReportDraft' => $this->isFinalReportDraft,
+            'mandatoryOutputsMap' => $mandatoryOutputsMap,
+            'additionalOutputsMap' => $additionalOutputsMap,
         ]);
     }
 }

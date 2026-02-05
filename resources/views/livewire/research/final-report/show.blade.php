@@ -250,12 +250,7 @@
                             <tbody>
                                 @foreach ($wajibs as $index => $output)
                                     @php
-                                        $rowMandatoryOutput = $progressReport
-                                            ? $progressReport
-                                                ->mandatoryOutputs()
-                                                ->where('proposal_output_id', $output->id)
-                                                ->first()
-                                            : null;
+                                        $rowMandatoryOutput = $mandatoryOutputsMap->get($output->id);
                                     @endphp
                                     <tr wire:key="wajib-row-{{ $output->id }}">
                                         <td>{{ $index + 1 }}</td>
@@ -359,12 +354,7 @@
                             <tbody>
                                 @foreach ($tambahans as $index => $output)
                                     @php
-                                        $rowAdditionalOutput = $progressReport
-                                            ? $progressReport
-                                                ->additionalOutputs()
-                                                ->where('proposal_output_id', $output->id)
-                                                ->first()
-                                            : null;
+                                        $rowAdditionalOutput = $additionalOutputsMap->get($output->id);
                                     @endphp
                                     <tr wire:key="tambahan-row-{{ $output->id }}">
                                         <td>{{ $index + 1 }}</td>
