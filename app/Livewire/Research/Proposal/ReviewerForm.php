@@ -268,7 +268,7 @@ class ReviewerForm extends Component
     public function allReviewLogs()
     {
         return ReviewLog::forProposal($this->proposalId)
-            ->with('user')
+            ->with(['user', 'scores.criteria'])
             ->orderBy('round', 'desc')
             ->orderBy('completed_at', 'desc')
             ->get()
