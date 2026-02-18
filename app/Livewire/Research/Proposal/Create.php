@@ -51,7 +51,13 @@ class Create extends ProposalCreate
                     }
                 }
             }],
-            'form.outputs.*.status' => 'required|string|max:255',
+            'form.outputs.*.status' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                $normalizedStatus = strtolower(trim((string) $value));
+                if (! in_array($normalizedStatus, ProposalConstants::OUTPUT_STATUSES, true)) {
+                    $index = explode('.', $attribute)[2] ?? 0;
+                    $fail('Baris '.((int) $index + 1).': Status tidak valid. Pilih salah satu: '.implode(', ', ProposalConstants::OUTPUT_STATUSES).'.');
+                }
+            }],
             'form.outputs.*.description' => 'required|string|max:2000',
         ];
     }
@@ -86,7 +92,7 @@ class Create extends ProposalCreate
                 'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'jurnal',
                 'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['jurnal'][3],
-                'status' => 'Published',
+                'status' => 'published',
                 'description' => 'Target publikasi jurnal nasional',
             ];
         } elseif (str_contains($schemeStrata, 'terapan') || str_contains($schemeName, 'terapan')) {
@@ -96,7 +102,7 @@ class Create extends ProposalCreate
                 'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'produk',
                 'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['produk'][0] ?? 'Purwarupa/Prototipe TRL 4-6',
-                'status' => 'Draft',
+                'status' => 'draft',
                 'description' => 'Target prototipe produk',
             ];
         } else {
@@ -106,7 +112,7 @@ class Create extends ProposalCreate
                 'category' => ProposalConstants::OUTPUT_CATEGORIES[0],
                 'group' => 'jurnal',
                 'type' => ProposalConstants::RESEARCH_OUTPUT_TYPES['jurnal'][0],
-                'status' => 'Submitted',
+                'status' => 'submit',
                 'description' => 'Target publikasi jurnal internasional bereputasi',
             ];
         }

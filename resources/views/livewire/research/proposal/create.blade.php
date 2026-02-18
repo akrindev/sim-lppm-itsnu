@@ -72,9 +72,16 @@
         <div class="d-flex justify-content-between mt-3 gap-2">
             <div>
                 @if ($currentStep > 1)
-                    <button type="button" wire:click="previousStep" class="btn btn-outline-secondary">
-                        <x-lucide-arrow-left class="icon" />
-                        Sebelumnya
+                    <button type="button" wire:click="previousStep" class="btn btn-outline-secondary"
+                        wire:loading.attr="disabled" wire:target="previousStep">
+                        <span wire:loading.remove wire:target="previousStep">
+                            <x-lucide-arrow-left class="icon" />
+                            Sebelumnya
+                        </span>
+                        <span wire:loading wire:target="previousStep">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Memuat...
+                        </span>
                     </button>
                 @else
                     <a href="{{ route('research.proposal.index') }}" class="btn btn-outline-secondary">
@@ -97,9 +104,16 @@
                             Menyimpan...
                         </span>
                     </button>
-                    <button type="button" wire:click="nextStep" class="btn btn-primary">
-                        Selanjutnya
-                        <x-lucide-arrow-right class="icon" />
+                    <button type="button" wire:click="nextStep" class="btn btn-primary"
+                        wire:loading.attr="disabled" wire:target="nextStep">
+                        <span wire:loading.remove wire:target="nextStep">
+                            Selanjutnya
+                            <x-lucide-arrow-right class="icon" />
+                        </span>
+                        <span wire:loading wire:target="nextStep">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Memuat...
+                        </span>
                     </button>
                 @else
                     <button type="button" wire:click="saveDraft" class="btn btn-outline-info me-2"

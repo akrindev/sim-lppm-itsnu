@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\File;
 
 class Research extends Model implements HasMedia
 {
@@ -92,6 +93,10 @@ class Research extends Model implements HasMedia
     {
         $this->addMediaCollection('substance_file')
             ->singleFile()
-            ->acceptsMimeTypes(['application/pdf']);
+            ->acceptsFile(function (File $file): bool {
+                $extension = strtolower(pathinfo($file->name, PATHINFO_EXTENSION));
+
+                return in_array($extension, ['pdf', 'doc', 'docx'], true);
+            });
     }
 }

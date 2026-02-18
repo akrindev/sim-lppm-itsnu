@@ -2,8 +2,8 @@
 @php
     $startYear = (int) ($form->start_year ?: date('Y'));
     $duration = (int) ($form->duration_in_years ?: 1);
-    $currentYear = date('Y');
-    $budgetCap = \App\Models\BudgetCap::where('year', $currentYear)->first();
+    $budgetCapYear = $startYear;
+    $budgetCap = \App\Models\BudgetCap::where('year', $budgetCapYear)->first();
     $researchCap = $budgetCap?->research_budget_cap;
     
     // Calculate totals per group for percentage visualization
@@ -83,7 +83,7 @@
                     </ul>
                     @if ($researchCap)
                         <div class="border-top mt-2 pt-2">
-                            <strong>Batas Maksimal Anggaran Penelitian {{ $currentYear }}:</strong>
+                            <strong>Batas Maksimal Anggaran Penelitian {{ $budgetCapYear }}:</strong>
                             <x-tabler.badge color="danger">
                                 Rp {{ number_format($researchCap, 0, ',', '.') }}
                             </x-tabler.badge>
@@ -234,12 +234,14 @@
                                 </td>
                                 <td>
                                     <input type="number"
-                                        wire:model.live="form.budget_items.{{ $index }}.volume"
-                                        wire:change="calculateTotal({{ $index }})"
+                                        data-budget-volume-index="{{ $index }}"
+                                        wire:model="form.budget_items.{{ $index }}.volume"
+                                        @input="$dispatch('budget-volume-input', { index: {{ $index }}, value: $event.target.value })"
+                                        @blur="$wire.calculateTotal({{ $index }})"
                                         class="form-control form-control-sm" placeholder="0" min="0"
                                         step="0.01">
                                 </td>
-                                <td x-data="moneyInput({{ $index }})">
+                                <td x-data="moneyInput({{ $index }})" x-on:budget-volume-input.window="handleVolumeInput($event.detail)">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">Rp</span>
                                         <input type="text"
@@ -247,6 +249,7 @@
                                             x-ref="input"
                                             @focus="handleFocus"
                                             @input="handleInput"
+                                            @blur="handleBlur"
                                             class="form-control" placeholder="0">
                                     </div>
                                 </td>

@@ -280,6 +280,38 @@ document.addEventListener("alpine:init", () => {
     Alpine.data("moneyInput", (index) => ({
         display: "",
 
+        parsePrice(value) {
+            const numeric = parseInt((value ?? "").toString().replace(/[^0-9]/g, ""), 10);
+            return Number.isNaN(numeric) ? 0 : numeric;
+        },
+
+        parseVolume(value) {
+            const numeric = parseFloat((value ?? "").toString().replace(",", "."));
+            return Number.isNaN(numeric) ? 0 : numeric;
+        },
+
+        getCurrentVolume() {
+            const volumeInput = document.querySelector(`[data-budget-volume-index="${index}"]`);
+            if (!volumeInput) {
+                return 0;
+            }
+
+            return this.parseVolume(volumeInput.value);
+        },
+
+        updateLocalPriceAndTotal(price) {
+            const safePrice = Number.isFinite(price) ? price : 0;
+            const volume = this.getCurrentVolume();
+            const total = safePrice * volume;
+
+            try {
+                this.$wire.set(`form.budget_items.${index}.unit_price`, safePrice, false);
+                this.$wire.set(`form.budget_items.${index}.total`, total, false);
+            } catch (e) {
+                return;
+            }
+        },
+
         init() {
             this.updateDisplay();
             // Watch for external changes to the Livewire model
@@ -335,10 +367,7 @@ document.addEventListener("alpine:init", () => {
             // Handle empty input
             if (rawValue === "") {
                 this.display = "";
-                try {
-                    this.$wire.set(`form.budget_items.${index}.unit_price`, 0);
-                    this.$wire.calculateTotal(index);
-                } catch (e) { }
+                this.updateLocalPriceAndTotal(0);
                 return;
             }
 
@@ -349,21 +378,14 @@ document.addEventListener("alpine:init", () => {
             let offsetFromEnd = lengthBefore - selectionEnd;
 
             // Format the raw value
-            let numericVal = parseInt(rawValue);
+            let numericVal = parseInt(rawValue, 10);
             let formattedValue = new Intl.NumberFormat("id-ID").format(
                 numericVal,
             );
 
             // Update state
             this.display = formattedValue;
-            try {
-                this.$wire.set(
-                    `form.budget_items.${index}.unit_price`,
-                    numericVal,
-                    false,
-                );
-                this.$wire.calculateTotal(index);
-            } catch (e) { }
+            this.updateLocalPriceAndTotal(numericVal);
 
             // Restore cursor position
             this.$nextTick(() => {
@@ -371,6 +393,23 @@ document.addEventListener("alpine:init", () => {
                 let newPosition = lengthAfter - offsetFromEnd;
                 input.setSelectionRange(newPosition, newPosition);
             });
+        },
+
+        handleBlur() {
+            try {
+                this.$wire.calculateTotal(index);
+            } catch (e) {
+                return;
+            }
+        },
+
+        handleVolumeInput(detail) {
+            if (!detail || Number(detail.index) !== Number(index)) {
+                return;
+            }
+
+            const currentPrice = this.parsePrice(this.display);
+            this.updateLocalPriceAndTotal(currentPrice);
         },
     }));
 

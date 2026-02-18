@@ -62,7 +62,13 @@ class Edit extends ProposalCreate
                     }
                 }
             }],
-            'form.outputs.*.status' => 'required|string|max:255',
+            'form.outputs.*.status' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                $normalizedStatus = strtolower(trim((string) $value));
+                if (! in_array($normalizedStatus, ProposalConstants::OUTPUT_STATUSES, true)) {
+                    $index = explode('.', $attribute)[2] ?? 0;
+                    $fail('Baris '.((int) $index + 1).': Status tidak valid. Pilih salah satu: '.implode(', ', ProposalConstants::OUTPUT_STATUSES).'.');
+                }
+            }],
             'form.outputs.*.description' => 'required|string|max:2000',
         ];
 

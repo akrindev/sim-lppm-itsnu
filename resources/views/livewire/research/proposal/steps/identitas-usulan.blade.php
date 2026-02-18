@@ -1,3 +1,12 @@
+@if ($this->budgetCapMissingMessage)
+    <div class="alert alert-danger mb-3">
+        <div class="d-flex">
+            <x-lucide-alert-circle class="icon me-2" />
+            <div>{{ $this->budgetCapMissingMessage }}</div>
+        </div>
+    </div>
+@endif
+
 <!-- Section: Informasi Dasar -->
 <div class="card mb-3">
     <div class="card-body">
