@@ -70,6 +70,7 @@ class CommunityServiceSeeder extends Seeder
         $validStatuses = [
             ProposalStatus::DRAFT,
             ProposalStatus::SUBMITTED,
+            ProposalStatus::NEED_ASSIGNMENT,
             ProposalStatus::APPROVED,
             ProposalStatus::WAITING_REVIEWER,
             ProposalStatus::UNDER_REVIEW,
@@ -142,7 +143,9 @@ class CommunityServiceSeeder extends Seeder
                     'created_at' => $baseCreatedAt,
                     'updated_at' => $baseCreatedAt,
                 ]);
-                $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED]) ? 'pending' : 'accepted';
+                $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::NEED_ASSIGNMENT], true)
+                    ? 'pending'
+                    : 'accepted';
                 $availableMembers = $dosenUsers->where('id', '!=', $submitter->id)->random(min(rand(2, 3), $dosenUsers->count() - 1));
 
                 foreach ($availableMembers as $member) {
@@ -174,7 +177,7 @@ class CommunityServiceSeeder extends Seeder
 
                 // Reviewers
                 if (in_array($statusEnum, [ProposalStatus::UNDER_REVIEW, ProposalStatus::REVIEWED, ProposalStatus::REVISION_NEEDED, ProposalStatus::COMPLETED])) {
-                    $this->seedReviewers($proposal, $statusEnum, $reviewerUsers, $submitter, $availableMembers);
+                    $this->seedReviewers($proposal, $statusEnum, $reviewerUsers);
                 }
 
                 // Reports
@@ -233,14 +236,13 @@ class CommunityServiceSeeder extends Seeder
         }
     }
 
-    protected function seedReviewers($proposal, $status, $reviewerUsers, $submitter, $teamMembers): void
+    protected function seedReviewers($proposal, $status, $reviewerUsers): void
     {
         if ($reviewerUsers->isEmpty()) {
             return;
         }
 
-        // Logic for rounds: COMPLETED implies Round 2
-        $currentRound = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
+        $currentRound = 1;
 
         $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
         $criterias = \App\Models\ReviewCriteria::where('type', 'community_service')->where('is_active', true)->get();
@@ -370,6 +372,10 @@ class CommunityServiceSeeder extends Seeder
         $path = match ($finalStatus) {
             ProposalStatus::DRAFT => [],
             ProposalStatus::SUBMITTED => [['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0]],
+            ProposalStatus::NEED_ASSIGNMENT => [
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::NEED_ASSIGNMENT, 'u' => $dekan, 'd' => 2],
+            ],
             ProposalStatus::APPROVED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
                 ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::APPROVED, 'u' => $dekan, 'd' => 2],

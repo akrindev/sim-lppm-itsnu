@@ -1,6 +1,6 @@
 <div>
     <!-- Reviewer Assignment (Admin Only) -->
-    @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita']) &&
+    @if (auth()->user()->hasRole(['admin lppm']) &&
             in_array($proposal->status, [\App\Enums\ProposalStatus::WAITING_REVIEWER, \App\Enums\ProposalStatus::UNDER_REVIEW]))
         <div class="mb-3">
             <livewire:research.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />
@@ -59,7 +59,7 @@
 
 
     <div class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <!-- Status & Actions Card -->
             <div class="mb-3 h-100 card">
                 <div class="card-header">
@@ -108,25 +108,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <!-- Timeline Card -->
-            <div class="mb-3 h-100 card">
-                <div class="card-header">
-                    <h4 class="mb-0 card-title">Status Proposal</h4>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Dibuat Pada</label>
-                        <p>{{ $proposal->created_at->format('d M Y H:i') }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Terakhir Diperbarui</label>
-                        <p>{{ $proposal->updated_at->format('d M Y H:i') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <!-- Review Status Card -->
             <div class="mb-3 h-100 card">
                 <div class="card-header">

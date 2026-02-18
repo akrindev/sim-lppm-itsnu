@@ -84,6 +84,12 @@ abstract class ProposalShow extends Component
     {
         $user = \Illuminate\Support\Facades\Auth::user();
 
+        // Admin LPPM can edit any proposal that is not completed
+        if ($user->hasRole(['admin lppm']) && $this->proposal->status !== \App\Enums\ProposalStatus::COMPLETED) {
+            return true;
+        }
+
+        // Regular users (dosen) can only edit their own draft proposals
         return $this->proposal->status === \App\Enums\ProposalStatus::DRAFT
             && $this->proposal->submitter_id === $user->id;
     }
@@ -93,6 +99,12 @@ abstract class ProposalShow extends Component
     {
         $user = \Illuminate\Support\Facades\Auth::user();
 
+        // Admin LPPM can delete any proposal that is not completed
+        if ($user->hasRole(['admin lppm']) && $this->proposal->status !== \App\Enums\ProposalStatus::COMPLETED) {
+            return true;
+        }
+
+        // Regular users (dosen) can only delete their own draft proposals
         return $this->proposal->status === \App\Enums\ProposalStatus::DRAFT
             && $this->proposal->submitter_id === $user->id;
     }

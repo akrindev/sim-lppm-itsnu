@@ -7,6 +7,7 @@ use App\Models\Proposal;
 use App\Models\ProposalMonev;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -142,10 +143,23 @@ class MonevIndex extends Component
     public function downloadTemplate($key)
     {
         $setting = Setting::where('key', $key)->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
+
+        if (! $setting || ! $setting->hasMedia('template')) {
+            $this->toastError('Template belum tersedia.');
+
+            return null;
         }
-        $this->toastError('Template belum tersedia.');
+
+        $media = $setting->getFirstMedia('template');
+        $relativePath = $media->getPathRelativeToRoot();
+
+        if (! Storage::disk($media->disk)->exists($relativePath)) {
+            $this->toastError('Template tidak ditemukan di penyimpanan.');
+
+            return null;
+        }
+
+        return $media->toResponse(request());
     }
 
     #[Computed]

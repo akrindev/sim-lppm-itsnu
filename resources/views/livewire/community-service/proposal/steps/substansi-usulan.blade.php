@@ -9,19 +9,17 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label" for="macro_research_group">Kelompok Makro Riset <span
+                    <label class="form-label" for="macro_research_group">Kelompok Makro PKM <span
                             class="text-danger">*</span></label>
-                    <div wire:ignore>
-                        <select id="macro_research_group"
-                            class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
-                            wire:model="form.macro_research_group_id" x-data="tomSelect"
-                            placeholder="Pilih kelompok makro riset" required>
-                            <option value="">-- Pilih Kelompok Makro Riset --</option>
-                            @foreach ($this->macroResearchGroups as $group)
-                                <option value="{{ $group->id }}">{{ $group->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <select id="macro_research_group"
+                        class="form-select @error('form.macro_research_group_id') is-invalid @enderror"
+                        wire:model="form.macro_research_group_id" x-data="tomSelect"
+                        placeholder="Pilih kelompok makro PKM" required>
+                        <option value="">-- Pilih Kelompok Makro PKM --</option>
+                        @foreach ($this->macroResearchGroups as $group)
+                            <option value="{{ $group->id }}">{{ $group->name }}</option>
+                        @endforeach
+                    </select>
                     @error('form.macro_research_group_id')
                         <div class="d-block invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -95,9 +93,11 @@
                 Belum ada luaran target. Klik tombol "Tambah Luaran" untuk menambahkan.
             </div>
         @else
-            <div class="table-responsive" x-data="{
-                typesMap: @js(\App\Constants\ProposalConstants::PKM_OUTPUT_TYPES)
-            }">
+            @php
+                $outputTypes = \App\Constants\ProposalConstants::PKM_OUTPUT_TYPES;
+                $outputStatuses = \App\Constants\ProposalConstants::OUTPUT_STATUSES;
+            @endphp
+            <div class="table-responsive">
                 <table class="table table-bordered">
                     @php
                         $duration = (int) ($form->duration_in_years ?? 1);
@@ -116,10 +116,10 @@
                     </thead>
                     <tbody>
                         @foreach ($form->outputs as $index => $output)
-                            <tr wire:key="output-{{ $index }}" x-data="{
-                                group: $wire.entangle('form.outputs.{{ $index }}.group'),
-                                type: $wire.entangle('form.outputs.{{ $index }}.type')
-                            }">
+                            @php
+                                $currentGroup = $form->outputs[$index]['group'] ?? '';
+                            @endphp
+                            <tr wire:key="output-{{ $index }}">
                                 <td>
                                     <select wire:model="form.outputs.{{ $index }}.year"
                                         class="form-select form-select-sm @error('form.outputs.' . $index . '.year') is-invalid @enderror">
@@ -138,7 +138,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select x-model="group"
+                                    <select wire:model.live="form.outputs.{{ $index }}.group"
                                         class="form-select-sm form-select @error('form.outputs.' . $index . '.group') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
                                         <option value="pemberdayaan">Pemberdayaan</option>
@@ -150,18 +150,27 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select x-model="type"
+                                    <select wire:model="form.outputs.{{ $index }}.type"
                                         class="form-select-sm form-select @error('form.outputs.' . $index . '.type') is-invalid @enderror">
                                         <option value="">-- Pilih --</option>
-                                        <template x-for="typeOption in (typesMap[group] || [])">
-                                            <option x-text="typeOption" :value="typeOption"></option>
-                                        </template>
+                                        @if (!empty($currentGroup) && isset($outputTypes[$currentGroup]))
+                                            @foreach ($outputTypes[$currentGroup] as $typeOption)
+                                                <option value="{{ $typeOption }}">{{ $typeOption }}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" wire:model="form.outputs.{{ $index }}.status"
-                                        class="form-control form-control-sm @error('form.outputs.' . $index . '.status') is-invalid @enderror"
-                                        placeholder="Status">
+                                    <select wire:model="form.outputs.{{ $index }}.status"
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.status') is-invalid @enderror">
+                                        <option value="">-- Pilih --</option>
+                                        @foreach ($outputStatuses as $status)
+                                            <option value="{{ $status }}">{{ ucfirst($status) }}</option>
+                                        @endforeach
+                                        @if (!empty($form->outputs[$index]['status']) && !in_array($form->outputs[$index]['status'], $outputStatuses, true))
+                                            <option value="{{ $form->outputs[$index]['status'] }}">{{ $form->outputs[$index]['status'] }}</option>
+                                        @endif
+                                    </select>
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.description"

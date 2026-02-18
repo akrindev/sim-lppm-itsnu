@@ -2,14 +2,17 @@
 
 namespace App\Livewire\Abstracts;
 
+use App\Constants\ProposalConstants;
 use App\Livewire\Concerns\HasToast;
 use App\Livewire\Forms\ProposalForm;
 use App\Livewire\Traits\WithProposalWizard;
 use App\Livewire\Traits\WithStepWizard;
+use App\Models\BudgetCap;
 use App\Services\BudgetValidationService;
 use App\Services\MasterDataService;
 use App\Services\ProposalService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -60,7 +63,11 @@ abstract class ProposalCreate extends Component
     {
         $user = Auth::user();
 
-        if ($user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita'])) {
+        if ($proposal->status === \App\Enums\ProposalStatus::COMPLETED) {
+            return false;
+        }
+
+        if ($user->hasRole(['admin lppm'])) {
             return true;
         }
 
@@ -97,7 +104,19 @@ abstract class ProposalCreate extends Component
             'form.macro_research_group_id' => 'Kelompok Makro Riset',
             'form.substance_file' => 'Substansi Usulan (PDF)',
             'form.outputs' => 'Luaran Target Capaian',
+            'form.outputs.*.year' => 'Tahun Ke-',
+            'form.outputs.*.category' => 'Jenis',
+            'form.outputs.*.group' => 'Kategori Luaran',
+            'form.outputs.*.type' => 'Luaran',
+            'form.outputs.*.status' => 'Status',
+            'form.outputs.*.description' => 'Keterangan (URL)',
             'form.budget_items' => 'RAB',
+            'form.budget_items.*.year' => 'Tahun Ke-',
+            'form.budget_items.*.budget_group_id' => 'Kelompok Anggaran',
+            'form.budget_items.*.budget_component_id' => 'Komponen Anggaran',
+            'form.budget_items.*.item' => 'Nama Item',
+            'form.budget_items.*.volume' => 'Volume',
+            'form.budget_items.*.unit_price' => 'Nominal Satuan',
             'form.partner_ids' => 'Mitra',
             'form.new_partner.name' => 'Nama Mitra',
             'form.new_partner.email' => 'Email Mitra',
@@ -106,6 +125,24 @@ abstract class ProposalCreate extends Component
             'form.new_partner.type' => 'Jenis Mitra',
             'form.new_partner.address' => 'Alamat Mitra',
             'form.new_partner_commitment_file' => 'Surat Kesanggupan Mitra',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'form.outputs.*.group.required' => 'Baris :position: Kategori Luaran wajib diisi.',
+            'form.outputs.*.type.required' => 'Baris :position: Luaran wajib diisi.',
+            'form.outputs.*.status.required' => 'Baris :position: Status wajib diisi.',
+            'form.outputs.*.status.in' => 'Baris :position: Status tidak valid. Pilih salah satu: '.implode(', ', ProposalConstants::OUTPUT_STATUSES).'.',
+            'form.outputs.*.description.required' => 'Baris :position: Keterangan (URL) wajib diisi.',
+            'form.budget_items.*.budget_group_id.required' => 'Baris :position: Kelompok Anggaran wajib diisi.',
+            'form.budget_items.*.budget_component_id.required' => 'Baris :position: Komponen Anggaran wajib diisi.',
+            'form.budget_items.*.item.required' => 'Baris :position: Nama Item wajib diisi.',
+            'form.budget_items.*.unit_price.required' => 'Baris :position: Nominal Satuan wajib diisi.',
+            'form.budget_items.*.unit_price.min' => 'Baris :position: Nominal Satuan minimal Rp1.',
+            'form.budget_items.*.volume.required' => 'Baris :position: Volume wajib diisi.',
+            'form.budget_items.*.volume.min' => 'Baris :position: Volume minimal 0.01.',
         ];
     }
 
@@ -158,81 +195,116 @@ abstract class ProposalCreate extends Component
 
     public function save(): void
     {
-        $this->form->validate();
+        try {
+            $this->form->validate();
 
-        app(BudgetValidationService::class)->validateBudgetGroupPercentages(
-            $this->form->budget_items,
-            $this->getProposalType()
-        );
+            $validationYear = (int) ($this->form->start_year ?: date('Y'));
 
-        app(BudgetValidationService::class)->validateBudgetCap(
-            $this->form->budget_items,
-            $this->getProposalType()
-        );
-
-        if ($this->form->proposal) {
-            app(ProposalService::class)->updateProposal(
-                $this->form->proposal,
-                $this->form
-            );
-            $proposal = $this->form->proposal;
-            $message = 'Proposal berhasil diperbarui.';
-        } else {
-            $proposal = app(ProposalService::class)->createProposal(
-                $this->form,
-                $this->getProposalType()
-            );
-            $message = 'Proposal berhasil dibuat.';
-        }
-
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
-
-        $this->redirect($this->getShowRoute($proposal->id));
-    }
-
-    public function saveDraft(): void
-    {
-        // Validate only the current step
-        $rules = $this->getStepValidationRules($this->currentStep);
-        if (! empty($rules)) {
-            $this->validate($rules);
-        }
-
-        // Additional validation for budget in step 3 if items are present
-        if ($this->currentStep === 3 && ! empty($this->form->budget_items)) {
             app(BudgetValidationService::class)->validateBudgetGroupPercentages(
                 $this->form->budget_items,
-                $this->getProposalType()
+                $this->getProposalType(),
+                $validationYear
             );
 
             app(BudgetValidationService::class)->validateBudgetCap(
                 $this->form->budget_items,
-                $this->getProposalType()
+                $this->getProposalType(),
+                $validationYear
             );
+
+            if ($this->form->proposal) {
+                app(ProposalService::class)->updateProposal(
+                    $this->form->proposal,
+                    $this->form
+                );
+                $proposal = $this->form->proposal;
+                $message = 'Proposal berhasil diperbarui.';
+            } else {
+                $proposal = app(ProposalService::class)->createProposal(
+                    $this->form,
+                    $this->getProposalType()
+                );
+                $message = 'Proposal berhasil dibuat.';
+            }
+
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
+
+            $this->redirect($this->getShowRoute($proposal->id));
+        } catch (ValidationException $exception) {
+            $this->setErrorBag($exception->validator->errors());
+            $this->toastValidationError($exception);
         }
+    }
 
-        if ($this->form->proposal) {
-            app(ProposalService::class)->updateProposal(
-                $this->form->proposal,
-                $this->form,
-                false // Disable global validation
-            );
-        } else {
-            $proposal = app(ProposalService::class)->createProposal(
-                $this->form,
-                $this->getProposalType()
-            );
-            $this->form->proposal = $proposal;
+    public function nextStep(): void
+    {
+        try {
+            $this->validateCurrentStep();
+
+            if ($this->currentStep < 5) {
+                $this->currentStep++;
+            }
+        } catch (ValidationException $exception) {
+            $this->setErrorBag($exception->validator->errors());
+            $this->toastValidationError($exception);
         }
+    }
 
-        // Force clear file input and reset iteration to clear frontend state
-        $this->form->substance_file = null;
-        $this->fileInputIteration++;
+    public function saveDraft(): void
+    {
+        try {
+            $rules = $this->getStepValidationRules($this->currentStep);
+            if (! empty($rules)) {
+                $this->validate($rules);
+            }
 
-        $message = 'Draft proposal berhasil disimpan.';
-        session()->flash('success', $message);
-        $this->toastSuccess($message);
+            if ($this->currentStep === 3 && ! empty($this->form->budget_items)) {
+                $validationYear = (int) ($this->form->start_year ?: date('Y'));
+
+                app(BudgetValidationService::class)->validateBudgetGroupPercentages(
+                    $this->form->budget_items,
+                    $this->getProposalType(),
+                    $validationYear
+                );
+
+                app(BudgetValidationService::class)->validateBudgetCap(
+                    $this->form->budget_items,
+                    $this->getProposalType(),
+                    $validationYear
+                );
+            }
+
+            if ($this->form->proposal) {
+                app(ProposalService::class)->updateProposal(
+                    $this->form->proposal,
+                    $this->form,
+                    false
+                );
+            } else {
+                $proposal = app(ProposalService::class)->createProposal(
+                    $this->form,
+                    $this->getProposalType()
+                );
+                $this->form->proposal = $proposal;
+            }
+
+            $this->form->substance_file = null;
+            $this->fileInputIteration++;
+
+            $message = 'Draft proposal berhasil disimpan.';
+            session()->flash('success', $message);
+            $this->toastSuccess($message);
+        } catch (ValidationException $exception) {
+            $this->setErrorBag($exception->validator->errors());
+            $this->toastValidationError($exception);
+        }
+    }
+
+    private function toastValidationError(ValidationException $exception): void
+    {
+        $firstError = collect($exception->errors())->flatten()->first();
+        $this->toastError($firstError ?: 'Terdapat kesalahan pada input form.');
     }
 
     #[Computed]
@@ -328,12 +400,40 @@ abstract class ProposalCreate extends Component
         return app(MasterDataService::class)->getTemplateUrl($this->getProposalType());
     }
 
+    #[Computed]
+    public function approvalTemplateUrl(): ?string
+    {
+        return app(MasterDataService::class)->getApprovalTemplateUrl($this->getProposalType());
+    }
+
+    #[Computed]
+    public function partnerCommitmentTemplateUrl(): ?string
+    {
+        return app(MasterDataService::class)->getPartnerCommitmentTemplateUrl($this->getProposalType());
+    }
+
+    #[Computed]
+    public function budgetCapMissingMessage(): ?string
+    {
+        $year = (int) ($this->form->start_year ?: date('Y'));
+        $proposalType = $this->getProposalType();
+        $budgetCap = BudgetCap::getCapForYear($year, $proposalType);
+
+        if ($budgetCap !== null && $budgetCap > 0) {
+            return null;
+        }
+
+        $proposalLabel = $proposalType === 'research' ? 'Penelitian' : 'PKM';
+
+        return "Batas anggaran RAB untuk {$proposalLabel} tahun {$year} belum diatur. Silakan hubungi Admin LPPM sebelum melanjutkan.";
+    }
+
     protected function getStepValidationRules(int $step): array
     {
         $type = $this->getProposalType();
 
         return match ($step) {
-            1 => [
+            1 => array_merge([
                 'form.title' => 'required|string|max:255',
                 'form.research_scheme_id' => $type === 'research' ? 'required|exists:research_schemes,id' : 'nullable|exists:research_schemes,id',
                 'form.focus_area_id' => 'required|exists:focus_areas,id',
@@ -348,8 +448,9 @@ abstract class ProposalCreate extends Component
                 'form.start_year' => 'required|integer|min:2020|max:2050',
                 'form.summary' => 'required|string|min:100',
                 'form.author_tasks' => 'required|string',
-                'form.tkt_type' => $type === 'research' ? ['required', 'string', 'max:255', \Illuminate\Validation\Rule::in(app(\App\Services\MasterDataService::class)->tktTypes()->toArray())] : 'nullable',
-                'form.tkt_results' => $type === 'research' ? ['nullable', 'array', function ($attribute, $value, $fail) {
+            ], $type === 'research' ? [
+                'form.tkt_type' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::in(app(\App\Services\MasterDataService::class)->tktTypes()->toArray())],
+                'form.tkt_results' => ['nullable', 'array', function ($attribute, $value, $fail) {
                     if (empty($value)) {
                         return;
                     }
@@ -384,8 +485,8 @@ abstract class ProposalCreate extends Component
                             }
                         }
                     }
-                }] : 'nullable',
-            ],
+                }],
+            ] : []),
             2 => array_merge($this->getStep2Rules(), $type === 'research' ? [
                 'form.outputs' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
                     $wajibCount = collect($value)->where('category', 'Wajib')->count();
@@ -407,6 +508,9 @@ abstract class ProposalCreate extends Component
                         if (empty($item['status'])) {
                             $errors[] = 'Status';
                         }
+                        if (empty($item['description'])) {
+                            $errors[] = 'Keterangan (URL)';
+                        }
 
                         if (! empty($errors)) {
                             $fail("Baris {$rowNum}: ".implode(', ', $errors).' wajib diisi.');
@@ -415,7 +519,31 @@ abstract class ProposalCreate extends Component
                 }],
             ] : []),
             3 => [
-                'form.budget_items' => ['required', 'array', 'min:1'],
+                'form.budget_items' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        return;
+                    }
+
+                    $validationYear = (int) ($this->form->start_year ?: date('Y'));
+
+                    try {
+                        app(BudgetValidationService::class)->validateBudgetGroupPercentages(
+                            $value,
+                            $this->getProposalType(),
+                            $validationYear
+                        );
+
+                        app(BudgetValidationService::class)->validateBudgetCap(
+                            $value,
+                            $this->getProposalType(),
+                            $validationYear
+                        );
+                    } catch (\Illuminate\Validation\ValidationException $exception) {
+                        foreach (($exception->errors()['budget_items'] ?? []) as $errorMessage) {
+                            $fail($errorMessage);
+                        }
+                    }
+                }],
                 'form.budget_items.*.year' => 'required|integer|min:1|max:10',
                 'form.budget_items.*.budget_group_id' => 'required|exists:budget_groups,id',
                 'form.budget_items.*.budget_component_id' => 'required|exists:budget_components,id',

@@ -12,6 +12,7 @@ use App\Livewire\Traits\ReportAccess;
 use App\Livewire\Traits\ReportAuthorization;
 use App\Models\Keyword;
 use App\Models\Proposal;
+use App\Services\MasterDataService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -138,6 +139,12 @@ class Show extends Component
         session()->flash('success', $message);
         $this->toastSuccess($message);
         $this->redirect(route('community-service.progress-report.index'), navigate: true);
+    }
+
+    #[Computed]
+    public function reportEndorsementTemplateUrl(): ?string
+    {
+        return app(MasterDataService::class)->getReportEndorsementTemplateUrl('community-service');
     }
 
     /**

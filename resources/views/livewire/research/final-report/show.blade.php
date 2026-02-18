@@ -48,6 +48,15 @@
         </div>
     </div>
 
+    @if ($this->reportEndorsementTemplateUrl)
+        <div class="alert alert-secondary" role="alert">
+            <x-lucide-download class="icon me-2" />
+            <a href="{{ $this->reportEndorsementTemplateUrl }}" target="_blank" class="text-primary text-decoration-none">
+                Unduh Template Halaman Pengesahan Laporan
+            </a>
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible mb-3" role="alert">
             <div class="d-flex">

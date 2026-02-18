@@ -6,6 +6,14 @@ class ProposalConstants
 {
     public const OUTPUT_CATEGORIES = ['Wajib', 'Tambahan'];
 
+    public const OUTPUT_STATUSES = [
+        'draft',
+        'submit',
+        'sedang direview',
+        'accepted',
+        'published',
+    ];
+
     public const RESEARCH_OUTPUT_GROUPS = [
         'jurnal',
         'prosiding',

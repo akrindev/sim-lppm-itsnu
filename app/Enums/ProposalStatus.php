@@ -5,8 +5,8 @@ namespace App\Enums;
 enum ProposalStatus: string
 {
     case DRAFT = 'draft';
-    case SUBMITTED = 'submitted';
     case NEED_ASSIGNMENT = 'need_assignment';
+    case SUBMITTED = 'submitted';
     case APPROVED = 'approved';
     case WAITING_REVIEWER = 'waiting_reviewer';
     case UNDER_REVIEW = 'under_review';
@@ -22,8 +22,8 @@ enum ProposalStatus: string
     {
         return match ($this) {
             self::DRAFT => 'Draft',
-            self::SUBMITTED => 'Diajukan',
             self::NEED_ASSIGNMENT => 'Perlu Persetujuan Anggota',
+            self::SUBMITTED => 'Diajukan',
             self::APPROVED => 'Disetujui Dekan',
             self::WAITING_REVIEWER => 'Menunggu Penugasan Reviewer',
             self::UNDER_REVIEW => 'Sedang Direview',
@@ -41,8 +41,8 @@ enum ProposalStatus: string
     {
         return match ($this) {
             self::DRAFT => 'secondary',
-            self::SUBMITTED => 'info',
             self::NEED_ASSIGNMENT => 'warning',
+            self::SUBMITTED => 'info',
             self::APPROVED => 'primary',
             self::WAITING_REVIEWER => 'cyan',
             self::UNDER_REVIEW => 'orange',
@@ -60,8 +60,8 @@ enum ProposalStatus: string
     {
         return match ($this) {
             self::DRAFT => in_array($newStatus, [self::SUBMITTED]),
-            self::SUBMITTED => in_array($newStatus, [self::APPROVED, self::NEED_ASSIGNMENT, self::REJECTED]),
             self::NEED_ASSIGNMENT => in_array($newStatus, [self::SUBMITTED]),
+            self::SUBMITTED => in_array($newStatus, [self::APPROVED, self::NEED_ASSIGNMENT, self::REJECTED]),
             self::APPROVED => in_array($newStatus, [self::WAITING_REVIEWER, self::UNDER_REVIEW, self::REJECTED]),
             self::WAITING_REVIEWER => in_array($newStatus, [self::UNDER_REVIEW]),
             self::UNDER_REVIEW => in_array($newStatus, [self::REVIEWED]),
@@ -79,8 +79,8 @@ enum ProposalStatus: string
     {
         return match ($this) {
             self::DRAFT => 'Proposal sedang dalam tahap penyusunan',
-            self::SUBMITTED => 'Proposal telah diajukan dan menunggu persetujuan Dekan',
             self::NEED_ASSIGNMENT => 'Proposal memerlukan persetujuan anggota tim',
+            self::SUBMITTED => 'Proposal telah diajukan dan menunggu persetujuan Dekan',
             self::APPROVED => 'Proposal telah disetujui Dekan dan menunggu persetujuan Kepala LPPM',
             self::WAITING_REVIEWER => 'Proposal menunggu Admin LPPM menugaskan reviewer',
             self::UNDER_REVIEW => 'Proposal sedang dalam proses review oleh reviewer yang ditugaskan',
@@ -99,8 +99,8 @@ enum ProposalStatus: string
         return [
             'all' => 'Semua Status',
             self::DRAFT->value => self::DRAFT->label(),
-            self::SUBMITTED->value => self::SUBMITTED->label(),
             self::NEED_ASSIGNMENT->value => self::NEED_ASSIGNMENT->label(),
+            self::SUBMITTED->value => self::SUBMITTED->label(),
             self::APPROVED->value => self::APPROVED->label(),
             self::WAITING_REVIEWER->value => self::WAITING_REVIEWER->label(),
             self::UNDER_REVIEW->value => self::UNDER_REVIEW->label(),

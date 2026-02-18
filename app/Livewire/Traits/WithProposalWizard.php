@@ -100,23 +100,25 @@ trait WithProposalWizard
         });
 
         $this->dispatch('partner-created');
-        $this->dispatch('modal-close', id: 'modal-partner');
+        $this->dispatch('close-modal', modalId: 'modal-partner');
     }
 
     public function validateBudgetRealtime(): void
     {
         try {
+            $validationYear = (int) ($this->form->start_year ?: date('Y'));
+
             if (! empty($this->form->budget_items)) {
                 app(\App\Services\BudgetValidationService::class)->validateBudgetGroupPercentages(
                     $this->form->budget_items,
                     $this->getProposalTypeForValidation(),
-                    (int) date('Y')
+                    $validationYear
                 );
 
                 app(\App\Services\BudgetValidationService::class)->validateBudgetCap(
                     $this->form->budget_items,
                     $this->getProposalTypeForValidation(),
-                    (int) date('Y')
+                    $validationYear
                 );
             }
 

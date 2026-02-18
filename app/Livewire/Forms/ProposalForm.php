@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Constants\ProposalConstants;
 use App\Models\CommunityService;
 use App\Models\Proposal;
 use App\Models\Research;
@@ -534,9 +535,9 @@ class ProposalForm extends Form
      */
     public function rules(): array
     {
-        // Determine if this is a Research or CommunityService proposal
-        $isResearch = ($this->proposal && $this->proposal->detailable_type === Research::class) || $this->research_scheme_id;
         $isCommunityService = $this->proposal && $this->proposal->detailable_type === CommunityService::class;
+        $isResearch = ($this->proposal && $this->proposal->detailable_type === Research::class)
+            || (! $isCommunityService && ! empty($this->research_scheme_id));
 
         $rules = [
             'title' => 'required|string|max:255',
@@ -574,42 +575,37 @@ class ProposalForm extends Form
         // $rules['tkt_type'] = 'nullable|string|max:255';
         // $rules['roadmap_data'] = 'nullable|array';
 
-        $rules['tkt_results'] = ['nullable', 'array', function ($attribute, $value, $fail) {
-            if (empty($value)) {
-                return;
-            }
-
-            // 1. Calculate achieved level
-            $achievedLevel = 0;
-            // Get level models to map IDs to integer levels
-            $levels = \App\Models\TktLevel::whereIn('id', array_keys($value))->get();
-
-            foreach ($levels as $level) {
-                $data = $value[$level->id] ?? null;
-                // Check if passed (percentage >= 80)
-                if ($data && isset($data['percentage']) && $data['percentage'] >= 80) {
-                    $achievedLevel = max($achievedLevel, $level->level);
+        if ($isResearch) {
+            $rules['tkt_results'] = ['nullable', 'array', function ($attribute, $value, $fail) {
+                if (empty($value)) {
+                    return;
                 }
-            }
 
-            // 2. Get required range for the scheme if selected
-            if ($this->research_scheme_id) {
-                $scheme = ResearchScheme::find($this->research_scheme_id);
-                if ($scheme && $scheme->strata) {
-                    $range = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata($scheme->strata);
+                $achievedLevel = 0;
+                $levels = \App\Models\TktLevel::whereIn('id', array_keys($value))->get();
 
-                    // If range exists (not PKM), validate
-                    if ($range) {
-                        [$min, $max] = $range;
+                foreach ($levels as $level) {
+                    $data = $value[$level->id] ?? null;
+                    if ($data && isset($data['percentage']) && $data['percentage'] >= 80) {
+                        $achievedLevel = max($achievedLevel, $level->level);
+                    }
+                }
 
-                        // Check if achieved level is within range
-                        if ($achievedLevel < $min || $achievedLevel > $max) {
-                            $fail("TKT Saat Ini (Level $achievedLevel) tidak sesuai dengan Skema $scheme->strata (Target: Level $min - $max).");
+                if ($this->research_scheme_id) {
+                    $scheme = ResearchScheme::find($this->research_scheme_id);
+                    if ($scheme && $scheme->strata) {
+                        $range = \App\Livewire\Research\Proposal\Components\TktMeasurement::getTktRangeForStrata($scheme->strata);
+
+                        if ($range) {
+                            [$min, $max] = $range;
+                            if ($achievedLevel < $min || $achievedLevel > $max) {
+                                $fail("TKT Saat Ini (Level $achievedLevel) tidak sesuai dengan Skema $scheme->strata (Target: Level $min - $max).");
+                            }
                         }
                     }
                 }
-            }
-        }];
+            }];
+        }
         // } elseif ($isCommunityService) {
         // For CommunityService, background and methodology can be null or shorter
         // $rules['background'] = 'nullable|string|min:50';
@@ -687,12 +683,18 @@ class ProposalForm extends Form
     {
         if (! empty($this->outputs)) {
             foreach ($this->outputs as $output) {
+                $rawStatus = trim((string) ($output['status'] ?? ''));
+                $normalizedStatus = strtolower($rawStatus);
+                $status = in_array($normalizedStatus, ProposalConstants::OUTPUT_STATUSES, true)
+                    ? $normalizedStatus
+                    : $rawStatus;
+
                 $proposal->outputs()->create([
                     'output_year' => $output['year'] ?? 1, // date('Y'),
                     'category' => $output['category'] ?? 'Wajib',
                     'group' => $output['group'] ?? '',
                     'type' => $output['type'] ?? '',
-                    'target_status' => $output['status'] ?? '',
+                    'target_status' => $status,
                     'description' => $output['description'] ?? null,
                 ]);
             }
@@ -752,7 +754,7 @@ class ProposalForm extends Form
 
         // Get proposal type to determine which budget cap to use
         $proposalType = $this->getProposalType();
-        $currentYear = (int) date('Y');
+        $currentYear = (int) ($this->start_year ?: date('Y'));
 
         // Get budget cap for current year and proposal type
         $budgetCap = \App\Models\BudgetCap::getCapForYear($currentYear, $proposalType);
@@ -825,7 +827,7 @@ class ProposalForm extends Form
         }
 
         // Get current year
-        $currentYear = (int) date('Y');
+        $currentYear = (int) ($this->start_year ?: date('Y'));
 
         // Get budget cap for current year and proposal type
         $budgetCap = \App\Models\BudgetCap::getCapForYear($currentYear, $proposalType);
@@ -856,6 +858,10 @@ class ProposalForm extends Form
      */
     private function getProposalType(): string
     {
+        if ($this->proposal) {
+            return $this->proposal->detailable_type === Research::class ? 'research' : 'community_service';
+        }
+
         return $this->research_scheme_id ? 'research' : 'community_service';
     }
 }

@@ -47,6 +47,15 @@
         </div>
     </div>
 
+    @if ($this->reportEndorsementTemplateUrl)
+        <div class="alert alert-secondary" role="alert">
+            <x-lucide-download class="icon me-2" />
+            <a href="{{ $this->reportEndorsementTemplateUrl }}" target="_blank" class="text-primary text-decoration-none">
+                Unduh Template Halaman Pengesahan Laporan
+            </a>
+        </div>
+    @endif
+
     <!-- Ringkasan & Kata Kunci -->
     <div class="card mb-3">
         <div class="card-header">

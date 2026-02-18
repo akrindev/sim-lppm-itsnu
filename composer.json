@@ -8,17 +8,19 @@
 	"require": {
 		"php": "^8.2",
 		"barryvdh/laravel-dompdf": "^3.1",
+		"fakerphp/faker": "^1.23",
 		"laravel/fortify": "^1.30",
 		"laravel/framework": "^12.0",
 		"laravel/tinker": "^2.10.1",
+		"league/flysystem-aws-s3-v3": "^3.0",
 		"livewire/flux": "^2.1.1",
 		"maatwebsite/excel": "^3.1",
 		"mallardduck/blade-lucide-icons": "^1.23",
+		"resend/resend-laravel": "^1.2",
 		"setasign/fpdf": "^1.8",
 		"setasign/fpdi": "^2.6",
 		"spatie/laravel-medialibrary": "^11.0",
-		"spatie/laravel-permission": "^6.21",
-		"fakerphp/faker": "^1.23"
+		"spatie/laravel-permission": "^6.21"
 	},
 	"require-dev": {
 		"fruitcake/laravel-debugbar": "^4.0",

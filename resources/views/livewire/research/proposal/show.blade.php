@@ -41,11 +41,17 @@
     @php
         $user = auth()->user();
         $role = 'guest';
-        if ($user->hasRole('reviewer')) $role = 'reviewer';
-        elseif ($user->hasRole('dekan')) $role = 'dekan';
-        elseif ($user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita'])) $role = 'admin';
-        elseif ($user->hasRole('kepala lppm')) $role = 'kepala';
-        elseif ($user->id === $proposal->submitter_id) $role = 'dosen';
+        if ($user->hasRole('reviewer')) {
+            $role = 'reviewer';
+        } elseif ($user->hasRole('dekan')) {
+            $role = 'dekan';
+        } elseif ($user->hasRole(['admin lppm'])) {
+            $role = 'admin';
+        } elseif ($user->hasRole('kepala lppm')) {
+            $role = 'kepala';
+        } elseif ($user->id === $proposal->submitter_id) {
+            $role = 'dosen';
+        }
     @endphp
 
     <div class="col-md-12">
@@ -53,24 +59,28 @@
     </div>
 
     <!-- Steps Indicator -->
-    <div class="mb-3 col-md-12">
+    <div class="col-md-12 mb-3">
         <div class="card">
             <div class="card-body">
-                <ul class="my-4 steps steps-green steps-counter">
+                <ul class="steps steps-green steps-counter my-4">
                     <li class="step-item" :class="{ 'active': currentStep === 1 }">
-                        <a href="#" @click.prevent="currentStep = 1" class="text-decoration-none">Identitas Usulan</a>
+                        <a href="#" @click.prevent="currentStep = 1" class="text-decoration-none">Identitas
+                            Usulan</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 2 }">
-                        <a href="#" @click.prevent="currentStep = 2" class="text-decoration-none">Substansi Usulan</a>
+                        <a href="#" @click.prevent="currentStep = 2" class="text-decoration-none">Substansi
+                            Usulan</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 3 }">
                         <a href="#" @click.prevent="currentStep = 3" class="text-decoration-none">RAB</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 4 }">
-                        <a href="#" @click.prevent="currentStep = 4" class="text-decoration-none">Dokumen Pendukung</a>
+                        <a href="#" @click.prevent="currentStep = 4" class="text-decoration-none">Dokumen
+                            Pendukung</a>
                     </li>
                     <li class="step-item" :class="{ 'active': currentStep === 5 }">
-                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Review & Riwayat</a>
+                        <a href="#" @click.prevent="currentStep = 5" class="text-decoration-none">Review &
+                            Riwayat</a>
                     </li>
                 </ul>
             </div>
@@ -82,6 +92,7 @@
         <!-- Section 1: Identitas Usulan -->
         <div id="section-identitas" x-show="currentStep === 1">
             @include('livewire.research.proposal.components.identitas-usulan', ['proposal' => $proposal])
+
             <div class="mb-3">
                 <livewire:research.proposal.team-member-form :proposalId="$proposal->id" :key="'team-form-' . $proposal->id" />
             </div>
@@ -104,29 +115,41 @@
 
         <!-- Section 5: Workflow & Aksi -->
         <div id="section-workflow" x-show="currentStep === 5">
-            @include('livewire.research.proposal.components.workflow-actions', ['proposal' => $proposal])
-            
-            <!-- History Section -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h3 class="card-title">Riwayat Perubahan Data</h3>
+            <div class="row g-3 mt-4">
+                <div class="col-12 col-lg-8 order-lg-1 order-2">
+                    @include('livewire.research.proposal.components.workflow-actions', [
+                        'proposal' => $proposal,
+                    ])
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-12">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">Riwayat Perubahan Data</h3>
+                                </div>
+                                <div class="card-body">
+                                    <livewire:proposals.proposal-activity-timeline :proposal="$proposal" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <livewire:proposals.proposal-activity-timeline :proposal="$proposal" />
+                        <div class="col-12">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">Riwayat Status</h3>
+                                </div>
+                                <div class="card-body">
+                                    @include('livewire.proposals.proposal-status-history', [
+                                        'logs' => $proposal->statusLogs,
+                                    ])
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h3 class="card-title">Riwayat Status</h3>
-                        </div>
-                        <div class="card-body">
-                            @include('livewire.proposals.proposal-status-history', ['logs' => $proposal->statusLogs])
-                        </div>
-                    </div>
+                <div class="col-12 col-lg-4 order-lg-2 order-1">
+                    @include('livewire.proposals.components.workflow-progress-checklist', [
+                        'proposal' => $proposal,
+                    ])
                 </div>
             </div>
         </div>

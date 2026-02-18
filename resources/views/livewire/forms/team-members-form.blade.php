@@ -67,9 +67,16 @@
                         <input id="member_nidn" type="text"
                             class="form-control @error('member_nidn') is-invalid @enderror" wire:model.live="member_nidn"
                             placeholder="Masukkan NIDN atau NIP anggota">
-                        <button class="btn-outline-primary btn" type="button" wire:click="checkMember" id="button-addon2">
-                            <x-lucide-search class="icon" />
-                            Cek
+                        <button class="btn-outline-primary btn" type="button" wire:click="checkMember"
+                            wire:loading.attr="disabled" wire:target="checkMember" id="button-addon2">
+                            <span wire:loading.remove wire:target="checkMember">
+                                <x-lucide-search class="icon" />
+                                Cek
+                            </span>
+                            <span wire:loading wire:target="checkMember">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Mengecek...
+                            </span>
                         </button>
                     </div>
                     @error('member_nidn')
@@ -102,6 +109,11 @@
                             @if (!empty($foundMember['institution']))
                                 <dt class="text-bold col-12 col-sm-4">Institusi</dt>
                                 <dd class="col-12 col-sm-8">{{ $foundMember['institution'] }}</dd>
+                            @endif
+
+                            @if (!empty($foundMember['faculty']))
+                                <dt class="text-bold col-12 col-sm-4">Fakultas</dt>
+                                <dd class="col-12 col-sm-8">{{ $foundMember['faculty'] }}</dd>
                             @endif
 
                             @if (!empty($foundMember['study_program']))

@@ -88,7 +88,15 @@ class Show extends Component
      */
     public function canEdit(): bool
     {
-        return $this->form->proposal->submitter_id === Auth::id();
+        $user = Auth::user();
+
+        // Admin LPPM can edit any proposal that is not completed
+        if ($user->hasRole(['admin lppm']) && $this->form->proposal->status !== \App\Enums\ProposalStatus::COMPLETED) {
+            return true;
+        }
+
+        // Regular users (dosen) can only edit their own proposals
+        return $this->form->proposal->submitter_id === $user->id;
     }
 
     /**

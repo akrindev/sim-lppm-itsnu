@@ -182,7 +182,15 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">File Surat Kesanggupan Mitra (PDF)</label>
+        <div class="d-flex align-items-center justify-content-between">
+            <label class="form-label mb-0">File Surat Kesanggupan Mitra (PDF)</label>
+            @if ($this->partnerCommitmentTemplateUrl)
+                <a href="{{ $this->partnerCommitmentTemplateUrl }}" target="_blank" class="text-primary text-decoration-none small">
+                    <x-lucide-download class="icon me-1" />
+                    Unduh Template
+                </a>
+            @endif
+        </div>
         <input type="file" wire:model="form.new_partner_commitment_file"
             class="form-control @error('form.new_partner_commitment_file') is-invalid @enderror"
             accept=".pdf">

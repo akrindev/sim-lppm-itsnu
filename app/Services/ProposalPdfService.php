@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Proposal;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use setasign\Fpdi\Fpdi;
 
 class ProposalPdfService
@@ -52,21 +53,23 @@ class ProposalPdfService
             $pdf->useTemplate($templateId);
         }
 
-        // 3. Add pages from the substance file if it exists
+        $tempSubstancePath = null;
         $substanceFile = $proposal->detailable?->getFirstMedia('substance_file');
-        if ($substanceFile && file_exists($substanceFile->getPath())) {
-            try {
-                $substancePageCount = $pdf->setSourceFile($substanceFile->getPath());
-                for ($i = 1; $i <= $substancePageCount; $i++) {
-                    $templateId = $pdf->importPage($i);
-                    $size = $pdf->getTemplateSize($templateId);
-                    $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                    $pdf->useTemplate($templateId);
+        if ($substanceFile) {
+            $substanceSourcePath = $this->resolveReadableMediaPath($substanceFile, $tempSubstancePath);
+
+            if ($substanceSourcePath !== null) {
+                try {
+                    $substancePageCount = $pdf->setSourceFile($substanceSourcePath);
+                    for ($i = 1; $i <= $substancePageCount; $i++) {
+                        $templateId = $pdf->importPage($i);
+                        $size = $pdf->getTemplateSize($templateId);
+                        $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                        $pdf->useTemplate($templateId);
+                    }
+                } catch (\Exception $exception) {
+                    report($exception);
                 }
-            } catch (\Exception $e) {
-                // If PDF version is too high for FPDI, we might fail here.
-                // In some environments, we'd use Ghostscript to down-convert.
-                // For now, we skip or log.
             }
         }
 
@@ -75,7 +78,55 @@ class ProposalPdfService
 
         // Cleanup temporary info PDF
         @unlink($tempInfoPath);
+        if ($tempSubstancePath !== null) {
+            @unlink($tempSubstancePath);
+        }
 
         return $outputPath;
+    }
+
+    private function resolveReadableMediaPath(object $media, ?string &$tempSubstancePath): ?string
+    {
+        $driver = strtolower((string) config("filesystems.disks.{$media->disk}.driver", ''));
+
+        if ($driver === 'local') {
+            $localPath = $media->getPath();
+
+            return is_file($localPath) ? $localPath : null;
+        }
+
+        $relativePath = $media->getPathRelativeToRoot();
+        $disk = Storage::disk($media->disk);
+
+        if (! $disk->exists($relativePath)) {
+            return null;
+        }
+
+        $stream = $disk->readStream($relativePath);
+        if (! is_resource($stream)) {
+            return null;
+        }
+
+        $tempSubstancePath = tempnam(sys_get_temp_dir(), 'proposal_substance_');
+        if ($tempSubstancePath === false) {
+            fclose($stream);
+
+            return null;
+        }
+
+        $tempHandle = fopen($tempSubstancePath, 'wb');
+        if (! is_resource($tempHandle)) {
+            fclose($stream);
+            @unlink($tempSubstancePath);
+            $tempSubstancePath = null;
+
+            return null;
+        }
+
+        stream_copy_to_stream($stream, $tempHandle);
+        fclose($stream);
+        fclose($tempHandle);
+
+        return $tempSubstancePath;
     }
 }

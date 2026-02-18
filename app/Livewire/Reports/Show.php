@@ -13,7 +13,9 @@ use App\Models\AdditionalOutput;
 use App\Models\Keyword;
 use App\Models\MandatoryOutput;
 use App\Models\Proposal;
+use App\Services\MasterDataService;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -31,9 +33,12 @@ class Show extends Component
     // Report configuration
     protected array $config = [];
 
+    public string $reportType = 'research-progress';
+
     public function mount(Proposal $proposal, string $type = 'research-progress'): void
     {
         $this->proposal = $proposal;
+        $this->reportType = $type;
         $this->config = $this->getConfig($type);
 
         $this->checkAccess();
@@ -315,6 +320,14 @@ class Show extends Component
         return AdditionalOutput::where('progress_report_id', $this->progressReport->id)
             ->where('proposal_output_id', $this->form->editingAdditionalId)
             ->first();
+    }
+
+    #[Computed]
+    public function reportEndorsementTemplateUrl(): ?string
+    {
+        $proposalType = str_contains($this->reportType, 'community-service') ? 'community-service' : 'research';
+
+        return app(MasterDataService::class)->getReportEndorsementTemplateUrl($proposalType);
     }
 
     public function render()
