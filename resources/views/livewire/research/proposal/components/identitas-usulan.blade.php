@@ -32,6 +32,17 @@
 
             <div class="mb-3 row">
                 <div class="col-md-6">
+                    <label class="form-label"><x-lucide-calendar-plus class="me-2 icon" />Dibuat Pada</label>
+                    <p class="text-reset">{{ $proposal->created_at->format('d M Y H:i') }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"><x-lucide-calendar-clock class="me-2 icon" />Terakhir Diperbarui</label>
+                    <p class="text-reset">{{ $proposal->updated_at->format('d M Y H:i') }}</p>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-md-6">
                     <label class="form-label"><x-lucide-clipboard-list class="me-2 icon" />Skema
                         Penelitian</label>
                     <p class="text-reset">{{ $proposal->researchScheme?->name ?? '—' }}</p>
