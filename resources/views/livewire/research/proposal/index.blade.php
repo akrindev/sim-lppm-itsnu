@@ -180,7 +180,7 @@
     </div>
 
     <!-- Role-based Tabs (only for regular dosen users) -->
-    @unless (auth()->user()->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']))
+    @unless (auth()->user()->activeHasAnyRole(['admin lppm', 'kepala lppm', 'rektor']))
         <div class="mb-3">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item" role="presentation">

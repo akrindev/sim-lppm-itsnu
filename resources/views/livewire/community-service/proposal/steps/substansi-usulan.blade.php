@@ -95,6 +95,7 @@
         @else
             @php
                 $outputTypes = \App\Constants\ProposalConstants::PKM_OUTPUT_TYPES;
+                $outputStatuses = \App\Constants\ProposalConstants::OUTPUT_STATUSES;
             @endphp
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -160,9 +161,16 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" wire:model="form.outputs.{{ $index }}.status"
-                                        class="form-control form-control-sm @error('form.outputs.' . $index . '.status') is-invalid @enderror"
-                                        placeholder="Status">
+                                    <select wire:model="form.outputs.{{ $index }}.status"
+                                        class="form-select-sm form-select @error('form.outputs.' . $index . '.status') is-invalid @enderror">
+                                        <option value="">-- Pilih --</option>
+                                        @foreach ($outputStatuses as $status)
+                                            <option value="{{ $status }}">{{ ucfirst($status) }}</option>
+                                        @endforeach
+                                        @if (!empty($form->outputs[$index]['status']) && !in_array($form->outputs[$index]['status'], $outputStatuses, true))
+                                            <option value="{{ $form->outputs[$index]['status'] }}">{{ $form->outputs[$index]['status'] }}</option>
+                                        @endif
+                                    </select>
                                 </td>
                                 <td>
                                     <input type="text" wire:model="form.outputs.{{ $index }}.description"

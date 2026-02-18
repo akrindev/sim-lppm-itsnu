@@ -43,7 +43,7 @@
         $role = 'guest';
         if ($user->hasRole('reviewer')) $role = 'reviewer';
         elseif ($user->hasRole('dekan')) $role = 'dekan';
-        elseif ($user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita'])) $role = 'admin';
+        elseif ($user->hasRole(['admin lppm'])) $role = 'admin';
         elseif ($user->hasRole('kepala lppm')) $role = 'kepala';
         elseif ($user->id === $proposal->submitter_id) $role = 'dosen';
     @endphp

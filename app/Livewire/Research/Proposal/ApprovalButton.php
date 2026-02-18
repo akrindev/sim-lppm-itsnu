@@ -32,7 +32,7 @@ class ApprovalButton extends Component
     public function canApprove(): bool
     {
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->hasRole(['admin lppm', 'kepala lppm', 'rektor']);
         $proposal = $this->proposal;
 
         return $isAdmin && $proposal->status === ProposalStatus::REVIEWED && $proposal->allReviewsCompleted();
@@ -57,7 +57,7 @@ class ApprovalButton extends Component
     public function approve(): void
     {
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->hasRole(['admin lppm', 'kepala lppm', 'rektor']);
 
         if (! $isAdmin) {
             $message = 'Anda tidak memiliki akses untuk approve proposal';
@@ -86,7 +86,7 @@ class ApprovalButton extends Component
     public function reject(): void
     {
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor']);
+        $isAdmin = $user->hasRole(['admin lppm', 'kepala lppm', 'rektor']);
 
         if (! $isAdmin) {
             $message = 'Anda tidak memiliki akses untuk reject proposal';

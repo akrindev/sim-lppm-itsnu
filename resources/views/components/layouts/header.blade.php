@@ -51,8 +51,6 @@
                             'superadmin' => 'M9 3L5 7l4 4 4-4-4-4-4 4z',
                             'admin lppm'
                                 => 'M12 15V3m0 12l-4-4m4 4l4-4M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z',
-                            'admin lppm saintek' => 'M4 7h16M4 17h16M4 12h16',
-                            'admin lppm dekabita' => 'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z',
                             'kepala lppm'
                                 => 'M12 15V3m0 12l-4-4m4 4l4-4M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z',
                             'dosen'
@@ -92,9 +90,6 @@
                                                     'superadmin' => 'M9 3L5 7l4 4 4-4-4-4-4 4z',
                                                     'admin lppm'
                                                         => 'M12 15V3m0 12l-4-4m4 4l4-4M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z',
-                                                    'admin lppm saintek' => 'M4 7h16M4 17h16M4 12h16',
-                                                    'admin lppm dekabita'
-                                                        => 'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z',
                                                     'kepala lppm'
                                                         => 'M12 15V3m0 12l-4-4m4 4l4-4M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z',
                                                     'dosen'

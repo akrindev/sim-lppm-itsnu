@@ -1,6 +1,6 @@
 <div>
     <!-- Reviewer Assignment (Admin Only) -->
-    @if (auth()->user()->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita']) &&
+    @if (auth()->user()->hasRole(['admin lppm']) &&
             in_array($proposal->status, [\App\Enums\ProposalStatus::WAITING_REVIEWER, \App\Enums\ProposalStatus::UNDER_REVIEW]))
         <div class="mb-3">
             <livewire:community-service.proposal.reviewer-assignment :proposalId="$proposal->id" :key="'reviewer-assignment-' . $proposal->id" />

@@ -1,5 +1,7 @@
 <?php
 
+$normalizeDiskUrl = static fn (?string $url): ?string => blank($url) ? null : (str_starts_with($url, 'http://') || str_starts_with($url, 'https://') ? $url : "https://{$url}");
+
 return [
 
     /*
@@ -53,7 +55,7 @@ return [
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => env('AWS_DEFAULT_REGION'),
             'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
+            'url' => $normalizeDiskUrl(env('AWS_URL')),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
@@ -66,7 +68,7 @@ return [
             'secret' => env('R2_SECRET_ACCESS_KEY', env('AWS_SECRET_ACCESS_KEY')),
             'region' => env('R2_DEFAULT_REGION', 'auto'),
             'bucket' => env('R2_BUCKET', env('AWS_BUCKET')),
-            'url' => env('R2_URL'),
+            'url' => $normalizeDiskUrl(env('R2_URL')),
             'endpoint' => env('R2_ENDPOINT'),
             'use_path_style_endpoint' => env('R2_USE_PATH_STYLE_ENDPOINT', true),
             'throw' => false,

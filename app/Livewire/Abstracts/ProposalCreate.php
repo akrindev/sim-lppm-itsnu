@@ -67,7 +67,7 @@ abstract class ProposalCreate extends Component
             return false;
         }
 
-        if ($user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita'])) {
+        if ($user->hasRole(['admin lppm'])) {
             return true;
         }
 

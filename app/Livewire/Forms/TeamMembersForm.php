@@ -61,7 +61,7 @@ class TeamMembersForm extends Component
 
         // Search for user by identity_id (NIDN/NIP)
         $identity = Identity::where('identity_id', $this->member_nidn)
-            ->with('user', 'institution', 'studyProgram')
+            ->with('user', 'institution', 'studyProgram.faculty', 'faculty')
             ->first();
 
         // if it self show error
@@ -75,11 +75,13 @@ class TeamMembersForm extends Component
 
         if ($identity) {
             $this->memberFound = true;
+            $facultyName = $identity->faculty?->name ?? $identity->studyProgram?->faculty?->name;
             $this->foundMember = [
                 'name' => $identity->user->name,
                 'email' => $identity->user->email,
                 'nidn' => $identity->identity_id,
                 'institution' => $identity->institution?->name,
+                'faculty' => $facultyName,
                 'study_program' => $identity->studyProgram?->name,
                 'identity_type' => $identity->type,
                 'sinta_id' => $identity->sinta_id,

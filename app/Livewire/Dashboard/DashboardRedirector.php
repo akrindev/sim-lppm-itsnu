@@ -18,7 +18,7 @@ class DashboardRedirector extends Component
         $this->roleName = active_role();
 
         $dashboardComponent = match ($this->roleName) {
-            'superadmin', 'admin lppm', 'admin lppm saintek', 'admin lppm dekabita' => 'dashboard.admin-dashboard',
+            'superadmin', 'admin lppm' => 'dashboard.admin-dashboard',
             'kepala lppm' => 'dashboard.kepala-lppm-dashboard',
             'dosen' => 'dashboard.dosen-dashboard',
             'reviewer' => 'dashboard.reviewer-dashboard',

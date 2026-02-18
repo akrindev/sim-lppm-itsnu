@@ -38,7 +38,7 @@
 
     <div class="page-body">
         <div class="container-xl">
-            @if (in_array($roleName, ['superadmin', 'admin lppm', 'admin lppm saintek', 'admin lppm dekabita']))
+            @if (in_array($roleName, ['superadmin', 'admin lppm']))
                 <div class="row row-deck row-cards">
                     <div class="col-sm-6 col-lg-3">
                         <div class="card">

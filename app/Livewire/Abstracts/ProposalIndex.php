@@ -21,7 +21,7 @@ abstract class ProposalIndex extends Component
     public function mount(): void
     {
         // If user is a regular 'dosen' (not an admin/leader role), default to 'ketua' view
-        if (! Auth::user()->activeHasAnyRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita', 'kepala lppm', 'rektor', 'dekan'])) {
+        if (! Auth::user()->activeHasAnyRole(['admin lppm', 'kepala lppm', 'rektor', 'dekan'])) {
             $this->roleFilter = 'ketua';
         }
     }
