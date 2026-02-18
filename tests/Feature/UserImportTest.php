@@ -17,7 +17,8 @@ class UserImportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->markTestSkipped('UserImportTest is currently failing due to complex Excel mocking and Livewire v3 temporary file handling. Skipping to ensure green build.');
+
+        $this->seed(\Database\Seeders\RoleSeeder::class);
     }
 
     public function test_admin_can_access_import_page()
@@ -46,10 +47,10 @@ class UserImportTest extends TestCase
 
         Excel::shouldReceive('toArray')
             ->andReturn([[
-                ['name' => 'John Doe', 'email' => 'john@example.com', 'password' => 'password', 'nidn' => '12345', 'type' => 'dosen', 'inst' => 'INST', 'prodi' => 'PRODI', 'sinta' => '123456', 'address' => 'Jl. Test', 'birthdate' => '1990-01-01', 'birthplace' => 'Surabaya'],
+                ['name' => 'John Doe', 'email' => 'john@example.com', 'password' => 'password', 'nidn' => '12345', 'type' => 'dosen', 'inst' => null, 'prodi' => null, 'sinta' => '123456', 'address' => 'Jl. Test', 'birthdate' => '1990-01-01', 'birthplace' => 'Surabaya'],
             ]]);
 
-        $file = UploadedFile::fake()->create('users.xlsx');
+        $file = UploadedFile::fake()->create('users.xlsx', 10, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
         Livewire::actingAs($admin)
             ->test(Import::class)
@@ -65,12 +66,12 @@ class UserImportTest extends TestCase
 
         Excel::shouldReceive('toArray')
             ->andReturn([[
-                ['name' => 'John Doe', 'email' => 'john@example.com', 'password' => 'password', 'nidn' => '12345', 'type' => 'dosen', 'inst' => 'INST', 'prodi' => 'PRODI', 'sinta' => '123456', 'address' => 'Jl. Test', 'birthdate' => '1990-01-01', 'birthplace' => 'Surabaya'],
+                ['name' => 'John Doe', 'email' => 'john@example.com', 'password' => 'password', 'nidn' => '12345', 'type' => 'dosen', 'inst' => null, 'prodi' => null, 'sinta' => '123456', 'address' => 'Jl. Test', 'birthdate' => '1990-01-01', 'birthplace' => 'Surabaya'],
             ]]);
 
         Excel::shouldReceive('import');
 
-        $file = UploadedFile::fake()->create('users.xlsx');
+        $file = UploadedFile::fake()->create('users.xlsx', 10, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
         Livewire::actingAs($admin)
             ->test(Import::class)
