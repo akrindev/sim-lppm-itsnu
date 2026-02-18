@@ -63,6 +63,10 @@ abstract class ProposalCreate extends Component
     {
         $user = Auth::user();
 
+        if ($proposal->status === \App\Enums\ProposalStatus::COMPLETED) {
+            return false;
+        }
+
         if ($user->hasRole(['admin lppm', 'admin lppm saintek', 'admin lppm dekabita'])) {
             return true;
         }
@@ -381,6 +385,12 @@ abstract class ProposalCreate extends Component
     public function templateUrl()
     {
         return app(MasterDataService::class)->getTemplateUrl($this->getProposalType());
+    }
+
+    #[Computed]
+    public function approvalTemplateUrl(): ?string
+    {
+        return app(MasterDataService::class)->getApprovalTemplateUrl($this->getProposalType());
     }
 
     #[Computed]

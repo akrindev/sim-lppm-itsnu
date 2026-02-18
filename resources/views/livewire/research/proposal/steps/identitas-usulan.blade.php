@@ -10,12 +10,12 @@
 <!-- Section: Informasi Dasar -->
 <div class="card mb-3">
     <div class="card-body">
-        <div class="d-flex align-items-center mb-4">
+        <div class="d-flex align-items-center mb-3">
             <x-lucide-file-text class="icon me-3" />
             <h3 class="card-title mb-0">1.1 Informasi Dasar Proposal</h3>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-2">
             <div class="col-md-12">
                 <div class="mb-3">
                     <label class="form-label" for="title">Judul Proposal <span class="text-danger">*</span></label>

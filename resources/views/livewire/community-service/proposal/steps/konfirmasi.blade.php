@@ -9,6 +9,15 @@
         <div class="alert alert-info">
             <x-lucide-info class="me-2 icon" />
             Silakan periksa kembali seluruh data proposal Anda sebelum mengirimkan.
+
+            @if ($this->approvalTemplateUrl)
+                <div class="mt-2">
+                    <a href="{{ $this->approvalTemplateUrl }}" target="_blank" class="text-primary text-decoration-none">
+                        <x-lucide-download class="icon me-1" />
+                        Unduh Template Halaman Persetujuan
+                    </a>
+                </div>
+            @endif
         </div>
 
         <!-- Ringkasan Step 1: Identitas Usulan -->

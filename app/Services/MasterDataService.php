@@ -153,6 +153,48 @@ class MasterDataService
         return null;
     }
 
+    public function getApprovalTemplateUrl(string $type): ?string
+    {
+        $key = match ($type) {
+            'research' => 'research_approval_template',
+            'community-service' => 'community_service_approval_template',
+            default => null,
+        };
+
+        if (! $key) {
+            return null;
+        }
+
+        $setting = Setting::where('key', $key)->first();
+
+        if ($setting && $setting->hasMedia('template')) {
+            return $setting->getFirstMediaUrl('template');
+        }
+
+        return null;
+    }
+
+    public function getReportEndorsementTemplateUrl(string $type): ?string
+    {
+        $key = match ($type) {
+            'research' => 'research_report_endorsement_template',
+            'community-service' => 'community_service_report_endorsement_template',
+            default => null,
+        };
+
+        if (! $key) {
+            return null;
+        }
+
+        $setting = Setting::where('key', $key)->first();
+
+        if ($setting && $setting->hasMedia('template')) {
+            return $setting->getFirstMediaUrl('template');
+        }
+
+        return null;
+    }
+
     public function clearCache(): void
     {
         $this->cache = [];

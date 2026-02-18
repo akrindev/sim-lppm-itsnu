@@ -151,6 +151,134 @@
 
             <div class="row row-cards mt-3">
                 <div class="col-12">
+                    <h2 class="page-title mb-3">Template Persetujuan Proposal</h2>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Persetujuan Proposal Penelitian</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveResearchApprovalTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="research_approval_template">
+                                    @error('research_approval_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->researchApprovalTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadResearchApprovalTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->researchApprovalTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Persetujuan Proposal PKM</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveCommunityServiceApprovalTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="community_service_approval_template">
+                                    @error('community_service_approval_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->communityServiceApprovalTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadCommunityServiceApprovalTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->communityServiceApprovalTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cards mt-3">
+                <div class="col-12">
+                    <h2 class="page-title mb-3">Template Pengesahan Laporan</h2>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Pengesahan Laporan Penelitian</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveResearchReportEndorsementTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="research_report_endorsement_template">
+                                    @error('research_report_endorsement_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->researchReportEndorsementTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadResearchReportEndorsementTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->researchReportEndorsementTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Pengesahan Laporan PKM</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveCommunityServiceReportEndorsementTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="community_service_report_endorsement_template">
+                                    @error('community_service_report_endorsement_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->communityServiceReportEndorsementTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadCommunityServiceReportEndorsementTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->communityServiceReportEndorsementTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cards mt-3">
+                <div class="col-12">
                     <h2 class="page-title mb-3">Template Monev Internal</h2>
                 </div>
                 <!-- Monev Berita Acara -->
