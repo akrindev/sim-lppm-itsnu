@@ -85,6 +85,7 @@ class ResearchSeeder extends Seeder
         $validStatuses = [
             ProposalStatus::DRAFT,
             ProposalStatus::SUBMITTED,
+            ProposalStatus::NEED_ASSIGNMENT,
             ProposalStatus::APPROVED,
             ProposalStatus::WAITING_REVIEWER,
             ProposalStatus::UNDER_REVIEW,
@@ -173,7 +174,9 @@ class ResearchSeeder extends Seeder
                     'updated_at' => $baseCreatedAt,
                 ]);
 
-                $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::SUBMITTED]) ? 'pending' : 'accepted';
+                $teamMemberStatus = in_array($statusEnum, [ProposalStatus::DRAFT, ProposalStatus::NEED_ASSIGNMENT], true)
+                    ? 'pending'
+                    : 'accepted';
                 $availableMembers = $dosenUsers->where('id', '!=', $submitter->id)->random(min(rand(1, 2), $dosenUsers->count() - 1));
 
                 foreach ($availableMembers as $member) {
@@ -210,7 +213,7 @@ class ResearchSeeder extends Seeder
                     ProposalStatus::REVISION_NEEDED,
                     ProposalStatus::COMPLETED,
                 ])) {
-                    $this->seedReviewers($proposal, $statusEnum, $reviewerUsers, $submitter, $availableMembers);
+                    $this->seedReviewers($proposal, $statusEnum, $reviewerUsers);
                 }
 
                 // Progress Reports & Realization
@@ -282,14 +285,13 @@ class ResearchSeeder extends Seeder
         }
     }
 
-    protected function seedReviewers($proposal, $status, $reviewerUsers, $submitter, $teamMembers): void
+    protected function seedReviewers($proposal, $status, $reviewerUsers): void
     {
         if ($reviewerUsers->isEmpty()) {
             return;
         }
 
-        // Logic for rounds: COMPLETED status implies Round 2 (Round 1 was revision)
-        $currentRound = ($status === ProposalStatus::COMPLETED) ? 2 : 1;
+        $currentRound = 1;
 
         $reviewers = $reviewerUsers->random(min(2, $reviewerUsers->count()));
         $criterias = \App\Models\ReviewCriteria::where('type', 'research')->where('is_active', true)->get();
@@ -437,6 +439,10 @@ class ResearchSeeder extends Seeder
             ProposalStatus::DRAFT => [],
             ProposalStatus::SUBMITTED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+            ],
+            ProposalStatus::NEED_ASSIGNMENT => [
+                ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
+                ['f' => ProposalStatus::SUBMITTED, 't' => ProposalStatus::NEED_ASSIGNMENT, 'u' => $dekan, 'd' => 2],
             ],
             ProposalStatus::APPROVED => [
                 ['f' => ProposalStatus::DRAFT, 't' => ProposalStatus::SUBMITTED, 'u' => $submitter, 'd' => 0],
