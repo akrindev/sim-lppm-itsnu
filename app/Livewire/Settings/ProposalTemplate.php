@@ -4,6 +4,7 @@ namespace App\Livewire\Settings;
 
 use App\Livewire\Concerns\HasToast;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -249,105 +250,83 @@ class ProposalTemplate extends Component
 
     public function downloadResearchTemplate()
     {
-        $setting = Setting::where('key', 'research_proposal_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $message = 'Template belum tersedia.';
-        session()->flash('error', $message);
-        $this->toastError($message);
+        return $this->downloadTemplateByKey('research_proposal_template');
     }
 
     public function downloadCommunityServiceTemplate()
     {
-        $setting = Setting::where('key', 'community_service_proposal_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $message = 'Template belum tersedia.';
-        session()->flash('error', $message);
-        $this->toastError($message);
+        return $this->downloadTemplateByKey('community_service_proposal_template');
     }
 
     public function downloadMonevBeritaAcaraTemplate()
     {
-        $setting = Setting::where('key', 'monev_berita_acara_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('monev_berita_acara_template');
     }
 
     public function downloadMonevBorangTemplate()
     {
-        $setting = Setting::where('key', 'monev_borang_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('monev_borang_template');
     }
 
     public function downloadMonevRekapPenilaianTemplate()
     {
-        $setting = Setting::where('key', 'monev_rekap_penilaian_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('monev_rekap_penilaian_template');
     }
 
     public function downloadResearchApprovalTemplate()
     {
-        $setting = Setting::where('key', 'research_approval_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('research_approval_template');
     }
 
     public function downloadCommunityServiceApprovalTemplate()
     {
-        $setting = Setting::where('key', 'community_service_approval_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('community_service_approval_template');
     }
 
     public function downloadResearchReportEndorsementTemplate()
     {
-        $setting = Setting::where('key', 'research_report_endorsement_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('research_report_endorsement_template');
     }
 
     public function downloadCommunityServiceReportEndorsementTemplate()
     {
-        $setting = Setting::where('key', 'community_service_report_endorsement_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('community_service_report_endorsement_template');
     }
 
     public function downloadResearchPartnerCommitmentTemplate()
     {
-        $setting = Setting::where('key', 'research_partner_commitment_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
-        }
-        $this->toastError('Template belum tersedia.');
+        return $this->downloadTemplateByKey('research_partner_commitment_template');
     }
 
     public function downloadCommunityServicePartnerCommitmentTemplate()
     {
-        $setting = Setting::where('key', 'community_service_partner_commitment_template')->first();
-        if ($setting && $setting->hasMedia('template')) {
-            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
+        return $this->downloadTemplateByKey('community_service_partner_commitment_template');
+    }
+
+    private function downloadTemplateByKey(string $key)
+    {
+        $setting = Setting::where('key', $key)->first();
+
+        if (! $setting || ! $setting->hasMedia('template')) {
+            $message = 'Template belum tersedia.';
+            session()->flash('error', $message);
+            $this->toastError($message);
+
+            return null;
         }
-        $this->toastError('Template belum tersedia.');
+
+        $media = $setting->getFirstMedia('template');
+        $relativePath = $media->getPathRelativeToRoot();
+
+        if (! Storage::disk($media->disk)->exists($relativePath)) {
+            $message = 'Template tidak ditemukan di penyimpanan.';
+            session()->flash('error', $message);
+            $this->toastError($message);
+
+            return null;
+        }
+
+        return $media->toResponse(request());
     }
 
     #[Computed]
