@@ -37,6 +37,17 @@
                     </p>
                 </div>
             </div>
+
+            <div class="mb-3 row">
+                <div class="col-md-6">
+                    <label class="form-label"><x-lucide-calendar-plus class="me-2 icon" />Dibuat Pada</label>
+                    <p class="text-reset">{{ $proposal->created_at->format('d M Y H:i') }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"><x-lucide-calendar-clock class="me-2 icon" />Terakhir Diperbarui</label>
+                    <p class="text-reset">{{ $proposal->updated_at->format('d M Y H:i') }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -82,7 +93,7 @@
 
     <div class="mb-3 card">
         <div class="card-header">
-            <h3 class="card-title">1.3 Klasifikasi Ilmu</h3>
+            <h3 class="card-title">1.3 Rumpun Ilmu</h3>
         </div>
         <div class="card-body">
             <div class="mb-3 row">
