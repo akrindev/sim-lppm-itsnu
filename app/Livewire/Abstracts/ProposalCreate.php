@@ -111,6 +111,12 @@ abstract class ProposalCreate extends Component
             'form.outputs.*.status' => 'Status',
             'form.outputs.*.description' => 'Keterangan (URL)',
             'form.budget_items' => 'RAB',
+            'form.budget_items.*.year' => 'Tahun Ke-',
+            'form.budget_items.*.budget_group_id' => 'Kelompok Anggaran',
+            'form.budget_items.*.budget_component_id' => 'Komponen Anggaran',
+            'form.budget_items.*.item' => 'Nama Item',
+            'form.budget_items.*.volume' => 'Volume',
+            'form.budget_items.*.unit_price' => 'Nominal Satuan',
             'form.partner_ids' => 'Mitra',
             'form.new_partner.name' => 'Nama Mitra',
             'form.new_partner.email' => 'Email Mitra',
@@ -130,6 +136,13 @@ abstract class ProposalCreate extends Component
             'form.outputs.*.status.required' => 'Baris :position: Status wajib diisi.',
             'form.outputs.*.status.in' => 'Baris :position: Status tidak valid. Pilih salah satu: '.implode(', ', ProposalConstants::OUTPUT_STATUSES).'.',
             'form.outputs.*.description.required' => 'Baris :position: Keterangan (URL) wajib diisi.',
+            'form.budget_items.*.budget_group_id.required' => 'Baris :position: Kelompok Anggaran wajib diisi.',
+            'form.budget_items.*.budget_component_id.required' => 'Baris :position: Komponen Anggaran wajib diisi.',
+            'form.budget_items.*.item.required' => 'Baris :position: Nama Item wajib diisi.',
+            'form.budget_items.*.unit_price.required' => 'Baris :position: Nominal Satuan wajib diisi.',
+            'form.budget_items.*.unit_price.min' => 'Baris :position: Nominal Satuan minimal Rp1.',
+            'form.budget_items.*.volume.required' => 'Baris :position: Volume wajib diisi.',
+            'form.budget_items.*.volume.min' => 'Baris :position: Volume minimal 0.01.',
         ];
     }
 
@@ -391,6 +404,12 @@ abstract class ProposalCreate extends Component
     public function approvalTemplateUrl(): ?string
     {
         return app(MasterDataService::class)->getApprovalTemplateUrl($this->getProposalType());
+    }
+
+    #[Computed]
+    public function partnerCommitmentTemplateUrl(): ?string
+    {
+        return app(MasterDataService::class)->getPartnerCommitmentTemplateUrl($this->getProposalType());
     }
 
     #[Computed]

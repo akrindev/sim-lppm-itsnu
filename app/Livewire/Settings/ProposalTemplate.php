@@ -24,6 +24,10 @@ class ProposalTemplate extends Component
 
     public $community_service_report_endorsement_template;
 
+    public $research_partner_commitment_template;
+
+    public $community_service_partner_commitment_template;
+
     public $monev_berita_acara_template;
 
     public $monev_borang_template;
@@ -167,6 +171,44 @@ class ProposalTemplate extends Component
         $this->toastSuccess('Template halaman pengesahan laporan PKM berhasil diunggah.');
     }
 
+    public function saveResearchPartnerCommitmentTemplate()
+    {
+        $this->validate([
+            'research_partner_commitment_template' => 'required|file|mimes:doc,docx,pdf|max:10240',
+        ]);
+
+        $setting = Setting::firstOrCreate(['key' => 'research_partner_commitment_template']);
+        $setting->clearMediaCollection('template');
+        $setting->addMedia($this->research_partner_commitment_template->getRealPath())
+            ->usingName($this->research_partner_commitment_template->getClientOriginalName())
+            ->usingFileName($this->research_partner_commitment_template->getClientOriginalName())
+            ->toMediaCollection('template');
+
+        $this->research_partner_commitment_template = null;
+        unset($this->researchPartnerCommitmentTemplateMedia);
+
+        $this->toastSuccess('Template surat kesanggupan mitra (penelitian) berhasil diunggah.');
+    }
+
+    public function saveCommunityServicePartnerCommitmentTemplate()
+    {
+        $this->validate([
+            'community_service_partner_commitment_template' => 'required|file|mimes:doc,docx,pdf|max:10240',
+        ]);
+
+        $setting = Setting::firstOrCreate(['key' => 'community_service_partner_commitment_template']);
+        $setting->clearMediaCollection('template');
+        $setting->addMedia($this->community_service_partner_commitment_template->getRealPath())
+            ->usingName($this->community_service_partner_commitment_template->getClientOriginalName())
+            ->usingFileName($this->community_service_partner_commitment_template->getClientOriginalName())
+            ->toMediaCollection('template');
+
+        $this->community_service_partner_commitment_template = null;
+        unset($this->communityServicePartnerCommitmentTemplateMedia);
+
+        $this->toastSuccess('Template surat kesanggupan mitra (PKM) berhasil diunggah.');
+    }
+
     public function saveMonevBorangTemplate()
     {
         $this->validate([
@@ -290,6 +332,24 @@ class ProposalTemplate extends Component
         $this->toastError('Template belum tersedia.');
     }
 
+    public function downloadResearchPartnerCommitmentTemplate()
+    {
+        $setting = Setting::where('key', 'research_partner_commitment_template')->first();
+        if ($setting && $setting->hasMedia('template')) {
+            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
+        }
+        $this->toastError('Template belum tersedia.');
+    }
+
+    public function downloadCommunityServicePartnerCommitmentTemplate()
+    {
+        $setting = Setting::where('key', 'community_service_partner_commitment_template')->first();
+        if ($setting && $setting->hasMedia('template')) {
+            return response()->download($setting->getFirstMedia('template')->getPath(), $setting->getFirstMedia('template')->file_name);
+        }
+        $this->toastError('Template belum tersedia.');
+    }
+
     #[Computed]
     public function researchTemplateMedia()
     {
@@ -358,6 +418,22 @@ class ProposalTemplate extends Component
     public function communityServiceReportEndorsementTemplateMedia()
     {
         $setting = Setting::where('key', 'community_service_report_endorsement_template')->first();
+
+        return $setting ? $setting->getFirstMedia('template') : null;
+    }
+
+    #[Computed]
+    public function researchPartnerCommitmentTemplateMedia()
+    {
+        $setting = Setting::where('key', 'research_partner_commitment_template')->first();
+
+        return $setting ? $setting->getFirstMedia('template') : null;
+    }
+
+    #[Computed]
+    public function communityServicePartnerCommitmentTemplateMedia()
+    {
+        $setting = Setting::where('key', 'community_service_partner_commitment_template')->first();
 
         return $setting ? $setting->getFirstMedia('template') : null;
     }

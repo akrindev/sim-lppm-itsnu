@@ -195,6 +195,27 @@ class MasterDataService
         return null;
     }
 
+    public function getPartnerCommitmentTemplateUrl(string $type): ?string
+    {
+        $key = match ($type) {
+            'research' => 'research_partner_commitment_template',
+            'community-service' => 'community_service_partner_commitment_template',
+            default => null,
+        };
+
+        if (! $key) {
+            return null;
+        }
+
+        $setting = Setting::where('key', $key)->first();
+
+        if ($setting && $setting->hasMedia('template')) {
+            return $setting->getFirstMediaUrl('template');
+        }
+
+        return null;
+    }
+
     public function clearCache(): void
     {
         $this->cache = [];

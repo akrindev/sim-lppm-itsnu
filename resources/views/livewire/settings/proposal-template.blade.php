@@ -279,6 +279,70 @@
 
             <div class="row row-cards mt-3">
                 <div class="col-12">
+                    <h2 class="page-title mb-3">Template Surat Kesanggupan Mitra</h2>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Surat Kesanggupan Mitra Penelitian</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveResearchPartnerCommitmentTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="research_partner_commitment_template">
+                                    @error('research_partner_commitment_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->researchPartnerCommitmentTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadResearchPartnerCommitmentTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->researchPartnerCommitmentTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Surat Kesanggupan Mitra PKM</h3>
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveCommunityServicePartnerCommitmentTemplate">
+                                <div class="mb-3">
+                                    <label class="form-label">Unggah Template Baru</label>
+                                    <input type="file" class="form-control" wire:model="community_service_partner_commitment_template">
+                                    @error('community_service_partner_commitment_template')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                                    Unggah
+                                </button>
+                            </form>
+                            @if ($this->communityServicePartnerCommitmentTemplateMedia)
+                                <div class="mt-3">
+                                    <button wire:click="downloadCommunityServicePartnerCommitmentTemplate" class="btn btn-ghost-primary w-100">
+                                        Unduh: {{ $this->communityServicePartnerCommitmentTemplateMedia->file_name }}
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cards mt-3">
+                <div class="col-12">
                     <h2 class="page-title mb-3">Template Monev Internal</h2>
                 </div>
                 <!-- Monev Berita Acara -->
